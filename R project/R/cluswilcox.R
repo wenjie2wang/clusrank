@@ -51,32 +51,40 @@ cluswilcox <-
 
   crd <- data.frame(z, group, id, stratum)
 
-  ## group is assumed to take value 1 and 2; could be made more general
-  g.uniq <- unique(crd$group)
-  crd$group <- match(crd$group, g.uniq)
-  
+  ## group is assumed to take value 1 and 2; could be made
+  ## more general
+  gr.uniq <- unique(crd$group) ## Record possible groups
+
   crd1 <- crd[with(crd, order(id)), ]
-  
+  ## Reorder the observations by the order of id.
   zrank <- rank(crd1$z, na.last = NA)
+  ## Compute the rank of z score
+  
   crd2 <- cbind(subset(crd1, z != "NA"), zrank)
+  ## Add z score to the dataframe crd1
   
   #calculate ranksum within each cluster within each stratum
   
   g <- table(crd2$id)
-  
+  ## g is the cluster size
   sumrank <- c(by(crd2$zrank, crd2$id, sum))
+  ## Compute rank sum within each cluster
     
   stratum <- c(by(crd2$stratum, crd2$id, mean))
-
+  ## Compute stratum mean of each cluster
+  
   group <- c(by(crd2$group, crd2$id, mean))
+  ## Compute group mean of each cluster
   
   
   #count number of subunits within cluster size group within each stratum
  
-
+  
   ng.stratum <- as.data.frame(table(g, stratum))
+  ## Count the objects for each group and each stratum 
   ng.xy <- as.data.frame(table(g, stratum, group))
   ng.x <- subset(ng.xy, group == 1)
+  ## Take out the count for group 1
   ng.y <- subset(ng.xy, group == 2)
   
   colnames(ng.stratum)[3] <- "Ngv"
@@ -111,8 +119,10 @@ cluswilcox <-
   varwc <- merge(merge(merge(psumrnk, ng.xy), ng.stratum), psumrnk_int)
   varwc_int <- (varwc[ ,"sumrank"] - varwc[ ,"psumrank"] / varwc[, "Ngv"])^2
   VarWc <- cbind(varwc, varwc_int)  
-
-  varwc_final <- sum(VarWc[,"Freq"] * (VarWc[, "Ngv"]-VarWc[, "Freq"]) / (VarWc[,"Ngv"] * (VarWc[,"Ngv"] -1)) * VarWc[,"varwc_int"])
+  varwc_pre_final <- VarWc[,"Freq"] * (VarWc[, "Ngv"]-VarWc[, "Freq"]) / (VarWc[,"Ngv"] * (VarWc[,"Ngv"] -1)) * VarWc[,"varwc_int"]
+  varwc_final <- sum(varwc_pre_final[VarWc[,"Ngv"] > 1])
+  ## Drop the value where there is only 1 cluster in that stratum,
+  ## and that cluster contains only 1
   
   zc <- (WC - ExpWc)/sqrt(varwc_final)
   pval <- 2*(1-pnorm(abs(zc)))

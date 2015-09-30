@@ -2,7 +2,7 @@
 \alias{crd}
 \docType{data}
 \title{
-Clustered non-stratified data for test of funciton cluswilcox
+Clustered non-stratified data
 }
 \description{
 Test non-stratified data include 3 variables: id, z, group. Have some missing values.

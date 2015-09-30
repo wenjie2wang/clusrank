@@ -34,14 +34,14 @@ Bernard Rosner, Robert J. Glynn, Mei-Ling Ting Lee(2006)
 
 \keyword{ package }
 \examples{
-data(crd)
-cluswilcox(z ~ group, data = crd, id = id)
-data(crd.str)
-cluswilcox(z ~ group, data = crd.str, id = id, stratum = stratum)
-
 data(crsd)
 clusignrank(z, id, data = crsd)
 data(crsd.unb)
 clusignrank(z, id, data = crsd.unb)
+
+data(crd)
+cluswilcox(z ~ group, data = crd, id = id)
+data(crd.str)
+cluswilcox(z ~ group, data = crd.str, id = id, stratum = stratum)
 
 }

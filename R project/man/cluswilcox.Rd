@@ -70,3 +70,4 @@ cluswilcox(z ~ group, data = crd, id = id)
 data(crd.str)
 cluswilcox(z ~ group, data = crd.str, id = id, stratum = stratum)
 }
+}

@@ -1,10 +1,10 @@
 #'The Wilcoxon Signed Rank Test for Paired Comparisons of Clustered Data
 #'
-#'Signed rank test for clustered data where there are for example
-#'change score for each of 1 or more subjects per cluster and
-#'one wants to test the hypothesis that the change score 
-#'distribution is symmetric about zero using the Wilcoxon signed
-#'rank test using the subunit as the unit of change.
+#'This is the signed rank test for clustered data where there are 
+#'changed score for each subject per cluster. The hypothesis to tset
+#'is that the distribution of change in score 
+#'is symmetric about zero. Each subunit (instead of the most basic unit)
+#'it the unit of change.
 #'
 #'@param z  The name of score for each observation 
 #'in the data
