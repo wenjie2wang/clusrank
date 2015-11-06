@@ -76,15 +76,6 @@ The Wilcoxon rank sum test and Wilcoxon signed rank test are frequently used non
 
 %% The address of (at least) one author should be given
 %% in the following format:
-\Address{
-  Achim Zeileis\\
-  Department of Statistics and Mathematics\\
-  Faculty of Economics and Statistics\\
-  Universit\"at Innsbruck\\
-  6020 Innsbruck, Austria\\
-  E-mail: \email{Achim.Zeileis@uibk.ac.at}\\
-  URL: \url{http://eeecon.uibk.ac.at/~zeileis/}
-}
 
 \Address{
 Jun Yan\\
@@ -112,9 +103,38 @@ Email:\email{jun.yan@uconn.edu}
 %% Note that you should use the \pkg{}, \proglang{} and \code{} commands.
 
 \section{Introduction}
-Clustered data are often found in studies of eyes, ears, knees as well as in family studies. Regardless of the type of data, responses for individual eyes of the same subject are usually highly correlated. If the eye is the unit of analysis, then standard test procedures are not appropriate because they assume independence of sampling units, in general, in the presence of clustering, true p-values will be underestimated and confidence interval width will be too narrow. 
+In this paper we present the \textbf{clusrank} package, a package 
+for Wilcoxon rank sum test \cite{Rosn:GLyn:Lee:inco:2003} 
+and signed rank test \citep{Rosn:Glyn:Lee:wilc:2006} 
+for clustered data.  Clustering can be due to 
+a naturally occurring hierarchy in the target population
+or a consequence of study design or both. In general,
+applying standard test procedures to data in the presence 
+of clustering will underestimate the true p-value, and 
+the width of confidence interval will be too narrow.  
+Despite the common occurrence of 
+clustered data in a wide range of contexts such as 
+clinical trials, longitudinal study, social science, etc,
+there is no available R package for non-parametric test
+for clustered data yet. Therefore this package will help 
+researchers and scientists in related areas as a ready tool
+for testing clustered data.
 
-An introduction of large sample Wilcoxon rank sum test and signed rank test will be given. We will also present the usage of the package \textbf{clusrank}.
+
+
+This package is a realization of test procedures in 
+\citet{Rosn:GLyn:Lee:inco:2003} and \citet{Roxn:Glyn:Lee:wilc:2006}.
+The input data can be either balanced (same number of 
+subunits per cluster) or unbalanced (different number of subunits 
+per cluster), with ties or without ties. The Wilcoxon rank sum
+test is also able to handle stratified data, e.g., stratification
+by center in multi-center clinical trials. The methods depends
+on asymptotic normality of the test statistics as number of 
+clusters goes to infinity, therefore
+sample size is required to be large while the cluster size is bounded. Implementation in
+SAS macro is also available.
+
+
 \section{Methods}
 \subsection{Wilcoxon rank sum test for clustered data}
 Assume the data come in clusters where $X_{ij}$ denotes the score for the $j$th subunit from the $i$th cluster in the first group, $i = 1,\ldots,m; j = 1,\ldots,g_i$ and $Y_{kl}$ denotes the score for the $l$th subunit from the $k$th cluster in the second group, $k=1, \ldots,n;l=1,\ldots,h_k$. The clustered Wilcoxon rank sum statistic $W_{c,obs}$ is defined as 
@@ -268,6 +288,6 @@ In this article, clustered Wilcoxon rank sum test and Wilcoxon signed rank are b
 Data \text{sedlab} is provided by Lab Seddon Lab \citep{ferrara2015pheno}.%% Note: If there is markup in \(sub)section, then it has to be escape as above.
 \bibliographystyle{j}
 
-\bibliography{mybib}
+\bibliography{clusrank}
 
 \end{document}
