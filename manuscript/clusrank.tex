@@ -104,11 +104,13 @@ Email:\email{jun.yan@uconn.edu}
 
 \section{Introduction}
 In this paper we present the \textbf{clusrank} package, a package 
-for Wilcoxon rank sum test \cite{Rosn:GLyn:Lee:inco:2003} 
-and signed rank test \citep{Rosn:Glyn:Lee:wilc:2006} 
-for clustered data.  Clustering can be due to 
+for Wilcoxon rank sum test  
+and signed rank test 
+for clustered data.  
+Clustering in the data can be due to 
 a naturally occurring hierarchy in the target population
-or a consequence of study design or both. In general,
+or a consequence of study design or both. 
+In general,
 applying standard test procedures to data in the presence 
 of clustering will underestimate the true p-value, and 
 the width of confidence interval will be too narrow.  
@@ -121,33 +123,73 @@ researchers and scientists in related areas as a ready tool
 for testing clustered data.
 
 
-
 This package is a realization of test procedures in 
 \citet{Rosn:GLyn:Lee:inco:2003} and \citet{Roxn:Glyn:Lee:wilc:2006}.
 The input data can be either balanced (same number of 
 subunits per cluster) or unbalanced (different number of subunits 
 per cluster), with ties or without ties. The Wilcoxon rank sum
-test is also able to handle stratified data, e.g., stratification
-by center in multi-center clinical trials. The methods depends
-on asymptotic normality of the test statistics as number of 
-clusters goes to infinity, therefore
+test is also able to handle stratified data, e.g., stratification in the data
+by center in multi-center clinical trials. Test procedures for both small and large sample size are provided. The small sample test implements the permutation test. The large sample size test
+procedures are built upon asymptotic normality of the test statistics, therefore
 sample size is required to be large while the cluster size is bounded. Implementation in
-SAS macro is also available.
+SAS macro is also available for the large sample test.
 
 
-\section{Methods}
-\subsection{Wilcoxon rank sum test for clustered data}
-Assume the data come in clusters where $X_{ij}$ denotes the score for the $j$th subunit from the $i$th cluster in the first group, $i = 1,\ldots,m; j = 1,\ldots,g_i$ and $Y_{kl}$ denotes the score for the $l$th subunit from the $k$th cluster in the second group, $k=1, \ldots,n;l=1,\ldots,h_k$. The clustered Wilcoxon rank sum statistic $W_{c,obs}$ is defined as 
+The order of this paper is as following, 
+section 2 introduces the Wilcoxon rank 
+sum test for clustered data, section 3 
+introduces the Wilcoxon signed rank test 
+for clustered data, section 4 is on the 
+data analysis.
+
+
+\section{Wilcoxon rank sum test for clustered data}
+Wilcoxon rank sum test is a non-parametric test
+to compare the means of two population when the 
+underlying probability distributions are unknown 
+or non-normal. To account for the clustering effect,
+the modified rank sum test treats each cluster as a 
+basic unit instead of each single observation. 
+Therefore, the null distribution of test statistics
+conditioned on clusters is different than the one
+when no clustering effect is incorporated,
+and the modified test will have a higher power in 
+consequence. 
+
+
+Specifically, 
+assume the data come in clusters and 
+let $X_{ij}$ denote the score for the $j$th subunit
+from the $i$th cluster in the first group, 
+$i = 1,\ldots,m; j = 1,\ldots,g_i$ and $Y_{kl}$ 
+denote the score for the $l$th subunit from 
+the $k$th cluster in the second group,
+$k=1, \ldots,n;l=1,\ldots,h_k$.
+The null hypothesis is that it is 
+equally likely for an observation from the 
+first group to exceed an 
+observation from the second group and vice versa.
+The clustered Wilcoxon rank sum statistic 
+$W_{c,obs}$ is defined as 
 \begin{equation}
 W_{c,obs} = \sum_{i=1}^m\sum_{j=1}^{g_i}\text{Rank}(X_{ij})
 \end{equation}
-where ranks are determined based on the combined sample of all subunits over the $X$ and $Y$ clusters combined. It is assumed that the subunits for a given cluster are exchangeable. Hypothesis being tested is 
-$$H_0: Pr\{U(X_{ij} - Y_{kl}) = 1\} = Pr\{U(X_{ij} - Y_{kl}) = 0\}, \text{for any }i, j, k, l,$$
-vs.$$H_1:Pr\{U(X_{ij} - Y_{kl}) = 1\} \not = Pr\{U(X_{ij} - Y_{kl}) = 0\}, \text{for any }i, j, k, l,$$
-where $U(a) = 1$ if $a > 0$, $U(a) = 1/2$ if $a = 0$ and $U(a) = 0$ if $a < 0$.
-In words, the test is based on the probability that the score from a random subunit from the $X$ sample is greater than the score from a random subunit from the $Y$ sample. 
-\subsubsection{Balanced designs}\label{bal}
-Under $H_0$, scores for clusters assigned to the $X$ and $Y$ treatments are identically distributed, so we can pool $X$ and $Y$ clusters together and refer to a combined set of $Z$ clusters, where $Z_{ij} = $score for the $j$th subunit of the $i$th cluster, $j = 1,\ldots,g,i=1,\ldots,m+n = N$. Suppose that $m$ of the $N$ clusters are assigned at random to the $X$ treatment and the remaining $n$ clusters to the $Y$ treatment. Let $\delta_i = 1$ if $i\in I$, and $\delta_i = 0$ if $i \not \in I$ denote the indicator function of the $m$ unique values out of $\{1, \ldots N\}$ randomly assigned to the $X$ group.  The distribution of the clustered rank sum statistic $W_{c.obs}$ is
+where ranks are determined based on the
+combined sample of all subunits over the
+$X$ and $Y$ clusters combined. Subunits
+for a given cluster are assumed to be exchangeable.
+
+
+\subsection{Balanced designs}\label{bal}
+Under balanced designs, the cluster sizes are identical, 
+and
+the score assigned to clusters under treatments
+$X$ and $Y$ are
+identically distributed under the null hypothesis. 
+Therefore, we can pool $X$ and $Y$ clusters together and refer to a combined set of $Z$ clusters, where $Z_{ij} = $score for the $j$th subunit of the $i$th cluster, $j = 1,\ldots,g,i=1,\ldots,m+n = N$. Suppose that $m$ of the $N$ clusters are assigned at random to the $X$ treatment and the remaining $n$ clusters to the $Y$ treatment. Let $I$ be the 
+set of indices of clusters which are assigned to $X$, and $\delta_i$ be
+an indicator function
+$\delta_i = 1$ if $i\in I$, and $\delta_i = 0$ if $i \not \in I$ denote the indicator function of the $m$ unique values out of $\{1, \ldots N\}$ randomly assigned to the $X$ group.  The distribution of the clustered rank sum statistic $W_{c.obs}$ is
 \begin{equation}\label{eq:Wc}
 W_c = \sum^N_{i=1}\delta_iR_{i+} \quad \text{where   }R_{i+} = \sum^g_{j=1}R_{ij}
 \end{equation}
@@ -189,7 +231,7 @@ And the test statistic is
 \begin{equation}
 Z_c = \{W_c - E(W_c)\}/\{\text{Var}(W_c)\}^{1/2}
 \end{equation}
-\subsection{Wilcoxon signed rank test for clustered data}
+\section{Wilcoxon signed rank test for clustered data}
 Let $X_{ij} (Y_{ij})$ denotes the baseline (follow-up) score for the $j$th subunit in the $i$th cluster (subject) and define $Z_{ij} = Y_{ij} - X_{ij}, j = 1, \ldots,g_i; i = 1,\ldots,m$. Also within each cluster, the difference scores are assumed to be independent and identically distributed. Hypothesis being tested is
 \begin{equation*}
 H_0: \text{the difference score } Z \text{ is symmetric about 0}
