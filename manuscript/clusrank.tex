@@ -148,8 +148,8 @@ Wilcoxon rank sum test is a non-parametric test
 to compare the means of two population when the 
 underlying probability distributions are unknown 
 or non-normal. To account for the clustering effect,
-the modified rank sum test treats each cluster as a 
-basic unit instead of each single observation. 
+the modified rank sum test treats each cluster but not 
+each single observation as a basic unit. 
 Therefore, the null distribution of test statistics
 conditioned on clusters is different than the one
 when no clustering effect is incorporated,
@@ -171,30 +171,29 @@ first group to exceed an
 observation from the second group and vice versa.
 The clustered Wilcoxon rank sum statistic 
 $W_{c,obs}$ is defined as 
-\begin{equation}
+\begin{equation} \label{eq:Wco}
 W_{c,obs} = \sum_{i=1}^m\sum_{j=1}^{g_i}\text{Rank}(X_{ij})
 \end{equation}
 where ranks are determined based on the
 combined sample of all subunits over the
-$X$ and $Y$ clusters combined. Subunits
+$X$ and $Y$ clusters. Subunits
 for a given cluster are assumed to be exchangeable.
 
 
 \subsection{Balanced designs}\label{bal}
-Under balanced designs, the cluster sizes are identical, 
-and
-the score assigned to clusters under treatments
+Under balanced designs, the cluster sizes are the same.
+Since the score assigned to clusters under treatments
 $X$ and $Y$ are
-identically distributed under the null hypothesis. 
-Therefore, we can pool $X$ and $Y$ clusters together and refer to a combined set of $Z$ clusters, where $Z_{ij} = $score for the $j$th subunit of the $i$th cluster, $j = 1,\ldots,g,i=1,\ldots,m+n = N$. Suppose that $m$ of the $N$ clusters are assigned at random to the $X$ treatment and the remaining $n$ clusters to the $Y$ treatment. Let $I$ be the 
-set of indices of clusters which are assigned to $X$, and $\delta_i$ be
-an indicator function
-$\delta_i = 1$ if $i\in I$, and $\delta_i = 0$ if $i \not \in I$ denote the indicator function of the $m$ unique values out of $\{1, \ldots N\}$ randomly assigned to the $X$ group.  The distribution of the clustered rank sum statistic $W_{c.obs}$ is
+identically distributed under the null hypothesis, we can pool $X$ and $Y$ clusters together and refer to a combined set of $Z$ clusters, where $Z_{ij} = $score for the $j$th subunit of the $i$th cluster, $j = 1,\ldots,g, i=1,\ldots,m+n = N$. Suppose that $m$ of the $N$ clusters are assigned at random to the $X$ treatment and the remaining $n$ clusters to the $Y$ treatment. Let $\delta_i$ be
+an indicator function that equals $1$ when the $i$th cluster 
+is assigned to the $X$ group and $0$ when the $i$th cluster
+is assigned to the $Y$ group. 
+The distribution of the clustered rank sum statistic $W_{c.obs}$ is
 \begin{equation}\label{eq:Wc}
 W_c = \sum^N_{i=1}\delta_iR_{i+} \quad \text{where   }R_{i+} = \sum^g_{j=1}R_{ij}
 \end{equation}
 
-and $R_{ij}=$rank of the $j$th subunit in the $i$th cluster among all $gN$ subunits over all $Z$ clusters. It is shown that under $H_0$, 
+where $R_{ij}=$rank of the $j$th subunit in the $i$th cluster among all $gN$ subunits over all $Z$ clusters. It is shown that under $H_0$, 
 \begin{equation}\label{eq:EWc}
 E(W_c) = gm(gN + 1)/2
 \end{equation}
@@ -202,14 +201,41 @@ and
 \begin{equation}\label{eq:VWc}
 \text{Var}(W_c) = [mn/\{N(N-1)\}]\sum^N_{i=1}\{R_{i+} - g(1+gN)/2\}^2
 \end{equation}
-%So a natural large sample test statistic based on \eqref{eq:Wc}, \eqref{eq:EWc}, and \eqref{eq:VWc} is 
+So a natural large sample test statistic based on \eqref{eq:Wc}, \eqref{eq:EWc}, and \eqref{eq:VWc} is 
 \begin{equation}
-Z_c \{W_c - E(W_c)\}/\{\text{Var}(W_c)\}^{1/2}
+Z_c = \{W_c - E(W_c)\}/\{\text{Var}(W_c)\}^{1/2}
 \end{equation}
-$Z_c$ is asymptotically normal if both $m \to \infty$ and $n \to \infty$
+$Z_c$ is asymptotically normal if both $m \to \infty$ and $n \to \infty$. When the sample size is small, permutation test can be 
+performed.
 \subsubsection{Unbalanced designs}\label{unbal}
-For unbalanced designs, let $(m_g, n_g)=$ number of clusters of size $g$ assigned to the $X$ and $Y$ treatment. Denote $N_g = m_g + n_g$ for $g=1,\ldots,g_{max}$ and $N =\sum_{g=1}^{g_{max}}N_g$. Let $R_{ij,g} = $ rank for the $j$th subunit in the $i$th cluster of size $g$, $g = 1, \ldots,g_{max}; i = 1, \ldots,N_g,j=1,\ldots,g$, where ranks are computed based on the total study population. 
-The construction of statistic $W_{c,obs}$ and its distribution $W_c$ is the same as in the balanced case, i.e., $W_{c,obs}$ is the summation of ranks in the sample that is assigned to $X$ clusters and $W_c$ is the summation of ranks that is \textbf{randomly} assigned to $X$ clusters. But $E(W_c)$ and $\text{Var}(W_c)$ is slightly different from those in balanced design. 
+For unbalanced designs, cluster sizes vary. 
+Consequently, under the $H_0$, 
+the distribution of sum of rank
+assigned to each cluster are no longer
+identically distributed across clusters 
+with different sizes. Therefore, when 
+determining the null distribution of the test
+statistic \eqref{Wco}, we need to control
+for the cluster size. 
+Let $(m_g, n_g)=$ number of clusters of
+size $g$ assigned to the $X$ and $Y$ treatment.
+Denote $N_g = m_g + n_g$ for $g=1,\ldots,g_{max}$ and $N =\sum_{g=1}^{g_{max}}N_g$. 
+Let $R_{ij,g} = $ rank for the $j$th
+subunit in the $i$th cluster of size $g$,
+$g = 1, \ldots, g_{max},
+i = 1, \ldots, N_g, j=1, \ldots, g$, 
+where ranks are computed based on the
+combined sample. 
+The statistic $W_{c, obs}$ can then be
+written as:
+\begin{equation}
+W_{c, obs} = \sum_{g=1}^{g_{max}}
+\sum_{i\in I_{g, obs}}\~R_{i+, g}
+\end{equation}
+where $R_{i+,g}$ = sum of ranks of 
+all subunits in the $i$th cluster of size $g$,
+$i = 1, \ldots, N_g$.
+But $E(W_c)$ and $\text{Var}(W_c)$ is slightly different from those in balanced design. 
 \begin{equation}\label{eq:uEWc}
 E(W_c) = \sum_{g=1}^{g_{max}}m_g(R_{++,g}/N_g)
 \end{equation}
