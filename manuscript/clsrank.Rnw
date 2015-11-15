@@ -1,56 +1,17 @@
+%% The tex file is not to be edited; it is generated.
+%% Only edit .Rnw file
+
 \documentclass[article]{jss}
-\usepackage[utf8]{inputenc}
+
 \usepackage{amsmath}
-\usepackage{amsfonts}
-\usepackage{amssymb}
-\usepackage{graphicx}
-\usepackage{url}
-\usepackage{natbib}
-\usepackage{lmodern}
-\usepackage{amssymb,amsmath}
-
-% use upquote if available, for straight quotes in verbatim environments
-\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
-% use microtype if available
-\IfFileExists{microtype.sty}{%
-\usepackage{microtype}
-\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
-}{}
-\usepackage[margin=1in]{geometry}
-\usepackage{color}
-\usepackage{fancyvrb}
-\newcommand{\VerbBar}{|}
-\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
-\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
-% Add ',fontsize=\small' for more characters per line
-\usepackage{framed}
-\definecolor{shadecolor}{RGB}{248,248,248}
-\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
-\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{{#1}}}}
-\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{{#1}}}
-\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{{#1}}}
-\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{{#1}}}
-\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{{#1}}}
-\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{{#1}}}
-\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{{#1}}}
-\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{{#1}}}}
-\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{{#1}}}
-\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{{#1}}}
-\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{{#1}}}
-\newcommand{\RegionMarkerTok}[1]{{#1}}
-\newcommand{\ErrorTok}[1]{\textbf{{#1}}}
-\newcommand{\NormalTok}[1]{{#1}}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% almost as usual
 \author{Yujing Jiang\\ University of Connecticut \And 
-        Mei-Ling Ting Lee\\ University of Maryland
-        \And  
-        Jun Yan\\ University of Connecticut }
-\title{R package Clustered Wilcoxon Rank Sum Test and Signed Rank Test}
+  Xin He\\ University of Maryland \And
+  Mei-Ling Ting Lee\\ University of Maryland \And
+  Bernard Rosner\\ Harvard University  \And  
+  Jun Yan\\ University of Connecticut }
+\title{Rank-Based Tests for Clustered Data with \proglang{R} Package \pkg{clsrank}}
 
 %% for pretty printing and a nice hypersummary also set:
 \Plainauthor{Yujing Jiang, Mei-Ling Ting Lee, Jun Yan} %% comma-separated
@@ -62,7 +23,9 @@
 The Wilcoxon rank sum test and Wilcoxon signed rank test are frequently used nonparametric tests for comparing paired data and two independent samples respectively. Modifications of these two test have been proposed by \citet{rosner2003incorporation} and \citet{rosner2006wilcoxon} to incorporate clustering effect in the nature of data. The modified tests work for both balanced and unbalanced designs, whether or not the data are stratified. This paper introduces a R package, \textbf{clusrank}, which packaged these two tests. 
 }
 \Keywords{clustered data,  Wilcoxon rank sum test, Wilcoxon signed rank test}
-\Plainkeywords{clustered data,  Wilcoxon rank sum test, Wilcoxon signed rank test} %% without formatting
+\Plainkeywords{clustered data,  Wilcoxon rank sum test, Wilcoxon signed rank test}
+
+%% without formatting
 %% at least one keyword must be supplied
 
 %% publication information
@@ -82,9 +45,9 @@ Jun Yan\\
   Department of Statistics\\
   Professor of Statistics\\
   University of Connecticut\\
-   215 Glenbrook Rd. Unit 4120, Storrs, CT 06269, USA.
+  215 Glenbrook Rd. Unit 4120, Storrs, CT 06269, USA.
 
-Email:\email{jun.yan@uconn.edu}
+  Email:\email{jun.yan@uconn.edu}
 }
 %% It is also possible to add a telephone and fax number
 %% before the e-mail in the following format:
@@ -400,7 +363,9 @@ In this article, clustered Wilcoxon rank sum test and Wilcoxon signed rank are b
 
 \section*{Acknowledgement}
 Data \text{sedlab} is provided by Lab Seddon Lab \citep{ferrara2015pheno}.%% Note: If there is markup in \(sub)section, then it has to be escape as above.
-\bibliographystyle{j}
+
+
+% \bibliographystyle{jss}
 
 \bibliography{clusrank}
 
