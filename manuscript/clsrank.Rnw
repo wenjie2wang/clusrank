@@ -19,9 +19,23 @@
 \Shorttitle{\pkg{clsrank}: rank test for cluster data} %% a short title (if necessary)
 
 %% an abstract and keywords
+
+
 \Abstract{
-The Wilcoxon rank sum test and Wilcoxon signed rank test are frequently used nonparametric tests for comparing paired data and two independent samples respectively. Modifications of these two test have been proposed by \citet{rosner2003incorporation} and \citet{rosner2006wilcoxon} to incorporate clustering effect in the nature of data. The modified tests work for both balanced and unbalanced designs, whether or not the data are stratified. This paper introduces a R package, \textbf{clusrank}, which packaged these two tests. 
+\textbf{Do not exceeds linewidth 70 for better diff effect.
+Start new sentences at new lines whenever possible.}
+
+\textbf{Borrow some ideas from the biometrics papers to motivate.}
+
+
+\textbf{Read the instructions of JSS: code, pkg, proglang are already defined!}
+
+The Wilcoxon rank sum test and Wilcoxon signed rank test are widely
+used nonparametric tests for comparing paired data and two independent samples respectively. Modifications of these two test have been proposed by \citet{rosner2003incorporation} and \citet{rosner2006wilcoxon} to incorporate clustering effect in the nature of data. The modified tests work for both balanced and unbalanced designs, whether or not the data are stratified. This paper introduces a R package, \textbf{clusrank}, which packaged these two tests. 
 }
+
+\textbf{No key word should repeat words in the title.}
+
 \Keywords{clustered data,  Wilcoxon rank sum test, Wilcoxon signed rank test}
 \Plainkeywords{clustered data,  Wilcoxon rank sum test, Wilcoxon signed rank test}
 
@@ -66,6 +80,12 @@ Jun Yan\\
 %% Note that you should use the \pkg{}, \proglang{} and \code{} commands.
 
 \section{Introduction}
+
+\textbf{Flow: importance of rank tests for clustered data (see
+  those biometrics papers); unavailability implementation;
+  propose the package and highlight contributions.}
+
+
 In this paper we present the \textbf{clusrank} package, a package 
 for Wilcoxon rank sum test  
 and signed rank test 
@@ -98,6 +118,7 @@ sample size is required to be large while the cluster size is bounded. Implement
 SAS macro is also available for the large sample test.
 
 
+\textbf{Please, never hard code a reference.}
 The order of this paper is as following, 
 section 2 introduces the Wilcoxon rank 
 sum test for clustered data, section 3 
@@ -107,6 +128,11 @@ data analysis.
 
 
 \section{Wilcoxon rank sum test for clustered data}
+
+\textbf{The two tests can be introduced in one section
+  with subsections. Set up the problem first (with clustered data).
+  The finite sample permutation can be a subsection too.}
+
 Wilcoxon rank sum test is a non-parametric test
 to compare the means of two population when the 
 underlying probability distributions are unknown 
@@ -305,7 +331,12 @@ Z_{c,s} = \left.T_{c,s}\middle/ \left(\sum_{i=1}^m\hat{w}^2_i\bar{S}^2_i\right)^
 where $\hat{w}_i = g_i/[\widehat{Var}(S_{ij})\{1 + (g_i-1)\hat{\rho}_{s,cor}\}]$, $\hat{\rho}_{s,cor} = \hat{\rho}_s\left(1 + \frac{1 - \hat{\rho}_s^2}{m - 5/2}\right)$,$\hat{\rho_s} = $ max $[\hat{\sigma}_A^2/(\hat{\sigma}_A^2 + \hat{\sigma}^2), 0]$, $\hat{\sigma
 }^2 = \sum_{i=1}^m\sum_{j=1}^{g_i}(S_{ij} - \bar{S}_i)^2/(G-m), \hat{\sigma}^2_A = $ max $[\{\sum_{i=1}^mg_i(\bar{S_i}- \bar{\bar{S}})^2/(m-1)- \hat{\sigma}^2\}/g_0,0], g_0 = [\sum_{i=1}^mg_i - \sum_{i=1}^mg_i^2/\sum_{i=1}^mg_i]/(m-1)$ and $\widehat{Var}(S_{ij}) = \sum_{i=1}^m\sum_{j=1}^{g_i}(S_{ij} - \bar{\bar{S}})^2/(G-1)$.
 
+
+
 \section{R package clusrank}
+
+\textbf{use the macros defined by JSS.}
+
 The R package is a realization of all the tested we presented in the previous section. It contains two functions, 
 The package \emph{clsrank} contains two functions, \text{cluswilcox}
 and \text{clusignrank}. The \text{cluswilcox} is a function for
@@ -329,6 +360,8 @@ required to label the cluster each observation belongs to. \(id\) and
 of \(stratum\) is also needed to label which stratum each observation
 comes from. There are also some currenly unused options which is may be
 extended later. A usage example is as follows:
+
+\textbf{Replace these codes with knitr.}
 
 \begin{CodeChunk} 
 \begin{CodeInput}
@@ -356,7 +389,8 @@ R> clusignrank(z, id, data = crsd. unb)
 \end{CodeInput}
 \end{CodeChunk}
 
-
+\textbf{Can add a simulation to check the sample size necessary for the 
+asymptotics to work.}
 
 \section{Summary}
 In this article, clustered Wilcoxon rank sum test and Wilcoxon signed rank are briefly introduced, for both balanced and unbalanced designs, also, an extra situation considering stratified data is mentioned for Wilcoxon rank sum test. Also a R \textbf{clsrank} package with functions for each test is built. This R package is a counterpart of the existing SAS macros for these two tests. 
