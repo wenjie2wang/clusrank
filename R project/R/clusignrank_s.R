@@ -62,7 +62,8 @@ clusignrank.s <-
     crsd1 <- cbind(crsd, zrank)
     signrank <- ifelse(crsd1$z > 0, 1, -1) * crsd1$zrank
     crsd1 <- cbind(crsd1, signrank)
-    colnames(crsd1)[4] <- "signrank"  
+    colnames(crsd1)[4] <- "signrank"
+    if(balance == TRUE){
       T_c <- sum(crsd1$signrank)
       sumrank <- c(by(crsd1$signrank, crsd1$id, sum))
       delta <- replicate(n.sim, sample(c(-1, 1), m, TRUE))
@@ -71,6 +72,51 @@ clusignrank.s <-
       result <- list(T_C = T_c,  
                      p.value = P_val, n = n, m = m)
       return(result)
+    } else {
+      if (balance == FALSE) {
+        sumidrank <- c(by(crsd1$signrank, crsd1$id, sum))
+        sumsq <- sum(sumidrank ^ 2)
+        meansumrank <- sumidrank / g
+        sumsqi <- sum(g ^ 2)
+        
+        # calculate intraclass correlation between signed ranks within the same cluster
+        crsd1$id.f <- as.factor(crsd1$id)
+        mod <- lm(signrank ~ id.f, crsd1, y = TRUE)
+        errordf <- mod$df.residual
+        errorss <- sum(mod$residuals ^ 2)
+        modeldf <- n - errordf - 1
+        modelss <- sum((mod$y - mean(mod$y)) ^ 2) - errorss
+        sumi <- n
+        
+        m0 <- (sumi - (sumsqi / sumi)) / (m - 1)
+        totalss <- errorss + modelss
+        totaldf <- errordf + modeldf
+        wthms <- errorss / errordf
+        betms <- modelss / modeldf
+        vars <- totalss / totaldf
+        s2b <- (betms - wthms) / m0
+        s2w <- wthms
+        rosglm <- s2b / (s2b + s2w)
+        if (rosglm < 0) {
+          rosglm = 0
+        }
+        ros <- rosglm
+        roscor <- ros * (1 + (1 - ros ^ 2) / (m - 2.5))
+        if (roscor > 1) {
+          roscor = 1
+        }
+        wi <- g / (vars * (1 + (g - 1) * roscor))
+        T_c <- sum(meansumrank * wi)
+        
+        delta <- replicate(n.sim, sample(c(-1, 1), m, TRUE))
+        T_c.sim <- colSums(delta * c(meansumrank) * c(wi))
+        P_val <- 2 * min(1 - ecdf(T_c.sim)(T_c), ecdf(T_c.sim)(T_c), 0.5)
+        
+        
+        result <- list(T_C = T_c,  p.value = P_val, n = n, m = m)
+        return(result)
+      }
+    }
     
     
     
