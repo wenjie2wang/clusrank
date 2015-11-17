@@ -97,7 +97,7 @@ cluswilcox <-
   ## preparation
   ## data <- na.omit(data) ## data[complete.cases(data),]
     
-    METHOD <- "Wilcoxon rank sum test for clutered data"
+  METHOD <- "Wilcoxon rank sum test for clutered data"
     
   cl <- match.call()
   mf <- match.call(expand.dots = FALSE)
@@ -139,13 +139,14 @@ cluswilcox <-
   crd2 <- cbind(subset(crd1, z != "NA"), zrank)
   ## Add z score to the dataframe crd1
   
-  #calculate ranksum within each cluster within each stratum
+### calculate ranksum within each cluster within each stratum
   
   g <- table(crd2$id)
   ## g is the cluster size
   sumrank <- c(by(crd2$zrank, crd2$id, sum))
   ## Compute rank sum within each cluster
-    
+
+  ## FIXME: unique
   stratum <- c(by(crd2$stratum, crd2$id, mean))
   ## Compute stratum mean of each cluster
   
@@ -172,21 +173,22 @@ cluswilcox <-
   str_unique_n <- length(str_unique)
   g_unique <- unique(g)
   g_unique_n <- length(g_unique)
-  psumrnk_int <- matrix(0,str_unique_n*g_unique_n, 3)
+  psumrnk_int <- matrix(0, str_unique_n * g_unique_n, 3)
   
   k <- 1
   for(i in 1:str_unique_n){
     for(j in 1:g_unique_n){
-      foo <- sum(subset(psumrnk, stratum == str_unique[i] & g == g_unique[j])[,"sumrank"])
-      if(foo){
+      ind <- stratum == str_unique[i] & g == g_unique[j]
+      foo <- sum(psumrnk[ind, "sumrank"])
+      if (foo) {
         psumrnk_int[k,] <- c(str_unique[i], g_unique[j], foo)
         k <- k + 1
       }
     }
   }
   colnames(psumrnk_int) <- c("stratum", "g", "psumrank")
-  psumrnk_int <- (psumrnk_int[psumrnk_int[,"stratum"]!=0,])
-  if(nrow(psumrnk_int) == 1) {
+  psumrnk_int <- (psumrnk_int[psumrnk_int[, "stratum"] != 0,])
+  if (nrow(psumrnk_int) == 1) {
     psumrnk_int <- t(as.data.frame(psumrnk_int))
   } else {
     psumrnk_int <- (as.data.frame(psumrnk_int))
@@ -200,7 +202,7 @@ cluswilcox <-
   varwc <- merge(merge(merge(psumrnk, ng.xy), ng.stratum), psumrnk_int)
   varwc_int <- (varwc[ ,"sumrank"] - varwc[ ,"psumrank"] / varwc[, "Ngv"])^2
   VarWc <- cbind(varwc, varwc_int)  
-  varwc_pre_final <- VarWc[,"Freq"] * (VarWc[, "Ngv"]-VarWc[, "Freq"]) / (VarWc[,"Ngv"] * (VarWc[,"Ngv"] -1)) * VarWc[,"varwc_int"]
+  varwc_pre_final <- VarWc[,"Freq"] * (VarWc[, "Ngv"]- VarWc[, "Freq"]) / (VarWc[,"Ngv"] * (VarWc[,"Ngv"] -1)) * VarWc[,"varwc_int"]
   varwc_final <- sum(varwc_pre_final[VarWc[,"Ngv"] > 1])
   ## Drop the value where there is only 1 cluster in that stratum,
   ## and that cluster contains only 1
