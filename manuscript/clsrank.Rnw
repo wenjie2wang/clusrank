@@ -30,8 +30,29 @@ Start new sentences at new lines whenever possible.}
 
 \textbf{Read the instructions of JSS: code, pkg, proglang are already defined!}
 
-The Wilcoxon rank sum test and Wilcoxon signed rank test are widely
-used nonparametric tests for comparing paired data and two independent samples respectively. Modifications of these two test have been proposed by \citet{rosner2003incorporation} and \citet{rosner2006wilcoxon} to incorporate clustering effect in the nature of data. The modified tests work for both balanced and unbalanced designs, whether or not the data are stratified. This paper introduces a R package, \textbf{clusrank}, which packaged these two tests. 
+Nonparametric tests such as Wilcoxon rank sum test
+and Wilcoxon signed rank test are widely used in 
+the situation where the underlying distribution
+of the population is far from normal or simply unknown.
+One necessary assumption for the appropriateness of the
+null distribution of the test statistic is that each
+observations are independent, however, this is also an 
+assumption which is violated quite often in practice. 
+E.g., in the study of human eyes, each person is the unit of 
+randomization, whereas the data is collected from both eyes,
+therefore we sould expect high correlation between the 
+data collected from the two eyes from the same person. 
+To account for the clustering effect, modifications of these
+two tests have been proposed by \citet{rosner2003incorporation}
+and \citet{rosner2006wilcoxon}. 
+The modified tests work for both balanced and unbalanced data, 
+i.e., cluster size is idential or variable. In addition,
+the modified rank sum test can also deal with stratified data.
+No R package is available so far for nonparametric tests for
+clustered data.
+The package \pkg{clsrank} is a realization of the test
+procedures from the two papers mentioned above with both
+small and large sample tests. 
 }
 
 \textbf{No key word should repeat words in the title.}
