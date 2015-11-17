@@ -1,0 +1,7 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^Makefile$
+^README.md$
+^simulation$
+^manuscript$
+^test$
