@@ -333,9 +333,11 @@ where $\hat{w}_i = g_i/[\widehat{Var}(S_{ij})\{1 + (g_i-1)\hat{\rho}_{s,cor}\}]$
 
 
 
-\section{R package clusrank}
+\section{R package \pkg{clusrank}}
 
 \textbf{use the macros defined by JSS.}
+
+\textbf{give the main functions and explain their required arguments}
 
 The R package is a realization of all the tested we presented in the previous section. It contains two functions, 
 The package \emph{clsrank} contains two functions, \text{cluswilcox}
@@ -349,6 +351,22 @@ clustered stratified data set comparing effects of two treatments; data
 between pre and post treatment effect, data \emph{crsd.unb} is clustered
 unbalancd data set comparing the difference between pre and post
 treatment effect.
+
+\section{Illustration}
+
+<<load, echo=TRUE>>=
+library("clsrank")
+@ 
+
+\subsection{Real Data Examples}
+
+show all examples
+
+
+\subsection{Simulation for Small Sample}
+
+Find the appropriate sample size for each configuration.
+
 
 \subsection{cluswilcox}\label{cluswilcox}
 
