@@ -20,50 +20,50 @@
 ##
 ################################################################################
 
-#'The Wilcoxon Signed Rank Test for Paired Comparisons of Clustered Data
-#'
-#'This is the signed rank test for clustered data where there are 
-#'changed score for each subject per cluster. The hypothesis to tset
-#'is that the distribution of change in score 
-#'is symmetric about zero. Each subunit (instead of the most basic unit)
-#'it the unit of change.
-#'
-#'@param z  a vector, contains the difference between 
-#'score of observations, or the score of objects before treatment.
-#'@param y  a vector, the score of objects after treatment if is 
-#'not NULL.
-#'@param id the cluster id for each 
-#'observation. If not specified, each observation will 
-#'be assigned a distinct id, i.e., no cluster in the data.
-#'@param data  an optional data frame
-#'
-#'@return  a list with the following components
-#'\item{rstatistic}{Clustered Wilcoxon signed rank statistic.}
-#'\item{vrstatistic}{Variance of clustered Wilcoxon signed rank statistic.}
-#'\item{statistic}{Standardized clustered Wilcoxon signed rank statistic.}
-#'\item{p.value}{P-value for clustered Wilcoxon rank test statistic W_c.}
-#'\item{n}{Total number of observations.}
-#'\item{m}{Total number of clusters.}
-#'\item{data.name}{a character string giving the names of the data.}
-#'\item{method}{the type of test applied.}
-#'\item{adjusted}{indicator of whether adjusted signed rank statistic is used.}
-#'@note This function is able to deal with data with 
-#'identitical or variable cluster size. When the data
-#'is unbalanced, adjusted signed rank statistic is used.
-#'Ties are dropped in the test. 
-#'@examples
-#'data(crsd)
-#'clusignrank(z, id, data = crsd)
-#'data(crsd.unb)
-#'clusignrank(z, id, data = crsd.unb)
-#'@author Yujing Jiang \email{yujing.jiang@uconn.edu}
-#'@references
-#'Bernard Rosner, Robert J. Glynn, Mei-Ling Ting Lee(2006) 
-#'\emph{The Wilcoxon Signed Rank Test for Paired Comparisons of
-#' Clustered Data.} Biometrics, \bold{62}, 185-192.
+#' The Wilcoxon Signed Rank Test for Paired Comparisons of Clustered Data
+#' 
+#' This is the signed rank test for clustered data where there are 
+#' changed score for each subject per cluster. The hypothesis to tset
+#' is that the distribution of change in score 
+#' is symmetric about zero. Each subunit (instead of the most basic unit)
+#' it the unit of change.
+#' 
+#' @param z  a vector, contains the difference between 
+#' score of observations, or the score of objects before treatment.
+#' @param y  a vector, the score of objects after treatment if is 
+#' not NULL.
+#' @param id the cluster id for each 
+#' observation. If not specified, each observation will 
+#' be assigned a distinct id, i.e., no cluster in the data.
+#' @param data  an optional data frame
+#' 
+#' @return  a list with the following components
+#' \item{rstatistic}{Clustered Wilcoxon signed rank statistic.}
+#' \item{vrstatistic}{Variance of clustered Wilcoxon signed rank statistic.}
+#' \item{statistic}{Standardized clustered Wilcoxon signed rank statistic.}
+#' \item{p.value}{P-value for clustered Wilcoxon rank test statistic W_c.}
+#' \item{n}{Total number of observations.}
+#' \item{m}{Total number of clusters.}
+#' \item{data.name}{a character string giving the names of the data.}
+#' \item{method}{the type of test applied.}
+#' \item{adjusted}{indicator of whether adjusted signed rank statistic is used.}
+#' @note This function is able to deal with data with 
+#' identitical or variable cluster size. When the data
+#' is unbalanced, adjusted signed rank statistic is used.
+#' Ties are dropped in the test. 
+#' @examples
+#' data(crsd)
+#' clusignrank(z, id, data = crsd)
+#' data(crsd.unb)
+#' clusignrank(z, id, data = crsd.unb)
+#' @author Yujing Jiang 
+#' @references
+#' Bernard Rosner, Robert J. Glynn, Mei-Ling Ting Lee(2006) 
+#' \emph{The Wilcoxon Signed Rank Test for Paired Comparisons of
+#'  Clustered Data.} Biometrics, \bold{62}, 185-192.
 
 clusignrank <- 
-  function(z, y = NULL, id = NULL, data = parent.frame()){
+  function(z, y = NULL, id = NULL, data = parent.frame()) {
     #Calculate number of observations per cluster
     
     METHOD <- "Wilcoxon signed rank test for clutered data"
@@ -229,69 +229,49 @@ clusignrank <-
     }
     
     
-  }################################################################################
-##
-##   R package clusrank by Mei-Ling Ting Lee, Jun Yan, and Yujing Jiang
-##   Copyright (C) 2015
-##
-##   This file is part of the R package clusrank.
-##
-##   The R package clusrank is free software: you can redistribute it and/or
-##   modify it under the terms of the GNU General Public License as published
-##   by the Free Software Foundation, either version 3 of the License, or
-##   (at your option) any later version.
-##
-##   The R package clusrank is distributed in the hope that it will be useful,
-##   but WITHOUT ANY WARRANTY without even the implied warranty of
-##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##   GNU General Public License for more details.
-##
-##   You should have received a copy of the GNU General Public License
-##   along with the R package reda. If not, see <http://www.gnu.org/licenses/>.
-##
-################################################################################
+  }
 
-#'The Wilcoxon Signed Rank Test for Paired Comparisons of Clustered Data
-#'
-#'This is the signed rank test for clustered data where there are 
-#'changed score for each subject per cluster. The hypothesis to tset
-#'is that the distribution of change in score 
-#'is symmetric about zero. Each subunit (instead of the most basic unit)
-#'it the unit of change.
-#'
-#'@param z  a vector, contains the difference between 
-#'score of observations, or the score of objects before treatment.
-#'@param y  a vector, the score of objects after treatment if is 
-#'not NULL.
-#'@param id the cluster id for each 
-#'observation. If not specified, each observation will 
-#'be assigned a distinct id, i.e., no cluster in the data.
-#'@param data  an optional data frame
-#'
-#'@return  a list with the following components
-#'\item{rstatistic}{Clustered Wilcoxon signed rank statistic.}
-#'\item{vrstatistic}{Variance of clustered Wilcoxon signed rank statistic.}
-#'\item{statistic}{Standardized clustered Wilcoxon signed rank statistic.}
-#'\item{p.value}{P-value for clustered Wilcoxon rank test statistic W_c.}
-#'\item{n}{Total number of observations.}
-#'\item{m}{Total number of clusters.}
-#'\item{data.name}{a character string giving the names of the data.}
-#'\item{method}{the type of test applied.}
-#'\item{adjusted}{indicator of whether adjusted signed rank statistic is used.}
-#'@note This function is able to deal with data with 
-#'identitical or variable cluster size. When the data
-#'is unbalanced, adjusted signed rank statistic is used.
-#'Ties are dropped in the test. 
-#'@examples
-#'data(crsd)
-#'clusignrank(z, id, data = crsd)
-#'data(crsd.unb)
-#'clusignrank(z, id, data = crsd.unb)
-#'@author Yujing Jiang \email{yujing.jiang@uconn.edu}
-#'@references
-#'Bernard Rosner, Robert J. Glynn, Mei-Ling Ting Lee(2006) 
-#'\emph{The Wilcoxon Signed Rank Test for Paired Comparisons of
-#' Clustered Data.} Biometrics, \bold{62}, 185-192.
+#' The Wilcoxon Signed Rank Test for Paired Comparisons of Clustered Data
+#' 
+#' This is the signed rank test for clustered data where there are 
+#' changed score for each subject per cluster. The hypothesis to tset
+#' is that the distribution of change in score 
+#' is symmetric about zero. Each subunit (instead of the most basic unit)
+#' it the unit of change.
+#' 
+#' @param z  a vector, contains the difference between 
+#' score of observations, or the score of objects before treatment.
+#' @param y  a vector, the score of objects after treatment if is 
+#' not NULL.
+#' @param id the cluster id for each 
+#' observation. If not specified, each observation will 
+#' be assigned a distinct id, i.e., no cluster in the data.
+#' @param data  an optional data frame
+#' 
+#' @return  a list with the following components
+#' \item{rstatistic}{Clustered Wilcoxon signed rank statistic.}
+#' \item{vrstatistic}{Variance of clustered Wilcoxon signed rank statistic.}
+#' \item{statistic}{Standardized clustered Wilcoxon signed rank statistic.}
+#' \item{p.value}{P-value for clustered Wilcoxon rank test statistic W_c.}
+#' \item{n}{Total number of observations.}
+#' \item{m}{Total number of clusters.}
+#' \item{data.name}{a character string giving the names of the data.}
+#' \item{method}{the type of test applied.}
+#' \item{adjusted}{indicator of whether adjusted signed rank statistic is used.}
+#' @note This function is able to deal with data with 
+#' identitical or variable cluster size. When the data
+#' is unbalanced, adjusted signed rank statistic is used.
+#' Ties are dropped in the test. 
+#' @examples
+#' data(crsd)
+#' clusignrank(z, id, data = crsd)
+#' data(crsd.unb)
+#' clusignrank(z, id, data = crsd.unb)
+#' @author Yujing Jiang 
+#' @references
+#' Bernard Rosner, Robert J. Glynn, Mei-Ling Ting Lee(2006) 
+#' \emph{The Wilcoxon Signed Rank Test for Paired Comparisons of
+#'  Clustered Data.} Biometrics, \bold{62}, 185-192.
 
 clusignrank <- 
   function(z, y = NULL, id = NULL, data = parent.frame()){

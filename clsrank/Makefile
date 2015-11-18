@@ -4,10 +4,10 @@ Rpkg: Rd build
 	make check 
 	make INSTALL
 
-Rd: 
+Rd:
 	Rscript -e "library(methods); devtools::document();" 
 
-build:  
+build:  Rd
 	R CMD build ../$(pkg)
 
 check: $(pkg)_*.tar.gz

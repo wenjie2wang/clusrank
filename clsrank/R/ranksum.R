@@ -53,7 +53,7 @@
 #'data(crd.str)
 #'cluswilcox(z ~ group, data = crd.str, id = id, stratum = stratum)
 #'
-#'@author Yujing Jiang \email{yujing.jiang@uconn.edu}
+#'@author Yujing Jiang 
 #'@references
 #'Bernard Rosner, Robert J. Glynn, Mei-Ling Ting Lee(2003)
 #' \emph{Incorporation of Clustering Effects for the Wilcoxon Rank 
