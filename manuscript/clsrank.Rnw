@@ -36,11 +36,12 @@ the situation where the underlying distribution
 of the population is far from normal or simply unknown.
 One necessary assumption for the appropriateness of the
 null distribution of the test statistic is that each
-observations are independent, however, this is also an 
+observation is independent, however, this is also an 
 assumption which is violated quite often in practice. 
-E.g., in the study of human eyes, each person is the unit of 
+For instance, in the study of human eyes,
+each person is the unit of 
 randomization, whereas the data is collected from both eyes,
-therefore we sould expect high correlation between the 
+therefore we sould expect correlation between the 
 data collected from the two eyes from the same person. 
 To account for the clustering effect, modifications of these
 two tests have been proposed by \citet{rosner2003incorporation}
@@ -57,8 +58,8 @@ small and large sample tests.
 
 \textbf{No key word should repeat words in the title.}
 
-\Keywords{clustered data,  Wilcoxon rank sum test, Wilcoxon signed rank test}
-\Plainkeywords{clustered data,  Wilcoxon rank sum test, Wilcoxon signed rank test}
+\Keywords{Wilcoxon rank sum test, Wilcoxon signed rank test}
+\Plainkeywords{Wilcoxon rank sum test, Wilcoxon signed rank test}
 
 %% without formatting
 %% at least one keyword must be supplied
@@ -96,6 +97,7 @@ Jun Yan\\
 
 
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 
 %% include your article here, just as usual
 %% Note that you should use the \pkg{}, \proglang{} and \code{} commands.
@@ -105,6 +107,45 @@ Jun Yan\\
 \textbf{Flow: importance of rank tests for clustered data (see
   those biometrics papers); unavailability implementation;
   propose the package and highlight contributions.}
+
+Clustering often occurs in medical studies when the research 
+objects are eyes, ears, teeth or in family studies. 
+In these studies, an assumption usually being made is that
+the outcome variables follow a normal or binomial distribution,
+and tests based on this assumption have been studied intensively.
+Nonetheless, under situations where these assumptions are
+susceptible, blindly apply these test will lead to 
+untrustworthy result. 
+
+
+Usually, when the distribution underlying
+the data is unknown or non-normal, one solution is to use
+non-parametric test, e.g., the Wilcoxon rank sum test 
+to compare the mean of two populations and the Wilcoxon 
+signed rank test to test the shift of the population 
+before and after a treatment. In the presence of 
+clutering effect, the standard statistical procedures
+will often lead to an underestimated p-value, because
+the correlation within a cluster is usually positive. 
+
+
+To adjust for clustering effect in non-parametric tests,
+\citet{Rosn:GLyn:Lee:inco:2003} proposed a modified Wilcoxon
+rank sum test 
+and \citet{Roxn:Glyn:Lee:wilc:2006} poposed a modified Wilcoxon
+signed rank test. The null distribution of both test statistics
+are based on the asymptotic normality, therefore 
+they are large sample tests. When the sample size is small,
+permutation test could be applied. These two tests 
+also allow unbalanced data, i.e., cluster sizes vary. 
+Moreover, for Wilcoxon rank sum test, the input data can 
+also be stratified, and stratified data is common in biomedical 
+studies, e.g, studies carried out at different centers simultaneously
+will generate data stratified by covariate center. 
+
+
+It will facilitate  
+
 
 
 In this paper we present the \textbf{clusrank} package, a package 
