@@ -1,11 +1,10 @@
-cluswilcox.test.data <- function(x, y, group,
-                            id, stratum, 
-                            data,
-                            group.x,
-                            alternative,
-                            mu, paired, exact, 
-                            correct, conf.int,
-                            conf.level, ...) {
+cluswilcox.test.default <- function(x, y, group,
+                                    id, stratum, 
+                                    data,
+                                    group.x,
+                                    alternative,
+                                    mu, paired, exact, 
+                                    ...) {
   ## Process the input arguments before feeding them to
   ## main test functions. Assign a class (better to 
   ## be S4) to the processed arguments for them to be
@@ -62,15 +61,9 @@ cluswilcox.test.data <- function(x, y, group,
   ##
   ##   paired: a logical indicating whether you want a paired test.
   ##
-  ##   exact:	a logical indicating whether an exact 
-  ##     p-value should be computed.
-  ##
-  ##   conf.int: a logical indicating whether a confidence 
-  ##     interval should be computed.
-  ##   
-  ##   conf.level: confidence level of the interval.
-  ##
-   
+  
+  
+  
   pars <- as.list(match.call()[-1])
   
   ## If data name existed, take out the x (and y) observations,
@@ -78,8 +71,6 @@ cluswilcox.test.data <- function(x, y, group,
   ## take values from a data frame. 
   
   if(!is.null(pars$data)) {
-    
-    
     x <- data[, as.character(pars$x)]
     DNAME <- (pars$x)
     
@@ -116,7 +107,6 @@ cluswilcox.test.data <- function(x, y, group,
     
   } else {
     
-    
     DNAME <- deparse(substitute(x))
     
     if(!is.null(y)) {
@@ -138,114 +128,157 @@ cluswilcox.test.data <- function(x, y, group,
     
   }
   
-  ## If group variable provided, then x comes in 
-  ## under two treatments, i.e., it is not that
-  ## x is from treatment 1 and y from treatment 2.
-  ## Or x consistis of data from pre-treatment and
-  ## post-treatment. Need "paired" option to decide.
-  ## Will give warning if both "group" and "y"
-  ## are available.
   
-  
-  if(!is.null(group)) {
-    if (!isTRUE(all(group == floor(group))) ||
-        !(is.character(group))) 
-      stop("'group' must only contain integers or
-           characters")
-    
-    group.uniq <- unique(group)
-    group.uniq.freq <- table(group)
-    
-    if(length(group.uniq) > 2)
-      stop("'group' can only have no more than two levels.")
-    
-    if(length(group) != length(x))
-      stop("'group' must have the same length as 'x'")
-    
-    if(!is.null(y) || length(group.uniq) != 1) {
-      warning("Both 'y' and 'group' are provided, only need one,
-              'y' is ignored.")
-    }
-    if(paired == TRUE && is.null(y) 
-       && group.uniq.freq[1] != group.uniq.freq[2]) {
-      stop("For paired test, unequal sample sizes
-           from pre-treatment and post-treatment")
-    }
-    
-    ## If the group.x is not provided, use the smaller
-    ## id as the x group, either integer or character.
-    
-    if(is.null(group.x)) {
-      group.x <- min(unique(group))
-    }
-    group[group == group.x] <- 1
-    group[group != group.x] <- 2
-    
-    }
-  
-  
-  alternative <- match.arg(alternative)
-  if(!missing(mu) && ((length(mu) > 1L) || !is.finite(mu))) {
-    stop("'mu' must be a single number")
-  }
-  if(conf.int) {
-    if (!((length(conf.level) == 1L) && is.finite(conf.level) && 
-          (conf.level > 0) && (conf.level < 1))) 
-      stop("'conf.level' must be a single number between 0 and 1")
-  }
-  
-  
-  ## Initialize id, group, stratum if not provided.
+  ## Check and initialize id if not given,
+  ## transform it to numeric if given as characters.
   
   l.x <- length(x)
   
   if( is.null(id)) {
     id <- c(1 : l.x)
-  }
-  
-  if( is.null(group)) {
-    if ( !paired) {
-      stop("'group' variable missing for two sample rank sum test")
+  } else {
+    if(!is.numeric(id)) {
+      if(!is.character(id)) {
+        stop("'id' has to be numeric or characters")
+      }
+      if(length(id) != l.x) {
+        stop("'id' and 'x' must have the same lengths")
+      }
+      uniq.id <- unique(id)
+      l.uniq.id <- length(uniq.id)
+      id <- as.numeric(recoderFunc(id, uniq.id, c(1 : l.uniq.id)))
     }
-    group <- rep(1, l.x)
-  }
-  
-  if( is.null(stratum)) {
-    stratum <- rep(1, l.x)
   }
   
   
   
-  
-  if (!is.numeric(x)) 
+  ## Check x.
+  if ( !is.numeric(x)) 
     stop("'x' must be numeric")
-  if (!is.null(y)) {
-    if (!is.numeric(y)) 
-      stop("'y' must be numeric")
-    if (paired) {
-      if (length(x) != length(y)) 
-        stop("'x' and 'y' must have the same length")
-      OK <- complete.cases(x, y, id, )
+  
+  ## If y is present, carry out paired test.
+  
+  if( !is.null(y)) {
+    paired <- TRUE
+  }
+  
+  ## Check data for paired test, paired test
+  ## do not deal with stratified data.
+  
+  if( paired == TRUE) {
+    
+    if(!is.null(stratum)) {
+      warning("Signed rank test does not handle stratified data,
+              stratum id will be ignored.")
+    }
+    
+    if( !is.null(y)) {
+      
+      if (!is.numeric(y)) 
+        stop("'y' must be numeric")
+      
+      l.y <- length(y)
+      
+      if( l.y != l.x) {
+        stop("'x' and 'y' must have the same 
+             lengths for signed rank test.")
+      }
+      
+      OK <- complete.cases(x, y, id)
       x <- x[OK] - y[OK]
       id <- id[OK]
-      y <- NULL
+      finite.x <- is.finite(x)
+      x <- x[finite.x]
+      id <- id[finite.x]
+      
+      if(length(x) < 1L) {
+                  stop("not enough (finite) 'x' observations")
+      }
+      
+      } else {
+        
+        ## If only x is given, it is the difference score.
+        
+        OK <- complete.cases(x, id)
+        x <- x[OK]
+        id <- id[OK]
+        finite.x <- is.finite(x)
+        x <- x[finite.x]
+        id <- id[finite.x]
+        if(length(x) < 1L) {
+          stop("not enough (finite) 'x' observations")
+        }
+      }
+    
+    if(!is.null(group)) {
+      warning("'group' variable is ignored for signed rank test.")
     }
-    else {
-      ## If not for paired test, "y" vector will be ignored. 
-      warning("'y' vector is ignored for two sample rank sum test")
-      OK <- complete.cases(x, id)
-      x <- x[OK]
-      id <- id[OK]
-      x <- x[is.finite(x)]
-    }
+    
+    } else {
+      ## Rank sum test.
+      if( is.null(group)) {
+        stop( "'group id' required for rank sum test.")
+      }
+      
+      l.group <- length(group) 
+      if( l.group != l.x) {
+        stop( "'x' and 'group' must have the same lengths for rank
+              sum test.")
+      }
+      
+      
+      if (!isTRUE(all(group == floor(group))) ||
+          !(is.character(group))) 
+        stop("'group' must only contain integers or
+             characters")
+      
+      group.uniq <- unique(group)
+      group.uniq.freq <- table(group)
+      
+      if(length(group.uniq) > 2)
+        stop("'group' can only have no more than two levels.")
+      
+      ## If the group.x is not provided, use the smaller
+      ## id as the x group, either integer or character.
+      
+      if(is.null(group.x)) {
+        group.x <- min(unique(group))
+      }
+      group[group == group.x] <- 1
+      group[group != group.x] <- 2
+      
+      if( is.null(stratum)) {
+        stratum <- rep(1, l.x)
+      }
+   
+      }
+  
+  
+  
+  alternative <- match.arg(alternative)
+  if(!missing(mu) && ((length(mu) > 1L) || !is.finite(mu))) {
+    stop("'mu' must be a single number")
+  }  
+  
+  if(paired == TRUE) {
+    result <- list(x = x, id = id, alternative = alternative, 
+                   mu = mu, exact = exact)
+    class(result) <- "signedrank"
+    return(result)
   } else {
-    
-    
-    
-    ## If paired is TRUE, assume x vector is the difference vector
-    DNAME <- deparse(substitute(x))
-    x <- x[is.finite(x)]
+    result <- list(x = x, id = id, group = group, stratum = stratum,
+                   alternative = alternative, 
+                   mu = mu, exact = exact)
+    class(result) <- "ranksum"
+    return(result)
   }
-  if (length(x) < 1L) 
-    stop("not enough (finite) 'x' observations")
+
+  
+  
+  
+
+  
+  
+  
+  
 }
