@@ -262,13 +262,13 @@ cluswilcox.test.default <- function(x, y, group,
   
   if(paired == TRUE) {
     result <- list(x = x, id = id, alternative = alternative, 
-                   mu = mu, exact = exact)
+                   mu = mu, exact = exact,dname = DNAME)
     class(result) <- "signedrank"
     return(result)
   } else {
     result <- list(x = x, id = id, group = group, stratum = stratum,
                    alternative = alternative, 
-                   mu = mu, exact = exact)
+                   mu = mu, exact = exact, dname = DNAME)
     class(result) <- "ranksum"
     return(result)
   }
