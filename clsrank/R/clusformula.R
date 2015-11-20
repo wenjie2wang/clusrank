@@ -38,6 +38,13 @@ cluswilcox.test.formula <- function(formula, data, subset, na.action,
     terms(formula, special)
   else terms(formula, special, data = data)
   
+  cluster <- function(x) {x}
+  
+  stratum <- function(x) {x}
+  
+  group <- function(x) {x}
+  
+  
   mf <- eval(temp, parent.frame())
   
   if(nrow(mf) == 0) 
@@ -141,6 +148,13 @@ cluswilcox.test.formula <- function(formula, data, subset, na.action,
   group <- group[OK && finite.x]
   stratum <- group[OK && finite.x]
   cluster <- cluster[OK && finite.x]
-  return(list(x, group, strats, cluster, DNAME, METHOD))
+  
+  if(permutation == FALSE) {
+    return(cluswilcox.test.ranksum(x,  cluster, group, strats))
+  } else {
+    return(cluswilcox.test.ranksum.permutation(x,  cluster, group, strats, ...))
+  }
+  
+  
 
 } 
