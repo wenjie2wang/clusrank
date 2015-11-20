@@ -1,7 +1,5 @@
-cluswilcox.permutation <-
-  function(formula, data = parent.frame(), subset = NULL,
-           id = NULL, stratum = NULL, contrasts = NULL,
-           na.action = na.omit, n.rep = 1000, ...) {
+cluswilcox.test.ranksum.permutation <-
+  function(x, cluster, group, strats,  n.rep = 1000, ...) {
     # Incoporating clustering effects for the WilcoxonRank Sum Test 
     # for stratified balanced or unbalanced designs for small 
     # sample size, where permutation test is used to simulate 
@@ -20,7 +18,7 @@ cluswilcox.permutation <-
     #   1. id
     #   2. score
     #   3. group (X, Y) indicators : need to be 1 and 2.
-    #   4. stratum
+    #   4. strats
     #
     # Args:
     #   1. name of data set.
@@ -35,93 +33,96 @@ cluswilcox.permutation <-
     
     ## preparation
     ## data <- na.omit(data) ## data[complete.cases(data),]
-    cl <- match.call()
-    mf <- match.call(expand.dots = FALSE)
-    m <- match(c("formula", "data", "subset", "id", "stratum", "na.action"), 
-               names(mf), 0L)
-    mf <- mf[c(1L, m)]
-    mf[[1L]] <- quote(stats::model.frame)
-    mf <- eval(mf, parent.frame())
-    mt <- attr(mf, "terms")
-    z <- model.response(mf, "numeric")
-    x <- model.matrix(mt, mf, contrasts)
-    group <- x[,2]
-    id <- model.extract(mf, "id")
-    if (is.null(id)) id <- 1:length(z) ## non-clustered data
-    stratum <- model.extract(mf, "stratum")
-    if (is.null(stratum)) stratum <- rep(1, length(z))
+   
     
-    crd <- data.frame(z, group, id, stratum)
+    data <- as.data.frame(cbind(x, cluster, group, strats))
     
     ## group is assumed to take value 1 and 2; could be made
     ## more general
-    gr.uniq <- unique(crd$group) ## Record possible groups
+    group.uniq <- unique(data$group) ## Record possible groups
     
-    crd1 <- crd[with(crd, order(id)), ]
+    data <- data[with(data, order(cluster)), ]
     ## Reorder the observations by the order of id.
-    zrank <- rank(crd1$z, na.last = NA)
-    ## Compute the rank of z score
+    xrank <- rank(data$x, na.last = NA)
+    ## Compute the rank of x score
     
-    crd2 <- cbind(subset(crd1, z != "NA"), zrank)
-    ## Add z score to the dataframe crd1
+    data <- cbind(data, xrank)
+
+    ### calculate ranksum within each cluster within each strats
     
-    #calculate ranksum within each cluster within each stratum
-    
-    g <- table(crd2$id)
-    ## g is the cluster size
-    sumrank <- c(by(crd2$zrank, crd2$id, sum))
+    cluster.size <- table(data$cluster)
+    ## cluster.size is the cluster size
+    sumrank <- c(by(data$xrank, data$cluster, sum))
     ## Compute rank sum within each cluster
     
-    stratum <- c(by(crd2$stratum, crd2$id, mean))
-    ## Compute stratum mean of each cluster
+    strats <- c(by(data$strats, data$cluster, mean))
+    ## Compute strats  of each cluster
     
-    group <- c(by(crd2$group, crd2$id, mean))
-    ## Compute group mean of each cluster
+    group <- c(by(data$group, data$cluster, mean))
+    ## Compute group  of each cluster    
     
+    #count number of subunits within cluster size group within each strats
     
-    #count number of subunits within cluster size group within each stratum
-    
-    
-    ng.stratum <- as.data.frame(table(g, stratum))
-    ## Count the objects for each group and each stratum 
-    ng.xy <- as.data.frame(table(g, stratum, group))
-    ng.x <- subset(ng.xy, group == 1)
+    n.csize.strats <- as.data.frame(table(cluster.size, strats))
+    ## Count the objects for each group and each strats 
+    n.csize.xy <- as.data.frame(table(cluster.size, strats, group))
+    n.csize.x <- subset(n.csize.xy, group == 1)
     ## Take out the count for group 1
-    ng.y <- subset(ng.xy, group == 2)
+    n.csize.y <- subset(n.csize.xy, group == 2)
     
-    colnames(ng.stratum)[3] <- "Ngv"
-    colnames(ng.x)[4] <- "mgv"
+    ## Ngv is the number of clusters which have the same 
+    ## subunit, controlled by stratum.
+    colnames(n.csize.strats)[3] <- "Ngv"
     
-    psumrnk <- cbind(g, stratum, group, sumrank)
+    ## mgv is number of clusters which have the same 
+    ## subunit in group x, ontrolled by stratum.
+    colnames(n.csize.x)[4] <- "mgv"
     
-    str_unique <- sort(unique(stratum))
-    str_unique_n <- length(str_unique)
-    g_unique <- unique(g)
-    g_unique_n <- length(g_unique)
-    psumrnk_int <- matrix(0,str_unique_n*g_unique_n, 3)
+    psumrnk <- cbind(cluster.size, strats, group, sumrank)
+    
+    str.uniq <- sort(unique(strats))
+    n.str.uniq <- length(str.uniq)
+    cluser.size.uniq <- unique(cluster.size)
+    n.cluser.size.uniq <- length(cluser.size.uniq)
+    
+    if(n.cluser.size.uniq > 1L) {
+      balance <- FALSE
+    } else {
+      balance <- TRUE
+    }
+    
+    psumrnk_int <- matrix(0,  n.str.uniq * cluser.size.uniq , 3)
     
     k <- 1
-    for(i in 1:str_unique_n){
-      for(j in 1:g_unique_n){
-        foo <- sum(subset(psumrnk, stratum == str_unique[i] & g == g_unique[j])[,"sumrank"])
-        if(foo){
-          psumrnk_int[k,] <- c(str_unique[i], g_unique[j], foo)
+    for(i in 1:n.str.uniq ){
+      for(j in 1:n.cluser.size.uniq){
+        ind <- strats == str.uniq[i] & cluster.size == cluser.size.uniq[j]
+        foo <- sum(psumrnk[ind, "sumrank"])
+        if (foo) {
+          psumrnk_int[k,] <- c(str.uniq[i], cluser.size.uniq[j], foo)
           k <- k + 1
         }
       }
     }
-    colnames(psumrnk_int) <- c("stratum", "g", "psumrank")
-    psumrnk_int <- psumrnk_int[psumrnk_int[,"stratum"]!=0,]
+    colnames(psumrnk_int) <- c("strats", "cluster.size", "psumrank")
+    psumrnk_int <- (psumrnk_int[psumrnk_int[, "strats"] != 0,])
+    if (nrow(psumrnk_int) == 1) {
+      psumrnk_int <- t(as.data.frame(psumrnk_int))
+    } else {
+      psumrnk_int <- (as.data.frame(psumrnk_int))
+    }
     
-    WC <- sum(psumrnk[psumrnk[,"group"]==1,"sumrank"])
+    WC <- sum(psumrnk[psumrnk[,"group"] == 1,"sumrank"])
   
     ## Matrix to sample permuation from
-    sample.base <- as.data.frame(cbind(stratum, g, group, sumrank))
+    sample.base <- as.data.frame(cbind(strats, cluster.size, group, sumrank))
     W.samp <- rep(0, n.rep)
-    for(stm in unique(stratum)) {
-      for(gz in unique(g)) {
-        index <- which(sample.base$stratum == stm & sample.base$g == gz)
-        x.size <- ng.x[which(ng.x$stratum == stm & ng.x$g == gz), ]$mgv
+    for(stm in unique(strats)) {
+      for(cz in unique(cluster.size)) {
+        index <- which(sample.base$strats == stm & 
+                         sample.base$cluster.size == cz)
+        x.size <- n.csize.x[which(n.csize.x$strats == stm & 
+                               n.csize.x$cluster.size == cz), ]$mgv
         index.samp <- replicate(n.rep, sample(index, x.size))
         x.samp <- sample.base[index.samp, "sumrank"]
         W.samp <- W.samp + colSums(matrix(x.samp, nrow = x.size))
