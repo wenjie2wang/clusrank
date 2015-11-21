@@ -1,5 +1,6 @@
 cluswilcox.test.ranksum.permutation <-
-  function(x, cluster, group, strats,  n.rep = 1000, ...) {
+  function(x, cluster, group, strats, alternative, n.rep = 1000, 
+           DNAME = NULL, METHOD = NULL) {
     # Incoporating clustering effects for the WilcoxonRank Sum Test 
     # for stratified balanced or unbalanced designs for small 
     # sample size, where permutation test is used to simulate 
@@ -33,7 +34,7 @@ cluswilcox.test.ranksum.permutation <-
     
     ## preparation
     ## data <- na.omit(data) ## data[complete.cases(data),]
-   
+    
     
     data <- as.data.frame(cbind(x, cluster, group, strats))
     
@@ -47,7 +48,7 @@ cluswilcox.test.ranksum.permutation <-
     ## Compute the rank of x score
     
     data <- cbind(data, xrank)
-
+    
     ### calculate ranksum within each cluster within each strats
     
     cluster.size <- table(data$cluster)
@@ -113,7 +114,7 @@ cluswilcox.test.ranksum.permutation <-
     }
     
     WC <- sum(psumrnk[psumrnk[,"group"] == 1,"sumrank"])
-  
+    
     ## Matrix to sample permuation from
     sample.base <- as.data.frame(cbind(strats, cluster.size, group, sumrank))
     W.samp <- rep(0, n.rep)
@@ -122,14 +123,23 @@ cluswilcox.test.ranksum.permutation <-
         index <- which(sample.base$strats == stm & 
                          sample.base$cluster.size == cz)
         x.size <- n.csize.x[which(n.csize.x$strats == stm & 
-                               n.csize.x$cluster.size == cz), ]$mgv
+                                    n.csize.x$cluster.size == cz), ]$mgv
         index.samp <- replicate(n.rep, sample(index, x.size))
         x.samp <- sample.base[index.samp, "sumrank"]
         W.samp <- W.samp + colSums(matrix(x.samp, nrow = x.size))
         
       }
     } 
-    pval <- 2 * min(ecdf(W.samp)(WC), 1 - ecdf(W.samp)(WC), 0.5)
-    result <- list(WC = WC, p.value = pval)
-    result  
+    ecdf.wc <- ecdf(W.samp)
+    pval<- switch(alternative,
+                  less = ecdf.wc(abs(WC)), 
+                  greater = 1 - ecdf.wc(abs(WC)), 
+                  two.sided = 2 * min(ecdf.wc(abs(WC)),     
+                                      1 - ecdf.wc(abs(WC)), 
+                                      0.5))
+    names(WC) <- "Rank sum statistic"
+    
+    result <- list(WC = WC, p.value = pval, permutation = TRUE)
+    class(result) <- "ctest"
+    result
   }

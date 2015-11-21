@@ -1,5 +1,9 @@
-cluswilcox.test.formula <- function(formula, data, subset, na.action, 
+cluswilcox.test.formula <- function(formula, data = NULL, 
+                                    subset = NULL, na.action = na.omit, 
+                                    alternative = c("two.sided", "less", "greater"),
+                                    mu = 0,
                                     group.x = NULL, permutation = FALSE,
+                                    n.rep = 500, 
                                     ...) {
   ## This function is only used for rank sum test. 
   ## Mainly to process data.
@@ -22,9 +26,14 @@ cluswilcox.test.formula <- function(formula, data, subset, na.action,
   
   METHOD <- "Wilcoxon rank sum test for clutered data"
   
+  alternative <- match.arg(alternative)
+  if (!missing(mu) && ((length(mu) > 1L) || !is.finite(mu))) 
+    stop("'mu' must be a single number")
   Call <- match.call()
   
-  DNAME <- paste("from", Call$data)
+  if(!missing(data)) {
+    DNAME <- paste("from", Call$data)
+  }
   
   
   indx <- match(c("formula", "data", "subset", "na.action"),
@@ -39,9 +48,7 @@ cluswilcox.test.formula <- function(formula, data, subset, na.action,
   else terms(formula, special, data = data)
   
   cluster <- function(x) {x}
-  
   stratum <- function(x) {x}
-  
   group <- function(x) {x}
   
   
@@ -148,11 +155,23 @@ cluswilcox.test.formula <- function(formula, data, subset, na.action,
   group <- group[OK && finite.x]
   stratum <- group[OK && finite.x]
   cluster <- cluster[OK && finite.x]
+  mu <- (group == 1)* mu
+  x <- x - mu
   
   if(permutation == FALSE) {
-    return(cluswilcox.test.ranksum(x,  cluster, group, strats))
+    return(cluswilcox.test.ranksum(x,  cluster, 
+                                   group, strats, 
+                                   alternative,
+                                   DNAME, METHOD))
   } else {
-    return(cluswilcox.test.ranksum.permutation(x,  cluster, group, strats, ...))
+    return(cluswilcox.test.ranksum.permutation(x,  
+                                               cluster, 
+                                               group, 
+                                               strats, 
+                                               alternative,
+                                               n.rep,
+                                               DNAME,
+                                               METHOD))
   }
   
   

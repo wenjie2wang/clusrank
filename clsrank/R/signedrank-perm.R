@@ -8,9 +8,9 @@
 #'
 #'@param z  The name of score for each observation 
 #'in the data
-#'@param id  The name of id of cluster for each 
+#'@param cluster  The name of cluster of cluster for each 
 #'observation in the data. If not specified, each score has 
-#'its own id, which reduces to non-clustereddata.
+#'its own cluster, which reduces to non-clustereddata.
 #'@param data  An optional data frame, list or environment (or object
 #'coercible by \code{as.data.frame} to a data frame) containing the
 #'variables in the model.  If not found in \code{data}, the 
@@ -30,60 +30,75 @@
 #' Zero values can be included in a dataset but are not used in 
 #' the analysis. 
 #'@examples
-#'data(crsd)
-#'clusignrank(z, id, data = crsd)
-#'data(crsd.unb)
-#'clusignrank(z, id, data = crsd.unb)
+#'data(data)
+#'clusignrank(z, cluster, data = data)
+#'data(data.unb)
+#'clusignrank(z, cluster, data = data.unb)
 #'
 #'@references
 #'Bernard Rosner, Robert J. Glynn, Mei-Ling Ting Lee(2006) 
 #'\emph{The Wilcoxon Signed Rank Test for Paired Comparisons of
 #' Clustered Data.} Biometrics, \bold{62}, 185-192.
 
-clusignrank.s <- 
-  function(z, id = NULL, data = parent.frame(), n.sim = 1000){
+cluswilcox.test.signedrank.permutation <- 
+  function(z, cluster,  alternative, n.rep = 1000,
+           DNAME = NULL, METHOD = NULL){
     
     #Calculate number of observations per cluster
-    pars <- as.list(match.call()[-1])
-    data <- data[, as.character(pars$z) !=0]
-    z <- data[,as.character(pars$z)]
-    id <- pars$id
-    if (is.null(id)) {
-      id <- 1:length(z)
-    } else {
-      id <- data[,as.character(id)]
-    }
-    crsd <- data.frame(z, id)
-    g <- table(crsd$id)
-    m <- length(g)
-    n <- nrow(crsd)
     
-    zrank <- rank(abs(crsd$z))
-    crsd1 <- cbind(crsd, zrank)
-    signrank <- ifelse(crsd1$z > 0, 1, -1) * crsd1$zrank
-    crsd1 <- cbind(crsd1, signrank)
-    colnames(crsd1)[4] <- "signrank"
+    
+    data <- data.frame(z, cluster)
+    cluster.size <- table(data$cluster)
+    m <- length(cluster.size)
+    n <- nrow(data)
+    if (length(table(cluster.size)) != 1) {
+      balance = FALSE
+    } else {
+      balance = TRUE
+    }
+    zrank <- rank(abs(data$z))
+    data <- cbind(data, zrank)
+    signrank <- ifelse(data$z > 0, 1, -1) * data$zrank
+    data <- cbind(data, signrank)
+    colnames(data)[4] <- "signrank"
+    
     if(balance == TRUE){
-      T_c <- sum(crsd1$signrank)
-      sumrank <- c(by(crsd1$signrank, crsd1$id, sum))
-      delta <- replicate(n.sim, sample(c(-1, 1), m, TRUE))
+      T_c <- sum(data$signrank)
+      sumrank <- c(by(data$signrank, data$cluster, sum))
+      delta <- replicate(n.rep, sample(c(-1, 1), m, TRUE))
       T_c.sim <- colSums(delta * sumrank)
-      P_val <- 2 * min(1 - ecdf(T_c.sim)(T_c), ecdf(T_c.sim)(T_c), 0.5)
-      result <- list(T_C = T_c,  
-                     p.value = P_val, n = n, m = m)
+      ecdf.tc <- ecdf(T_c.sim)
+      
+      
+      P_val <- switch(alternative,
+                      less = ecdf.tc(abs(T_c)), 
+                      greater = 1 - ecdf.tc(abs(T_c)), 
+                      two.sided = 2 * min(ecdf.tc(abs(T_c)),     
+                                          1 - ecdf.tc(abs(T_c)), 
+                                          0.5))
+      
+      
+      names(T_c) <- "rank statistic"
+      names(n) <- "total number of observations"
+      names(m) <- "total number of clusters"
+      result <- list(rstatistic = T_c,  
+                     p.value = P_val, 
+                     n = n,  cn = m, permutation = TRUE,
+                     method = METHOD, data.name = DNAME)
+      class(result) <- "ctest"
       return(result)
     } else {
       if (balance == FALSE) {
-        sumidrank <- c(by(crsd1$signrank, crsd1$id, sum))
-        sumsq <- sum(sumidrank ^ 2)
-        meansumrank <- sumidrank / g
-        sumsqi <- sum(g ^ 2)
+        sumclusterrank <- c(by(data$signrank, data$cluster, sum))
+        sumsq <- sum(sumclusterrank ^ 2)
+        meansumrank <- sumclusterrank / cluster.size
+        sumsqi <- sum(cluster.size ^ 2)
         
         # calculate intraclass correlation between signed ranks within the same cluster
-        crsd1$id.f <- as.factor(crsd1$id)
-        mod <- lm(signrank ~ id.f, crsd1, y = TRUE)
-        errordf <- mod$df.residual
-        errorss <- sum(mod$residuals ^ 2)
+        data$cluster.f <- as.factor(data$cluster)
+        mod <- lm(signrank ~ cluster.f, data, y = TRUE)
+        errordf <- mod$df.resclusterual
+        errorss <- sum(mod$resclusteruals ^ 2)
         modeldf <- n - errordf - 1
         modelss <- sum((mod$y - mean(mod$y)) ^ 2) - errorss
         sumi <- n
@@ -105,15 +120,31 @@ clusignrank.s <-
         if (roscor > 1) {
           roscor = 1
         }
-        wi <- g / (vars * (1 + (g - 1) * roscor))
+        wi <- cluster.size / (vars * (1 + (g - 1) * roscor))
         T_c <- sum(meansumrank * wi)
         
-        delta <- replicate(n.sim, sample(c(-1, 1), m, TRUE))
+        delta <- replicate(n.rep, sample(c(-1, 1), m, TRUE))
         T_c.sim <- colSums(delta * c(meansumrank) * c(wi))
-        P_val <- 2 * min(1 - ecdf(T_c.sim)(T_c), ecdf(T_c.sim)(T_c), 0.5)
+        
+        ecdf.tc <- ecdf(T_c.sim)
         
         
-        result <- list(T_C = T_c,  p.value = P_val, n = n, m = m)
+        P_val <- switch(alternative,
+                        less = ecdf.tc(abs(T_c)), 
+                        greater = 1 - ecdf.tc(abs(T_c)), 
+                        two.sided = 2 * min(ecdf.tc(abs(T_c)),     
+                                            1 - ecdf.tc(abs(T_c)), 
+                                            0.5))
+        
+
+        names(T_c) <- "rank statistic"
+        names(n) <- "total number of observations"
+        names(m) <- "total number of clusters"
+        result <- list(rstatistic = T_c,  
+                       p.value = P_val, 
+                       n = n,  cn = m, permutation = TRUE,
+                       method = METHOD, data.name = DNAME)
+        class(result) <- "ctest"
         return(result)
       }
     }

@@ -32,8 +32,7 @@ print.ctest <- function (x, digits = getOption("digits"), prefix = "\t", ...)
   cat(strwrap(paste(out, collapse = ", ")), sep = "\n")
   out <- character()
   if(!is.null(x$n)) 
-    out <- c(out, paste(names(x$n), "=", format(signif(x$n, 
-                                                               max(1L, digits - 2L)))))
+    out <- c(out, paste(names(x$n), "=", format(signif(x$n, max(1L, digits - 2L)))))
   if(!is.null(x$cn)) 
     out <- c(out, paste(names(x$cn), "=", format(signif(x$cn, 
                                                        max(1L, digits - 2L)))))

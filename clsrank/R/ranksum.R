@@ -62,7 +62,8 @@
 
 
 cluswilcox.test.ranksum <-
-  function(x, cluster, group, strats) {
+  function(x, cluster, group, strats, 
+           alternative, DNAME = NULL, METHOD = NULL) {
   # Incoporatin.csize clusterin.csize effects for the WilcoxonRank Sum Test 
   # for stratified balanced or unbalanced designs. In addition,
   # one can control for confoundin.csize by formin.csize strata which are 
@@ -189,11 +190,16 @@ cluswilcox.test.ranksum <-
   ## and that cluster contains only 1
   
   zc <- (WC - ExpWc)/sqrt(varwc_final)
-  pval <- 2*(1-pnorm(abs(zc)))
-  names(WC) <- "Wc"
-  names(ExpWc) <- "ExpWc" 
-  names(varwc_final) <- "VarWc"
-  names(zc) <- "Zc"
+  pval <- switch(alternative,
+                  less = pnorm(abs(zc)), 
+                  greater = pnorm(abs(zc), lower.tail = FALSE), 
+                  two.sided = 2 * min(pnorm(abs(zc)),     
+                                      pnorm(abs(zc), lower.tail = FALSE)))
+  
+  names(WC) <- "Rank sum statistic"
+  names(ExpWc) <- "Expected value of rank sum statistic" 
+  names(varwc_final) <- "Variance of rank sum statistic"
+  names(zc) <- "Test statistic"
   result <- list(rstatistic = WC, erstatistic = ExpWc, 
                  vrstatistic = varwc_final,
                  statistic = zc, p.value = pval,
