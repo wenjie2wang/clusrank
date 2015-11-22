@@ -21,23 +21,24 @@
 ################################################################################
 
 #' The Wilcoxon Signed Rank Test for Clustered Data
-#' 
-#' Performs one-sample Wilcoxon test on vectors of data using 
+#'
+#' Performs one-sample Wilcoxon test on vectors of data using
 #' large sample.
-#' 
-#' @param x  numeric vector of data values. Non-finite (e.g., 
+#'
+#' @param x  numeric vector of data values. Non-finite (e.g.,
 #' infinite or missing) values will be omitted.
-#' @param cluster numeric or charater vector, the id of clusters. 
-#'  If not specified, each observation will 
+#' @param cluster numeric or charater vector, the id of clusters.
+#'  If not specified, each observation will
 #' be assigned a distinct cluster, i.e., no cluster in the data.
-#' @param alternative a character string specifying the 
+#' @param alternative a character string specifying the
 #' alternative hypothesis, must be one of "two.sided" (default),
 #'  "greater" or "less". You can specify just the initial letter.
-#' @param DNAME a character string, inheritated from 
+#'@param n.rep number of samples generated for permutation test.
+#' @param DNAME a character string, inheritated from
 #' \code{cluswilcox.test.formula}, for result output.
-#' @param METHOD a character string, inheritated from 
+#' @param METHOD a character string, inheritated from
 #' \code{cluswilcox.test.formula}, for result output.
-#' @return  a list with class "\code{ctest}" containing 
+#' @return  a list with class "\code{ctest}" containing
 #' the following components:
 #' \item{rstatistic}{the value of the signed rank statistic
 #'  with a name describing it.}
@@ -49,28 +50,28 @@
 #' \item{data.name}{a character string giving the names of the data.}
 #' \item{method}{the type of test applied.}
 #' \item{adjusted}{indicator of whether adjusted signed rank statistic is used.}
-#' @note This function is able to deal with data with 
+#' @note This function is able to deal with data with
 #' clusterentitical or variable cluster size. When the data
 #' is unbalanced, adjusted signed rank statistic is used.
-#' Ties are dropped in the test. 
+#' Ties are dropped in the test.
 #' @examples
 #' data(crsd)
 #' cluswilcox.test(z, cluster = id, data = crsd, permutation = TRUE)
-#' data(crsd.unb)
-#' cluswilcox.test(z, cluster = id, data = crsd.unb, permutation = TRUE)
-#' @author Yujing Jiang 
+#' data(crsdUnb)
+#' cluswilcox.test(z, cluster = id, data = crsdUnb, permutation = TRUE)
+#' @author Yujing Jiang
 #' @references
-#' Bernard Rosner, Robert J. Glynn, Mei-Ling Ting Lee(2006) 
+#' Bernard Rosner, Robert J. Glynn, Mei-Ling Ting Lee(2006)
 #' \emph{The Wilcoxon Signed Rank Test for Paired Comparisons of
 #'  Clustered Data.} Biometrics, \bold{62}, 185-192.
-cluswilcox.test.signedrank.permutation <- 
-  function(z, cluster, alternative, n.rep = 500,
+cluswilcox.test.signedrank.permutation <-
+  function(x, cluster, alternative, n.rep = 500,
            DNAME = NULL , METHOD = NULL){
-    
+
     #Calculate number of observations per cluster
-    
-    
-    data <- data.frame(z, cluster)
+
+
+    data <- data.frame(x, cluster)
     cluster.size <- table(data$cluster)
     m <- length(cluster.size)
     n <- nrow(data)
@@ -79,33 +80,33 @@ cluswilcox.test.signedrank.permutation <-
     } else {
       balance = TRUE
     }
-    zrank <- rank(abs(data$z))
-    data <- cbind(data, zrank)
-    signrank <- ifelse(data$z > 0, 1, -1) * data$zrank
+    xrank <- rank(abs(data$x))
+    data <- cbind(data, xrank)
+    signrank <- ifelse(data$x > 0, 1, -1) * data$xrank
     data <- cbind(data, signrank)
     colnames(data)[4] <- "signrank"
-    
+
     if(balance == TRUE){
       T_c <- sum(data$signrank)
       sumrank <- c(by(data$signrank, data$cluster, sum))
       delta <- replicate(n.rep, sample(c(-1, 1), m, TRUE))
       T_c.sim <- colSums(delta * sumrank)
       ecdf.tc <- ecdf(T_c.sim)
-      
-      
+
+
       P_val <- switch(alternative,
-                      less = ecdf.tc(abs(T_c)), 
-                      greater = 1 - ecdf.tc(abs(T_c)), 
-                      two.sided = 2 * min(ecdf.tc(abs(T_c)),     
-                                          1 - ecdf.tc(abs(T_c)), 
+                      less = ecdf.tc(abs(T_c)),
+                      greater = 1 - ecdf.tc(abs(T_c)),
+                      two.sided = 2 * min(ecdf.tc(abs(T_c)),
+                                          1 - ecdf.tc(abs(T_c)),
                                           0.5))
-      
-      
+
+
       names(T_c) <- "rank statistic"
       names(n) <- "total number of observations"
       names(m) <- "total number of clusters"
-      result <- list(rstatistic = T_c,  
-                     p.value = P_val, 
+      result <- list(rstatistic = T_c,
+                     p.value = P_val,
                      n = n,  cn = m, permutation = TRUE,
                      method = METHOD, data.name = DNAME)
       class(result) <- "ctest"
@@ -116,7 +117,7 @@ cluswilcox.test.signedrank.permutation <-
         sumsq <- sum(sumclusterrank ^ 2)
         meansumrank <- sumclusterrank / cluster.size
         sumsqi <- sum(cluster.size ^ 2)
-        
+
         # calculate intraclass correlation between signed ranks within the same cluster
         data$cluster.f <- as.factor(data$cluster)
         mod <- lm(signrank ~ cluster.f, data, y = TRUE)
@@ -125,7 +126,7 @@ cluswilcox.test.signedrank.permutation <-
         modeldf <- n - errordf - 1
         modelss <- sum((mod$y - mean(mod$y)) ^ 2) - errorss
         sumi <- n
-        
+
         m0 <- (sumi - (sumsqi / sumi)) / (m - 1)
         totalss <- errorss + modelss
         totaldf <- errordf + modeldf
@@ -145,34 +146,34 @@ cluswilcox.test.signedrank.permutation <-
         }
         wi <- cluster.size / (vars * (1 + (cluster.size - 1) * roscor))
         T_c <- sum(meansumrank * wi)
-        
+
         delta <- replicate(n.rep, sample(c(-1, 1), m, TRUE))
         T_c.sim <- colSums(delta * c(meansumrank) * c(wi))
-        
+
         ecdf.tc <- ecdf(T_c.sim)
-        
-        
+
+
         P_val <- switch(alternative,
-                        less = ecdf.tc(abs(T_c)), 
-                        greater = 1 - ecdf.tc(abs(T_c)), 
-                        two.sided = 2 * min(ecdf.tc(abs(T_c)),     
-                                            1 - ecdf.tc(abs(T_c)), 
+                        less = ecdf.tc(abs(T_c)),
+                        greater = 1 - ecdf.tc(abs(T_c)),
+                        two.sided = 2 * min(ecdf.tc(abs(T_c)),
+                                            1 - ecdf.tc(abs(T_c)),
                                             0.5))
-        
+
 
         names(T_c) <- "adjusted rank statistic"
         names(n) <- "total number of observations"
         names(m) <- "total number of clusters"
-        result <- list(rstatistic = T_c,  
-                       p.value = P_val, 
+        result <- list(rstatistic = T_c,
+                       p.value = P_val,
                        n = n,  cn = m, permutation = TRUE,
-                       method = METHOD, data.name = DNAME, 
+                       method = METHOD, data.name = DNAME,
                        balance = balance)
         class(result) <- "ctest"
         return(result)
       }
     }
-    
-    
-    
+
+
+
   }

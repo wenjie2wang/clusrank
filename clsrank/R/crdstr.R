@@ -10,7 +10,7 @@
 #'   \item stratum. stratum id
 #' }
 #'
-#' @name crdstr
+#' @name crdStr
 #' @format A data frame with 956 rows and 4 variables
 #' @source \url{https://sites.google.com/a/channing.harvard.edu/bernardrosner/channing/incorporating-cluster-effects-for-the-wilcoxon-rank-sum-test-1/stratify--cluswilcox/sample-data}
 NULL

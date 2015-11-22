@@ -1,6 +1,6 @@
 ################################################################################
 ##
-##   R package clusrank by Mei-Lin.csize Tin.csize Lee, Jun Yan, and Yujin.csize Jian.csize
+##   R package clusrank by Mei-Ling Ting Lee, Jun Yan, and Yujing Jiang
 ##   Copyright (C) 2015
 ##
 ##   This file is part of the R package clusrank.
@@ -16,94 +16,100 @@
 ##   GNU General Public License for more details.
 ##
 ##   You should have received a copy of the GNU General Public License
-##   alon.csize with the R package clusrank. If not, see <http://www.gnu.org/licenses/>.
+##   along with the R package clusrank. If not, see <http://www.gnu.org/licenses/>.
 ##
 ################################################################################
 
 
 #'Wilcoxon Rank Sum Test for Clustered Data
-#'This is the sum rank test to compare the means of scores from 
+#'This is the sum rank test to compare the means of scores from
 #'two groups for clustered data. The cluster size can be either
-#'identitical or variable. Effect of stratification on the test 
+#'identitical or variable. Effect of stratification on the test
 #'is also adjusted for if in presence.
 #'@param formula   an object of class \code{"formula"} in the
-#'form of  \code{lhs \~ rhs}, where \code{lhs} is a numeric 
+#'form of  \code{lhs \~ rhs}, where \code{lhs} is a numeric
 #'variable giving the data values and \code{rhs} contains
 #'the \code{cluster}, \code{group}, \code{stratum}, e.g.,
-#'\code{z ~ cluster(a) + group(b) + stratum(c)}, where 
+#'\code{z ~ cluster(a) + group(b) + stratum(c)}, where
 #'\code{cluster}, \code{group}, \code{stratum} are special terms.
 #'@param data a optional data frame
-#'@param subset an optional vector specifyin.csize a 
+#'@param subset an optional vector specifyin.csize a
 #'subset of observations to be used.
-#'@param na.action a function which indicates what should happen 
+#'@param na.action a function which indicates what should happen
 #'when the data contains NAs. The  default action is to omit them.
-#'@param alternative a character string specifying the 
+#'@param alternative a character string specifying the
 #' alternative hypothesis, must be one of "two.sided" (default),
 #'  "greater" or "less". You can specify just the initial letter.
-#'  @param mu a number specifying an optional parameter used to 
+#'@param mu a number specifying an optional parameter used to
 #'  form the null hypothesis. See 'Details'.
-#'  @param group.x a character or a number, indicates which group id
+#'@param group.x a character or a number, indicates which group id
 #'  is for treatment x.
+#'@param permutation A logical, whether to use permutation test.
+#'@param n.rep number of samples generated for permutation test.
 #'@param ... additional arguments, currently ignored.
 #'
 #'@return  a list with the followin.csize components
-#'\item{Wc}{Clustered Wilcoxon ranksum statistic.}
-#'\item{ExpWc}{Expected value clustered Wilcoxon ranksum statistic.}
-#'\item{VarWc}{Variance of clustered Wilcoxon ranksum statistic.}
-#'\item{zc}{z statistic for clustered Wilcoxon ranksum statistic.}
-#'\item{p.value}{P-value for clustered Wilcoxon ranksum z statistic}
-#'
+#' \item{rstatistic}{the value of the signed rank statistic
+#'  with a name describing it.}
+#'\item{erstatistics}{Expected value clustered Wilcoxon ranksum statistic.}
+#'\item{vrstatistics}{Variance of clustered Wilcoxon ranksum statistic.}
+#'\item{statistics}{the value of the test statistic.}
+#'\item{p.value}{the p-value for the test}
+#'\item{data.name}{a character string giving the names of the data.}
+#'\item{method}{the name of the method}
+#'\item{balance}{a logical, indicating if the data is balanced.}
 #'@examples
 #'data(crd)
 #'cluswilcox.test(z ~ group(group) + cluster(id), data = crd)
-#'data(crd.str)
-#'cluswilcox.test(z ~ group(group) + cluster(id) + stratum(stratum), data = crd.str)
+#'data(crdStr)
+#'cluswilcox.test(z ~ group(group) + cluster(id) + stratum(stratum), data = crdStr)
 #'
 #'@author Yujing Jiang
 #'@references
 #'Bernard Rosner, Robert J. Glynn, Mei-Lin.csize Tin.csize Lee(2003)
-#' \emph{Incorporation of Clusterin.csize Effects for the Wilcoxon Rank 
+#' \emph{Incorporation of Clusterin.csize Effects for the Wilcoxon Rank
 #' Sum Test: A Large-Sample Approach.} Biometrics, \bold{59}, 1089-1098.
+#' @S3method cluswilcox.test formula
+#' @export
 
-
-cluswilcox.test.formula <- function(formula, data = NULL, 
-                                    subset = NULL, na.action = na.omit, 
+cluswilcox.test.formula <- function(formula, data = NULL,
+                                    subset = NULL, na.action = na.omit,
                                     alternative = c("two.sided", "less", "greater"),
                                     mu = 0,
                                     group.x = NULL, permutation = FALSE,
-                                    n.rep = 500, 
+                                    n.rep = 500,
                                     ...) {
-  ## This function is only used for rank sum test. 
+  ## This function is only used for rank sum test.
   ## Mainly to process data.
   ## Inputs:
   ##  formula: a formula of the form "lhs ~ rhs",
-  ##    where the lhs is a numeric variable giving the 
-  ##    data values, the observed score and the rhs 
-  ##    is of the form with special terms: 
+  ##    where the lhs is a numeric variable giving the
+  ##    data values, the observed score and the rhs
+  ##    is of the form with special terms:
   ##    cluster(x1) + group(x2) + stratum(x3), where
   ##    x1, x2, x3 are the corresponding variables.
-  ##  data: an optional matrix or dataframe of data 
+  ##  data: an optional matrix or dataframe of data
   ##    used in the formula.
   ##  subset: an optional vector specifying
   ##   a subset of observations to be used.
-  ##  na.action: a function which indicates what should happen when 
+  ##  na.action: a function which indicates what should happen when
   ##    the data contain NAs. Defaults to getOption("na.action").
   ##
   ##
   ##
-  
+
   METHOD <- "Wilcoxon rank sum test for clutered data"
-  
+
   alternative <- match.arg(alternative)
-  if (!missing(mu) && ((length(mu) > 1L) || !is.finite(mu))) 
+  if (!missing(mu) && ((length(mu) > 1L) || !is.finite(mu)))
     stop("'mu' must be a single number")
   Call <- match.call()
-  
+
   if(!missing(data)) {
     DNAME <- paste("from", Call$data)
   }
-  
-  
+
+
   indx <- match(c("formula", "data", "subset", "na.action"),
                 names(Call), nomatch = 0)
   if(indx[1] == 0)
@@ -116,34 +122,32 @@ cluswilcox.test.formula <- function(formula, data = NULL,
   else terms(formula, special, data = data)
   x.name <- rownames(attr(temp$formula, "factors"))[1]
   DNAME <- paste0(paste(x.name ,DNAME), ",")
-  
-  cluster <- function(x) {x}
-  stratum <- function(x) {x}
-  group <- function(x) {x}
-  
-  
+
+
+
+
   mf <- eval(temp, parent.frame())
-  
-  if(nrow(mf) == 0) 
+
+  if(nrow(mf) == 0)
     stop("No (non-missing) observations")
-  
+
   Terms <- terms(mf)
   extraArgs <- list(...)
-  
+
   x <- model.extract(mf, "response")
   if(is.vector(x)) {
     data.n <- length(x)
   } else {
     data.n <- nrow(x)
   }
-  
-  
+
+
   strats <- attr(Terms, "specials")$stratum
-  
+
   if(length(strats)) {
     stemp <- untangle.specials(Terms, "stratum", 1)
     strats.name <- gsub("[\\(\\)]", "",
-                         regmatches(stemp$vars, 
+                         regmatches(stemp$vars,
                                     gregexpr("\\(.*?\\)", stemp$vars))[[1]])
         DNAME <- paste0(  DNAME, " stratum: ", strats.name, ",")
 
@@ -154,7 +158,7 @@ cluswilcox.test.formula <- function(formula, data = NULL,
     }
     strats.uniq <- unique(strats.keep)
     strats.uniq.l <- length(strats.uniq)
-    
+
     if(is.character(strats.uniq)) {
       strats <- recoderFunc(strats.keep, strats.uniq, c(1 : strats.uniq.l))
     } else {
@@ -166,16 +170,16 @@ cluswilcox.test.formula <- function(formula, data = NULL,
   } else {
     strats <- rep(1, data.n)
   }
-  
+
   cluster <- attr(Terms, "specials")$cluster
   if(length(cluster)) {
     ctemp <- untangle.specials(Terms, "cluster", 1)
     cluster.name <- gsub("[\\(\\)]", "",
-                         regmatches(ctemp$vars, 
+                         regmatches(ctemp$vars,
                                     gregexpr("\\(.*?\\)", ctemp$vars))[[1]])
     DNAME <- paste0(DNAME, " cluster: ", cluster.name, ",")
-    
-      
+
+
     if(length(ctemp$vars) == 1) {
       cluster.keep <- mf[[ctemp$vars]]
     } else {
@@ -183,7 +187,7 @@ cluswilcox.test.formula <- function(formula, data = NULL,
     }
     cluster.uniq <- unique(cluster.keep)
     cluster.uniq.l <- length(cluster.uniq)
-    
+
     if(is.character(cluster.uniq)) {
       cluster <- recoderFunc(cluster.keep, cluster.uniq, c(1 : cluster.uniq.l))
     } else {
@@ -195,16 +199,16 @@ cluswilcox.test.formula <- function(formula, data = NULL,
   } else {
     cluster <- c(1 : data.n)
   }
-  
+
   group <- attr(Terms, "specials")$group
   if(length(group)) {
     gtemp <- untangle.specials(Terms, "group", 1)
     group.name <- gsub("[\\(\\)]", "",
-                         regmatches(gtemp$vars, 
+                         regmatches(gtemp$vars,
                                     gregexpr("\\(.*?\\)", gtemp$vars))[[1]])
         DNAME <- paste0(DNAME, " group: ", group.name, ",")
 
-    
+
     if(length(gtemp$vars) == 1) {
       group.keep <- mf[[gtemp$vars]]
     } else {
@@ -212,11 +216,11 @@ cluswilcox.test.formula <- function(formula, data = NULL,
     }
     group.uniq <- unique(group.keep)
     group.uniq.l <- length(group.uniq)
-    
+
     if(!is.character(group.uniq) && !is.numeric(group.uniq)) {
       stop("group id has to be numeric or character")
     }
-    
+
     if(group.uniq.l > 2L) {
       stop("can only handle 2 groups in rank sum test")
     }
@@ -232,7 +236,7 @@ cluswilcox.test.formula <- function(formula, data = NULL,
   } else {
     stop("no group id for rank sum test")
   }
-  
+
   OK <- complete.cases(x)
   finite.x <- is.finite(x)
   x <- x[OK && finite.x]
@@ -241,23 +245,23 @@ cluswilcox.test.formula <- function(formula, data = NULL,
   cluster <- cluster[OK && finite.x]
   mu <- (group == 1)* mu
   x <- x - mu
-  
+
   if(permutation == FALSE) {
-    return(cluswilcox.test.ranksum(x,  cluster, 
-                                   group, strats, 
+    return(cluswilcox.test.ranksum(x,  cluster,
+                                   group, strats,
                                    alternative,
                                    DNAME, METHOD))
   } else {
-    return(cluswilcox.test.ranksum.permutation(x,  
-                                               cluster, 
-                                               group, 
-                                               strats, 
+    return(cluswilcox.test.ranksum.permutation(x,
+                                               cluster,
+                                               group,
+                                               strats,
                                                alternative,
                                                n.rep,
                                                DNAME,
                                                METHOD))
   }
-  
-  
 
-} 
+
+
+}

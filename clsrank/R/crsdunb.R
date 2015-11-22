@@ -9,7 +9,7 @@
 #'   \item z. observed score
 #' }
 #'
-#' @name crsdunb
+#' @name crsdUnb
 #' @format A data frame with 748 rows and 2 variables
 #' @source \url{https://sites.google.com/a/channing.harvard.edu
 #' /bernardrosner/channing/
