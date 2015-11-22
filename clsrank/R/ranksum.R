@@ -169,13 +169,8 @@ cluswilcox.test.ranksum <-
     }
   }
   colnames(psumrnk_int) <- c("strats", "cluster.size", "psumrank")
-  psumrnk_int <- (psumrnk_int[psumrnk_int[, "strats"] != 0,])
-  if (nrow(psumrnk_int) == 1) {
-    psumrnk_int <- t(as.data.frame(psumrnk_int))
-  } else {
-    psumrnk_int <- (as.data.frame(psumrnk_int))
-  }
-  
+  psumrnk_int <- as.data.frame(psumrnk_int[psumrnk_int[, "strats"] != 0, , drop = FALSE])
+
   WC <- sum(psumrnk[psumrnk[,"group"] == 1,"sumrank"])
   
   expwc <- merge(merge(n.csize.x, psumrnk_int), n.csize.strats)
@@ -203,6 +198,7 @@ cluswilcox.test.ranksum <-
   result <- list(rstatistic = WC, erstatistic = ExpWc, 
                  vrstatistic = varwc_final,
                  statistic = zc, p.value = pval,
+                 data.name = DNAME,
                  method = METHOD, 
                  balance = balance)
   class(result) <- "ctest"

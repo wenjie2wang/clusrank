@@ -20,30 +20,32 @@
 ##
 ################################################################################
 
-#' The Wilcoxon Signed Rank Test for Paired Comparisons of Clustered Data
+#' The Wilcoxon Signed Rank Test for Clustered Data
 #' 
-#' This is the signed rank test for clustered data where there are 
-#' changed score for each subject per cluster. The hypothesis to tset
-#' is that the distribution of change in score 
-#' is symmetric about zero. Each subunit (instead of the most basic unit)
-#' it the unit of change.
+#' Performs one-sample Wilcoxon test on vectors of data using 
+#' large sample.
 #' 
-#' @param z  a vector, contains the difference between 
-#' score of observations, or the score of objects before treatment.
-#' @param y  a vector, the score of objects after treatment if is 
-#' not NULL.
-#' @param cluster the cluster cluster for each 
-#' observation. If not specified, each observation will 
+#' @param x  numeric vector of data values. Non-finite (e.g., 
+#' infinite or missing) values will be omitted.
+#' @param cluster numeric or charater vector, the id of clusters. 
+#'  If not specified, each observation will 
 #' be assigned a distinct cluster, i.e., no cluster in the data.
-#' @param data  an optional data frame
-#' 
-#' @return  a list with the following components
-#' \item{rstatistic}{Clustered Wilcoxon signed rank statistic.}
-#' \item{vrstatistic}{Variance of clustered Wilcoxon signed rank statistic.}
-#' \item{statistic}{Standardized clustered Wilcoxon signed rank statistic.}
-#' \item{p.value}{P-value for clustered Wilcoxon rank test statistic W_c.}
+#' @param alternative a character string specifying the 
+#' alternative hypothesis, must be one of "two.sided" (default),
+#'  "greater" or "less". You can specify just the initial letter.
+#' @param DNAME a character string, inheritated from 
+#' \code{cluswilcox.test.numeric}, for result output.
+#' @param METHOD a character string, inheritated from 
+#' \code{cluswilcox.test.numeric}, for result output.
+#' @return  a list with class "\code{ctest}" containing 
+#' the following components:
+#' \item{rstatistic}{the value of the signed rank statistic
+#'  with a name describing it.}
+#' \item{vrstatistic}{Variance of \code{rstatistic}.}
+#' \item{statistic}{the value of the test statistic.}
+#' \item{p.value}{the p-value for the test.}
 #' \item{n}{Total number of observations.}
-#' \item{m}{Total number of clusters.}
+#' \item{cn}{Total number of clusters.}
 #' \item{data.name}{a character string giving the names of the data.}
 #' \item{method}{the type of test applied.}
 #' \item{adjusted}{indicator of whether adjusted signed rank statistic is used.}
@@ -52,10 +54,10 @@
 #' is unbalanced, adjusted signed rank statistic is used.
 #' Ties are dropped in the test. 
 #' @examples
-#' data(data)
-#' clusignrank(z, cluster, data = data)
-#' data(data.unb)
-#' clusignrank(z, cluster, data = data.unb)
+#' data(crsd)
+#' cluswilcox.test(z, cluster = id, data = crsd)
+#' data(crsd.unb)
+#' cluswilcox.test(z, cluster = id, data = crsd.unb)
 #' @author Yujing Jiang 
 #' @references
 #' Bernard Rosner, Robert J. Glynn, Mei-Ling Ting Lee(2006) 
@@ -63,7 +65,7 @@
 #'  Clustered Data.} Biometrics, \bold{62}, 185-192.
 
 cluswilcox.test.signedrank <- 
-  function(z, cluster,
+  function(x, cluster,
            alternative = c("two.sided", "less", "greater"),
            DNAME = NULL, METHOD = NULL) {
     #Calculate number of observations per cluster
@@ -73,8 +75,8 @@ cluswilcox.test.signedrank <-
     
     ## Drop the ties
 
-    data <- data.frame(z, cluster)
-    data <- data[z != 0, ]
+    data <- data.frame(x, cluster)
+    data <- data[x != 0, ]
     cluster.size <- table(data$cluster)
     m <- length(cluster.size)
     n <- nrow(data)
@@ -84,9 +86,9 @@ cluswilcox.test.signedrank <-
       balance = TRUE
     }
     
-    zrank <- rank(abs(data$z))
-    data <- cbind(data, zrank)
-    signrank <- ifelse(data$z > 0, 1, -1) * data$zrank
+    xrank <- rank(abs(data$x))
+    data <- cbind(data, xrank)
+    signrank <- ifelse(data$x > 0, 1, -1) * data$xrank
     data <- cbind(data, signrank)
     colnames(data)[4] <- "signrank"  
     if(balance == TRUE){
@@ -155,8 +157,9 @@ cluswilcox.test.signedrank <-
                        two.sided = 2 * min(pnorm(abs(W_c)),     
                                            pnorm(abs(W_c), lower.tail = FALSE)))
 
-        names(T_c) <- "T_cs"
-        names(W_c) <- "W_cs"
+        names(T_c) <- "adjusted rank statistic"
+        names(W_c) <- "test statistic"
+        
         ADJUST <- TRUE
         
         names(n) <- "total number of observations"

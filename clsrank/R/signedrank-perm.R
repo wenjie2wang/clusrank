@@ -1,48 +1,71 @@
-#'The Wilcoxon Signed Rank Test for Paired Comparisons of Clustered Data
-#'
-#'This is the signed rank test for clustered data where there are 
-#'changed score for each subject per cluster. The hypothesis to tset
-#'is that the distribution of change in score 
-#'is symmetric about zero. Each subunit (instead of the most basic unit)
-#'it the unit of change.
-#'
-#'@param z  The name of score for each observation 
-#'in the data
-#'@param cluster  The name of cluster of cluster for each 
-#'observation in the data. If not specified, each score has 
-#'its own cluster, which reduces to non-clustereddata.
-#'@param data  An optional data frame, list or environment (or object
-#'coercible by \code{as.data.frame} to a data frame) containing the
-#'variables in the model.  If not found in \code{data}, the 
-#'variables are taken from \code{environment(formula)}, typically
-#'the environment from which this function is called.
-#'
-#'@return  a list with the following components
-#'\item{T_c}{Clustered Wilcoxon signed ranksum statistic}
-#'\item{Var_t}{Variance of clustered Wilcoxon signed ranksum statistic}
-#'\item{W_c}{Standardized clustered Wilcoxon signed ranksum statistic}
-#'\item{p.value}{P-value for clustered Wilcoxon ranksum test statistic W_c}
-#'\item{n}{Total number of observations}
-#'\item{m}{Total number of clusters}
-#'
-#'@note  The function will determine if the dataset is balanced or 
-#'unbalanced, and treat them accordingly
-#' Zero values can be included in a dataset but are not used in 
-#' the analysis. 
-#'@examples
-#'data(data)
-#'clusignrank(z, cluster, data = data)
-#'data(data.unb)
-#'clusignrank(z, cluster, data = data.unb)
-#'
-#'@references
-#'Bernard Rosner, Robert J. Glynn, Mei-Ling Ting Lee(2006) 
-#'\emph{The Wilcoxon Signed Rank Test for Paired Comparisons of
-#' Clustered Data.} Biometrics, \bold{62}, 185-192.
+################################################################################
+##
+##   R package clusrank by Mei-Ling Ting Lee, Jun Yan, and Yujing Jiang
+##   Copyright (C) 2015
+##
+##   This file is part of the R package clusrank.
+##
+##   The R package clusrank is free software: you can redistribute it and/or
+##   modify it under the terms of the GNU General Public License as published
+##   by the Free Software Foundation, either version 3 of the License, or
+##   (at your option) any later version.
+##
+##   The R package clusrank is distributed in the hope that it will be useful,
+##   but WITHOUT ANY WARRANTY without even the implied warranty of
+##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##   GNU General Public License for more details.
+##
+##   You should have received a copy of the GNU General Public License
+##   along with the R package reda. If not, see <http://www.gnu.org/licenses/>.
+##
+################################################################################
 
+#' The Wilcoxon Signed Rank Test for Clustered Data
+#' 
+#' Performs one-sample Wilcoxon test on vectors of data using 
+#' large sample.
+#' 
+#' @param x  numeric vector of data values. Non-finite (e.g., 
+#' infinite or missing) values will be omitted.
+#' @param cluster numeric or charater vector, the id of clusters. 
+#'  If not specified, each observation will 
+#' be assigned a distinct cluster, i.e., no cluster in the data.
+#' @param alternative a character string specifying the 
+#' alternative hypothesis, must be one of "two.sided" (default),
+#'  "greater" or "less". You can specify just the initial letter.
+#' @param DNAME a character string, inheritated from 
+#' \code{cluswilcox.test.formula}, for result output.
+#' @param METHOD a character string, inheritated from 
+#' \code{cluswilcox.test.formula}, for result output.
+#' @return  a list with class "\code{ctest}" containing 
+#' the following components:
+#' \item{rstatistic}{the value of the signed rank statistic
+#'  with a name describing it.}
+#' \item{vrstatistic}{Variance of \code{rstatistic}.}
+#' \item{statistic}{the value of the test statistic.}
+#' \item{p.value}{the p-value for the test.}
+#' \item{n}{Total number of observations.}
+#' \item{cn}{Total number of clusters.}
+#' \item{data.name}{a character string giving the names of the data.}
+#' \item{method}{the type of test applied.}
+#' \item{adjusted}{indicator of whether adjusted signed rank statistic is used.}
+#' @note This function is able to deal with data with 
+#' clusterentitical or variable cluster size. When the data
+#' is unbalanced, adjusted signed rank statistic is used.
+#' Ties are dropped in the test. 
+#' @examples
+#' data(crsd)
+#' cluswilcox.test(z, cluster = id, data = crsd, permutation = TRUE)
+#' data(crsd.unb)
+#' cluswilcox.test(z, cluster = id, data = crsd.unb, permutation = TRUE)
+#' @author Yujing Jiang 
+#' @references
+#' Bernard Rosner, Robert J. Glynn, Mei-Ling Ting Lee(2006) 
+#' \emph{The Wilcoxon Signed Rank Test for Paired Comparisons of
+#'  Clustered Data.} Biometrics, \bold{62}, 185-192.
 cluswilcox.test.signedrank.permutation <- 
-  function(z, cluster,  alternative, n.rep = 1000,
-           DNAME = NULL, METHOD = NULL){
+  function(z, cluster, alternative, n.rep = 500,
+           DNAME = NULL , METHOD = NULL){
     
     #Calculate number of observations per cluster
     
@@ -97,8 +120,8 @@ cluswilcox.test.signedrank.permutation <-
         # calculate intraclass correlation between signed ranks within the same cluster
         data$cluster.f <- as.factor(data$cluster)
         mod <- lm(signrank ~ cluster.f, data, y = TRUE)
-        errordf <- mod$df.resclusterual
-        errorss <- sum(mod$resclusteruals ^ 2)
+        errordf <- mod$df.residual
+        errorss <- sum(mod$residuals ^ 2)
         modeldf <- n - errordf - 1
         modelss <- sum((mod$y - mean(mod$y)) ^ 2) - errorss
         sumi <- n
@@ -120,7 +143,7 @@ cluswilcox.test.signedrank.permutation <-
         if (roscor > 1) {
           roscor = 1
         }
-        wi <- cluster.size / (vars * (1 + (g - 1) * roscor))
+        wi <- cluster.size / (vars * (1 + (cluster.size - 1) * roscor))
         T_c <- sum(meansumrank * wi)
         
         delta <- replicate(n.rep, sample(c(-1, 1), m, TRUE))
@@ -137,13 +160,14 @@ cluswilcox.test.signedrank.permutation <-
                                             0.5))
         
 
-        names(T_c) <- "rank statistic"
+        names(T_c) <- "adjusted rank statistic"
         names(n) <- "total number of observations"
         names(m) <- "total number of clusters"
         result <- list(rstatistic = T_c,  
                        p.value = P_val, 
                        n = n,  cn = m, permutation = TRUE,
-                       method = METHOD, data.name = DNAME)
+                       method = METHOD, data.name = DNAME, 
+                       balance = balance)
         class(result) <- "ctest"
         return(result)
       }

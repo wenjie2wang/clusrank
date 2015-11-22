@@ -5,18 +5,23 @@ print.ctest <- function (x, digits = getOption("digits"), prefix = "\t", ...)
   cat("\n")
   cat("data:  ", x$data.name, "\n", sep = "")
   out <- character()
-  if (!is.null(x$rstatistic))
-    out <- c(out, paste(names(x$rstatistic), "=", format(signif(x$rstatistic, 
+  if (!is.null(x$rstatistic)){
+     cat(paste(names(x$rstatistic), "=", format(signif(x$rstatistic, 
                                                                 max(1L, digits - 2L)))))
-  if (!is.null(x$erstatistic))
-    out <- c(out, paste(names(x$erstatistic), "=", format(signif(x$erstatistic, 
+  cat("\n")
+  }
+  if (!is.null(x$erstatistic)){
+    cat( paste(names(x$erstatistic), "=", format(signif(x$erstatistic, 
                                                                 max(1L, digits - 2L)))))
   
-  if (!is.null(x$vrstatistic))
-    out <- c(out, paste(names(x$vrstatistic), "=", format(signif(x$vrstatistic, 
+  cat("\n")}
+  
+  if (!is.null(x$vrstatistic)){
+    cat(paste(names(x$vrstatistic), "=", format(signif(x$vrstatistic, 
                                                                  max(1L, digits - 2L)))))
+  cat("\n")}
   
-  
+  out <- character(0)
   if (!is.null(x$statistic)) 
     out <- c(out, paste(names(x$statistic), "=", format(signif(x$statistic, 
                                                                max(1L, digits - 2L)))))

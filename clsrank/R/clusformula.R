@@ -1,3 +1,71 @@
+################################################################################
+##
+##   R package clusrank by Mei-Lin.csize Tin.csize Lee, Jun Yan, and Yujin.csize Jian.csize
+##   Copyright (C) 2015
+##
+##   This file is part of the R package clusrank.
+##
+##   The R package clusrank is free software: you can redistribute it and/or
+##   modify it under the terms of the GNU General Public License as published
+##   by the Free Software Foundation, either version 3 of the License, or
+##   (at your option) any later version.
+##
+##   The R package clusrank is distributed in the hope that it will be useful,
+##   but WITHOUT ANY WARRANTY without even the implied warranty of
+##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##   GNU General Public License for more details.
+##
+##   You should have received a copy of the GNU General Public License
+##   alon.csize with the R package clusrank. If not, see <http://www.gnu.org/licenses/>.
+##
+################################################################################
+
+
+#'Wilcoxon Rank Sum Test for Clustered Data
+#'This is the sum rank test to compare the means of scores from 
+#'two groups for clustered data. The cluster size can be either
+#'identitical or variable. Effect of stratification on the test 
+#'is also adjusted for if in presence.
+#'@param formula   an object of class \code{"formula"} in the
+#'form of  \code{lhs \~ rhs}, where \code{lhs} is a numeric 
+#'variable giving the data values and \code{rhs} contains
+#'the \code{cluster}, \code{group}, \code{stratum}, e.g.,
+#'\code{z ~ cluster(a) + group(b) + stratum(c)}, where 
+#'\code{cluster}, \code{group}, \code{stratum} are special terms.
+#'@param data a optional data frame
+#'@param subset an optional vector specifyin.csize a 
+#'subset of observations to be used.
+#'@param na.action a function which indicates what should happen 
+#'when the data contains NAs. The  default action is to omit them.
+#'@param alternative a character string specifying the 
+#' alternative hypothesis, must be one of "two.sided" (default),
+#'  "greater" or "less". You can specify just the initial letter.
+#'  @param mu a number specifying an optional parameter used to 
+#'  form the null hypothesis. See 'Details'.
+#'  @param group.x a character or a number, indicates which group id
+#'  is for treatment x.
+#'@param ... additional arguments, currently ignored.
+#'
+#'@return  a list with the followin.csize components
+#'\item{Wc}{Clustered Wilcoxon ranksum statistic.}
+#'\item{ExpWc}{Expected value clustered Wilcoxon ranksum statistic.}
+#'\item{VarWc}{Variance of clustered Wilcoxon ranksum statistic.}
+#'\item{zc}{z statistic for clustered Wilcoxon ranksum statistic.}
+#'\item{p.value}{P-value for clustered Wilcoxon ranksum z statistic}
+#'
+#'@examples
+#'data(crd)
+#'cluswilcox.test(z ~ group(group) + cluster(id), data = crd)
+#'data(crd.str)
+#'cluswilcox.test(z ~ group(group) + cluster(id) + stratum(stratum), data = crd.str)
+#'
+#'@author Yujing Jiang
+#'@references
+#'Bernard Rosner, Robert J. Glynn, Mei-Lin.csize Tin.csize Lee(2003)
+#' \emph{Incorporation of Clusterin.csize Effects for the Wilcoxon Rank 
+#' Sum Test: A Large-Sample Approach.} Biometrics, \bold{59}, 1089-1098.
+
+
 cluswilcox.test.formula <- function(formula, data = NULL, 
                                     subset = NULL, na.action = na.omit, 
                                     alternative = c("two.sided", "less", "greater"),
@@ -42,10 +110,12 @@ cluswilcox.test.formula <- function(formula, data = NULL,
     stop(" A formula argument is required for clustered rank sum test")
   temp <- Call[c(1, indx)]
   temp[[1]] <- as.name("model.frame")
-  special <- c("strata", "cluster", "group")
+  special <- c("stratum", "cluster", "group")
   temp$formula <- if(missing(data))
     terms(formula, special)
   else terms(formula, special, data = data)
+  x.name <- rownames(attr(temp$formula, "factors"))[1]
+  DNAME <- paste0(paste(x.name ,DNAME), ",")
   
   cluster <- function(x) {x}
   stratum <- function(x) {x}
@@ -68,26 +138,30 @@ cluswilcox.test.formula <- function(formula, data = NULL,
   }
   
   
-  strats <- attr(Terms, "specials")$strata
+  strats <- attr(Terms, "specials")$stratum
   
   if(length(strats)) {
-    DNAME <- paste("stratum id:", strats, DNAME)
-    stemp <- untangle.specials(Terms, "strata", 1)
+    stemp <- untangle.specials(Terms, "stratum", 1)
+    strats.name <- gsub("[\\(\\)]", "",
+                         regmatches(stemp$vars, 
+                                    gregexpr("\\(.*?\\)", stemp$vars))[[1]])
+        DNAME <- paste0(  DNAME, " stratum: ", strats.name, ",")
+
     if(length(stemp$vars) == 1) {
-      strata.keep <- mf[[stemp$vars]]
+      strats.keep <- mf[[stemp$vars]]
     } else {
       stop("more than one variable are set as the stratum id")
     }
-    strata.uniq <- unique(strata.keep)
-    strata.uniq.l <- length(strata.uniq)
+    strats.uniq <- unique(strats.keep)
+    strats.uniq.l <- length(strats.uniq)
     
-    if(is.character(strata.uniq)) {
-      strata <- recoderFunc(strata.keep, strata.uniq, c(1 : strata.uniq.l))
+    if(is.character(strats.uniq)) {
+      strats <- recoderFunc(strats.keep, strats.uniq, c(1 : strats.uniq.l))
     } else {
-      if(!is.numeric(strata.uniq)) {
+      if(!is.numeric(strats.uniq)) {
         stop("stratum id should be numeric or character")
       }
-      strata <- strata.keep
+      strats <- strats.keep
     }
   } else {
     strats <- rep(1, data.n)
@@ -95,8 +169,13 @@ cluswilcox.test.formula <- function(formula, data = NULL,
   
   cluster <- attr(Terms, "specials")$cluster
   if(length(cluster)) {
-    DNAME <- paste("cluster id:", cluster, DNAME)
     ctemp <- untangle.specials(Terms, "cluster", 1)
+    cluster.name <- gsub("[\\(\\)]", "",
+                         regmatches(ctemp$vars, 
+                                    gregexpr("\\(.*?\\)", ctemp$vars))[[1]])
+    DNAME <- paste0(DNAME, " cluster: ", cluster.name, ",")
+    
+      
     if(length(ctemp$vars) == 1) {
       cluster.keep <- mf[[ctemp$vars]]
     } else {
@@ -119,8 +198,13 @@ cluswilcox.test.formula <- function(formula, data = NULL,
   
   group <- attr(Terms, "specials")$group
   if(length(group)) {
-    DNAME <- paste("group id:", group, DNAME)
     gtemp <- untangle.specials(Terms, "group", 1)
+    group.name <- gsub("[\\(\\)]", "",
+                         regmatches(gtemp$vars, 
+                                    gregexpr("\\(.*?\\)", gtemp$vars))[[1]])
+        DNAME <- paste0(DNAME, " group: ", group.name, ",")
+
+    
     if(length(gtemp$vars) == 1) {
       group.keep <- mf[[gtemp$vars]]
     } else {

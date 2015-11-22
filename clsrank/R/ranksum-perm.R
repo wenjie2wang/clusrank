@@ -1,5 +1,5 @@
 cluswilcox.test.ranksum.permutation <-
-  function(x, cluster, group, strats, alternative, n.rep = 1000, 
+  function(x, cluster, group, strats, alternative, n.rep , 
            DNAME = NULL, METHOD = NULL) {
     # Incoporating clustering effects for the WilcoxonRank Sum Test 
     # for stratified balanced or unbalanced designs for small 
@@ -137,9 +137,11 @@ cluswilcox.test.ranksum.permutation <-
                   two.sided = 2 * min(ecdf.wc(abs(WC)),     
                                       1 - ecdf.wc(abs(WC)), 
                                       0.5))
+    
     names(WC) <- "Rank sum statistic"
     
-    result <- list(WC = WC, p.value = pval, permutation = TRUE)
+    result <- list(rstatistic = WC, p.value = pval, permutation = TRUE, 
+                   data.name = DNAME, method = METHOD, balance = balance)
     class(result) <- "ctest"
     result
   }
