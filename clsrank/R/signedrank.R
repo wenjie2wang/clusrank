@@ -37,6 +37,7 @@
 #' \code{cluswilcox.test.numeric}, for result output.
 #' @param METHOD a character string, inheritated from
 #' \code{cluswilcox.test.numeric}, for result output.
+#' @param ...  Further arguments to be passed to or from methods.
 #' @return  a list with class "\code{ctest}" containing
 #' the following components:
 #' \item{rstatistic}{the value of the signed rank statistic
@@ -49,7 +50,7 @@
 #' \item{data.name}{a character string giving the names of the data.}
 #' \item{method}{the type of test applied.}
 #' \item{adjusted}{indicator of whether adjusted signed rank statistic is used.}
-#' @note This function is able to deal with data with
+#'  @note This function is able to deal with data with
 #' clusterentitical or variable cluster size. When the data
 #' is unbalanced, adjusted signed rank statistic is used.
 #' Ties are dropped in the test.
@@ -67,7 +68,7 @@
 cluswilcox.test.signedrank <-
   function(x, cluster,
            alternative = c("two.sided", "less", "greater"),
-           DNAME = NULL, METHOD = NULL) {
+           DNAME = NULL, METHOD = NULL, ...) {
     #Calculate number of observations per cluster
 
     METHOD <- "Wilcoxon signed rank test for clutered data"

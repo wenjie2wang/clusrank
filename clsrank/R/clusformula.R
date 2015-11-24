@@ -26,50 +26,13 @@
 #'two groups for clustered data. The cluster size can be either
 #'identitical or variable. Effect of stratification on the test
 #'is also adjusted for if in presence.
-#'@param formula   an object of class \code{"formula"} in the
-#'form of  \code{lhs \~ rhs}, where \code{lhs} is a numeric
-#'variable giving the data values and \code{rhs} contains
-#'the \code{cluster}, \code{group}, \code{stratum}, e.g.,
-#'\code{z ~ cluster(a) + group(b) + stratum(c)}, where
-#'\code{cluster}, \code{group}, \code{stratum} are special terms.
-#'@param data a optional data frame
-#'@param subset an optional vector specifyin.csize a
-#'subset of observations to be used.
-#'@param na.action a function which indicates what should happen
-#'when the data contains NAs. The  default action is to omit them.
-#'@param alternative a character string specifying the
-#' alternative hypothesis, must be one of "two.sided" (default),
-#'  "greater" or "less". You can specify just the initial letter.
-#'@param mu a number specifying an optional parameter used to
-#'  form the null hypothesis. See 'Details'.
-#'@param group.x a character or a number, indicates which group id
-#'  is for treatment x.
-#'@param permutation A logical, whether to use permutation test.
-#'@param n.rep number of samples generated for permutation test.
-#'@param ... additional arguments, currently ignored.
-#'
-#'@return  a list with the followin.csize components
-#' \item{rstatistic}{the value of the signed rank statistic
-#'  with a name describing it.}
-#'\item{erstatistics}{Expected value clustered Wilcoxon ranksum statistic.}
-#'\item{vrstatistics}{Variance of clustered Wilcoxon ranksum statistic.}
-#'\item{statistics}{the value of the test statistic.}
-#'\item{p.value}{the p-value for the test}
-#'\item{data.name}{a character string giving the names of the data.}
-#'\item{method}{the name of the method}
-#'\item{balance}{a logical, indicating if the data is balanced.}
-#'@examples
-#'data(crd)
-#'cluswilcox.test(z ~ group(group) + cluster(id), data = crd)
-#'data(crdStr)
-#'cluswilcox.test(z ~ group(group) + cluster(id) + stratum(stratum), data = crdStr)
 #'
 #'@author Yujing Jiang
 #'@references
 #'Bernard Rosner, Robert J. Glynn, Mei-Lin.csize Tin.csize Lee(2003)
 #' \emph{Incorporation of Clusterin.csize Effects for the Wilcoxon Rank
 #' Sum Test: A Large-Sample Approach.} Biometrics, \bold{59}, 1089-1098.
-#' @S3method cluswilcox.test formula
+#' @describeIn cluswilcox.test formula interface for sum rank test.
 #' @export
 
 cluswilcox.test.formula <- function(formula, data = NULL,
@@ -77,8 +40,7 @@ cluswilcox.test.formula <- function(formula, data = NULL,
                                     alternative = c("two.sided", "less", "greater"),
                                     mu = 0,
                                     group.x = NULL, permutation = FALSE,
-                                    n.rep = 500,
-                                    ...) {
+                                    n.rep = 500, ...) {
   ## This function is only used for rank sum test.
   ## Mainly to process data.
   ## Inputs:
