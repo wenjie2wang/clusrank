@@ -207,10 +207,11 @@ cluswilcox.test.numeric <- function(x, y = NULL,
   }
 
   if(permutation == FALSE) {
-    return(cluswilcox.test.signedrank(x, cluster, alternative, DNAME, METHOD))
+    return(cluswilcox.test.signedrank(x, cluster, alternative, mu, DNAME, METHOD))
   } else {
     METHOD <- paste(METHOD, "using permutation")
-    return(cluswilcox.test.signedrank.permutation(x, cluster, alternative, n.rep,
+    return(cluswilcox.test.signedrank.permutation(x, cluster, alternative, mu,
+                                                  n.rep,
                                                   DNAME, METHOD))
   }
 }

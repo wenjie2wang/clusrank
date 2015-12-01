@@ -212,6 +212,7 @@ cluswilcox.test.formula <- function(formula, data = NULL,
     return(cluswilcox.test.ranksum(x,  cluster,
                                    group, strats,
                                    alternative,
+                                   mu,
                                    DNAME, METHOD))
   } else {
     return(cluswilcox.test.ranksum.permutation(x,
@@ -219,6 +220,7 @@ cluswilcox.test.formula <- function(formula, data = NULL,
                                                group,
                                                strats,
                                                alternative,
+                                               mu,
                                                n.rep,
                                                DNAME,
                                                METHOD))

@@ -63,11 +63,6 @@ print.ctest <- function (x, digits = getOption("digits"), prefix = "\t", ...)
     }
     else cat(x$alternative, "\n", sep = "")
   }
-  if (!is.null(x$conf.int)) {
-    cat(format(100 * attr(x$conf.int, "conf.level")), " percent confidence interval:\n", 
-        " ", paste(format(c(x$conf.int[1L], x$conf.int[2L])), 
-                   collapse = " "), "\n", sep = "")
-  }
   if (!is.null(x$estimate)) {
     cat("sample estimates:\n")
     print(x$estimate, digits = digits, ...)

@@ -33,6 +33,7 @@
 #' @param alternative a character string specifying the
 #' alternative hypothesis, must be one of "two.sided" (default),
 #'  "greater" or "less". You can specify just the initial letter.
+#'@param mu null value of the hypothesis
 #'@param n.rep number of samples generated for permutation test.
 #' @param DNAME a character string, inheritated from
 #' \code{cluswilcox.test.formula}, for result output.
@@ -65,11 +66,12 @@
 #' \emph{The Wilcoxon Signed Rank Test for Paired Comparisons of
 #'  Clustered Data.} Biometrics, \bold{62}, 185-192.
 cluswilcox.test.signedrank.permutation <-
-  function(x, cluster, alternative, n.rep = 500,
+  function(x, cluster, alternative, mu, n.rep = 500,
            DNAME = NULL , METHOD = NULL){
 
     #Calculate number of observations per cluster
 
+    names(mu) <- "location shift"
 
     data <- data.frame(x, cluster)
     cluster.size <- table(data$cluster)
@@ -108,6 +110,7 @@ cluswilcox.test.signedrank.permutation <-
       result <- list(rstatistic = T_c,
                      p.value = P_val,
                      n = n,  cn = m, permutation = TRUE,
+                     null.value = mu,
                      method = METHOD, data.name = DNAME)
       class(result) <- "ctest"
       return(result)
@@ -168,6 +171,7 @@ cluswilcox.test.signedrank.permutation <-
                        p.value = P_val,
                        n = n,  cn = m, permutation = TRUE,
                        method = METHOD, data.name = DNAME,
+                       null.value = mu,
                        balance = balance)
         class(result) <- "ctest"
         return(result)

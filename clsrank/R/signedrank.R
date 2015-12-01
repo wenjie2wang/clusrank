@@ -33,6 +33,7 @@
 #' @param alternative a character string specifying the
 #' alternative hypothesis, must be one of "two.sided" (default),
 #'  "greater" or "less". You can specify just the initial letter.
+#'@param mu null value of the hypothesis
 #' @param DNAME a character string, inheritated from
 #' \code{cluswilcox.test.numeric}, for result output.
 #' @param METHOD a character string, inheritated from
@@ -68,10 +69,12 @@
 cluswilcox.test.signedrank <-
   function(x, cluster,
            alternative = c("two.sided", "less", "greater"),
+           mu,
            DNAME = NULL, METHOD = NULL, ...) {
     #Calculate number of observations per cluster
 
     METHOD <- "Wilcoxon signed rank test for clutered data"
+    names(mu) <- "location shift"
 
 
     ## Drop the ties
@@ -109,7 +112,7 @@ cluswilcox.test.signedrank <-
       names(m) <- "total number of clusters"
       names(Var_t) <- paste("Variance of ", names(T_c))
       result <- list(rstatistic = T_c, vrstatistic = Var_t, statistic = W_c,
-                     p.value = P_val, n = n, cn = m,
+                     p.value = P_val, n = n, cn = m, null.value = mu,
                      data.name = DNAME, method = METHOD,
                      adjusted = ADJUST)
       class(result) <- "ctest"
@@ -167,7 +170,7 @@ cluswilcox.test.signedrank <-
         names(m) <- "total number of clusters"
         names(Var_t) <- paste("Variance of ", names(T_c))
         result <- list(rstatistic = T_c, vrstatistic = Var_t, statistic = W_c,
-                       p.value = P_val, n = n, cn = m,
+                       p.value = P_val, n = n, cn = m, null.value = mu,
                        data.name = DNAME, method = METHOD,
                        adjusted = ADJUST)
         class(result) <- "ctest"

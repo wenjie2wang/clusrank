@@ -6,10 +6,10 @@
 \usepackage{amsmath}
 
 %% almost as usual
-\author{Yujing Jiang\\ University of Connecticut \And 
+\author{Yujing Jiang\\ University of Connecticut \And
   Xin He\\ University of Maryland \And
   Mei-Ling Ting Lee\\ University of Maryland \And
-  Bernard Rosner\\ Harvard University  \And  
+  Bernard Rosner\\ Harvard University  \And
   Jun Yan\\ University of Connecticut }
 \title{Rank-Based Tests for Clustered Data with \proglang{R} Package \pkg{clsrank}}
 
@@ -31,29 +31,29 @@ Start new sentences at new lines whenever possible.}
 \textbf{Read the instructions of JSS: code, pkg, proglang are already defined!}
 
 Nonparametric tests such as Wilcoxon rank sum test
-and Wilcoxon signed rank test are widely used in 
+and Wilcoxon signed rank test are widely used in
 the situation where the underlying distribution
 of the population is far from normal or simply unknown.
 One necessary assumption for the appropriateness of the
 null distribution of the test statistic is that each
-observation is independent, however, this is also an 
-assumption which is violated quite often in practice. 
+observation is independent, however, this is also an
+assumption which is violated quite often in practice.
 For instance, in the study of human eyes,
-each person is the unit of 
+each person is the unit of
 randomization, whereas the data is collected from both eyes,
-therefore we sould expect correlation between the 
-data collected from the two eyes from the same person. 
+therefore we sould expect correlation between the
+data collected from the two eyes from the same person.
 To account for the clustering effect, modifications of these
 two tests have been proposed by \citet{rosner2003incorporation}
-and \citet{rosner2006wilcoxon}. 
-The modified tests work for both balanced and unbalanced data, 
+and \citet{rosner2006wilcoxon}.
+The modified tests work for both balanced and unbalanced data,
 i.e., cluster size is idential or variable. In addition,
 the modified rank sum test can also deal with stratified data.
 No R package is available so far for nonparametric tests for
 clustered data.
 The package \pkg{clsrank} is a realization of the test
 procedures from the two papers mentioned above with both
-small and large sample tests. 
+small and large sample tests.
 }
 
 \textbf{No key word should repeat words in the title.}
@@ -108,120 +108,155 @@ Jun Yan\\
   those biometrics papers); unavailability implementation;
   propose the package and highlight contributions.}
 
-Clustering often occurs in medical studies when the research 
-objects are eyes, ears, teeth or in family studies. 
-In these studies, an assumption usually being made is that
-the outcome variables follow a normal or binomial distribution,
-and tests based on this assumption have been studied intensively.
-Nonetheless, under situations where these assumptions are
-susceptible, blindly apply these test will lead to 
-untrustworthy result. 
+Clustered data often arise in biomedical
+studies, e.g., when the research objects are eyes,
+ears, teath, etc. In these cases, the observations
+can be classified into a number of distinct groups
+or "clusters", where the observations are more similar
+within each cluster than when they are from different clusters.
+For instance, when measurements are taken from both eyes
+of each patient, the measurments from the same person
+should be correlated whereas measurements
+taken from different patients should be independent.
+Quite often, the goal of study is to compare the
+measurements on the response variable
+from the control group and the treatment group
+or the measurements before and after a treatment
+to see if the treatment effect is present.
+The parametric statistical tests which explicitly account
+for clustering include an adjusted version of the standard
+two-sample t test which account for the intracluster correlation
+(i.e., correlation among obervations within the clusters) when
+the response variable follows a normal distribution and
+a adjusted $\chi^2$ statistic when the response variable is binary
+\citep{Donn:Bant:anal:1988}.
 
 
-Usually, when the distribution underlying
-the data is unknown or non-normal, one solution is to use
-non-parametric test, e.g., the Wilcoxon rank sum test 
-to compare the mean of two populations and the Wilcoxon 
-signed rank test to test the shift of the population 
-before and after a treatment. In the presence of 
-clutering effect, the standard statistical procedures
-will often lead to an underestimated p-value, because
-the correlation within a cluster is usually positive. 
+When the response variable is neither normal or binary,
+e.g., the observations are ordinal,
+the aforementioned tests are no longer suitable.
+An attractive alternative is non-parametric test.
+However, standard non-parametric tests requires the
+observations to be independent, which is violated when the
+data is clustered. If the intracluster correlation is
+positive, then the variance of the standard test statistic
+will be underestimated. \citet{Rosn:GLyn:Lee:inco:2003}
+proposed a Wilcoxon rank sum test for clustered data
+to compare two groups
+assuming that the members within each cluster is
+exchangeble and objects from the same cluster
+belong to the same group.Their method is able
+to deal with unbalanced data (i.e., data with
+variable cluster sizes) and stratified data
+(e.g., data from a multi-center study which
+is stratified by centers).
+Another modified
+rank sum test for clustered data was proposed by
+\citet{Datt:Satt:rank:2005}, their method is valid
+even when the members of the same cluster came from
+different groups, or when the intraclulster correlation
+is determined by the group membership.
+To compare paired observations, an adjusted version
+of wilcoxon signed rank test was proposed by
+\citet{Laro:wilc:2005} which invovles an estimate
+of variance based on certain sum of square over
+independent clusters, but this test procedure
+is not distribution free.
+\citet{Roxn:Glyn:Lee:wilc:2006} proposed another
+modified signed rank test assuming a common
+intercluster correlation and estimate it
+from absolute rank of observations.
+\citet{Datt:Satt:sign:2008} proposed a
+signed rank test procedure based on the
+principle of general with-in cluster resampling
+and this test can handle the case when
+the cluster size is informative, i.e.,
+cluster size depends on the group.
 
 
-To adjust for clustering effect in non-parametric tests,
-\citet{Rosn:GLyn:Lee:inco:2003} proposed a modified Wilcoxon
-rank sum test 
-and \citet{Roxn:Glyn:Lee:wilc:2006} poposed a modified Wilcoxon
-signed rank test. The null distribution of both test statistics
-are based on the asymptotic normality, therefore 
-they are large sample tests. When the sample size is small,
-permutation test could be applied. These two tests 
-also allow unbalanced data, i.e., cluster sizes vary. 
-Moreover, for Wilcoxon rank sum test, the input data can 
-also be stratified, and stratified data is common in biomedical 
-studies, e.g, studies carried out at different centers simultaneously
-will generate data stratified by covariate center. 
-
-
-It will facilitate  
-
-
-
-In this paper we present the \textbf{clusrank} package, a package 
-for Wilcoxon rank sum test  
-and signed rank test 
-for clustered data.  
-Clustering in the data can be due to 
-a naturally occurring hierarchy in the target population
-or a consequence of study design or both. 
-In general,
-applying standard test procedures to data in the presence 
-of clustering will underestimate the true p-value, and 
-the width of confidence interval will be too narrow.  
-Despite the common occurrence of 
-clustered data in a wide range of contexts such as 
-clinical trials, longitudinal study, social science, etc,
-there is no available R package for non-parametric test
-for clustered data yet. Therefore this package will help 
-researchers and scientists in related areas as a ready tool
+Despite the popularity of clustered data in
+a wide range of contexts such as
+clinical trials, longitudinal study,
+social science, etc,
+there is no available R package nor function
+publically available for
+non-parametric test for clustered data yet.
+Therefore a package pacted with
+functions for this purpose will help
+researchers and scientists
+in related areas as a ready tool
 for testing clustered data.
+In this paper we present the \pkg{clusrank}
+package, a
+realization of test procedures presented
+in \citet{Rosn:GLyn:Lee:inco:2003}
+and \citet{Roxn:Glyn:Lee:wilc:2006}.
+Large-sample inference based on asymptotic
+distribution of test statistics and
+small-sample inference based on permutation
+are provided for both rank sum test and
+signed rank test. The tests provided
+can also handel unbalanced data when
+there are clusters with different sizes,
+in addition, for rank sum test, the
+effect of
+stratification as an extra cofounding
+variable can also be accounted for.
 
-
-This package is a realization of test procedures in 
-\citet{Rosn:GLyn:Lee:inco:2003} and \citet{Roxn:Glyn:Lee:wilc:2006}.
-The input data can be either balanced (same number of 
-subunits per cluster) or unbalanced (different number of subunits 
-per cluster), with ties or without ties. The Wilcoxon rank sum
-test is also able to handle stratified data, e.g., stratification in the data
-by center in multi-center clinical trials. Test procedures for both small and large sample size are provided. The small sample test implements the permutation test. The large sample size test
-procedures are built upon asymptotic normality of the test statistics, therefore
-sample size is required to be large while the cluster size is bounded. Implementation in
-SAS macro is also available for the large sample test.
 
 
 \textbf{Please, never hard code a reference.}
-The order of this paper is as following, 
-section 2 introduces the Wilcoxon rank 
-sum test for clustered data, section 3 
-introduces the Wilcoxon signed rank test 
-for clustered data, section 4 is on the 
+The order of this paper is as following,
+section 2 introduces the Wilcoxon rank
+sum test for clustered data, section 3
+introduces the Wilcoxon signed rank test
+for clustered data, section 4 is on the
 data analysis.
 
 
-\section{Wilcoxon rank sum test for clustered data}
+\section{Test Procedures}
 
 \textbf{The two tests can be introduced in one section
   with subsections. Set up the problem first (with clustered data).
   The finite sample permutation can be a subsection too.}
 
-Wilcoxon rank sum test is a non-parametric test
-to compare the means of two population when the 
-underlying probability distributions are unknown 
-or non-normal. To account for the clustering effect,
-the modified rank sum test treats each cluster but not 
-each single observation as a basic unit of randomization. 
-Therefore, the null distribution of test statistics
-conditioned on clusters is different than the one
-when no clustering effect is incorporated,
-and the modified test will have a higher power in 
-consequence. 
+Nonparametric tests are popular alternatives of
+parametric tests when the underlying distribution of the
+response variable is unknown or among the distributions
+whose test procedures have not been derived specifically.
+Standard non-parametric tests rely on the independence of
+observations, however, often times the data come in
+are clustered by nature or by the design of data collecting
+scheme. Usually, but not always, the observations within
+each cluster is positively correlated whereas different clusters
+are independent. Therefore, the variance of the
+test statistic of the standard non-parametric test
+would be underestimated and thus
+the power of the test would be lower. The following
+test procedures adjust the variance used in the test
+for the clustering effect and takes the effect of
+different cluster sizes as well.
 
 
-Specifically, 
-assume the data come in clusters and 
+\subsection{Wilcoxan Rank Sum Test for Clustered Data}
+\label{ranksum}
+
+Suppose there are two groups under different treatments,
+$X$ and $Y$, the null hypothesis of the rank sum test
+is that the probability of an observation from a
+treatment $X$ exceeding an observation from treatment
+$Y$ is the same as an observation from treatment $Y$
+exceeding an observation from treatment $X$.
+Specifically,
+assume the data come in clusters and
 let $X_{ij}$ denote the score for the $j$th subunit
-from the $i$th cluster in the first group, 
-$i = 1,\ldots,m; j = 1,\ldots,g_i$ and $Y_{kl}$ 
-denote the score for the $l$th subunit from 
+from the $i$th cluster in the first group,
+$i = 1,\ldots,m; j = 1,\ldots,g_i$ and $Y_{kl}$
+denote the score for the $l$th subunit from
 the $k$th cluster in the second group,
 $k=1, \ldots,n;l=1,\ldots,h_k$.
-The null hypothesis is that it is 
-equally likely for an observation from the 
-first group to exceed an 
-observation from the second group and vice versa.
-The clustered Wilcoxon rank sum statistic 
-$W_{c,obs}$ is defined as 
+The clustered Wilcoxon rank sum statistic
+$W_{c,obs}$ is defined as
 \begin{equation} \label{eq:Wco}
 W_{c,obs} = \sum_{i=1}^m\sum_{j=1}^{g_i}\text{Rank}(X_{ij})
 \end{equation}
@@ -231,70 +266,70 @@ $X$ and $Y$ clusters. Subunits
 for a given cluster are assumed to be exchangeable.
 
 
-\subsection{Balanced designs}\label{bal}
+\subsection{Balanced designs}\label{ranksumbal}
 Under balanced designs, the cluster sizes are the same.
 Since the score assigned to clusters under treatments
 $X$ and $Y$ are
 identically distributed under the null hypothesis,
-we can pool $X$ and $Y$ clusters together and refer 
+we can pool $X$ and $Y$ clusters together and refer
 to a combined set of $Z$ clusters, where $Z_{ij} = $score
 for the $j$th subunit of the $i$th cluster,
 $j = 1,\ldots,g, i=1,\ldots,m+n = N$.
-Suppose that $m$ of the $N$ clusters are assigned 
+Suppose that $m$ of the $N$ clusters are assigned
 at random to the $X$ treatment and the remaining $n$
 clusters to the $Y$ treatment.
 Let $\delta_i$ be
-an indicator function that equals $1$ when the $i$th cluster 
+an indicator function that equals $1$ when the $i$th cluster
 is assigned to the $X$ group and $0$ when the $i$th cluster
-is assigned to the $Y$ group. 
-The distribution of the clustered rank sum statistic $W_{c.obs}$ is
+is assigned to the $Y$ group.
+The distribution of the clustered rank sum statistic $W_{c,obs}$ is
 \begin{equation}\label{eq:Wc}
 W_c = \sum^N_{i=1}\delta_iR_{i+} \quad \text{where   }R_{i+} = \sum^g_{j=1}R_{ij}
 \end{equation}
 
-where $R_{ij}=$rank of the $j$th subunit in the 
-$i$th cluster among all $gN$ subunits over all $Z$ clusters. It is shown that under $H_0$, 
+where $R_{ij}=$rank of the $j$th subunit in the
+$i$th cluster among all $gN$ subunits over all $Z$ clusters. It is shown that under $H_0$,
 \begin{equation}\label{eq:EWc}
 E(W_c) = gm(gN + 1)/2
 \end{equation}
-and 
+and
 \begin{equation}\label{eq:VWc}
 \text{Var}(W_c) = [mn/\{N(N-1)\}]\sum^N_{i=1}\{R_{i+} - g(1+gN)/2\}^2
 \end{equation}
-So a natural large sample test statistic based on \eqref{eq:Wc}, \eqref{eq:EWc}, and \eqref{eq:VWc} is 
+So a natural large sample test statistic based on \eqref{eq:Wc}, \eqref{eq:EWc}, and \eqref{eq:VWc} is
 \begin{equation}
 Z_c = \{W_c - E(W_c)\}/\{\text{Var}(W_c)\}^{1/2}
 \end{equation}
 $Z_c$ is asymptotically normal if both $m \to \infty$ and $n \to \infty$.
-When the sample size is small, permutation test can be 
+When the sample size is small, permutation test can be
 performed.
 \subsubsection{Unbalanced designs}\label{unbal}
-For unbalanced designs, cluster sizes vary, 
-thus under the $H_0$, 
+For unbalanced designs, cluster sizes vary,
+thus under the $H_0$,
 the distribution of sum of rank
 assigned to each cluster are no longer
-identically distributed across clusters 
-with different sizes. Therefore, when 
+identically distributed across clusters
+with different sizes. Therefore, when
 deriving the null distribution of the test
 statistic \eqref{Wco}, we need to control
-for the cluster size. 
+for the cluster size.
 Let $(m_g, n_g)=$ number of clusters of
 size $g$ assigned to the $X$ and $Y$ treatment.
 Denote $N_g = m_g + n_g$ for $g=1,\ldots,g_{max}$
-and $N =\sum_{g=1}^{g_{max}}N_g$. 
+and $N =\sum_{g=1}^{g_{max}}N_g$.
 Let $R_{ij,g} = $ rank for the $j$th
 subunit in the $i$th cluster of size $g$,
 $g = 1, \ldots, g_{max},
-i = 1, \ldots, N_g, j = 1, \ldots, g$, 
+i = 1, \ldots, N_g, j = 1, \ldots, g$,
 and $R_{ij,g}$s are computed based on the
-combined sample. 
+combined sample.
 The rank sum statistic can then be
 written as:
 \begin{equation}
 W_{c, obs} = \sum_{g=1}^{g_{max}}
 \sum_{i\in I_{g, obs}}R_{i+, g}
 \end{equation}
-where $R_{i+,g}$ = sum of ranks of 
+where $R_{i+,g}$ = sum of ranks of
 all subunits in the $i$th cluster of size $g$,
 $i = 1, \ldots, N_g$.
 The distribution corresponding to $W_{c, obs}$
@@ -306,36 +341,36 @@ W_c = = \sum_{g = 1}^{g_{max}}
 where $\delta_{i, g} = 1$ if the $i$th
 cluster of size $g$ is assigned to group $X$, and is $0$
 otherwise.
-The corresponding $E(W_c)$ and $\text{Var}(W_c)$ are 
-as following: 
+The corresponding $E(W_c)$ and $\text{Var}(W_c)$ are
+as following:
 \begin{equation}\label{eq:uEWc}
 E(W_c) = \sum_{g=1}^{g_{max}}m_g(R_{++,g}/N_g)
 \end{equation}
 \begin{equation}\label{eq:uVWc}
 \text{Var}(W_c) = \sum_{g=1}^{g_{max}}[m_gn_g/\{N_g(N_g - 1)\}]\sum_{i=1}^{N_g}(R_{i+,g} - R_{++,g}/N_g)^2
 \end{equation}
-A large-sample test statistics based on $W_c$,%\eqref{eq:uEWc}, and \eqref{eq:uVWc} is 
+A large-sample test statistics based on $W_c$,%\eqref{eq:uEWc}, and \eqref{eq:uVWc} is
 \begin{equation}
 Z_c = \{W_c - E(W_c)\}/\{\text{Var}(W_c)\}^{1/2}
 \end{equation}
 \subsubsection{Stratification}
-When stratification needs to be considered, e.g., 
-stratification by center in multiple clinical trials, 
-the test statistic and its null distribution will 
+When stratification needs to be considered, e.g.,
+stratification by center in multiple clinical trials,
+the test statistic and its null distribution will
 need modification to control for confounding variable.
-Suppose the set of relevant confounding variables 
+Suppose the set of relevant confounding variables
 can be summarized in terms of $V$ strata.
 Let $(m_{g,v}, n_{g,v})=$ number of clusters of size $g$
 in stratum $v$ assigned to the$X$ and $Y$ clusters of size $g$
-in stratum $v$, $g = 1, \ldots, g_{max}, v = 1, \ldots, V$. 
-Let $R_{i+, g, v}$ be the rank sum for the subunits in the 
-$i$th cluster of size $g$ in the $v$th stratum. 
+in stratum $v$, $g = 1, \ldots, g_{max}, v = 1, \ldots, V$.
+Let $R_{i+, g, v}$ be the rank sum for the subunits in the
+$i$th cluster of size $g$ in the $v$th stratum.
 The rank sum statistic is defined as
 \begin{equation}
 W_{c, obs} = \sum_{g=1}^{g_{max}}\sum_{v=1}^{V}\left(\sum_{i\in I_{g,v,obs}}R_{i+,g,v}\right)
 \end{equation}
 where $I_{g, v, obs}$ is the observed subset of  $m_{g,v}$
-unique indices selected from 
+unique indices selected from
 $\{1, \ldots, N_{g,v}\}$,
 corresponding to cluster of
 size $g$ in stratum $v$ that are assigned to the $X$ treatment.
@@ -343,10 +378,10 @@ The corresponding expectation and variance of the null
 distribution of $W_{c, obs}$
 \begin{align*}
 E(W_c)=& \sum_{g=1}^{g_{max}}\sum^V_{v=1}m_{g,v}R_{++,g,v}/N_{g,v}\\
-\text{Var}(W_c)=& \sum_{g=1}^{g_{max}}\sum_{v=1}^V[m_{g,v}n_{g,v}/\{N_{g,v}(N_{g,v} - 1)\}]\\ 
+\text{Var}(W_c)=& \sum_{g=1}^{g_{max}}\sum_{v=1}^V[m_{g,v}n_{g,v}/\{N_{g,v}(N_{g,v} - 1)\}]\\
 &\times\sum_{i=1}^{N_{g,v}}(R_{i+, g, v} - R_{++, g, v}/N_{g,v})^2
 \end{align*}
-The large sample test statistic is 
+The large sample test statistic is
 \begin{equation}
 Z_c = \{W_c - E(W_c)\}/\{\text{Var}(W_c)\}^{1/2}.
 \end{equation}
@@ -365,28 +400,28 @@ H_1: Z \text{ is symmetric about }\gamma, \gamma \not = 0.
 \end{equation*}
 Rank $|Z_{ij}|$ over the total of $G = \sum_{i=1}^m g_i$ subunits from the $m$ clusters and let $S_{ij}=R_{ij}V_{ij}$, where $R_{ij} = $ rank of $|Z_{ij}|$ within the total data set of $G$ subunits over $m$ clusters, and $V_{ij} = \text{sign}(Z_{ij})$.
 \subsubsection{Balanced Design} \label{bal1}
-In a balanced design (i.e., each cluster has the same number of subunits, $g$), the clustered Wilcoxon signed rank statistic is defined by 
+In a balanced design (i.e., each cluster has the same number of subunits, $g$), the clustered Wilcoxon signed rank statistic is defined by
 \begin{equation}
 T_{c}^{(obs)} = \sum_{i=1}^mS_{i+} \equiv \sum^m_{i=1}\sum^g_{j=1}R_{ij}V_{ij},
 \end{equation}
 where $S_{i+} = \sum_{j=1}^gS_{ij}$ and only consider nonzero$Z_{ij}$ in the computation of signed ranks.
-When considering the randomization distribution corresponding to $T_c$, the unit of randomization is the cluster while the unit of analysis is the subunit. Let $\delta_1, \ldots,\delta_m$ be i.i.d. random variables each taking on the values +1 and -1 with probability 1/2, then 
+When considering the randomization distribution corresponding to $T_c$, the unit of randomization is the cluster while the unit of analysis is the subunit. Let $\delta_1, \ldots,\delta_m$ be i.i.d. random variables each taking on the values +1 and -1 with probability 1/2, then
 \begin{equation} \label{eq:tc}
 T_c = \sum_{i=1}^m\delta_iS_{i+}.
 \end{equation}
 It is shown that under $H_0$, $E(T_c) = 0$ and $\text{Var}(T_c) = \sum^m_{i=1}S^2_{i+}$.
-And the large sample test statistic is 
+And the large sample test statistic is
 \begin{equation}
 Z_c = \left. T_c \middle/ \left(\sum_{i=1}^nS^2_{i+}\right)^{1/2}\right. \sim N(0, 1)\qquad \text{under } H_0.
 \end{equation}
 \subsubsection{Unbalanced Designs}
-In the case of an unbalanced design, the signed rank statistic is 
+In the case of an unbalanced design, the signed rank statistic is
 \begin{equation}
-T_c^{(obs)} = \sum_{i = 1}^m w_i\bar{S}_i  
+T_c^{(obs)} = \sum_{i = 1}^m w_i\bar{S}_i
 \end{equation}
-where $\bar{S}_i = S_{i+}/{g_i}, w_i = 1/\text{Var}(\bar{S}_i)$ under $H_0$. 
+where $\bar{S}_i = S_{i+}/{g_i}, w_i = 1/\text{Var}(\bar{S}_i)$ under $H_0$.
 The randomization distribution corresponding to $T_{c,s}^{obs} = \sum^m_{i=1}\delta_iw_i\bar{S}_i$.$\delta$ is defined as in \eqref{eq:tc}.
-And the test statistic is defined as 
+And the test statistic is defined as
 \begin{equation}
 Z_{c,s} = \left.T_{c,s}\middle/ \left(\sum_{i=1}^m\hat{w}^2_i\bar{S}^2_i\right)^{1/2}\right. \sim N(0,1) \text{ under }H_0,
 \end{equation}
@@ -401,7 +436,7 @@ where $\hat{w}_i = g_i/[\widehat{Var}(S_{ij})\{1 + (g_i-1)\hat{\rho}_{s,cor}\}]$
 
 \textbf{give the main functions and explain their required arguments}
 
-The R package is a realization of all the tested we presented in the previous section. It contains two functions, 
+The R package is a realization of all the tested we presented in the previous section. It contains two functions,
 The package \emph{clsrank} contains two functions, \text{cluswilcox}
 and \text{clusignrank}. The \text{cluswilcox} is a function for
 clustered Wilcoxon ranksum test and \text{clusignrank} is a function
@@ -418,7 +453,7 @@ treatment effect.
 
 <<load, echo=TRUE>>=
 library("clsrank")
-@ 
+@
 
 \subsection{Real Data Examples}
 
@@ -443,7 +478,7 @@ extended later. A usage example is as follows:
 
 \textbf{Replace these codes with knitr.}
 
-\begin{CodeChunk} 
+\begin{CodeChunk}
 \begin{CodeInput}
 R> library(clsrank)
 R> data(crd)
@@ -460,7 +495,7 @@ singed rank test for paired comparisons. It takes in three arguments:
 \emph{z} is observed score, \emph{id} is the cluster id of each
 observation. A usage example is as follows:
 
-\begin{CodeChunk} 
+\begin{CodeChunk}
 \begin{CodeInput}
 R> data(crsd)
 R> clusignrank(z, id, data = crsd)
@@ -469,14 +504,15 @@ R> clusignrank(z, id, data = crsd. unb)
 \end{CodeInput}
 \end{CodeChunk}
 
-\textbf{Can add a simulation to check the sample size necessary for the 
+\textbf{Can add a simulation to check the sample size necessary for the
 asymptotics to work.}
 
 \section{Summary}
-In this article, clustered Wilcoxon rank sum test and Wilcoxon signed rank are briefly introduced, for both balanced and unbalanced designs, also, an extra situation considering stratified data is mentioned for Wilcoxon rank sum test. Also a R \textbf{clsrank} package with functions for each test is built. This R package is a counterpart of the existing SAS macros for these two tests. 
+In this article, clustered Wilcoxon rank sum test and Wilcoxon signed rank are briefly introduced, for both balanced and unbalanced designs, also, an extra situation considering stratified data is mentioned for Wilcoxon rank sum test. Also a R \textbf{clsrank} package with functions for each test is built. This R package is a counterpart of the existing SAS macros for these two tests.
 
 \section*{Acknowledgement}
-Data \text{sedlab} is provided by Lab Seddon Lab \citep{ferrara2015pheno}.%% Note: If there is markup in \(sub)section, then it has to be escape as above.
+Data \text{sedlab} is provided by Lab Seddon Lab
+\citep{ferrara2015pheno}.%% Note: If there is markup in \(sub)section, then it has to be escape as above.
 
 
 % \bibliographystyle{jss}

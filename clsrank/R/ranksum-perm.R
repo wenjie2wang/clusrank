@@ -38,6 +38,7 @@
 #'@param alternative a character string specifying the
 #' alternative hypothesis, must be one of "two.sided" (default),
 #'  "greater" or "less". You can specify just the initial letter.
+#'@param mu null value of the hypothesis
 #'@param n.rep number of samples generated for permutation test.
 #'@param DNAME a character string, inheritated from
 #' \code{cluswilcox.test.model}, for result output.
@@ -67,7 +68,7 @@
 
 
 cluswilcox.test.ranksum.permutation <-
-  function(x, cluster, group, strats, alternative, n.rep ,
+  function(x, cluster, group, strats, alternative, mu, n.rep,
            DNAME = NULL, METHOD = NULL) {
     # Incoporating clustering effects for the WilcoxonRank Sum Test
     # for stratified balanced or unbalanced designs for small
@@ -206,9 +207,11 @@ cluswilcox.test.ranksum.permutation <-
                                       1 - ecdf.wc(abs(WC)),
                                       0.5))
 
+    names(mu) <- "location"
+
     names(WC) <- "Rank sum statistic"
 
-    result <- list(rstatistic = WC, p.value = pval,
+    result <- list(rstatistic = WC, p.value = pval, null.value = mu,
                    data.name = DNAME, method = METHOD, balance = balance)
     class(result) <- "ctest"
     result

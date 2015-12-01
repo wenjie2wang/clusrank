@@ -36,6 +36,7 @@
 #'@param alternative a character string specifying the
 #' alternative hypothesis, must be one of "two.sided" (default),
 #'  "greater" or "less". You can specify just the initial letter.
+#'@param mu null value of the hypothesis
 #'@param DNAME a character string, inheritated from
 #' \code{cluswilcox.test.model}, for result output.
 #' @param METHOD a character string, inheritated from
@@ -67,7 +68,7 @@
 
 cluswilcox.test.ranksum <-
   function(x, cluster, group, strats,
-           alternative, DNAME = NULL, METHOD = NULL) {
+           alternative, mu, DNAME = NULL, METHOD = NULL) {
     # Incoporating clustering effects for the WilcoxonRank Sum Test
     # for stratified balanced or unbalanced designs. In addition,
     # one can control for confounding by forming strata which are
@@ -199,9 +200,11 @@ cluswilcox.test.ranksum <-
   names(ExpWc) <- "Expected value of rank sum statistic"
   names(varwc_final) <- "Variance of rank sum statistic"
   names(zc) <- "Test statistic"
+  names(mu) <- "location"
   result <- list(rstatistic = WC, erstatistic = ExpWc,
                  vrstatistic = varwc_final,
                  statistic = zc, p.value = pval,
+                 null.value = mu,
                  data.name = DNAME,
                  method = METHOD,
                  balance = balance)
