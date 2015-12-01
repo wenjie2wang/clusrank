@@ -42,5 +42,5 @@
 #' factor H R1210C rare genetic variant in
 #' age-related macular degeneration}
 #' JAMA Ophthalmol, 2015 Apr 16.
-#' \url{doi: 10.1001/jamaophthalmol.2015.0814.}.
+#' \url{doi: 10.1001/jamaophthalmol.2015.0814}.
 NULL

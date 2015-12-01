@@ -212,6 +212,7 @@ cluswilcox.test.ranksum.permutation <-
     names(WC) <- "Rank sum statistic"
 
     result <- list(rstatistic = WC, p.value = pval, null.value = mu,
+                   alternative = alternative,
                    data.name = DNAME, method = METHOD, balance = balance)
     class(result) <- "ctest"
     result

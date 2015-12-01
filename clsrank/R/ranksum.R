@@ -204,6 +204,7 @@ cluswilcox.test.ranksum <-
   result <- list(rstatistic = WC, erstatistic = ExpWc,
                  vrstatistic = varwc_final,
                  statistic = zc, p.value = pval,
+                 alternative = alternative,
                  null.value = mu,
                  data.name = DNAME,
                  method = METHOD,

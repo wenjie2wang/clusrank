@@ -29,8 +29,8 @@
 #'
 #'@author Yujing Jiang
 #'@references
-#'Bernard Rosner, Robert J. Glynn, Mei-Lin.csize Tin.csize Lee(2003)
-#' \emph{Incorporation of Clusterin.csize Effects for the Wilcoxon Rank
+#'Bernard Rosner, Robert J. Glynn, Mei-Ling Ting Lee(2003)
+#' \emph{Incorporation of Clustering Effects for the Wilcoxon Rank
 #' Sum Test: A Large-Sample Approach.} Biometrics, \bold{59}, 1089-1098.
 #' @describeIn cluswilcox.test formula interface for sum rank test.
 #' @export

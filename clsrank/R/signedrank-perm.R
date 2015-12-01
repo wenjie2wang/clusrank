@@ -110,6 +110,7 @@ cluswilcox.test.signedrank.permutation <-
       result <- list(rstatistic = T_c,
                      p.value = P_val,
                      n = n,  cn = m, permutation = TRUE,
+                     alternative = alternative,
                      null.value = mu,
                      method = METHOD, data.name = DNAME)
       class(result) <- "ctest"
@@ -170,6 +171,7 @@ cluswilcox.test.signedrank.permutation <-
         result <- list(rstatistic = T_c,
                        p.value = P_val,
                        n = n,  cn = m, permutation = TRUE,
+                       alternative = alternative,
                        method = METHOD, data.name = DNAME,
                        null.value = mu,
                        balance = balance)
