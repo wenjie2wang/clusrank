@@ -214,33 +214,18 @@ for clustered data, section 4 is on the
 data analysis.
 
 
-\section{Test Procedures}
+\section{Tests}
+\label{test}
 
 \textbf{The two tests can be introduced in one section
   with subsections. Set up the problem first (with clustered data).
   The finite sample permutation can be a subsection too.}
 
-Nonparametric tests are popular alternatives of
-parametric tests when the underlying distribution of the
-response variable is unknown or among the distributions
-whose test procedures have not been derived specifically.
-Standard non-parametric tests rely on the independence of
-observations, however, often times the data come in
-are clustered by nature or by the design of data collecting
-scheme. Usually, but not always, the observations within
-each cluster is positively correlated whereas different clusters
-are independent. Therefore, the variance of the
-test statistic of the standard non-parametric test
-would be underestimated and thus
-the power of the test would be lower. The following
-test procedures adjust the variance used in the test
-for the clustering effect and takes the effect of
-different cluster sizes as well.
-
-
 \subsection{Wilcoxan Rank Sum Test for Clustered Data}
-\label{ranksum}
+\label{rank}
 
+\subsubsection{Hypothesis}
+\label(hrank)
 Suppose there are two groups under different treatments,
 $X$ and $Y$, the null hypothesis of the rank sum test
 is that the probability of an observation from a
@@ -248,7 +233,7 @@ treatment $X$ exceeding an observation from treatment
 $Y$ is the same as an observation from treatment $Y$
 exceeding an observation from treatment $X$.
 Specifically,
-assume the data come in clusters and
+assume the data came in clusters and
 let $X_{ij}$ denote the score for the $j$th subunit
 from the $i$th cluster in the first group,
 $i = 1,\ldots,m; j = 1,\ldots,g_i$ and $Y_{kl}$
@@ -263,10 +248,11 @@ W_{c,obs} = \sum_{i=1}^m\sum_{j=1}^{g_i}\text{Rank}(X_{ij})
 where ranks are determined based on the
 combined sample of all subunits over the
 $X$ and $Y$ clusters. Subunits
-for a given cluster are assumed to be exchangeable.
+for a given cluster are assumed to be exchangeable and each
+cluster only contains members from one treatment group.
 
 
-\subsection{Balanced designs}\label{ranksumbal}
+\subsection{Balanced designs}\label{brank}
 Under balanced designs, the cluster sizes are the same.
 Since the score assigned to clusters under treatments
 $X$ and $Y$ are
@@ -303,25 +289,28 @@ Z_c = \{W_c - E(W_c)\}/\{\text{Var}(W_c)\}^{1/2}
 $Z_c$ is asymptotically normal if both $m \to \infty$ and $n \to \infty$.
 When the sample size is small, permutation test can be
 performed.
-\subsubsection{Unbalanced designs}\label{unbal}
-For unbalanced designs, cluster sizes vary,
-thus under the $H_0$,
-the distribution of sum of rank
-assigned to each cluster are no longer
+
+
+\subsubsection{Unbalanced designs}\label{ubrank}
+
+For unbalanced designs, the null distribution
+of the sum of rank
+assigned to each cluster are not
 identically distributed across clusters
-with different sizes. Therefore, when
-deriving the null distribution of the test
-statistic \eqref{Wco}, we need to control
-for the cluster size.
+with different sizes.
 Let $(m_g, n_g)=$ number of clusters of
-size $g$ assigned to the $X$ and $Y$ treatment.
+size $g$ assigned to the $X$ and $Y$ treatment
+respectively.
 Denote $N_g = m_g + n_g$ for $g=1,\ldots,g_{max}$
-and $N =\sum_{g=1}^{g_{max}}N_g$.
+as the total number of clusters for clusters with
+size $g$,
+and $N =\sum_{g=1}^{g_{max}}N_g$ as the total number
+of clusters in the sample.
 Let $R_{ij,g} = $ rank for the $j$th
 subunit in the $i$th cluster of size $g$,
 $g = 1, \ldots, g_{max},
 i = 1, \ldots, N_g, j = 1, \ldots, g$,
-and $R_{ij,g}$s are computed based on the
+where $R_{ij,g}$s are computed based on the
 combined sample.
 The rank sum statistic can then be
 written as:
@@ -335,6 +324,7 @@ $i = 1, \ldots, N_g$.
 The distribution corresponding to $W_{c, obs}$
 is
 \begin{equation}
+\label{eq:ubrankstat}
 W_c = = \sum_{g = 1}^{g_{max}}
  = \sum_{g = 1}^{g_max}\sum_{i = 1}^{N_g}\delta_{i, g}R_{i+, g}
 \end{equation}
@@ -349,46 +339,83 @@ E(W_c) = \sum_{g=1}^{g_{max}}m_g(R_{++,g}/N_g)
 \begin{equation}\label{eq:uVWc}
 \text{Var}(W_c) = \sum_{g=1}^{g_{max}}[m_gn_g/\{N_g(N_g - 1)\}]\sum_{i=1}^{N_g}(R_{i+,g} - R_{++,g}/N_g)^2
 \end{equation}
-A large-sample test statistics based on $W_c$,%\eqref{eq:uEWc}, and \eqref{eq:uVWc} is
+A large-sample test statistics based on $W_c$ is as following:
 \begin{equation}
 Z_c = \{W_c - E(W_c)\}/\{\text{Var}(W_c)\}^{1/2}
 \end{equation}
+Again, when sample size is small, permutation test can
+be applied based on \eqref{eq:ubrankstat}
+
+When apply the ranksum test for the clustered data,
+a formula is used as a interface where the response
+variable is on the righthand side and covariates on
+the lefthand side, special functions \code{group},
+\code{cluster} and \code{stratum} are used to indicate
+the function of each variable.
+
+```{r}
+library(clusrank)
+data(crd)
+
+## Using large-sample test.
+cluswilcox.test(z ~ group(group) + cluster(id), data = crd)
+## For small sample, using the permutation test.
+cluswilcox.test(z ~ group(group) + cluster(id), data = crd, permutation = TRUE)
+
+
+```
+
+
 \subsubsection{Stratification}
-When stratification needs to be considered, e.g.,
-stratification by center in multiple clinical trials,
+Futher more, the data is also stratified,
 the test statistic and its null distribution will
-need modification to control for confounding variable.
-Suppose the set of relevant confounding variables
-can be summarized in terms of $V$ strata.
-Let $(m_{g,v}, n_{g,v})=$ number of clusters of size $g$
+need modification to control for stratification as
+an extra
+confounding variable.
+Suppose there are $V$ strata,
+let $(m_{g,v}, n_{g,v})=$ number of clusters of size $g$
 in stratum $v$ assigned to the$X$ and $Y$ clusters of size $g$
-in stratum $v$, $g = 1, \ldots, g_{max}, v = 1, \ldots, V$.
+in stratum $v$ respectively,
+$g = 1, \ldots, g_{max}, v = 1, \ldots, V$.
 Let $R_{i+, g, v}$ be the rank sum for the subunits in the
 $i$th cluster of size $g$ in the $v$th stratum.
 The rank sum statistic is defined as
+
 \begin{equation}
+\label{eq: srank}
 W_{c, obs} = \sum_{g=1}^{g_{max}}\sum_{v=1}^{V}\left(\sum_{i\in I_{g,v,obs}}R_{i+,g,v}\right)
 \end{equation}
-where $I_{g, v, obs}$ is the observed subset of  $m_{g,v}$
+where $I_{g, v, obs}$ is the observed subset of $m_{g,v}$
 unique indices selected from
 $\{1, \ldots, N_{g,v}\}$,
 corresponding to cluster of
 size $g$ in stratum $v$ that are assigned to the $X$ treatment.
 The corresponding expectation and variance of the null
 distribution of $W_{c, obs}$
+
 \begin{align*}
 E(W_c)=& \sum_{g=1}^{g_{max}}\sum^V_{v=1}m_{g,v}R_{++,g,v}/N_{g,v}\\
 \text{Var}(W_c)=& \sum_{g=1}^{g_{max}}\sum_{v=1}^V[m_{g,v}n_{g,v}/\{N_{g,v}(N_{g,v} - 1)\}]\\
 &\times\sum_{i=1}^{N_{g,v}}(R_{i+, g, v} - R_{++, g, v}/N_{g,v})^2
 \end{align*}
-The large sample test statistic is
+
+The large sample test statistic is then
 \begin{equation}
 Z_c = \{W_c - E(W_c)\}/\{\text{Var}(W_c)\}^{1/2}.
 \end{equation}
 Again, permutation test can be applied when sample size is small.
 
+Following is an illustration of the rank sum test for the
+stratified data, the \code{crdStr} data is a test data set
+comes with the package:
+```{r}
+data(crdStr)
+cluswilcox.test(z ~ group(group) + cluster(id) + stratum(stratum), data = crdStr)
 
-\section{Wilcoxon signed rank test for clustered data}
+```
+
+
+\subsection{Wilcoxon signed rank test for clustered data}
 
 Let $X_{ij} (Y_{ij})$ denotes the baseline (follow-up) score for the $j$th subunit in the $i$th cluster (subject) and define $Z_{ij} = Y_{ij} - X_{ij}, j = 1, \ldots,g_i; i = 1,\ldots,m$. Also within each cluster, the difference scores are assumed to be independent and identically distributed. Hypothesis being tested is
 \begin{equation*}
