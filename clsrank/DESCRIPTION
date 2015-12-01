@@ -1,13 +1,13 @@
-Package: clsrank
-Type: Package
-Title: Wilcoxon rank sum test for clustered data
-Version: 0.0-4
-Date: 2015-5-8
-Authors@R: c(person(given = "Yujing", family = "Jiang", 
+Package: clusrank
+Version: 0.1-0
+Title: Wilcoxon Rank Sum Test for Clustered Data
+Description: Non-parametric tests(Wilcoxon rank sum test and Wilcoxon signed rank test)for clustered data. Both small-sample and large-sample tests are provided.S3 class is used.
+Authors@R: c(person(given = "Yujing", family = "Jiang",
                     email = "yujing.jiang@uconn.edu",
                     role = c("aut","cre")),
              person(given = "Jun", family = "Yan", role = "ctb"))
-Description: Incorporating cluster effects for the Wilcoxon Rank Sum Test. Can be handle stratified data too.
 License: GPL (>=3)
-Packaged: 2015-05-8 00:55:35 UTC; noisy
-NeedsCompilation: no
+Depends:
+  R (>= 3.1.0)
+LazyData: true
+RoxygenNote: 5.0.1

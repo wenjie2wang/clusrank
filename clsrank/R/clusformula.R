@@ -205,8 +205,8 @@ cluswilcox.test.formula <- function(formula, data = NULL,
   group <- group[OK && finite.x]
   stratum <- group[OK && finite.x]
   cluster <- cluster[OK && finite.x]
-  mu <- (group == 1)* mu
-  x <- x - mu
+  mu.vec <- (group == 1)* mu
+  x <- x - mu.vec
 
   if(permutation == FALSE) {
     return(cluswilcox.test.ranksum(x,  cluster,
