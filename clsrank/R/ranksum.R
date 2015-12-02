@@ -200,7 +200,7 @@ cluswilcox.test.ranksum <-
   names(ExpWc) <- "Expected value of rank sum statistic"
   names(varwc_final) <- "Variance of rank sum statistic"
   names(zc) <- "Test statistic"
-  names(mu) <- "location"
+  names(mu) <- "difference in locations"
   result <- list(rstatistic = WC, erstatistic = ExpWc,
                  vrstatistic = varwc_final,
                  statistic = zc, p.value = pval,
