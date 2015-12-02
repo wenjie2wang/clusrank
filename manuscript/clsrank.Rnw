@@ -4,7 +4,8 @@
 \documentclass[article]{jss}
 
 \usepackage{amsmath}
-
+\begin{document}
+%% \SweaveOpts{concordance=TRUE}
 %% almost as usual
 \author{Yujing Jiang\\ University of Connecticut \And
   Xin He\\ University of Maryland \And
@@ -96,8 +97,7 @@ Jun Yan\\
 %% end of declarations %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\begin{document}
-\SweaveOpts{concordance=TRUE}
+
 
 %% include your article here, just as usual
 %% Note that you should use the \pkg{}, \proglang{} and \code{} commands.
@@ -225,7 +225,7 @@ data analysis.
 \label{rank}
 
 \subsubsection{Hypothesis}
-\label(hrank)
+\label{hrank}
 Suppose there are two groups under different treatments,
 $X$ and $Y$, the null hypothesis of the rank sum test
 is that the probability of an observation from a
@@ -252,7 +252,7 @@ for a given cluster are assumed to be exchangeable and each
 cluster only contains members from one treatment group.
 
 
-\subsection{Balanced designs}\label{brank}
+\subsection{Balanced data}\label{brank}
 Under balanced designs, the cluster sizes are the same.
 Since the score assigned to clusters under treatments
 $X$ and $Y$ are
@@ -260,8 +260,9 @@ identically distributed under the null hypothesis,
 we can pool $X$ and $Y$ clusters together and refer
 to a combined set of $Z$ clusters, where $Z_{ij} = $score
 for the $j$th subunit of the $i$th cluster,
-$j = 1,\ldots,g, i=1,\ldots,m+n = N$.
-Suppose that $m$ of the $N$ clusters are assigned
+$j = 1,\ldots,g, i=1,\ldots, m+n = N$.
+Under $H_0$,
+suppose that $m$ of the $N$ clusters are assigned
 at random to the $X$ treatment and the remaining $n$
 clusters to the $Y$ treatment.
 Let $\delta_i$ be
@@ -291,7 +292,7 @@ When the sample size is small, permutation test can be
 performed.
 
 
-\subsubsection{Unbalanced designs}\label{ubrank}
+\subsubsection{Unbalanced data}\label{ubrank}
 
 For unbalanced designs, the null distribution
 of the sum of rank
@@ -346,28 +347,25 @@ Z_c = \{W_c - E(W_c)\}/\{\text{Var}(W_c)\}^{1/2}
 Again, when sample size is small, permutation test can
 be applied based on \eqref{eq:ubrankstat}
 
-When apply the ranksum test for the clustered data,
+When applying the ranksum test for the clustered data,
 a formula is used as a interface where the response
 variable is on the righthand side and covariates on
 the lefthand side, special functions \code{group},
 \code{cluster} and \code{stratum} are used to indicate
 the function of each variable.
 
-```{r}
+<<rank sum test for unbalanced data>>=
 library(clusrank)
 data(crd)
-
 ## Using large-sample test.
 cluswilcox.test(z ~ group(group) + cluster(id), data = crd)
 ## For small sample, using the permutation test.
 cluswilcox.test(z ~ group(group) + cluster(id), data = crd, permutation = TRUE)
+@
 
 
-```
-
-
-\subsubsection{Stratification}
-Futher more, the data is also stratified,
+\subsubsection{Data with Stratification}
+Futher more, if the data is also stratified,
 the test statistic and its null distribution will
 need modification to control for stratification as
 an extra
@@ -408,16 +406,28 @@ Again, permutation test can be applied when sample size is small.
 Following is an illustration of the rank sum test for the
 stratified data, the \code{crdStr} data is a test data set
 comes with the package:
-```{r}
+<<rank sum test for stratified data>>=
 data(crdStr)
 cluswilcox.test(z ~ group(group) + cluster(id) + stratum(stratum), data = crdStr)
-
-```
+@
 
 
 \subsection{Wilcoxon signed rank test for clustered data}
+\label{sign}
+\subsubsection{Hypothesis}
+\label{hsign}
+Let $X_{ij} (Y_{ij})$ denotes the baseline
+(follow-up) score for the $j$th subunit
+in the $i$th cluster (subject) and
+define $Z_{ij} = Y_{ij} - X_{ij}, j = 1,
+\ldots,g_i; i = 1,\ldots,m$.
+Within each cluster, the difference
+scores are assumed to be independent and
+identically distributed. The signed rank
+test is used to find out if the population
+is shifted after the treatment.
+Formally, hypothesis being tested is
 
-Let $X_{ij} (Y_{ij})$ denotes the baseline (follow-up) score for the $j$th subunit in the $i$th cluster (subject) and define $Z_{ij} = Y_{ij} - X_{ij}, j = 1, \ldots,g_i; i = 1,\ldots,m$. Also within each cluster, the difference scores are assumed to be independent and identically distributed. Hypothesis being tested is
 \begin{equation*}
 H_0: \text{the difference score } Z \text{ is symmetric about 0}
 \end{equation*}
@@ -425,62 +435,100 @@ vs
 \begin{equation*}
 H_1: Z \text{ is symmetric about }\gamma, \gamma \not = 0.
 \end{equation*}
-Rank $|Z_{ij}|$ over the total of $G = \sum_{i=1}^m g_i$ subunits from the $m$ clusters and let $S_{ij}=R_{ij}V_{ij}$, where $R_{ij} = $ rank of $|Z_{ij}|$ within the total data set of $G$ subunits over $m$ clusters, and $V_{ij} = \text{sign}(Z_{ij})$.
-\subsubsection{Balanced Design} \label{bal1}
-In a balanced design (i.e., each cluster has the same number of subunits, $g$), the clustered Wilcoxon signed rank statistic is defined by
+
+Rank $|Z_{ij}|$ over the total of
+$G = \sum_{i=1}^m g_i$ subunits from
+the $m$ clusters and let $S_{ij}=R_{ij}V_{ij}$,
+where $R_{ij} = $ rank of $|Z_{ij}|$
+within the total data set of $G$
+subunits over $m$ clusters, and $V_{ij} = \text{sign}(Z_{ij})$.
+
+
+\subsubsection{Balanced Data}
+\label{bsign}
+If the data is balanced,
+the clustered
+Wilcoxon signed rank statistic is defined as following:
+
 \begin{equation}
 T_{c}^{(obs)} = \sum_{i=1}^mS_{i+} \equiv \sum^m_{i=1}\sum^g_{j=1}R_{ij}V_{ij},
 \end{equation}
-where $S_{i+} = \sum_{j=1}^gS_{ij}$ and only consider nonzero$Z_{ij}$ in the computation of signed ranks.
-When considering the randomization distribution corresponding to $T_c$, the unit of randomization is the cluster while the unit of analysis is the subunit. Let $\delta_1, \ldots,\delta_m$ be i.i.d. random variables each taking on the values +1 and -1 with probability 1/2, then
+
+
+where $S_{i+} = \sum_{j=1}^gS_{ij}$ which
+is the sum of the rank within $i^{th}$ cluster
+and only consider nonzero
+$Z_{ij}$ in the computation of signed ranks.
+When considering the randomization
+distribution corresponding to $T_c$,
+the unit of randomization is the cluster.
+Let $\delta_1, \ldots,\delta_m$ be i.i.d.
+random variables each taking on the values
++1 and -1 with probability 1/2, then the
+distribution of $T_{c}^{(obs)}$ is:
+
 \begin{equation} \label{eq:tc}
 T_c = \sum_{i=1}^m\delta_iS_{i+}.
 \end{equation}
-It is shown that under $H_0$, $E(T_c) = 0$ and $\text{Var}(T_c) = \sum^m_{i=1}S^2_{i+}$.
-And the large sample test statistic is
+
+It is shown that under $H_0$, $E(T_c) = 0$
+and $\text{Var}(T_c) = \sum^m_{i=1}S^2_{i+}$.
+Standarize $T_{c}^{(obs)}$ with $E(T_c)$ and
+$\text{Var}(T_c)$,
+the large sample test statistic is defined as
 \begin{equation}
 Z_c = \left. T_c \middle/ \left(\sum_{i=1}^nS^2_{i+}\right)^{1/2}\right. \sim N(0, 1)\qquad \text{under } H_0.
 \end{equation}
-\subsubsection{Unbalanced Designs}
-In the case of an unbalanced design, the signed rank statistic is
+When the sample size is small, a permutation
+test can be applied.
+
+
+For the signed rank test, the input should be a numeric
+vector which contains the difference between the paired
+observations, or two vectors, where vector
+\code{x} contains observations before the treatment,
+and \code{y} contains observations after the treatment.
+This manner of input is restricted to the signed rank
+test.
+
+<<signed rank test for balanced data>>=
+## Large sample signed rank test for clustered data
+data(crsd)
+cluswilcox.test(z, cluster = id, data = crsd)
+## Small sample test
+data(crsd)
+cluswilcox.test(z, cluster = id, data = crsd, permutation = TRUE)
+@
+
+\subsubsection{Unbalanced Data}
+\label{ubsign}
+When the data is unbalanced
+the test statistic is defined as:
+
 \begin{equation}
 T_c^{(obs)} = \sum_{i = 1}^m w_i\bar{S}_i
 \end{equation}
+
 where $\bar{S}_i = S_{i+}/{g_i}, w_i = 1/\text{Var}(\bar{S}_i)$ under $H_0$.
-The randomization distribution corresponding to $T_{c,s}^{obs} = \sum^m_{i=1}\delta_iw_i\bar{S}_i$.$\delta$ is defined as in \eqref{eq:tc}.
-And the test statistic is defined as
+The randomization distribution
+corresponding to
+$T_{c,s}^{obs} = \sum^m_{i=1}\delta_iw_i\bar{S}_i$.
+$\delta$ is defined as in \eqref{eq:tc}.
+The test statistic is defined as
 \begin{equation}
 Z_{c,s} = \left.T_{c,s}\middle/ \left(\sum_{i=1}^m\hat{w}^2_i\bar{S}^2_i\right)^{1/2}\right. \sim N(0,1) \text{ under }H_0,
 \end{equation}
+
 where $\hat{w}_i = g_i/[\widehat{Var}(S_{ij})\{1 + (g_i-1)\hat{\rho}_{s,cor}\}]$, $\hat{\rho}_{s,cor} = \hat{\rho}_s\left(1 + \frac{1 - \hat{\rho}_s^2}{m - 5/2}\right)$,$\hat{\rho_s} = $ max $[\hat{\sigma}_A^2/(\hat{\sigma}_A^2 + \hat{\sigma}^2), 0]$, $\hat{\sigma
 }^2 = \sum_{i=1}^m\sum_{j=1}^{g_i}(S_{ij} - \bar{S}_i)^2/(G-m), \hat{\sigma}^2_A = $ max $[\{\sum_{i=1}^mg_i(\bar{S_i}- \bar{\bar{S}})^2/(m-1)- \hat{\sigma}^2\}/g_0,0], g_0 = [\sum_{i=1}^mg_i - \sum_{i=1}^mg_i^2/\sum_{i=1}^mg_i]/(m-1)$ and $\widehat{Var}(S_{ij}) = \sum_{i=1}^m\sum_{j=1}^{g_i}(S_{ij} - \bar{\bar{S}})^2/(G-1)$.
 
-
-
-\section{R package \pkg{clusrank}}
-
-\textbf{use the macros defined by JSS.}
-
-\textbf{give the main functions and explain their required arguments}
-
-The R package is a realization of all the tested we presented in the previous section. It contains two functions,
-The package \emph{clsrank} contains two functions, \text{cluswilcox}
-and \text{clusignrank}. The \text{cluswilcox} is a function for
-clustered Wilcoxon ranksum test and \text{clusignrank} is a function
-for clustered Wilcoxon signed rank test. Also there are four test
-datasets in this package, data \emph{crd} is clustered non-stratified
-data set comparing effects of two treatments, data \emph{crd.str} is
-clustered stratified data set comparing effects of two treatments; data
-\emph{crsd} is clustered balanced data set comparing the difference
-between pre and post treatment effect, data \emph{crsd.unb} is clustered
-unbalancd data set comparing the difference between pre and post
-treatment effect.
-
-\section{Illustration}
-
-<<load, echo=TRUE>>=
-library("clsrank")
+An illustration of use of the test is as following:
+<<signed rank test for balanced data>>=
+data(crsdUnb)
+cluswilcox.test(z, cluster = id, data = crsdUnb)
 @
+
+
 
 \subsection{Real Data Examples}
 
@@ -505,15 +553,7 @@ extended later. A usage example is as follows:
 
 \textbf{Replace these codes with knitr.}
 
-\begin{CodeChunk}
-\begin{CodeInput}
-R> library(clsrank)
-R> data(crd)
-R> cluswilcox(z ~ group, data = crd, id = id)
-R> data(crd.str)
-R> cluswilcox(z ~ group, data = crd.str, id = id, stratum = stratum)
-\end{CodeInput}
-\end{CodeChunk}
+
 
 \subsection{clusignrank}\label{clusignrank}
 
@@ -522,14 +562,7 @@ singed rank test for paired comparisons. It takes in three arguments:
 \emph{z} is observed score, \emph{id} is the cluster id of each
 observation. A usage example is as follows:
 
-\begin{CodeChunk}
-\begin{CodeInput}
-R> data(crsd)
-R> clusignrank(z, id, data = crsd)
-R> data(crsd.unb)
-R> clusignrank(z, id, data = crsd. unb)
-\end{CodeInput}
-\end{CodeChunk}
+
 
 \textbf{Can add a simulation to check the sample size necessary for the
 asymptotics to work.}
