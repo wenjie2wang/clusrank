@@ -89,8 +89,8 @@ randomization, whereas the data is collected from both eyes,
 therefore we sould expect correlation between the
 data collected from the two eyes from the same person.
 To account for the clustering effect, modifications of these
-two tests have been proposed by \citet{rosner2003incorporation}
-and \citet{rosner2006wilcoxon}.
+two tests have been proposed by \citet{Rosn:GLyn:Lee:inco:2003}
+and \citet{Roxn:Glyn:Lee:wilc:2006}.
 The modified tests work for both balanced and unbalanced data,
 i.e., cluster size is idential or variable. In addition,
 the modified rank sum test can also deal with stratified data.
@@ -244,7 +244,7 @@ variable can also be accounted for.
 
 
 
-\textbf{Please, never hard code a reference.}
+%\textbf{Please, never hard code a reference.}
 The order of this paper is as following,
 section 2 introduces the Wilcoxon rank
 sum test for clustered data, section 3
@@ -256,9 +256,9 @@ data analysis.
 \section{Tests}
 \label{test}
 
-\textbf{The two tests can be introduced in one section
-  with subsections. Set up the problem first (with clustered data).
-  The finite sample permutation can be a subsection too.}
+%\textbf{The two tests can be introduced in one section
+ % with subsections. Set up the problem first (with clustered data).
+  %The finite sample permutation can be a subsection too.}
 
 \subsection{Wilcoxan Rank Sum Test for Clustered Data}
 \label{rank}
@@ -291,7 +291,7 @@ for a given cluster are assumed to be exchangeable and each
 cluster only contains members from one treatment group.
 
 
-\subsection{Balanced data}\label{brank}
+\subsubsection{Balanced data}\label{brank}
 Under balanced designs, the cluster sizes are the same.
 Since the score assigned to clusters under treatments
 $X$ and $Y$ are
@@ -573,10 +573,10 @@ cluswilcox.test(z, cluster = id, data = crsdUnb)
 
 
 
-\subsection{Real Data Analysis}
+\section{Real Data Analysis}
 \label{real}
 
-\subsubsection{Data}
+\subsection{Data}
 To illustrate the usage of the package, we are going to
 perform the clustered Wilcoxon rank sum test on a
 real data set in a study of eyes.

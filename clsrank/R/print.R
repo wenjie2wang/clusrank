@@ -90,6 +90,7 @@ print.ctest <- function (x, digits = getOption("digits"), prefix = "\t", ...)
     cat("The signed rank test statistics is adjusted since the data is unbalanced.")
   if(!is.null(x$balance) && x$balance == FALSE)
     cat("The data is unbalanced")
+
     cat("\n")
   if (!is.null(x$alternative)) {
     cat("alternative hypothesis: ")
