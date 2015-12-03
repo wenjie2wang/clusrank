@@ -3,15 +3,69 @@
 
 \documentclass[article]{jss}
 
+\usepackage[utf8]{inputenc}
 \usepackage{amsmath}
-\begin{document}
-%% \SweaveOpts{concordance=TRUE}
-%% almost as usual
-\author{Yujing Jiang\\ University of Connecticut \And
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{natbib}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{multicol}
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{{#1}}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{{#1}}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{{#1}}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{{#1}}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{{#1}}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{{#1}}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{{#1}}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{{#1}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{{#1}}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{{#1}}}
+\newcommand{\RegionMarkerTok}[1]{{#1}}
+\newcommand{\ErrorTok}[1]{\textbf{{#1}}}
+\newcommand{\NormalTok}[1]{{#1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\author{\begin{tabular}{*{2}{>{\centering}p{.5\textwidth}}}
+\large Nome1 & \large Nome2 \tabularnewline
+Department1 & Department2 \tabularnewline
+School1 & School2 \tabularnewline
+\url{url1} & \url{url2}
+\end{tabular}
+}
+
+
+\author{
+\begin{multicols}{3}
+Yujing Jiang\\ University of Connecticut \And
   Xin He\\ University of Maryland \And
   Mei-Ling Ting Lee\\ University of Maryland \And
   Bernard Rosner\\ Harvard University  \And
-  Jun Yan\\ University of Connecticut }
+  Jun Yan\\ University of Connecticut
+  \end{multicols}
+  }
 \title{Rank-Based Tests for Clustered Data with \proglang{R} Package \pkg{clsrank}}
 
 %% for pretty printing and a nice hypersummary also set:
@@ -23,14 +77,6 @@
 
 
 \Abstract{
-\textbf{Do not exceeds linewidth 70 for better diff effect.
-Start new sentences at new lines whenever possible.}
-
-\textbf{Borrow some ideas from the biometrics papers to motivate.}
-
-
-\textbf{Read the instructions of JSS: code, pkg, proglang are already defined!}
-
 Nonparametric tests such as Wilcoxon rank sum test
 and Wilcoxon signed rank test are widely used in
 the situation where the underlying distribution
@@ -57,7 +103,6 @@ procedures from the two papers mentioned above with both
 small and large sample tests.
 }
 
-\textbf{No key word should repeat words in the title.}
 
 \Keywords{Wilcoxon rank sum test, Wilcoxon signed rank test}
 \Plainkeywords{Wilcoxon rank sum test, Wilcoxon signed rank test}
@@ -101,12 +146,8 @@ Jun Yan\\
 
 %% include your article here, just as usual
 %% Note that you should use the \pkg{}, \proglang{} and \code{} commands.
-
+\begin{document}
 \section{Introduction}
-
-\textbf{Flow: importance of rank tests for clustered data (see
-  those biometrics papers); unavailability implementation;
-  propose the package and highlight contributions.}
 
 Clustered data often arise in biomedical
 studies, e.g., when the research objects are eyes,
@@ -527,7 +568,7 @@ where $\hat{w}_i = g_i/[\widehat{Var}(S_{ij})\{1 + (g_i-1)\hat{\rho}_{s,cor}\}]$
 }^2 = \sum_{i=1}^m\sum_{j=1}^{g_i}(S_{ij} - \bar{S}_i)^2/(G-m), \hat{\sigma}^2_A = $ max $[\{\sum_{i=1}^mg_i(\bar{S_i}- \bar{\bar{S}})^2/(m-1)- \hat{\sigma}^2\}/g_0,0], g_0 = [\sum_{i=1}^mg_i - \sum_{i=1}^mg_i^2/\sum_{i=1}^mg_i]/(m-1)$ and $\widehat{Var}(S_{ij}) = \sum_{i=1}^m\sum_{j=1}^{g_i}(S_{ij} - \bar{\bar{S}})^2/(G-1)$.
 
 An illustration of use of the test is as following:
-<<signed rank test for balanced data>>=
+<<signed rank test for unbalanced data>>=
 data(crsdUnb)
 cluswilcox.test(z, cluster = id, data = crsdUnb)
 @
@@ -562,7 +603,8 @@ The CARMS system has a
 5-step scale, where 1 to 3 represent no symptom,
 earlier and intermediate severity respectively,
 4 and 5 represent
-two different symptoms of the advanced AMD.
+two different symptoms of the advanced AMD,
+geographic atrophy and neovascular disease respectively.
 The
 CARMS grades were assessed separately for these
 two advanced stages, i.e., we are going
@@ -590,9 +632,27 @@ subject identifier which is the cluster id.
 ## Carry out clustered rank sum test for the subset
 ## with CARMS grade 1, 2, 3 and 4.
 data(sedlab)
-clusrank::cluswilcox.test()
+cluswilcox.test(CARMS ~ cluster(ID) + stratum(Agesex) + group(Variant),
+                data = sedlab, subset = CARMS %in% c(1, 2, 3, 4))
 @
 
+<<CARMS score 1, 2, 3, 5>>=
+## Carry out clustered rank sum test for the subset
+## with CARMS grade 1, 2, 3 and 5.
+data(sedlab)
+cluswilcox.test(CARMS ~ cluster(ID) + stratum(Agesex) + group(Variant),
+                data = sedlab, subset = CARMS %in% c(1, 2, 3, 5))
+@
+
+When controlled for the stratification covariate \code{Agesex},
+the p-value for CARMS grades 1-4 is less than $0.001$,
+which implies strong correlation between the
+presence of the complement factor H R1210C variant and
+the severity of AMD when treating geographic atrophy as the
+advanced stage. The p-value for CARMS grades 1,2,3 and 5
+is 0.06, again the evidence is relatively strong the
+the presence of the variant does affect the severity of
+AMD when treating neovascular disease as the advanced stage.
 
 
 
