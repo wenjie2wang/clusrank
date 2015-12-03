@@ -350,9 +350,13 @@ be applied based on \eqref{eq:ubrankstat}
 When applying the ranksum test for the clustered data,
 a formula is used as a interface where the response
 variable is on the righthand side and covariates on
-the lefthand side, special functions \code{group},
+the lefthand side. Special functions \code{group},
 \code{cluster} and \code{stratum} are used to indicate
-the function of each variable.
+the function of each variable, \code{group} indicates
+the id of the treatment group, \code{cluster} indicates
+the membership of an observation in a specific cluster
+and \code{stratum} indicates the stratum an observation
+belongs to.
 
 <<rank sum test for unbalanced data>>=
 library(clusrank)
@@ -530,42 +534,69 @@ cluswilcox.test(z, cluster = id, data = crsdUnb)
 
 
 
-\subsection{Real Data Examples}
+\subsection{Real Data Analysis}
+\label{real}
 
-show all examples
+\subsubsection{Data}
+To illustrate the usage of the package, we are going to
+perform the clustered Wilcoxon rank sum test on a
+real data set in a study of eyes.
+Age-related macular degeneration (AMD) is a disease
+that blurs the sharp centeral vision by
+affecting macula, a oval yellow spot
+near the center of the retina of the human eye.
+The complement factor H R1210C is a large protein
+that circulates in human plasma. The variant of
+this protein confers the strongest genetic risk
+for AMD and earlier age at onset. The objective
+of the study is to characterize the observable
+traits of this variant. The study was carried out by
+the Seddon Lab \citep{Sedd:Shar:Adel:eval:2006,
+Ferr:Sedd:phen:2015} with 143 patients (283 eyes)
+involved, including 62 patients with the rare
+variant. The degree of severity of AMD was graded
+based on the Clinical
+Age-Related Maculopathy Staging (CARMS) system for
+each enrolled eye.
+The CARMS system has a
+5-step scale, where 1 to 3 represent no symptom,
+earlier and intermediate severity respectively,
+4 and 5 represent
+two different symptoms of the advanced AMD.
+The
+CARMS grades were assessed separately for these
+two advanced stages, i.e., we are going
+to carry out the analysis on two subsets of the
+observations respectively: the subset of
+observations with
+CARMS grade 1, 2, 3, or 4, and the subset of
+observations with CARMS grade 1, 2, 3, or 5.
+Since high correlation between
+eyes of the same patient is expected while
+observations from different patients can be assumed
+as independent, the data is clustered in pairs and
+each subject is a cluster. The data also provided
+information on age and sex, and an extra variable
+combined age and sex, which could be used to stratify
+the data.
+In this analysis, the CARMS grade is the response
+variable and treatment refers to the presence
+of the complement factor H R1210C variant.
+The data set contains 7 variables: ID is the
+subject identifier which is the cluster id.
 
 
-\subsection{Simulation for Small Sample}
-
-Find the appropriate sample size for each configuration.
-
-
-\subsection{cluswilcox}\label{cluswilcox}
-
-The \emph{cluswilcox} function takes in a formula \(score \sim group\)
-to indicate which variable in the dataframe is the observed score of the
-subunit and which is the label of treatment. Also a vector of \(id\) is
-required to label the cluster each observation belongs to. \(id\) and
-\(group\) have to be numerical. If the data is stratified, then a vector
-of \(stratum\) is also needed to label which stratum each observation
-comes from. There are also some currenly unused options which is may be
-extended later. A usage example is as follows:
-
-\textbf{Replace these codes with knitr.}
+<<CARMS score 1, 2, 3, 4>>=
+## Carry out clustered rank sum test for the subset
+## with CARMS grade 1, 2, 3 and 4.
+data(sedlab)
+clusrank::cluswilcox.test()
+@
 
 
 
-\subsection{clusignrank}\label{clusignrank}
-
-The \emph{clusignrank} function is used to carry out clustered Wilcoxon
-singed rank test for paired comparisons. It takes in three arguments:
-\emph{z} is observed score, \emph{id} is the cluster id of each
-observation. A usage example is as follows:
 
 
-
-\textbf{Can add a simulation to check the sample size necessary for the
-asymptotics to work.}
 
 \section{Summary}
 In this article, clustered Wilcoxon rank sum test and Wilcoxon signed rank are briefly introduced, for both balanced and unbalanced designs, also, an extra situation considering stratified data is mentioned for Wilcoxon rank sum test. Also a R \textbf{clsrank} package with functions for each test is built. This R package is a counterpart of the existing SAS macros for these two tests.
