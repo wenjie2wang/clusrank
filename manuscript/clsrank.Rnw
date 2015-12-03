@@ -58,13 +58,11 @@ School1 & School2 \tabularnewline
 
 
 \author{
-\begin{multicols}{3}
 Yujing Jiang\\ University of Connecticut \And
   Xin He\\ University of Maryland \And
-  Mei-Ling Ting Lee\\ University of Maryland \And
+  Mei-Ling Ting Lee\\ University of Maryland \AND
   Bernard Rosner\\ Harvard University  \And
   Jun Yan\\ University of Connecticut
-  \end{multicols}
   }
 \title{Rank-Based Tests for Clustered Data with \proglang{R} Package \pkg{clsrank}}
 
