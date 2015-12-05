@@ -1,6 +1,7 @@
 %% The tex file is not to be edited; it is generated.
 %% Only edit .Rnw file
-
+%\VignetteIndexEntry{Clustered Rank-based Tests}
+%\VignetteEngine{knitr::knitr}
 \documentclass[nojss]{jss}
 
 \usepackage[utf8]{inputenc}

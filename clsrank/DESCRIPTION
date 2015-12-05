@@ -5,9 +5,13 @@ Description: Non-parametric tests(Wilcoxon rank sum test and Wilcoxon signed ran
 Authors@R: c(person(given = "Yujing", family = "Jiang",
                     email = "yujing.jiang@uconn.edu",
                     role = c("aut","cre")),
+             person(given = "Xin", family = "He", role = "ctb"),
+             person(given = "Mei-Ling Ting", family = "Lee", role = "ctb"),
              person(given = "Jun", family = "Yan", role = "ctb"))
 License: GPL (>=3)
 Depends:
   R (>= 3.1.0)
+Suggests: knitr
 LazyData: true
+VignetteBuilder: knitr
 RoxygenNote: 5.0.1
