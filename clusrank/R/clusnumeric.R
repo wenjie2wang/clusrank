@@ -40,6 +40,7 @@
 #' \emph{The Wilcoxon Signed Rank Test for Paired Comparisons of
 #'  Clustered Data.} Biometrics, \bold{62}, 185-192.
 #' @describeIn cluswilcox.test numeric interface for signed rank test.
+#' @importFrom stats
 #' @export
 
 cluswilcox.test.numeric <- function(x, y = NULL,

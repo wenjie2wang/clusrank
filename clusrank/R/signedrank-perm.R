@@ -55,6 +55,7 @@
 #' clusterentitical or variable cluster size. When the data
 #' is unbalanced, adjusted signed rank statistic is used.
 #' Ties are dropped in the test.
+#' @importFrom stats
 #' @examples
 #' data(crsd)
 #' cluswilcox.test(z, cluster = id, data = crsd, permutation = TRUE)

@@ -55,12 +55,14 @@
 #' clusterentitical or variable cluster size. When the data
 #' is unbalanced, adjusted signed rank statistic is used.
 #' Ties are dropped in the test.
+#' @importFrom stats
 #' @examples
 #' data(crsd)
 #' cluswilcox.test(z, cluster = id, data = crsd)
 #' data(crsdUnb)
 #' cluswilcox.test(z, cluster = id, data = crsdUnb)
 #' @author Yujing Jiang
+#'
 #' @references
 #' Bernard Rosner, Robert J. Glynn, Mei-Ling Ting Lee(2006)
 #' \emph{The Wilcoxon Signed Rank Test for Paired Comparisons of

@@ -51,7 +51,7 @@
 #'\item{data.name}{a character string giving the names of the data.}
 #'\item{method}{the name of the method}
 #'\item{balance}{a logical, indicating if the data is balanced.}
-#'
+#'@importFrom stats
 #'@examples
 #'data(crd)
 #'cluswilcox.test(z ~ group(group) + cluster(id), data = crd)
