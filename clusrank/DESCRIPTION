@@ -15,5 +15,4 @@ Depends:
   R (>= 3.1.0)
 Suggests: knitr
 LazyData: true
-VignetteBuilder: knitr
 RoxygenNote: 5.0.1

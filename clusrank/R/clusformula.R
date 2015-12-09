@@ -33,7 +33,7 @@
 #' \emph{Incorporation of Clustering Effects for the Wilcoxon Rank
 #' Sum Test: A Large-Sample Approach.} Biometrics, \bold{59}, 1089-1098.
 #' @describeIn cluswilcox.test formula interface for sum rank test.
-#' @importFrom stats
+#' @importFrom  stats na.omit terms complete.cases model.extract
 #' @export
 
 cluswilcox.test.formula <- function(formula, data = NULL,
