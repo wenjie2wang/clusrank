@@ -23,6 +23,7 @@
 
 
 #'Wilcoxon Rank Sum Test for Clustered Data using Permutation
+#'
 #'This is the rank sum test for clustered data.
 #' The cluster size can be either
 #'identitical or variable. Effect of stratification on the test

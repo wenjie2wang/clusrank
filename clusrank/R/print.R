@@ -22,6 +22,7 @@
 
 
 #'Print Function for Nonparametric Test for Clustered Data
+#'
 #'Printing objects of class "\code{ctest}", by simple \link{print}
 #'methods.
 #'

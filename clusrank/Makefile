@@ -8,13 +8,13 @@ Rd:
 	Rscript -e "library(methods); devtools::document();" 
 
 build:  Rd
-	R CMD build ../$(pkg) --compact-vignettes="gs+qpdf"
+	sudo R CMD build ../$(pkg) --compact-vignettes="gs+qpdf"
 
 check: $(pkg)_*.tar.gz
-	R CMD check --as-cran $(pkg)_*.tar.gz
+	sudo R CMD check --as-cran $(pkg)_*.tar.gz
 
 INSTALL: $(pkg)_*.tar.gz
-	R CMD INSTALL --build $(pkg)_*.tar.gz
+	sudo R CMD INSTALL --build $(pkg)_*.tar.gz
 
 ## update copyright year in each R source and date in DESCRIPTION
 updateYear: 

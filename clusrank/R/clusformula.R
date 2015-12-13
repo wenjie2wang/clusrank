@@ -22,6 +22,7 @@
 
 
 #'Wilcoxon Rank Sum Test for Clustered Data
+#'
 #'This is the sum rank test to compare the means of scores from
 #'two groups for clustered data. The cluster size can be either
 #'identitical or variable. Effect of stratification on the test
