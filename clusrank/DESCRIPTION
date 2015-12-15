@@ -1,7 +1,7 @@
 Package: clusrank
 Version: 0.1-0
 Title: Wilcoxon Rank Sum Test for Clustered Data
-Description: Non-parametric tests(Wilcoxon rank sum test and Wilcoxon signed rank test)for clustered data. Both small-sample and large-sample tests are provided.S3 class is used.
+Description: Non-parametric tests (Wilcoxon rank sum test and Wilcoxon signed rank test) for clustered data. 
 Imports:
     stats
 Authors@R: c(person(given = "Yujing", family = "Jiang",
@@ -13,6 +13,7 @@ Authors@R: c(person(given = "Yujing", family = "Jiang",
 License: GPL (>=3)
 Depends:
   R (>= 3.1.0)
+VignetteBuilder: knitr
 Suggests: knitr
 LazyData: true
 RoxygenNote: 5.0.1

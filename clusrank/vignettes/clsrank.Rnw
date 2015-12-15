@@ -633,7 +633,7 @@ The data set contains 7 variables: ID is the
 subject identifier which is the cluster id.
 
 
-<<CARMS score 1, 2, 3, 4>>=
+<<CARMS1234>>=
 ## Carry out clustered rank sum test for the subset
 ## with CARMS grade 1, 2, 3 and 4.
 data(sedlab)
@@ -641,7 +641,7 @@ cluswilcox.test(CARMS ~ cluster(ID) + stratum(Agesex) + group(Variant),
                 data = sedlab, subset = CARMS %in% c(1, 2, 3, 4))
 @
 
-<<CARMS score 1, 2, 3, 5>>=
+<<CARMS1235>>=
 ## Carry out clustered rank sum test for the subset
 ## with CARMS grade 1, 2, 3 and 5.
 data(sedlab)
