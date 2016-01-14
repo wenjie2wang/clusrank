@@ -65,41 +65,34 @@ Yujing Jiang\\ University of Connecticut \And
   Jun Yan\\ University of Connecticut
   }
 \title{Rank-Based Tests for Clustered Data with \proglang{R} Package
-\pkg{clsrank}}
+\pkg{clusrank}}
 
 %% for pretty printing and a nice hypersummary also set:
 \Plainauthor{Yujing Jiang, Mei-Ling Ting Lee, Jun Yan} %% comma-separated
 \Plaintitle{R package Clustered Wilcoxon Rank Sum Test and Signed Rank Test} %% without formatting
-\Shorttitle{\pkg{clsrank}: rank test for cluster data} %% a short title (if necessary)
+\Shorttitle{Rank tests for cluster data} %% a short title (if necessary)
 
 %% an abstract and keywords
 
 
 \Abstract{
-Nonparametric tests such as Wilcoxon rank sum test
-and Wilcoxon signed rank test are widely used in
-the situation where the underlying distribution
-of the population is far from normal or simply unknown.
-One necessary assumption for the appropriateness of the
-null distribution of the test statistic is that each
-observation is independent, however, this is also an
-assumption which is violated quite often in practice.
-For instance, in the study of human eyes,
-each person is the unit of
-randomization, whereas the data is collected from both eyes,
-therefore we sould expect correlation between the
-data collected from the two eyes from the same person.
-To account for the clustering effect, modifications of these
-two tests have been proposed by \citet{Rosn:GLyn:Lee:inco:2003}
-and \citet{Roxn:Glyn:Lee:wilc:2006}.
-The modified tests work for both balanced and unbalanced data,
-i.e., cluster size is idential or variable. In addition,
-the modified rank sum test can also deal with stratified data.
-No R package is available so far for nonparametric tests for
-clustered data.
-The package \pkg{clsrank} is a realization of the test
-procedures from the two papers mentioned above with both
-small and large sample tests.
+Wilcoxon rank sum test and signed rank test are widely used
+nonparametric tests for two-sample comparison when the distributions
+are far from normal or the analyst is unwilling to assume normality. 
+The independence assumption of individual data, however, does not hold
+for clustered data which are increasingly popular in many fields.
+For instance, in ophthalmologic clinical trials, data collected from
+the two eyes from the same patient are dependent.
+To account for the clustering effect, modifications of the
+rank-based tests have been proposed in the literature 
+\citep{Rosn:GLyn:Lee:inco:2003, Roxn:Glyn:Lee:wilc:2006}, but no
+implementation has been available in \proglang{R}, impeding their
+adoption in statistical practice with clustered data.
+We introduce an \proglang{R} package \pkg{clusrank}, which provides
+Wilcoxon rank sum test and signed rank test for clustered data.
+The tests can handle unblanced cluster sizes, presence of ties,
+and stratified data, based on the asymptotics for large samples or
+permutation for small samples.
 }
 
 
@@ -122,13 +115,25 @@ small and large sample tests.
 %% in the following format:
 
 \Address{
-Jun Yan\\
+  Yujing Jiang and Jun Yan\\
   Department of Statistics\\
   Professor of Statistics\\
   University of Connecticut\\
-  215 Glenbrook Rd. Unit 4120, Storrs, CT 06269, USA.
-
-  Email:\email{jun.yan@uconn.edu}
+  215 Glenbrook Rd. Unit 4120, Storrs, CT 06269, USA.\\
+  Email: \email{yujing.jiang@uconn.edu}, \email{jun.yan@uconn.edu}
+  
+  Xin He and Mei-Ling Ting Lee\\
+  Department of Epidemiology and Biostatistics\\
+  University of Maryland\\
+  EPIB 2234R, SPH Building \#255,  College Park, MD 20742, USA.\\
+  Email: \email{xinhe@umd.edu}, \email{mltlee@umd.edu}
+  
+  Bernard Rosner\\
+  Department of Biostatistics\\
+  Harvard University\\
+  180 Longwood Avenue,  Boston, Massachusetts 02115, USA\\
+  Email: \email{stbar@channing.harvard.edu}
+  
 }
 %% It is also possible to add a telephone and fax number
 %% before the e-mail in the following format:
@@ -148,129 +153,125 @@ Jun Yan\\
 \begin{document}
 \section{Introduction}
 
-Clustered data often arise in biomedical
-studies, e.g., when the research objects are eyes,
-ears, teath, etc. In these cases, the observations
-can be classified into a number of distinct groups
-or "clusters", where the observations are more similar
-within each cluster than when they are from different clusters.
-For instance, when measurements are taken from both eyes
-of each patient, the measurments from the same person
-should be correlated whereas measurements
-taken from different patients should be independent.
-Quite often, the goal of study is to compare the
-measurements on the response variable
-from the control group and the treatment group
-or the measurements before and after a treatment
-to see if the treatment effect is present.
-The parametric statistical tests which explicitly account
-for clustering include an adjusted version of the standard
-two-sample t test which account for the intracluster correlation
-(i.e., correlation among obervations within the clusters) when
-the response variable follows a normal distribution and
-a adjusted $\chi^2$ statistic when the response variable is binary
+Non-normal clustered data often arise in many fields, where the
+clusters are independent but individuals within each cluster are not. 
+For example, in ophthalmologic clinical trials, the outcomes of
+interest are often ordinal such as the Early Treatment for Diabetic
+Retinopathy Scale (ETDRS), and the individual measurements from
+both eyes from the same subject (cluster) are not independent.
+The goal of the studies are often to test whether two samples are from
+the same population against certain alternative (e.g., one population
+has larger values than the other).
+%% The parametric statistical tests which explicitly account
+%% for clustering include an adjusted version of the standard
+%% two-sample $t$ test which account for the intracluster correlation
+%% (i.e., correlation among obervations within the clusters) when
+%% the response variable follows a normal distribution and
+%% a adjusted $\chi^2$ statistic when the response variable is binary
+\textbf{Need to get right to the point.}
+\textbf{What is this reference? why citing it?}
 \citep{Donn:Bant:anal:1988}.
+Standard nonparametric tests, such as Wilconxon rank-sum test
+or signed rank test, are important tools for non-normal,
+independent data, but they are not applicable to clustered data. 
+Often, with positive within-cluster association, the effective
+sample size is less than the number of individuals.
+Consequently, the p-values from naive application of these tests
+are underestimated and misleading conclusions could be reached.
 
 
-When the response variable is neither normal or binary,
-e.g., the observations are ordinal,
-the aforementioned tests are no longer suitable.
-An attractive alternative is non-parametric test.
-However, standard non-parametric tests requires the
-observations to be independent, which is violated when the
-data is clustered. If the intracluster correlation is
-positive, then the variance of the standard test statistic
-will be underestimated. \citet{Rosn:GLyn:Lee:inco:2003}
+Recent developments have extended the Wilcoxon rank-sum test 
+and signed rank test to clustered data.
+\textbf{need to have a flow of reviewing the literature. The most
+  recent ones should include critics of earlier ones, so we can borrow
+  ideas from these papers.}
+The rank-sum test is the rank-based version of the two-sample $t$ test.
+\citet{Rosn:GLyn:Lee:inco:2003}
 proposed a Wilcoxon rank sum test for clustered data
 to compare two groups
 assuming that the members within each cluster is
-exchangeble and objects from the same cluster
-belong to the same group.Their method is able
+\textbf{open spell-check}
+exchangeable and objects from the same cluster
+belong to the same group. Their method is able
 to deal with unbalanced data (i.e., data with
 variable cluster sizes) and stratified data
 (e.g., data from a multi-center study which
 is stratified by centers).
 Another modified
+\textbf{See their JASA paper for critics for the RGL method.}
 rank sum test for clustered data was proposed by
 \citet{Datt:Satt:rank:2005}, their method is valid
 even when the members of the same cluster came from
 different groups, or when the intraclulster correlation
 is determined by the group membership.
-To compare paired observations, an adjusted version
-of wilcoxon signed rank test was proposed by
-\citet{Laro:wilc:2005} which invovles an estimate
-of variance based on certain sum of square over
-independent clusters, but this test procedure
-is not distribution free.
-\citet{Roxn:Glyn:Lee:wilc:2006} proposed another
-modified signed rank test assuming a common
-intercluster correlation and estimate it
+
+
+Wilcoxon signed-rank test is the nonparametric counterpart of the
+paired $t$ test to compare the distributions of paired observations. 
+\citet{Laro:wilc:2005} proposed an adjusted version
+of wilcoxon signed rank test where the variance estimate is based on
+certain sum of square over independent clusters, but this test procedure
+is not distribution free \textbf{reference for this claim?}.
+\citet{Roxn:Glyn:Lee:wilc:2006} proposed another modified signed rank
+test assuming a common intercluster correlation and estimating it
 from absolute rank of observations.
-\citet{Datt:Satt:sign:2008} proposed a
-signed rank test procedure based on the
-principle of general with-in cluster resampling
-and this test can handle the case when
-the cluster size is informative, i.e.,
-cluster size depends on the group.
+\citet{Datt:Satt:sign:2008} proposed a signed rank test procedure 
+based on the principle of general within-cluster resampling.
+Their test can handle the case when the cluster size is informative.
+That is, the distribution of pairwise differences within a cluster 
+depends on the cluster size.
 
 
-Despite the popularity of clustered data in
-a wide range of contexts such as
-clinical trials, longitudinal study,
-social science, etc,
-there is no available R package nor function
-publically available for
-non-parametric test for clustered data yet.
-Therefore a package pacted with
-functions for this purpose will help
-researchers and scientists
-in related areas as a ready tool
-for testing clustered data.
-In this paper we present the \pkg{clusrank}
-package, a
-realization of test procedures presented
-in \citet{Rosn:GLyn:Lee:inco:2003}
-and \citet{Roxn:Glyn:Lee:wilc:2006}.
-Large-sample inference based on asymptotic
-distribution of test statistics and
-small-sample inference based on permutation
-are provided for both rank sum test and
-signed rank test. The tests provided
-can also handel unbalanced data when
-there are clusters with different sizes,
-in addition, for rank sum test, the
-effect of
-stratification as an extra cofounding
-variable can also be accounted for.
+Despite the popularity of clustered data in a wide range of applications
+such as clinical trials, longitudinal study, social science, and
+others, and despite the availability of the rank-based tests for
+clustered data, we are unaware of any existing \proglang{R} package
+that provides functions implementing the methods reviewed above.
+This motivated our development of package \pkg{clusrank} for
+rank-based tests for clustered data.
+Large-sample inference based on asymptotic distribution of test
+statistics and small-sample inference based on permutation are
+provided for both rank sum test and signed rank test. 
+The tests provided can also handel unbalanced data when
+there are clusters with different sizes.
+In addition, for rank sum test, the effect of stratification as an
+extra cofounding variable can also be accounted for.
 
 
-
-%\textbf{Please, never hard code a reference.}
 The order of this paper is as following,
-section \ref{test} introduces Wilcoxon rank
+Section~\ref{sec:test} introduces Wilcoxon rank
 sum test and Wilcoxon signed rank test
 for clustered data, when data is balanced
-or unbalanced. In addition, the modification
+or unbalanced. 
+\textbf{Do not repeatedly use any expression, e.g., ``in addition''.}
+The usage of the main functions are explained in Section~\ref{sec:usage}.
+In addition, the modification
 of rank sum test when data is stratified
 is also discussed. Section \ref{real} is a real
 data analysis for a eye study. The article
 is summarized in section \ref{summ}.
 
+\textbf{Put the methods in Section 2;
+  put the usages (explain the arguments) in Section 3;
+  in Section 4: can add a simulation study to compare the power/size
+  (reproduce a table in JASA, e.g.); 
+  in Section 5: real data illustration.
+  Section 6: discussion for possible extensions.}
+
+\textbf{the name sedlab is a poor choice.}
 
 
+\section{Rank-Based Tests for Clustered Data}
+\label{sec:test} 
+%% note the label style. It helps to distinguish from
+%% table or figure labels.
 
-\section{Tests}
-\label{test}
 
-%\textbf{The two tests can be introduced in one section
- % with subsections. Set up the problem first (with clustered data).
-  %The finite sample permutation can be a subsection too.}
-
-\subsection{Wilcoxan Rank Sum Test for Clustered Data}
-\label{rank}
+\subsection{Wilcoxon Rank Sum Test}
+\label{rank} % DO NOT define if it is not used.
 
 \subsubsection{Hypothesis}
-\label{hrank}
+
 Suppose there are two groups under different treatments,
 $X$ and $Y$, the null hypothesis of the rank sum test
 is that the probability of an observation from a
