@@ -1,4 +1,4 @@
-filestem := clsrank
+filestem := clusrank
 knitrfile := $(filestem).Rnw
 texfile := $(filestem).tex
 pdffile := $(filestem).pdf
