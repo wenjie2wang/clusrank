@@ -46,6 +46,7 @@
 cluswilcox.test.numeric <- function(x, y = NULL,
                                     cluster = NULL,
                                     data = parent.frame(),
+                                    method = c("RGL", "DS"),
                                     alternative = c("two.sided", "less", "greater"),
                                     mu = 0, permutation = FALSE,
                                     n.rep = 500, ...) {
@@ -71,6 +72,7 @@ cluswilcox.test.numeric <- function(x, y = NULL,
   ##     (or similar: see model.frame) containing the variables.
   ##     By default the variables are taken from environment(formula).
   ##
+  ##   method:  the method to be used.
   ##
   ##   alternative: a character string specifying the
   ##     alternative hypothesis, must be one of
@@ -87,7 +89,12 @@ cluswilcox.test.numeric <- function(x, y = NULL,
   METHOD <- "Wilcoxon signed rank test for clutered data"
 
   pars <- as.list(match.call()[-1])
-
+  method <- match.arg(method)
+  
+  if(method == "DS" && permutation == TRUE) {
+    stop("Datta-Satta method does not provide permutation test")
+  }
+  
   ## If data name existed, take out the x (and y) observations,
   ## group cluster, cluster cluster, stratum cluster, otherwise, no need to
   ## take values from a data frame.
@@ -208,7 +215,7 @@ cluswilcox.test.numeric <- function(x, y = NULL,
   }
 
   if(permutation == FALSE) {
-    return(cluswilcox.test.signedrank(x, cluster, alternative, mu, DNAME, METHOD))
+    return(cluswilcox.test.signedrank(x, cluster, method, alternative, mu, DNAME, METHOD))
   } else {
     METHOD <- paste(METHOD, "using permutation")
     return(cluswilcox.test.signedrank.permutation(x, cluster, alternative, mu,

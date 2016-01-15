@@ -66,12 +66,12 @@ Yujing Jiang\\ University of Connecticut \And
   Jun Yan\\ University of Connecticut
   }
 \title{Rank-Based Tests for Clustered Data with \proglang{R} Package
-\pkg{clsrank}}
+\pkg{clusrank}}
 
 %% for pretty printing and a nice hypersummary also set:
 \Plainauthor{Yujing Jiang, Mei-Ling Ting Lee, Jun Yan} %% comma-separated
 \Plaintitle{R package Clustered Wilcoxon Rank Sum Test and Signed Rank Test} %% without formatting
-\Shorttitle{\pkg{clsrank}: rank test for cluster data} %% a short title (if necessary)
+\Shorttitle{\pkg{clusrank}: rank test for cluster data} %% a short title (if necessary)
 
 %% an abstract and keywords
 
@@ -98,7 +98,7 @@ i.e., cluster size is idential or variable. In addition,
 the modified rank sum test can also deal with stratified data.
 No R package is available so far for nonparametric tests for
 clustered data.
-The package \pkg{clsrank} is a realization of the test
+The package \pkg{clusrank} is a realization of the test
 procedures from the two papers mentioned above with both
 small and large sample tests.
 }
