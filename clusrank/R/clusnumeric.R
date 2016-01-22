@@ -87,7 +87,6 @@ cluswilcox.test.numeric <- function(x, y = NULL,
   ## permuation:
 
   METHOD <- "Wilcoxon signed rank test for clutered data"
-
   pars <- as.list(match.call()[-1])
   method <- match.arg(method)
   
@@ -109,34 +108,23 @@ cluswilcox.test.numeric <- function(x, y = NULL,
     } else {
       y <- NULL
     }
-
-
     if(!is.null(pars$cluster)) {
       cluster <- data[, as.character(pars$cluster)]
       DNAME <- paste0(DNAME, ", cluster: ", pars$cluster)
     } else {
       cluster <- NULL
     }
-
-
     DNAME <- paste0(DNAME, " from ", pars$data)
-
-
   } else {
-
     DNAME <- deparse(substitute(x))
-
     if(!is.null(y)) {
       DNAME <- paste(DNAME, "and", deparse(substitute(y)))
     }
 
-
     if(!is.null(cluster)) {
       DNAME <- paste0(DNAME, ", cluster id: ", deparse(substitute(cluster)))
     }
-
   }
-
 
   ## Check and initialize cluster if not given,
   ## transform it to numeric if given as characters.
@@ -159,12 +147,9 @@ cluswilcox.test.numeric <- function(x, y = NULL,
     }
   }
 
-
-
   ## Check x.
   if ( !is.numeric(x))
     stop("'x' must be numeric")
-
 
   ## Check data for paired test, paired test
   ## do not deal with stratified data.
@@ -204,11 +189,6 @@ cluswilcox.test.numeric <- function(x, y = NULL,
         stop("not enough (finite) 'x' observations")
       }
     }
-
-
-
-
-
   alternative <- match.arg(alternative)
   if(!missing(mu) && ((length(mu) > 1L) || !is.finite(mu))) {
     stop("'mu' must be a single number")
