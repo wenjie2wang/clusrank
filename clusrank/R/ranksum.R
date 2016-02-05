@@ -103,6 +103,10 @@ cluswilcox.test.ranksum <-
 
 
   METHOD <- "Wilcoxon rank sum test for clutered data"
+  testfunc <- switch(method, rgl = cluswilcox.test.ranksum.rgl, 
+                     ds = cluswilcox.test.ranksum.ds)
+  testfunc(x, cluster, group, strats,
+           alternative, mu, DNAME, METHOD)
 
   data <- as.data.frame(cbind(x, cluster, group, strats))
   ## group is assumed to take value 1 and 2; could be made

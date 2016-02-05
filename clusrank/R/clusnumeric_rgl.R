@@ -42,7 +42,7 @@ cluswilcox.test.signedrank.rgl <- function(x, cluster, alternative,
     class(result) <- "ctest"
     return(result)
   } else {
-    if (balance == FALSE) {
+    
       sumclusterrank <- c(by(data$signrank, data$cluster, sum))
       sumsq <- sum(sumclusterrank ^ 2)
       meansumrank <- sumclusterrank / cluster.size
