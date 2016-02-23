@@ -38,6 +38,7 @@
 #' @export
 
 cluswilcox.test.formula <- function(formula, data = NULL,
+                                    method = c("rgl", "ds"),
                                     subset = NULL, na.action = na.omit,
                                     alternative = c("two.sided", "less", "greater"),
                                     mu = 0,
@@ -108,32 +109,37 @@ cluswilcox.test.formula <- function(formula, data = NULL,
 
   strats <- attr(Terms, "specials")$stratum
 
-  if(length(strats)) {
-    stemp <- untangle.specials(Terms, "stratum", 1)
-    strats.name <- gsub("[\\(\\)]", "",
+ if(method == "rgl") {
+   { if(length(strats)) {
+     stemp <- untangle.specials(Terms, "stratum", 1)
+     strats.name <- gsub("[\\(\\)]", "",
                          regmatches(stemp$vars,
                                     gregexpr("\\(.*?\\)", stemp$vars))[[1]])
-        DNAME <- paste0(  DNAME, " stratum: ", strats.name, ",")
-
-    if(length(stemp$vars) == 1) {
-      strats.keep <- mf[[stemp$vars]]
-    } else {
-      stop("more than one variable are set as the stratum id")
-    }
-    strats.uniq <- unique(strats.keep)
-    strats.uniq.l <- length(strats.uniq)
-
-    if(is.character(strats.uniq)) {
-      strats <- recoderFunc(strats.keep, strats.uniq, c(1 : strats.uniq.l))
-    } else {
-      if(!is.numeric(strats.uniq)) {
-        stop("stratum id should be numeric or character")
-      }
-      strats <- strats.keep
-    }
-  } else {
-    strats <- rep(1, data.n)
-  }
+     DNAME <- paste0(  DNAME, " stratum: ", strats.name, ",")
+     
+     if(length(stemp$vars) == 1) {
+       strats.keep <- mf[[stemp$vars]]
+     } else {
+       stop("more than one variable are set as the stratum id")
+     }
+     strats.uniq <- unique(strats.keep)
+     strats.uniq.l <- length(strats.uniq)
+     
+     if(is.character(strats.uniq)) {
+       strats <- recoderFunc(strats.keep, strats.uniq, c(1 : strats.uniq.l))
+     } else {
+       if(!is.numeric(strats.uniq)) {
+         stop("stratum id should be numeric or character")
+       }
+       strats <- strats.keep
+     }
+   } else {
+     strats <- rep(1, data.n)
+   }
+   } else {
+       strats <- NULL
+     }
+ }
 
   cluster <- attr(Terms, "specials")$cluster
   if(length(cluster)) {
@@ -213,6 +219,7 @@ cluswilcox.test.formula <- function(formula, data = NULL,
   if(permutation == FALSE) {
     return(cluswilcox.test.ranksum(x,  cluster,
                                    group, strats,
+                                   method,
                                    alternative,
                                    mu,
                                    DNAME, METHOD))
