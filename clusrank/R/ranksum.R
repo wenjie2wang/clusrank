@@ -1,7 +1,7 @@
 ################################################################################
 ##
 ##   R package clusrank by Mei-Ling Ting Lee, Jun Yan, and Yujing Jiang
-##   Copyright (C) 2015
+##   Copyright (C) 2016
 ##
 ##   This file is part of the R package clusrank.
 ##
