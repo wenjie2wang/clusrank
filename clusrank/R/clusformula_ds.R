@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+cluswilcox.test.ranksum.ds <- function(X, cluster, group, 
+=======
 ################################################################################
 ##
 ##   R package clusrank by Mei-Ling Ting Lee, Jun Yan, and Yujing Jiang
@@ -20,26 +23,27 @@
 ##
 ################################################################################
 cluswilcox.test.ranksum.ds <- function(X, cluster, grp, 
+>>>>>>> dcd28ed27e3273521bccd4766d76ce33be2e54de
                                        alternative,
                                        mu,
                                        DNAME, METHOD) {
   
-  group.n <- length(unique(grp))
-  if(group.n == 1) {
+  group.uniq <- length(unique(group))
+  if(group.uniq == 1) {
     stop("invalid group variable, should contain at least 2 groups")
   }
-  if(group.n == 2) {
+  if(group.uniq == 2) {
     #####calculate quantity 2 (using the pooled estimate of F)
     n<-length(X)
     F.hat<-numeric(n)
     for (i in 1:n){
-      F.hat[i]<-(sum(X<=X[i])+sum(X<X[i]))/(2*n)
+      F.hat[i] <- (sum(X <= X[i]) + sum( X < X[i])) / (2 * n)
     }
     #####calculate quantity 1 (using ECD-F for each cluster)
     #### M is No. of clusters, n is No. of observations
     M<-length(unique(cluster)) 
-    n.i<-table(cluster)
-    F.prop<-numeric(n)
+    n.i <- table(cluster)
+    F.prop <-  numeric(n)
     for(ii in 1:n){
       F.j<-numeric(M)
       for (i in 1:M){
@@ -52,14 +56,14 @@ cluswilcox.test.ranksum.ds <- function(X, cluster, grp,
     a<-numeric(M)
     b<-1+F.prop
     for (i in 1:M){
-      a[i]<-sum((grp[cluster==i]*b[cluster==i])/(n.i[i]))
+      a[i]<-sum((group[cluster==i]*b[cluster==i])/(n.i[i]))
     }    
     c<-1/(M+1)
     S<-c*sum(a)
-    ########note: for m groups maybe can use grp[cluster==i&grp=m]
+    ########note: for m groups maybe can use group[cluster==i&group=m]
     
     #########Calculate E(S)=E(W*)
-    n.i1<-table(cluster[grp==1])
+    n.i1<-table(cluster[group==1])
     d<-n.i1/n.i
     E.S<-(1/2)*sum(d)
     
@@ -68,7 +72,7 @@ cluswilcox.test.ranksum.ds <- function(X, cluster, grp,
     a<-n.i1/n.i
     for (i in 1:M){
       b<-1/(n.i[i]*(M+1))
-      c<-(grp[cluster==i])*(M-1)
+      c<-(group[cluster==i])*(M-1)
       d<-sum(a[-i])
       W.hat[i]<-b*sum((c-d)*F.hat[cluster==i])
     }
@@ -77,8 +81,8 @@ cluswilcox.test.ranksum.ds <- function(X, cluster, grp,
     
     var.s<-sum((W.hat-E.W)^2) #calculate var(s)
     stat<-(S-E.S)/sqrt(var.s)   #calculate the test statistic
-    p.value<-2*pnorm(stat,lower.tail=F)
-    return(list(S=S,E.S=E.S,Var.S=var.s,z.stat=stat,p.value=p.value))
+    pvalue<-2*pnorm(stat,lower.tail=F)
+    return(list(S=S,E.S=E.S,Var.S=var.s,z.stat=stat,pvalue=pvalue))
   } else {
     #####calculate quantity 2 (using the pooled estimate of F)
     n<-length(X)
@@ -100,12 +104,12 @@ cluswilcox.test.ranksum.ds <- function(X, cluster, grp,
     }   
     
     ###########calculate S(j)=E(W*|X,g=j), where m is the number of groups
-    m<-length(unique(grp))
+    m<-length(unique(group))
     a<-matrix(0,m,M)
     b<-1+F.prop
     for(j in 1:m){
       for (i in 1:M){
-        gik.j<-ifelse(grp==j,1,0)
+        gik.j<-ifelse(group==j,1,0)
         a[j,i]<-sum((gik.j[cluster==i]*b[cluster==i])/(n.i[i]))
       } 
     }   
@@ -115,7 +119,7 @@ cluswilcox.test.ranksum.ds <- function(X, cluster, grp,
     #########Calculate E(S)=E(W*)
     n.ij<-matrix(0,m,M)
     for (i in 1:m){
-      n.ij[i,]<-table(cluster[grp==i])           
+      n.ij[i,]<-table(cluster[group==i])           
     }
     d<-apply(n.ij,1,FUN=function(x){x/n.i})
     E.S.j<-(1/2)*(apply(d,2,sum))
@@ -125,7 +129,7 @@ cluswilcox.test.ranksum.ds <- function(X, cluster, grp,
     a<-t(d)       #####first calculate W.hat for each cluster
     for (i in 1:M){
       for (j in 1:m){
-        gik.j<-ifelse(grp[cluster==i]==j,1,0)
+        gik.j<-ifelse(group[cluster==i]==j,1,0)
         b<-1/(n.i[i]*(M+1))
         c<-(gik.j)*(M-1)
         d<-sum(a[j,-i])
@@ -149,10 +153,10 @@ cluswilcox.test.ranksum.ds <- function(X, cluster, grp,
     ######calculate the test statistic
     library(MASS)
     T<-(t(S.j-E.S.j)%*%ginv(V.hat)%*%(S.j-E.S.j))*(1/M)
-    p.value<-p.value<-pchisq(T, df=(m-1),lower.tail=F)
+    pvalue<-pvalue<-pchisq(T, df=(m-1),lower.tail=F)
     
     #calculate the test statistic
-    return(list(S=S.j,E.S=E.S.j,Chisq.stat=T,df=m-1,p.value=p.value))
+    return(list(S=S.j,E.S=E.S.j,Chisq.stat=T,df=m-1,pvalue=pvalue))
   }
   
   

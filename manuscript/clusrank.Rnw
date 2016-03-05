@@ -151,33 +151,33 @@ permutation for small samples.
 %% include your article here, just as usual
 %% Note that you should use the \pkg{}, \proglang{} and \code{} commands.
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 \section{Introduction}
 
-Non-normal clustered data often arise in many fields, where the
-clusters are independent but individuals within each cluster are not. 
-For example, in ophthalmologic clinical trials, the outcomes of
-interest are often ordinal such as the Early Treatment for Diabetic
-Retinopathy Scale (ETDRS), and the individual measurements from
-both eyes from the same subject (cluster) are not independent.
-The goal of the studies are often to test whether two samples are from
-the same population against certain alternative (e.g., one population
-has larger values than the other).
-%% The parametric statistical tests which explicitly account
-%% for clustering include an adjusted version of the standard
-%% two-sample $t$ test which account for the intracluster correlation
-%% (i.e., correlation among obervations within the clusters) when
-%% the response variable follows a normal distribution and
-%% a adjusted $\chi^2$ statistic when the response variable is binary
+The Wilcoxon rank sum test and signed rank test are popular
+approaches to compare two independent (dependent) groups when the
+distribution of each group is unknown or non-normal. To apply the
+standard Wilcoxon test, all the observations under study should be
+independent within each group. However, in many studies, the
+observations are correlated within clusters due to the design of
+experiment or by nature. For example, when the responses of indivial
+eyes are recorded in ophthalmologic studies, the responses of the eyes
+from the same person are naturally positively correlated. Ignoring the
+cluster effect usually underestimate the standard error of the test
+statistic and hence leads to anticonservative conclusions.
+
+
+To account for the cluster effect, Wilcoxon tests which have the cluster effect incorporated have been developed.
+
+
+
+
+
+
+
 \textbf{Need to get right to the point.}
-\textbf{What is this reference? why citing it?}
-\citep{Donn:Bant:anal:1988}.
-Standard nonparametric tests, such as Wilconxon rank-sum test
-or signed rank test, are important tools for non-normal,
-independent data, but they are not applicable to clustered data. 
-Often, with positive within-cluster association, the effective
-sample size is less than the number of individuals.
-Consequently, the p-values from naive application of these tests
-are underestimated and misleading conclusions could be reached.
+
+
 
 
 Recent developments have extended the Wilcoxon rank-sum test 
