@@ -167,7 +167,15 @@ cluster effect usually underestimate the standard error of the test
 statistic and hence leads to anticonservative conclusions.
 
 
-To account for the cluster effect, Wilcoxon tests which have the cluster effect incorporated have been developed.
+To account for the cluster effect, Wilcoxon tests which have the
+cluster effect incorporated have been developed. A Mann-Whitney U
+statistic(which is equivalent to the Wilcoxon rank-sum test) was
+proposed by \cite{Rosn:Grov:use:1999}. However, this approach requires
+that identical average rank regardless of the cluster
+size, which may not be warrented when the cluster sizes are
+unequal. Also, the large sample theory was not considered. An
+alternative rank sum test for large sample was considered by
+\citet{Rosn:Glyn:Lee:inco:2003}. This approach does not need 
 
 
 
