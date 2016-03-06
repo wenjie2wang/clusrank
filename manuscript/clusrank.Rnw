@@ -189,105 +189,47 @@ described by \citet{Deni:etal:two:2010} to attack the Beherens-Fisher
 problem. This test also allows cluster members from both groups.
 
 For the one-sample problem (for univariate data), the Wilcoxon
-signed-rank test was extended to cluster data in \citet{The Wilcoxon
-Signed Rank Test for Paired Comparisons of Clustered Data}. To account for the cluster effect, Wilcoxon tests which have the
-cluster effect incorporated have been developed. A Mann-Whitney U
-statistic(which is equivalent to the Wilcoxon rank-sum test) was
-proposed by \cite{Rosn:Grov:use:1999}. However, this approach requires
-that identical average rank regardless of the cluster
-size, which may not be warrented when the cluster sizes are
-unequal. Also, the large sample theory was not considered. An
-alternative rank sum test for large sample was considered by
-\citet{Rosn:Glyn:Lee:inco:2003}. This approach does not need 
+signed-rank test was extended to clusterd data in
+\citet{Rosn:Glyn:Lee:wilc:2006} by adjusting the variance of the
+standard test statistic for clustering effect, assuming a common intercluster correlation. The cluster sizes are
+allowed to vary and a large-aample test was proposed. However, this
+method does not consider the situation where the cluster size is
+informative, i.e., the distribution of difference within a cluster
+depends on the cluster size. The signed rank statistic proposed by
+\citet{Datt:Satt:sign:2006} based on sampling within cluster performed
+better under scenarios when cluster size is informative.
 
 
 
+Despite the popularity of clustered data in a wide range of
+applications such as clinical trials, longitudinal study, social
+science, and others, and despite the availability of the rank-based
+tests for clustered data, we are unaware of any existing \proglang{R}
+package that provides functions implementing the methods reviewed
+above.  This motivated our development of package \pkg{clusrank} for
+rank-based tests for clustered data. Rank sum test from
+\citet{Rosn:Glyn:Lee:inco:2003},  \citet{Datt:Satt:rank:2005} and \citet{Deni:etal:two:2010} and
+signed rank test from \citet{Rosn:Glyn:Lee:wilc:2006} and
+\citet{Datt:Satt:sign:2006} were implemented in this package.
+
+%Large-sample inference based on asymptotic distribution of test
+%statistics and small-sample inference based on permutation are
+%provided for both rank sum test and signed rank test. 
+%The tests provided can also handel unbalanced data when
+%there are clusters with different sizes.
+%In addition, for rank sum test, the effect of stratification as an
+%extra cofounding variable can also be accounted for.
+
+
+The order of this paper is as following, Section~\ref{sec:test}
+introduces test statistics implemented in the package. The interface
+of the test functions are presented in Section 3. Section 4 uses a
+simulation study to compare the test statistics. Section 5 illustrates
+the usage of the package using a real data analysis for a eye
+study. THe last section discusses possible extensions of the package.
 
 
 
-
-\textbf{Need to get right to the point.}
-
-
-
-
-Recent developments have extended the Wilcoxon rank-sum test 
-and signed rank test to clustered data.
-\textbf{need to have a flow of reviewing the literature. The most
-  recent ones should include critics of earlier ones, so we can borrow
-  ideas from these papers.}
-The rank-sum test is the rank-based version of the two-sample $t$ test.
-\citet{Rosn:GLyn:Lee:inco:2003}
-proposed a Wilcoxon rank sum test for clustered data
-to compare two groups
-assuming that the members within each cluster is
-\textbf{open spell-check}
-exchangeable and objects from the same cluster
-belong to the same group. Their method is able
-to deal with unbalanced data (i.e., data with
-variable cluster sizes) and stratified data
-(e.g., data from a multi-center study which
-is stratified by centers).
-Another modified
-\textbf{See their JASA paper for critics for the RGL method.}
-rank sum test for clustered data was proposed by
-\citet{Datt:Satt:rank:2005}, their method is valid
-even when the members of the same cluster came from
-different groups, or when the intraclulster correlation
-is determined by the group membership.
-
-
-Wilcoxon signed-rank test is the nonparametric counterpart of the
-paired $t$ test to compare the distributions of paired observations. 
-\citet{Laro:wilc:2005} proposed an adjusted version
-of wilcoxon signed rank test where the variance estimate is based on
-certain sum of square over independent clusters, but this test procedure
-is not distribution free \textbf{reference for this claim?}.
-\citet{Roxn:Glyn:Lee:wilc:2006} proposed another modified signed rank
-test assuming a common intercluster correlation and estimating it
-from absolute rank of observations.
-\citet{Datt:Satt:sign:2008} proposed a signed rank test procedure 
-based on the principle of general within-cluster resampling.
-Their test can handle the case when the cluster size is informative.
-That is, the distribution of pairwise differences within a cluster 
-depends on the cluster size.
-
-
-Despite the popularity of clustered data in a wide range of applications
-such as clinical trials, longitudinal study, social science, and
-others, and despite the availability of the rank-based tests for
-clustered data, we are unaware of any existing \proglang{R} package
-that provides functions implementing the methods reviewed above.
-This motivated our development of package \pkg{clusrank} for
-rank-based tests for clustered data.
-Large-sample inference based on asymptotic distribution of test
-statistics and small-sample inference based on permutation are
-provided for both rank sum test and signed rank test. 
-The tests provided can also handel unbalanced data when
-there are clusters with different sizes.
-In addition, for rank sum test, the effect of stratification as an
-extra cofounding variable can also be accounted for.
-
-
-The order of this paper is as following,
-Section~\ref{sec:test} introduces Wilcoxon rank
-sum test and Wilcoxon signed rank test
-for clustered data, when data is balanced
-or unbalanced. 
-\textbf{Do not repeatedly use any expression, e.g., ``in addition''.}
-The usage of the main functions are explained in Section~\ref{sec:usage}.
-In addition, the modification
-of rank sum test when data is stratified
-is also discussed. Section \ref{real} is a real
-data analysis for a eye study. The article
-is summarized in section \ref{summ}.
-
-\textbf{Put the methods in Section 2;
-  put the usages (explain the arguments) in Section 3;
-  in Section 4: can add a simulation study to compare the power/size
-  (reproduce a table in JASA, e.g.); 
-  in Section 5: real data illustration.
-  Section 6: discussion for possible extensions.}
 
 \textbf{the name sedlab is a poor choice.}
 
