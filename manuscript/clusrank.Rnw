@@ -168,6 +168,29 @@ statistic and hence leads to anticonservative conclusions.
 
 
 To account for the cluster effect, Wilcoxon tests which have the
+cluster effect incorporated have been developed in recent years. To
+compare the distribution of two independent groups, a Mann-Whitney U
+statistic (which is equivalent to the Wilcoxon rank-sum test) was
+proposed by \cite{Rosn:Grov:use:1999} using a corrected variance
+estimate which was based on four estimated correlation parameters. But
+the large sample theory was not considered and the computation can be
+intensive in the presnece of many tied rankings. An alternative
+large-sample rank sum test was presented by
+\citet{Rosn:Glyn:Lee:inco:2003}. This approach allows to control
+covariates by stratification of the data by the covariates. However,
+this approach requires the cluster member cannot belong to different
+groups. More recently, \citet{Datt:Satt:rank:2005} proposed another
+rank-sum statistic which allows clusters to contain members from both
+groups and also when the correlation between cluster members differs
+across groups. However, all of the aforementioned tests requires the
+scales and/or shapes of the distributions to be the same under the
+null hypothesis. A weighted Mann-Whitney test for clusted data was
+described by \citet{Deni:etal:two:2010} to attack the Beherens-Fisher
+problem. This test also allows cluster members from both groups.
+
+For the one-sample problem (for univariate data), the Wilcoxon
+signed-rank test was extended to cluster data in \citet{The Wilcoxon
+Signed Rank Test for Paired Comparisons of Clustered Data}. To account for the cluster effect, Wilcoxon tests which have the
 cluster effect incorporated have been developed. A Mann-Whitney U
 statistic(which is equivalent to the Wilcoxon rank-sum test) was
 proposed by \cite{Rosn:Grov:use:1999}. However, this approach requires
