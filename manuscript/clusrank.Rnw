@@ -154,39 +154,34 @@ permutation for small samples.
 \SweaveOpts{concordance=TRUE}
 \section{Introduction}
 
-The Wilcoxon rank sum test and signed rank test are popular
-approaches to compare two independent (dependent) groups when the
-distribution of each group is unknown or non-normal. To apply the
-standard Wilcoxon test, all the observations under study should be
-independent within each group. However, in many studies, the
-observations are correlated within clusters due to the design of
-experiment or by nature. For example, when the responses of indivial
-eyes are recorded in ophthalmologic studies, the responses of the eyes
-from the same person are naturally positively correlated. Ignoring the
-cluster effect usually underestimate the standard error of the test
-statistic and hence leads to anticonservative conclusions.
+Clustered data arise in many applications, where the
+data are grouped into independent clusters with correlated cluster members.
+In an eye study, for instance, the measurements from each individual consist a 
+cluster.
+When the goal of a study is to compare two populations or the outcome of a 
+treatment to a baseline, standard Wilcoxon rank-sum test or signed rank test 
+are popular tools if the distribution of the data is non-normal or unknown. 
+However, these tests cannot be applied to clustered data directly since the 
+effective sample size of the clustered data will be different from the number 
+of observations due to non-zero intracluster correlation. As a consequence, the 
+p-value will be either under-estimated or over-estimated. 
 
-
-To account for the cluster effect, Wilcoxon tests which have the
-cluster effect incorporated have been developed in recent years. To
-compare the distribution of two independent groups, a Mann-Whitney U
-statistic (which is equivalent to the Wilcoxon rank-sum test) was
-proposed by \cite{Rosn:Grov:use:1999} using a corrected variance
-estimate which was based on four estimated correlation parameters. But
-the large sample theory was not considered and the computation can be
-intensive in the presnece of many tied rankings. An alternative
-large-sample rank sum test was presented by
-\citet{Rosn:Glyn:Lee:inco:2003}. This approach allows to control
-covariates by stratification of the data by the covariates. However,
-this approach requires the cluster member cannot belong to different
-groups. More recently, \citet{Datt:Satt:rank:2005} proposed another
-rank-sum statistic which allows clusters to contain members from both
-groups and also when the correlation between cluster members differs
-across groups. However, all of the aforementioned tests requires the
-scales and/or shapes of the distributions to be the same under the
-null hypothesis. A weighted Mann-Whitney test for clusted data was
-described by \citet{Deni:etal:two:2010} to attack the Beherens-Fisher
-problem. This test also allows cluster members from both groups.
+Recent developments have extended the Wilcoxon rank-sum test 
+and signed rank test to clustered data. A Mann-Whitney U statistic for 
+clustered data was first proposed by \citet{Rosn:Grov:use:1999}. The variance 
+of the test statistic is corrected by four types of intra cluster correlation. 
+However, no large sample theory was proved. A large sample test statistic for 
+clustered data by conditioning on the cluster size was introduced in 
+\citet{Rosn:Glyn:Lee:inco:2003} with asymptotic normality of the null 
+distribution justified. This approach also allows data which are stratified by 
+an extra covariant.  However, this approach requires that, first, members from 
+the same cluster have to belong to the same group; second, there have to be 
+clusters from both group for each cluster size. These two requirements was 
+later removed in \citet{Datt:Satt:rank:2005}. Also Datta and Satten's approach 
+allows comparison between $m(m \geq 3)$ groups. More recently, 
+\citet{Rosn:Blyn:Lee:exte:2006} extended their approach to accommodate the 
+situation where members of a single cluster may subject to different 
+treatments. 
 
 For the one-sample problem (for univariate data), the Wilcoxon
 signed-rank test was extended to clusterd data in
