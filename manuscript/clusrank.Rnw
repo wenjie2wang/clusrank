@@ -76,23 +76,23 @@ Yujing Jiang\\ University of Connecticut \And
 
 
 \Abstract{
-Wilcoxon rank sum test and signed rank test are widely used
-nonparametric tests for two-sample comparison when the distributions
-are far from normal or the analyst is unwilling to assume normality. 
-The independence assumption of individual data, however, does not hold
-for clustered data which are increasingly popular in many fields.
-For instance, in ophthalmologic clinical trials, data collected from
-the two eyes from the same patient are dependent.
-To account for the clustering effect, modifications of the
-rank-based tests have been proposed in the literature 
-\citep{Rosn:GLyn:Lee:inco:2003, Roxn:Glyn:Lee:wilc:2006}, but no
-implementation has been available in \proglang{R}, impeding their
-adoption in statistical practice with clustered data.
-We introduce an \proglang{R} package \pkg{clusrank}, which provides
-Wilcoxon rank sum test and signed rank test for clustered data.
-The tests can handle unblanced cluster sizes, presence of ties,
-and stratified data, based on the asymptotics for large samples or
-permutation for small samples.
+Rank based tests are popular distribution-free alternatives to 
+the popular one-sample and two-sample $t$-tests.
+For independent data, they are available in
+the \pkg{base} package of \proglang{R}.
+For clustered data, several rank-based tests that accounts for
+the within-cluster dependence are recently developed, but no existing
+package provides all of them at one place with ease of access.
+In package \pkg{clusrank}, the latest developments are implemented
+and wrapped under a unified high-level user-friendly function.
+Different methods are dispatched based on an input formula, 
+offering great flexibility in handling various situations such as 
+unbalanced cluster sizes, presence of ties, stratified data, 
+and heterogeneous group members from the same cluster. 
+Methods based on both asymptotics for large samples and
+permutation for small samples are available.
+We present some details about the implemented methods and a 
+comprehensive comparison of them in a simulation study.
 }
 
 

@@ -3,7 +3,7 @@ header = HEADER
 
 Rpkg: Rd build  
 	make check 
-	make INSTALL
+#	make INSTALL
 
 Rd:
 	Rscript -e "library(methods); devtools::document();" 
