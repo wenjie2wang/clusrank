@@ -151,7 +151,7 @@ comprehensive comparison of them in a simulation study.
 %% include your article here, just as usual
 %% Note that you should use the \pkg{}, \proglang{} and \code{} commands.
 \begin{document}
-\SweaveOpts{concordance=TRUE}
+
 \section{Introduction}
 
 Clustered data arise in many applications, where the
