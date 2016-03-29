@@ -178,7 +178,8 @@ an extra covariant.  However, this approach requires that, first, members from
 the same cluster have to belong to the same group; second, there have to be 
 clusters from both group for each cluster size. These two requirements was 
 later removed in \citet{Datt:Satt:rank:2005}. Also Datta and Satten's approach 
-allows comparison between $m(m \geq 3)$ groups. More recently, 
+allows comparison between $m(m \geq 3)$ groups. Though, their method is not
+able to compare the intracluster difference between two groups. More recently, 
 \citet{Rosn:Blyn:Lee:exte:2006} extended their approach to accommodate the 
 situation where members of a single cluster may subject to different 
 treatments. 

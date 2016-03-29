@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-cluswilcox.test.ranksum.ds <- function(X, cluster, group, 
-=======
 ################################################################################
 ##
 ##   R package clusrank by Mei-Ling Ting Lee, Jun Yan, and Yujing Jiang
@@ -22,8 +19,7 @@ cluswilcox.test.ranksum.ds <- function(X, cluster, group,
 ##   along with the R package clusrank. If not, see <http://www.gnu.org/licenses/>.
 ##
 ################################################################################
-cluswilcox.test.ranksum.ds <- function(X, cluster, grp, 
->>>>>>> dcd28ed27e3273521bccd4766d76ce33be2e54de
+cluswilcox.test.ranksum.ds <- function(x, cluster, group, 
                                        alternative,
                                        mu,
                                        DNAME, METHOD) {
@@ -34,10 +30,10 @@ cluswilcox.test.ranksum.ds <- function(X, cluster, grp,
   }
   if(group.uniq == 2) {
     #####calculate quantity 2 (using the pooled estimate of F)
-    n<-length(X)
+    n<-length(x)
     F.hat<-numeric(n)
     for (i in 1:n){
-      F.hat[i] <- (sum(X <= X[i]) + sum( X < X[i])) / (2 * n)
+      F.hat[i] <- (sum(x <= x[i]) + sum( x < x[i])) / (2 * n)
     }
     #####calculate quantity 1 (using ECD-F for each cluster)
     #### M is No. of clusters, n is No. of observations
@@ -47,12 +43,12 @@ cluswilcox.test.ranksum.ds <- function(X, cluster, grp,
     for(ii in 1:n){
       F.j<-numeric(M)
       for (i in 1:M){
-        F.j[i]<-(sum(X[cluster==i]<X[ii])+0.5*sum(X[cluster==i]==X[ii]))/(n.i[i])
+        F.j[i]<-(sum(x[cluster==i]<x[ii])+0.5*sum(x[cluster==i]==x[ii]))/(n.i[i])
       } 
       F.prop[ii]<-sum(F.j[-cluster[ii]])
     }   
     
-    ###########calculate S=E(W*|X,g)
+    ###########calculate S=E(W*|x,g)
     a<-numeric(M)
     b<-1+F.prop
     for (i in 1:M){
@@ -85,10 +81,10 @@ cluswilcox.test.ranksum.ds <- function(X, cluster, grp,
     return(list(S=S,E.S=E.S,Var.S=var.s,z.stat=stat,pvalue=pvalue))
   } else {
     #####calculate quantity 2 (using the pooled estimate of F)
-    n<-length(X)
+    n<-length(x)
     F.hat<-numeric(n)
     for (i in 1:n){
-      F.hat[i]<-(sum(X<=X[i])+sum(X<X[i]))/(2*n)
+      F.hat[i]<-(sum(x<=x[i])+sum(x<x[i]))/(2*n)
     }
     #####calculate quantity 1 (using ECD-F for each cluster)
     #### M is No. of clusters, n is No. of observations
@@ -98,12 +94,12 @@ cluswilcox.test.ranksum.ds <- function(X, cluster, grp,
     for(ii in 1:n){
       F.j<-numeric(M)
       for (i in 1:M){
-        F.j[i]<-(sum(X[cluster==i]<X[ii])+0.5*sum(X[cluster==i]==X[ii]))/(n.i[i])
+        F.j[i]<-(sum(x[cluster==i]<x[ii])+0.5*sum(x[cluster==i]==x[ii]))/(n.i[i])
       } 
       F.prop[ii]<-sum(F.j[-cluster[ii]])
     }   
     
-    ###########calculate S(j)=E(W*|X,g=j), where m is the number of groups
+    ###########calculate S(j)=E(W*|x,g=j), where m is the number of groups
     m<-length(unique(group))
     a<-matrix(0,m,M)
     b<-1+F.prop

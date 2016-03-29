@@ -211,13 +211,13 @@ cluswilcox.test.formula <- function(formula, data = NULL,
   finite.x <- is.finite(x)
   x <- x[OK && finite.x]
   group <- group[OK && finite.x]
-  stratum <- group[OK && finite.x]
+  strats <- strats[OK && finite.x]
   cluster <- cluster[OK && finite.x]
   mu.vec <- (group == 1)* mu
   x <- x - mu.vec
 
   if(permutation == FALSE) {
-    return(cluswilcox.test.ranksum(x,  cluster,
+    return(cluswilcox.test.ranksum(x, cluster,
                                    group, strats,
                                    method,
                                    alternative,
@@ -237,4 +237,18 @@ cluswilcox.test.formula <- function(formula, data = NULL,
 
 
 
+}
+
+
+
+cluswilcox.test.ranksum <- function(x, cluster, group, strats, method,
+                                    alternative, mu, DNAME = NULL, METHOD = NULL) {
+  if(method == "rgl") {
+    cluswilcox.test.ranksum.rgl(x, cluster, group, strats,
+                                alternative, mu, DNAME = NULL, METHOD = NULL)
+  }
+  if(method == "ds") {
+    cluswilcox.test.ranksum.ds(x, cluster, group, 
+                               alternative, mu, DNAME = NULL, METHOD = NULL)
+  }
 }
