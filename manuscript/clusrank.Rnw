@@ -237,9 +237,67 @@ study. THe last section discusses possible extensions of the package.
 
 
 \subsection{Wilcoxon Rank Sum Test}
-\label{rank} % DO NOT define if it is not used.
+\label{ranksum} % DO NOT define if it is not used.
 
-\subsubsection{Hypothesis}
+Let $X_{ij}$ denote the $i$th observation in the $j$th cluster,
+$1 \leq i \leq N$, $1 \leq j \leq g_i $. There are $N$ clusters
+in total, the $i$th cluster contains $g_i$ observations.
+Let $\delta_{ij}$ denote the treatment placed on $X_{ij}$,
+$\delta{ij} = 1$ if $X_{ij}$ is under treatment $1$,
+$\delta{ij} = 0$ if $X_{ij}$ is under treatment $2$.
+(The DS method is able to compare $m$ groups.)
+\subsubsection{RGL method: unbalanced data}
+The RGL method requires that all individuals in a single
+cluster belong to the same treatment group, i.e., the
+group membership indicators $\delta_{ij}$ for observations in
+the $i$th cluster take a identical value, thus we denote the group membership
+of the $i$th cluster as $\delta_{i}$.
+Let $N_g$ and $m_g$ denote the number of clusters and number of clusters under
+treatment 1 with cluster size $g$, respectivly, $g \in \{1, \ldots, g_{max}\}$.
+It is also assumed
+the observations within any single cluster are exchangable.
+Let $R_{ij}$ denote the rank of each observation among all observations.
+Then the test statistic $W_{rgl}$ is defined as
+$$W_{rgl} = \sum_{i,j}\delta_{ij}R_[ij] = \sum_{i}\delta_iR_{i+}$$,
+which is exactly the same as the standard Wilcoxon rank sum test.
+The sampling distribution of this test statistic is derived by
+conditioning on the cluster size and the number of clusters under treatment $1$
+for that specific sample size, i.e., all the clusters are
+first stratified based on their cluster size, then the sampling
+distribution of each stratum is obtained. Because clusters
+are assume to be independent, the expectation and
+variance of $W_{rgl}$ are obtained by combining the corresponding
+quantities of each stratum. Therefore,
+\begin{equation*}
+E(W_{rgl}) = \sum_{g = 1}^{g_{max}}m_g(R_{++,g} / N_g)
+\end{equation*}
+\begin{equation*}
+Var(W_{rgl}) = \sum_{g = 1} ^ {g_{max}}[m_g(N_g - m_g) / \{N_g{N_g - 1}\}]
+\sum_{i = 1}^{N_g}(R_{i+,g} - R_{++,g} / N_g)^2
+\end{equation*}
+
+
+RGL statistic is also capable of dealing with extra stratification
+covariate in the data, e.g., data from multiple medical centers where
+each center can be treated as a stratum. The derivation of the
+$E(W_{rgl})$ and $Var(W_{rgl})$ is very similar to the derivation for
+unbalanced data. On the basis of the stratums defined by the cluster
+size, each stratum is further stratified by the stratifying
+covariate. The expectation and variance of the test statistic
+restricted to each of these strata is computed by treating each
+restriction as an ordinary Wilcoxon rank sum test. Assume there are
+$V$ strata, the expectation and variance of $W_{rgl}$ are
+\begin{equation*}
+E(W_{rgl}) = \sum^{g_{max}}_{g = 1}\sum_{v =
+1}^{V}m_{g,v}R_{++, g, v} / N_{g,v}
+\end{equation*}
+\begin{equation*}
+Var(W_{rgl}) = \sum^{g_{max}}_{g=1}\sum_{v = 1}^V[m_{g,v}(N_{g,v} -
+m_{g,v}) / \{N_{g,v}(N_{g,v} - 1)\}]\times\sum^{N_{g,v}}_{i=1}(R_{i+, g, v} - R_{++,g,v}/N_{g,v})^2
+\end{equation*}
+The large sample test statistic with asymptotic normality
+is defined as $$Z_{rgl} = \frac{W_{rgl} - E(W_{rlg})}{VAR(W_{rgl})^{1/2}}$$.
+
 
 Suppose there are two groups under different treatments,
 $X$ and $Y$, the null hypothesis of the rank sum test
