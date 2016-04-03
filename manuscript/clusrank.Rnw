@@ -278,7 +278,7 @@ Var(W_{rgl}) = \sum_{g = 1} ^ {g_{max}}[m_g(N_g - m_g) / \{N_g{N_g - 1}\}]
 
 
 RGL statistic is also capable of dealing with extra stratification
-covariate in the data, e.g., data from multiple medical centers where
+covariate coming with the scores, e.g., data from multiple medical centers where
 each center can be treated as a stratum. The derivation of the
 $E(W_{rgl})$ and $Var(W_{rgl})$ is very similar to the derivation for
 unbalanced data. On the basis of the stratums defined by the cluster
@@ -297,6 +297,24 @@ m_{g,v}) / \{N_{g,v}(N_{g,v} - 1)\}]\times\sum^{N_{g,v}}_{i=1}(R_{i+, g, v} - R_
 \end{equation*}
 The large sample test statistic with asymptotic normality
 is defined as $$Z_{rgl} = \frac{W_{rgl} - E(W_{rlg})}{VAR(W_{rgl})^{1/2}}$$.
+
+
+\subsection{DS method: 2 group}
+DS construct another rank sum test based on a different idea from
+RGL's method. A single individual from each cluster is sampled,
+recorded as $X_i^*$ with its group membership $\delta_i^*$,
+$1 \leq i \leq M$. A WIlcoxon rank-sum statistic can be defined as
+\begin{equation*}
+W^* = \frac{1}{M+1}\sum^M_{i=1}\delta^*_iR^*_i,
+\end{equation*}
+where $R_i^*$ is the rank of $X^*$ among the set $\{\X_j^*, 1 \leq j \leq M\}$.
+But this test is inefficient since only one observation from each cluster
+is used. DS proposed a test statistic which is based on the average of $W^*$
+over all possible samples of $\{X_i^*, \delta_i^*\}$, i.e.,
+$$Z_{ds} = \frac{S - E(S)}{\sqrt{\hat{var}(S)}}$$, where
+$$S = E(W^*|\mathbd{X}, \mathbd{\delta})$$.
+$$E(W^*) = \frac{1}{2}\sum^M_{i=1}\frac{n_{g_{i1}}}{g_i}$$.
+The computation of $Var(S)$ is complicated therefore is not included here in the draft.
 
 
 Suppose there are two groups under different treatments,
