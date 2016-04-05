@@ -227,17 +227,17 @@ study. THe last section discusses possible extensions of the package.
 
 
 
-\textbf{the name sedlab is a poor choice.}
 
 
-\section{Rank-Based Tests for Clustered Data}
-\label{sec:test} 
+
+
+
 %% note the label style. It helps to distinguish from
 %% table or figure labels.
 
 
-\subsection{Wilcoxon Rank Sum Test}
-\label{ranksum} % DO NOT define if it is not used.
+\section{Wilcoxon Rank Sum Test}
+\label{sec:ranksum} % DO NOT define if it is not used.
 
 Let $X_{ij}$ denote the $i$th observation in the $j$th cluster,
 $1 \leq i \leq N$, $1 \leq j \leq g_i $. There are $N$ clusters
@@ -246,7 +246,7 @@ Let $\delta_{ij}$ denote the treatment placed on $X_{ij}$,
 $\delta{ij} = 1$ if $X_{ij}$ is under treatment $1$,
 $\delta{ij} = 0$ if $X_{ij}$ is under treatment $2$.
 (The DS method is able to compare $m$ groups.)
-\subsubsection{RGL method: unbalanced data}
+\subsection{RGL method: unbalanced data}
 The RGL method requires that all individuals in a single
 cluster belong to the same treatment group, i.e., the
 group membership indicators $\delta_{ij}$ for observations in
@@ -298,6 +298,31 @@ m_{g,v}) / \{N_{g,v}(N_{g,v} - 1)\}]\times\sum^{N_{g,v}}_{i=1}(R_{i+, g, v} - R_
 The large sample test statistic with asymptotic normality
 is defined as $$Z_{rgl} = \frac{W_{rgl} - E(W_{rlg})}{VAR(W_{rgl})^{1/2}}$$.
 
+\subsection{RGL method: with individual-level defined group membership}
+The previous approach is only able to test when the group membership 
+is determined at the cluster level. This assumption leaves out many other situation
+for clustered data. An extension of the RGL method enables this method to consider
+the cases where the group membership is determined at the individual level. 
+The test statistic is still $W_{rgl}$, however, the derivation of the distribution 
+of the test statistic is different. Besides conditioning on the cluster size,
+the derivation now involves the conditioning on the number of observations 
+under treatment $1$ in each cluster as well. The idea of the assumed sampling
+scheme is to be illustrated based on balanced data. First, the clusters are 
+randomly assigned to a specific exposure group with $q$ exposed subunits, according to 
+the observed exposure distribution $Q$. Then for clusters with $Q_i = q$, a random $q$ 
+out of $g$ subunits are randomized to be exposed and the remaining subunits are randomized
+to be unexposed. (Exposed means under treatment 1.) Permutation test can be
+derived based on this sampling scheme. 
+
+For large sample test, the expectation and variance are as following:
+\begin{equation*}
+  E(W_c) = \{(gN + 1) / 2\}\sum^g_{q = 0}qN_q.
+\end{equation*}
+
+\begin{equation*}
+  \hat{var}(W_c) = N[\{N/(N-1)\}\hat{var}(Q)s_B^2/g^2 + \hat{E}\{Q(g-Q)\}s^2_W/g].
+\end{equation*}
+where 
 
 \subsection{DS method: 2 group}
 DS construct another rank sum test based on a different idea from
