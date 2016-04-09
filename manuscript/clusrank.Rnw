@@ -239,14 +239,34 @@ study. THe last section discusses possible extensions of the package.
 \section{Wilcoxon Rank Sum Test}
 \label{sec:ranksum} % DO NOT define if it is not used.
 
-Let $X_{ij}$ denote the $i$th observation in the $j$th cluster,
-$1 \leq i \leq N$, $1 \leq j \leq g_i $. There are $N$ clusters
-in total, the $i$th cluster contains $g_i$ observations.
-Let $\delta_{ij}$ denote the treatment placed on $X_{ij}$,
-$\delta{ij} = 1$ if $X_{ij}$ is under treatment $1$,
-$\delta{ij} = 0$ if $X_{ij}$ is under treatment $2$.
-(The DS method is able to compare $m$ groups.)
+\subsection{General notation}
+Let $X_{ij}$ denote the $i$th observation in the $j$th cluster, $1
+\leq i \leq N$, $1 \leq j \leq g_i $. There are $N$ clusters in total,
+the $i$th cluster contains $g_i$ observations.  Let $\delta_{ij}$
+denote the treatment placed on $X_{ij}$, $\delta{ij} = 1$ if $X_{ij}$
+is under treatment $1$, $\delta{ij} = 0$ if $X_{ij}$ is under
+treatment $2$. Clusters are assumed to be independent, while
+observations within each cluster are correlated.
+
 \subsection{RGL method: unbalanced data}
+The RGL method is desinged for the scenario in which the unit being
+assigned treatment is cluster, e,g., when both eyes of the same
+patient receive the same treatment. Therefore we denote the treatment
+indicator for the $i$th cluster as $\delta_i$ for the illustration of
+RGL method. The RGL method can be applied to balanced data (i.e., all
+clusters have identical size) and unbalanced data (i.e., cluster size
+varies). In addition, the effect of stratification, if exists, can
+also be accounted for. 
+Let $R_{ij}$ denote the rank of $X_{ij}$ among all observations.
+
+The Wilcoxon rank sum statistic is 
+\begin{equation}\label{eq:rglrs}
+  W_{RGL} = \sum_{i=1}^N\sum_{j=1}^{g_i}\delta_{ij}R_{ij} = \sum_{i = 1}^N\delta_{i}R_{i+}
+  \end{equation}
+The idea behind the RGL method is to  stratify the clusters according
+to the cluster size, compute 
+The above equation can be then written as
+
 The RGL method requires that all individuals in a single
 cluster belong to the same treatment group, i.e., the
 group membership indicators $\delta_{ij}$ for observations in
