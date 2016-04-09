@@ -277,20 +277,26 @@ clusters to treatment $2$. Therefore, under $H_0$, $\sum_{i \in
   I_g}\delta_{i} = m_g$ and $P(\delta_{i} = 1, i \in I_g) =
 m_g/N_g$. The null distribution of $W_{RGL}$ under permutation is
 obtained by combining $W_g$'s. For large sample test, the test
-statistic based on $W_{RGL}$ is 
+statistic based on $W_{RGL}$ is
 \begin{equation}\label{eq:rlgrs2}
   Z_{RGL} = \frac{W_{RGL} - E(W_{RGL})}{\sqrt{var(W_{RGL})}},
 \end{equation}
 where $E(W_{RGL}) = \sum E(W_g)$, and $var(W_{RGL}) = \sum var(W_g)$. 
 
-In addition, if the data are stratified into $V$ strata, similar to \ref{eq:rglrs1},
-$W_{RGL}$ can be expressed as 
+In addition, if the data are stratified into $V$ strata, similar to
+\ref{eq:rglrs1}, $W_{RGL}$ can be expressed as
 \begin{equation*}
   W_{RGL} = \sum_{v = 1}^V\sum_{g = 1}^{g_{max}}\sum_{i \in I_{g,v}}\delta_iR_{i+},
   \end{equation*}
 where $I_{g,v}$ is the set of indices of clusters in the $v$th stratum
 with cluster size $g$. The permutation test and large sample test can
-be derived similarly as above. 
+be derived similarly as above.
+
+One pitfall for RGL rank sum test is that, since this method compares
+treatment effects at each cluster level, the imbalance in the
+distribution of treatment across cluster size strata will result in
+inefficiency. Additionally, the RGL perform best when correlation is
+weak.
 
 \subsection{DS rank sum test}
 When the treatment is assigned at the subunit level instead of the
@@ -303,7 +309,7 @@ test, therefore this test can only be applied when sample size is
 large. As a result, it cannot be applied to data which are strictly
 contralateral, e.g., when all subjects under an eye study has one eye
 under treatment $1$ and the other eye under treatment $2$, due to the
-failure of the asymptotic theory of this method under this scenario.
+failure of the asymptotic theory of this method.
 
 The construction of the DS test statistic involves randomly picking an
 observation from each cluster, say, $X_i^*$ from the $i$th cluster to
@@ -327,18 +333,50 @@ among $m$ treatment groups, $m \geq 3$ and the large sample test
 statistic follows a chi-squared distribution with degrees of freedom
 $m - 1$.
 
+\subsection{RGL method extension: treatment assigned at subunit level}
+
+Another test for the case when the treatment is assigned at subunit
+level was proposed by \citet{Rosn:Glyn:Lee:exte:2006}. Two test
+statistics were constructed for balanced and unbalanced data
+respectively. FOr balanced data, the Wilcoxon rank sum statistic is
+\begin{equation*}
+  W_c = \sum_{i = 1}^N\sum_{j=1}^g\delta_{ij}R_{ij},
+  \end{equation*}
+The sampling distribution of $W_c$ is derived by assuming that the
+data are generated in two stages: first, each cluster are randomly
+assigned to have $q$ subunits to be exposed under treatment $1$
+according to the observed exposure distribution of $Q$, a random $q$
+out of $g$ subunits are then assigned the treatment $1$ while the
+remaining are unexposed.
+
+A small sample permutation test can then be performed following the
+above randomization scheme. A large sample test is also available. A
+note is that this test is equivalent to the RGL test for unbalanced
+data when the treatment is assigned at the cluster level.
+
+For unbalanced data, the test statistic involves splitting the
+clusters according the cluster size and then applying the 2-stage
+randomization within each stratum. The test statistic is a weighted
+combination of estimated $\theta^{(g)} = Pr(X_{ij}^{(g)} >
+X_{kl}^{(g)})$, where $X_{ij}^{(g)}$ is from treatment group $1$ and
+$X_{kl}^{(g)}$ from treatment group $2$, the superscript refers to the
+size of the cluster the observation belongs to. A common underlying
+rank correlation is assumed across all clusters.
+
+This test also works better when the intracluster correlation is weak
+than when the correlation is strong. 
+
+\section{Wilcoxon signed rank test}\label{sec:signrank}
 
 
-When applying the ranksum test for the clustered data,
-a formula is used as a interface where the response
-variable is on the righthand side and covariates on
-the lefthand side. Special functions \code{group},
-\code{cluster} and \code{stratum} are used to indicate
-the function of each variable, \code{group} indicates
-the id of the treatment group, \code{cluster} indicates
-the membership of an observation in a specific cluster
-and \code{stratum} indicates the stratum an observation
-belongs to.
+When applying the ranksum test for the clustered data, a formula is
+used as a interface where the response variable is on the righthand
+side and covariates on the lefthand side. Special functions
+\code{group}, \code{cluster} and \code{stratum} are used to indicate
+the function of each variable, \code{group} indicates the id of the
+treatment group, \code{cluster} indicates the membership of an
+observation in a specific cluster and \code{stratum} indicates the
+stratum an observation belongs to.
 
 <<rank sum test for unbalanced data>>=
 library(clusrank)
