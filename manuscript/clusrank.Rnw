@@ -430,9 +430,9 @@ are identical for balanced data, $n_i = G$, $i = 1, \ldots, N$.
 
 Assuming a design in which the unit of randomization is the cluster,
 the sampling distribution of $T_{R}$ is then expressed by
-\begin{equation*}
+\begin{equation}\label{eq:rglsignd}
   T_{R} = \sum_{i=1}^N\delta_iS_{i+},
-  \end{equation*}
+  \end{equation}
 where $\delta_i$ are i.i.d. random variable each taking on the values
 $+1$ and $-1$ with equal probability under $H_0$. Therefore, if $N$ is
 small, a permutation test can be performed.  When $N$ is large, a
@@ -453,14 +453,24 @@ implemented in our package, is
 \begin{equation*}
   T_{Rs} = \sum_{i=1}^Nw_i\bar{S}_i,
   \end{equation*}
-where $w_i = 1/\var(\bar{S}_i)$ under $H_0$.
-The randomization si
+where $w_i = 1/\var(\bar{S}_i)$ under $H_0$. The randomization
+distribution is derived similarly as \eqref{eq:rglsignd}, which is
+represented in the following:
+\begin{equation*}
+  T_{Rs} = \sum_{i=1}^N\delta_iw_i\bar{S}_i,
+  \end{equation*}
+The expression above can be implemented for the permutation test.
+The large sample test statistic is defined as
+\begin{equation*}
+  W_{Rs} = \frac{T_{Rs}}{V(T_{Rs})^{1/2}}
+  \end{equation*}
+The computation of $w_i$ uses the assumption of a common intracluster
+correlation structure. In addition, the RGL signed rank test is not
+suitable for data for which the cluster size is informative to the
+distribution of $X_{ij}$.
 
 
-Corresponding small
-sample test and large sample test are derived similarly as for
-balanced data assuming a common intracluater correlation structure for
-each cluster and non-informative cluster size distribution. 
+
 
 \subsection{DS signed rank test}\label{sec:dssign}
 \citet{Datt:Satt:sign:2006} applied the general principle of within
@@ -479,6 +489,15 @@ To handle ties, ranks are defined as
     R_i^* = \frac{1}{2}\left\{\sum_{i` = 1}^NI(|X_{i`}^*|\leq|X_i^*|)
     +{\sum_{i` = 1}^NI(|X_{i`}^*|<|X_i^*| \right\}
 \end{equation*}
+
+As for the DS rank sum test, the formulation of DS signed rank test
+does not allow small sample permutation test since it allows arbitraty
+intracluster dependence structure.
+
+
+
+
+
 
 When applying the ranksum test for the clustered
 data, a formula is used as a interface where the response variable is
