@@ -4,7 +4,7 @@
 \documentclass[nojss]{jss}
 
 \usepackage[utf8]{inputenc}
-\usepackage{amsmath}
+\usepackage{amsmath, bm}
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{graphicx}
@@ -192,7 +192,7 @@ allowed to vary and a large-aample test was proposed. However, this
 method does not consider the situation where the cluster size is
 informative, i.e., the distribution of difference within a cluster
 depends on the cluster size. The signed rank statistic proposed by
-\citet{Datt:Satt:sign:2006} based on sampling within cluster performed
+\citet{Datt:Satt:sign:2008} based on sampling within cluster performed
 better under scenarios when cluster size is informative.
 
 
@@ -206,7 +206,7 @@ above.  This motivated our development of package \pkg{clusrank} for
 rank-based tests for clustered data. Rank sum test from
 \citet{Rosn:Glyn:Lee:inco:2003},  \citet{Datt:Satt:rank:2005} and \citet{Deni:etal:two:2010} and
 signed rank test from \citet{Rosn:Glyn:Lee:wilc:2006} and
-\citet{Datt:Satt:sign:2006} were implemented in this package.
+\citet{Datt:Satt:sign:2008} were implemented in this package.
 
 %Large-sample inference based on asymptotic distribution of test
 %statistics and small-sample inference based on permutation are
@@ -298,6 +298,9 @@ m_{g,v}) / \{N_{g,v}(N_{g,v} - 1)\}]\times\sum^{N_{g,v}}_{i=1}(R_{i+, g, v} - R_
 The large sample test statistic with asymptotic normality
 is defined as $$Z_{rgl} = \frac{W_{rgl} - E(W_{rlg})}{VAR(W_{rgl})^{1/2}}$$.
 
+\subsubsection{RGL method, group membership defined at the subunit level}
+
+
 
 \subsection{DS method: 2 group}
 DS construct another rank sum test based on a different idea from
@@ -307,14 +310,19 @@ $1 \leq i \leq M$. A WIlcoxon rank-sum statistic can be defined as
 \begin{equation*}
 W^* = \frac{1}{M+1}\sum^M_{i=1}\delta^*_iR^*_i,
 \end{equation*}
-where $R_i^*$ is the rank of $X^*$ among the set $\{\X_j^*, 1 \leq j \leq M\}$.
+where $R_i^*$ is the rank of $X^*$ among the set $\{X_j^*, 1 \leq j \leq M\}$.
 But this test is inefficient since only one observation from each cluster
 is used. DS proposed a test statistic which is based on the average of $W^*$
 over all possible samples of $\{X_i^*, \delta_i^*\}$, i.e.,
 $$Z_{ds} = \frac{S - E(S)}{\sqrt{\hat{var}(S)}}$$, where
-$$S = E(W^*|\mathbd{X}, \mathbd{\delta})$$.
+$$S = E(W^*|\bm{X}, \bm{\delta})$$.
 $$E(W^*) = \frac{1}{2}\sum^M_{i=1}\frac{n_{g_{i1}}}{g_i}$$.
 The computation of $Var(S)$ is complicated therefore is not included here in the draft.
+
+Following the same derivation, the DS test can be extended to the comparison
+among $m$ groups, $m \geq 3$.
+
+
 
 
 Suppose there are two groups under different treatments,
@@ -586,14 +594,14 @@ and \code{y} contains observations after the treatment.
 This manner of input is restricted to the signed rank
 test.
 
-<<signed rank test for balanced data>>=
-## Large sample signed rank test for clustered data
-data(crsd)
-cluswilcox.test(z, cluster = id, data = crsd)
-## Small sample test
-data(crsd)
-cluswilcox.test(z, cluster = id, data = crsd, permutation = TRUE)
-@
+%' <<signed rank test for balanced data>>=
+%' ## Large sample signed rank test for clustered data
+%' data(crsd)
+%' cluswilcox.test(z, cluster = id, data = crsd)
+%' ## Small sample test
+%' data(crsd)
+%' cluswilcox.test(z, cluster = id, data = crsd, permutation = TRUE)
+%' @
 
 \subsubsection{Unbalanced Data}
 \label{ubsign}
@@ -628,81 +636,81 @@ cluswilcox.test(z, cluster = id, data = crsdUnb)
 \section{Real Data Analysis}
 \label{real}
 
-\subsection{Data}
-To illustrate the usage of the package, we are going to
-perform the clustered Wilcoxon rank sum test on a
-real data set in a study of eyes.
-Age-related macular degeneration (AMD) is a disease
-that blurs the sharp centeral vision by
-affecting macula, a oval yellow spot
-near the center of the retina of the human eye.
-The complement factor H R1210C is a large protein
-that circulates in human plasma. The variant of
-this protein confers the strongest genetic risk
-for AMD and earlier age at onset. The objective
-of the study is to characterize the observable
-traits of this variant. The study was carried out by
-the Seddon Lab \citep{Sedd:Shar:Adel:eval:2006,
-Ferr:Sedd:phen:2015} with 143 patients (283 eyes)
-involved, including 62 patients with the rare
-variant. The degree of severity of AMD was graded
-based on the Clinical
-Age-Related Maculopathy Staging (CARMS) system for
-each enrolled eye.
-The CARMS system has a
-5-step scale, where 1 to 3 represent no symptom,
-earlier and intermediate severity respectively,
-4 and 5 represent
-two different symptoms of the advanced AMD,
-geographic atrophy and neovascular disease respectively.
-The
-CARMS grades were assessed separately for these
-two advanced stages, i.e., we are going
-to carry out the analysis on two subsets of the
-observations respectively: the subset of
-observations with
-CARMS grade 1, 2, 3, or 4, and the subset of
-observations with CARMS grade 1, 2, 3, or 5.
-Since high correlation between
-eyes of the same patient is expected while
-observations from different patients can be assumed
-as independent, the data is clustered in pairs and
-each subject is a cluster. The data also provided
-information on age and sex, and an extra variable
-combined age and sex, which could be used to stratify
-the data.
-In this analysis, the CARMS grade is the response
-variable and treatment refers to the presence
-of the complement factor H R1210C variant.
-The data set contains 7 variables: ID is the
-subject identifier which is the cluster id.
-
-
-<<CARMS score 1, 2, 3, 4>>=
-## Carry out clustered rank sum test for the subset
-## with CARMS grade 1, 2, 3 and 4.
-data(sedlab)
-cluswilcox.test(CARMS ~ cluster(ID) + stratum(Agesex) + group(Variant),
-                data = sedlab, subset = CARMS %in% c(1, 2, 3, 4))
-@
-
-<<CARMS score 1, 2, 3, 5>>=
-## Carry out clustered rank sum test for the subset
-## with CARMS grade 1, 2, 3 and 5.
-data(sedlab)
-cluswilcox.test(CARMS ~ cluster(ID) + stratum(Agesex) + group(Variant),
-                data = sedlab, subset = CARMS %in% c(1, 2, 3, 5))
-@
-
-When controlled for the stratification covariate \code{Agesex},
-the p-value for CARMS grades 1-4 is less than $0.001$,
-which implies strong correlation between the
-presence of the complement factor H R1210C variant and
-the severity of AMD when treating geographic atrophy as the
-advanced stage. The p-value for CARMS grades 1,2,3 and 5
-is 0.06, again the evidence is relatively strong the
-the presence of the variant does affect the severity of
-AMD when treating neovascular disease as the advanced stage.
+%' \subsection{Data}
+%' To illustrate the usage of the package, we are going to
+%' perform the clustered Wilcoxon rank sum test on a
+%' real data set in a study of eyes.
+%' Age-related macular degeneration (AMD) is a disease
+%' that blurs the sharp centeral vision by
+%' affecting macula, a oval yellow spot
+%' near the center of the retina of the human eye.
+%' The complement factor H R1210C is a large protein
+%' that circulates in human plasma. The variant of
+%' this protein confers the strongest genetic risk
+%' for AMD and earlier age at onset. The objective
+%' of the study is to characterize the observable
+%' traits of this variant. The study was carried out by
+%' the Seddon Lab \citep{Sedd:Shar:Adel:eval:2006,
+%' Ferr:Sedd:phen:2015} with 143 patients (283 eyes)
+%' involved, including 62 patients with the rare
+%' variant. The degree of severity of AMD was graded
+%' based on the Clinical
+%' Age-Related Maculopathy Staging (CARMS) system for
+%' each enrolled eye.
+%' The CARMS system has a
+%' 5-step scale, where 1 to 3 represent no symptom,
+%' earlier and intermediate severity respectively,
+%' 4 and 5 represent
+%' two different symptoms of the advanced AMD,
+%' geographic atrophy and neovascular disease respectively.
+%' The
+%' CARMS grades were assessed separately for these
+%' two advanced stages, i.e., we are going
+%' to carry out the analysis on two subsets of the
+%' observations respectively: the subset of
+%' observations with
+%' CARMS grade 1, 2, 3, or 4, and the subset of
+%' observations with CARMS grade 1, 2, 3, or 5.
+%' Since high correlation between
+%' eyes of the same patient is expected while
+%' observations from different patients can be assumed
+%' as independent, the data is clustered in pairs and
+%' each subject is a cluster. The data also provided
+%' information on age and sex, and an extra variable
+%' combined age and sex, which could be used to stratify
+%' the data.
+%' In this analysis, the CARMS grade is the response
+%' variable and treatment refers to the presence
+%' of the complement factor H R1210C variant.
+%' The data set contains 7 variables: ID is the
+%' subject identifier which is the cluster id.
+%' 
+%' 
+%' <<CARMS score 1, 2, 3, 4>>=
+%' ## Carry out clustered rank sum test for the subset
+%' ## with CARMS grade 1, 2, 3 and 4.
+%' data(sedlab)
+%' cluswilcox.test(CARMS ~ cluster(ID) + stratum(Agesex) + group(Variant),
+%'                 data = sedlab, subset = CARMS %in% c(1, 2, 3, 4))
+%' @
+%' 
+%' <<CARMS score 1, 2, 3, 5>>=
+%' ## Carry out clustered rank sum test for the subset
+%' ## with CARMS grade 1, 2, 3 and 5.
+%' data(sedlab)
+%' cluswilcox.test(CARMS ~ cluster(ID) + stratum(Agesex) + group(Variant),
+%'                 data = sedlab, subset = CARMS %in% c(1, 2, 3, 5))
+%' @
+%' 
+%' When controlled for the stratification covariate \code{Agesex},
+%' the p-value for CARMS grades 1-4 is less than $0.001$,
+%' which implies strong correlation between the
+%' presence of the complement factor H R1210C variant and
+%' the severity of AMD when treating geographic atrophy as the
+%' advanced stage. The p-value for CARMS grades 1,2,3 and 5
+%' is 0.06, again the evidence is relatively strong the
+%' the presence of the variant does affect the severity of
+%' AMD when treating neovascular disease as the advanced stage.
 
 
 
