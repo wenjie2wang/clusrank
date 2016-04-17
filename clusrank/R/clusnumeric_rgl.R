@@ -20,7 +20,7 @@
 ##
 ################################################################################
 cluswilcox.test.signedrank.rgl <- function(x, cluster, alternative,
-                                           mu, DNAME, METHOD) {
+                                           mu, exact, DNAME, METHOD) {
   METHOD <- paste(METHOD, "using Rosner-Glynn-Lee method")
   ## Drop the ties
   data <- data.frame(x, cluster)
@@ -39,7 +39,14 @@ cluswilcox.test.signedrank.rgl <- function(x, cluster, alternative,
   signrank <- ifelse(data$x > 0, 1, -1) * data$xrank
   data <- cbind(data, signrank)
   colnames(data)[4] <- "signrank"
-  if(balance == TRUE){
+
+  if(exact == TRUE) {
+      srksum <-  stats::aggregate(signrank ~ cluster, FUN = sum)[, 2]
+      perm <- rbind(rep(1, m), rep(-1, m))
+      perm <- expand.grid(as.data.frame(perm))
+      srksum.all <-colSums(t(perm) * srksum)
+  } else {
+   if(balance == TRUE){
     T_c <- sum(data$signrank)
     sumrank <- c(by(data$signrank, data$cluster, sum))
     sumsq <- sum(sumrank ^ 2)
@@ -122,5 +129,7 @@ cluswilcox.test.signedrank.rgl <- function(x, cluster, alternative,
                      adjusted = ADJUST)
       class(result) <- "ctest"
       return(result)
-    }
+ 
+  }
+  }
 }
