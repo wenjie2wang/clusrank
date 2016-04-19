@@ -65,13 +65,13 @@ print.ctest <- function (x, digits = getOption("digits"), prefix = "\t", ...)
                                                                  max(1L, digits - 2L)))))
   cat("\n")}
 
-  out <- character(0)
+  out <- character()
   if (!is.null(x$statistic))
     out <- c(out, paste(names(x$statistic), "=", format(signif(x$statistic,
                                                                max(1L, digits - 2L)))))
-  if (!is.null(x$parameter))
-    out <- c(out, paste(names(x$parameter), "=", format(signif(x$parameter,
-                                                               max(1L, digits - 2L)))))
+ # if (!is.null(x$parameter))
+  #  out <- c(out, paste(names(x$parameter), "=", format(signif(x$parameter,
+   #                                                            max(1L, digits - 2L)))))
   if (!is.null(x$p.value)) {
     fp <- format.pval(x$p.value, digits = max(1L, digits -
                                                 3L))
@@ -80,19 +80,31 @@ print.ctest <- function (x, digits = getOption("digits"), prefix = "\t", ...)
   }
   cat(strwrap(paste(out, collapse = ", ")), sep = "\n")
   out <- character()
+
+  if(!is.null(x$n) | !is.null(x$cn)){
   if(!is.null(x$n))
     out <- c(out, paste(names(x$n), "=", format(signif(x$n, max(1L, digits - 2L)))))
   if(!is.null(x$cn))
     out <- c(out, paste(names(x$cn), "=", format(signif(x$cn,
+                                                        max(1L, digits - 2L)))))
+  cat(strwrap(paste(out, collapse = ", ")), sep = "\n")}
+
+  if(!is.null(x$n.group) | !is.null(x$df)) {
+ out <- character()
+  if(!is.null(x$n.group))
+    out <- c(out, paste(names(x$n.group), "=", format(signif(x$n.group, max(1L, digits - 2L)))))
+  if(!is.null(x$df))
+    out <- c(out, paste(names(x$df), "=", format(signif(x$df,
                                                        max(1L, digits - 2L)))))
   cat(strwrap(paste(out, collapse = ", ")), sep = "\n")
-
+  }
   if(!is.null(x$adjusted) && x$adjusted == TRUE)
     cat("The signed rank test statistics is adjusted since the data is unbalanced.")
-  if(!is.null(x$balance) && x$balance == FALSE)
-    cat("The data is unbalanced")
+  if(!is.null(x$balance) && x$balance == FALSE) {
+        cat("The data is unbalanced")
+        cat("\n")
+  }
 
-    cat("\n")
   if (!is.null(x$alternative)) {
     cat("alternative hypothesis: ")
     if (!is.null(x$null.value)) {
@@ -109,15 +121,7 @@ print.ctest <- function (x, digits = getOption("digits"), prefix = "\t", ...)
     }
     else cat(x$alternative, "\n", sep = "")
   }
-  if (!is.null(x$conf.int)) {
-    cat(format(100 * attr(x$conf.int, "conf.level")), " percent confidence interval:\n",
-        " ", paste(format(c(x$conf.int[1L], x$conf.int[2L])),
-                   collapse = " "), "\n", sep = "")
-  }
-  if (!is.null(x$estimate)) {
-    cat("sample estimates:\n")
-    print(x$estimate, digits = digits, ...)
-  }
+  
   cat("\n")
   invisible(x)
 }
