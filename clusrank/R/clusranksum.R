@@ -334,7 +334,7 @@ cluswilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
     }
 }
 
-
+#' @importFrom MASS ginv 
 cluswilcox.test.ranksum.ds <- function(x, cluster, group, 
                                        alternative,
                                        mu,
@@ -456,9 +456,9 @@ cluswilcox.test.ranksum.ds <- function(x, cluster, group,
     d<-apply(n.ij,1,FUN=function(x){x/n.i})
     E.S.j<-(1/2)*(apply(d,2,sum))
     
-    #######Calculate estimate of variance of S
+    ## Calculate estimate of variance of S
     W.hat<-matrix(0,m,M) 
-    a<-t(d)       #####first calculate W.hat for each cluster
+    a<-t(d)       # first calculate W.hat for each cluster
     for (i in 1:M){
       for (j in 1:m){
         gik.j<-ifelse(group[cluster==i]==j,1,0)
@@ -474,16 +474,16 @@ cluswilcox.test.ranksum.ds <- function(x, cluster, group,
     }                            ##second, calculate E(W)
     
     ##########calculate sample variance
-    dev.W<-W.hat-E.W
-    term.old<-matrix(0,m,m)
+    dev.W <- W.hat-E.W
+    term.old <- matrix(0,m,m)
     for (i in 1:M){
-      term<-dev.W[,i]%*%t(dev.W[,i])
-      term.old<-term+term.old
+      term <- dev.W[,i]%*%t(dev.W[,i])
+      term.old <- term + term.old
     }
-    V.hat<-(1/M)*term.old
+    V.hat <- term.old / M
     
     ######calculate the test statistic
-    T<-(t(S.j-E.S.j) %*%MASS::ginv(V.hat) %*% (S.j-E.S.j))*(1/M)
+    T <- (t(S.j - E.S.j) %*% MASS::ginv(V.hat) %*% (S.j - E.S.j)) / M
     pval <- pchisq(T, df=(m-1),lower.tail=F)
       names(T) <- "test statistic"
       ngrp <- group.uniq

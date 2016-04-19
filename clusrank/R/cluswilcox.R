@@ -1,4 +1,4 @@
-cluswilcox <- function(x, ...) {
+cluswilcox.test <- function(x, ...) {
     UseMethod("wilcox.test")
 }
 
