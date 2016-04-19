@@ -1,99 +1,231 @@
-################################################################################
-##
-##   R package clusrank by Mei-Ling Ting Lee, Jun Yan, and Yujing Jiang
-##   Copyright (C) 2016
-##
-##   This file is part of the R package clusrank.
-##
-##   The R package clusrank is free software: you can redistribute it and/or
-##   modify it under the terms of the GNU General Public License as published
-##   by the Free Software Foundation, either version 3 of the License, or
-##   (at your option) any later version.
-##
-##   The R package clusrank is distributed in the hope that it will be useful,
-##   but WITHOUT ANY WARRANTY without even the implied warranty of
-##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##   GNU General Public License for more details.
-##
-##   You should have received a copy of the GNU General Public License
-##   along with the R package clusrank. If not, see <http://www.gnu.org/licenses/>.
-##
-################################################################################
-#' Wilcoxon Rank SUm and Signed Rank Tests for Clustered Data
-#'
-#' Performs one- and two-sample Wilcoxon tests on vectors of clustered data.
-#'
-#' @param x  A numeric vector of data values. Non-finite (e.g.,
-#' infinite or missing) values will be omitted.
-#' @param y An optional numeric vector of data values.
-#' @param cluster numeric or charater vector, the id of clusters.
-#'  If not specified, each observation will
-#' be assigned a distinct cluster, i.e., no cluster in the data.
-#'@param data A optional data frame.
-#'@param alternative a character string specifying the
-#' alternative hypothesis, must be one of "two.sided" (default),
-#'  "greater" or "less". You can specify just the initial letter.
-#'@param mu a number specifying an optional parameter used to
-#'  form the null hypothesis. See 'Details'.
-#'@param permutation A logical, whether to use permutation test.
-#'@param n.rep number of samples generated for permutation test.
-#'@param formula   an object of class \code{"formula"} in the
-#'form of  \code{lhs \~ rhs}, where \code{lhs} is a numeric
-#'variable giving the data values and \code{rhs} contains
-#'the \code{cluster}, \code{group}, \code{stratum}, e.g.,
-#'\code{z ~ cluster(a) + group(b) + stratum(c)}, where
-#'\code{cluster}, \code{group}, \code{stratum} are special terms.
-#'@param subset an optional vector specifyin.csize a
-#'subset of observations to be used.
-#'@param na.action a function which indicates what should happen
-#'when the data contains NAs. The  default action is to omit them.
-#'@param group.x a character or a number, indicates which group id
-#'  is for treatment x.
-#' @param ...  Further arguments to be passed to or from methods.
-#' @details
-#' THe formula interface is only applicable for the 2-sample tests,
-#' and vice versa.
-#'
-#' If only \code{x} is given, or if both \code{x} and \code{y} are given,
-#' then a Wilcoxon signed rank test of the null that the distribution of
-#' \code{x} (in the one sample case) or of \code{x - y} (in the paried
-#' two sample case) is symmetric about \code{mu} is performed.
-#'
-#' By default(if \code{permutation} is not specified),
-#' a normal approximation is used. Otherwise, a permutation test
-#' is used.
-#'@return  a list with class "ctest" containing the following components:
-#' \item{rstatistic}{the value of the signed rank statistic
-#'  with a name describing it.}
-#'\item{erstatistics}{Expected value clustered Wilcoxon ranksum statistic.}
-#'\item{vrstatistics}{Variance of clustered Wilcoxon ranksum statistic.}
-#'\item{statistics}{the value of the test statistic.}
-#'\item{p.value}{the p-value for the test}
-#'\item{data.name}{a character string giving the names of the data.}
-#'\item{method}{the name of the method}
-#'\item{balance}{a logical, indicating if the data is balanced.}
-#' \item{n}{Total number of observations.}
-#' \item{cn}{Total number of clusters.}
-#' \item{adjusted}{indicator of whether adjusted signed rank statistic is used.}
-#' @seealso \code{\link{cluswilcox.test.formula}}, \code{\link{cluswilcox.test.numeric}}
-#' @examples
-#' ## Formula interface, only for rank sum test.
-#' data(crd)
-#' cluswilcox.test(z ~ group(group) + cluster(id), data = crd)
-#' data(crdStr)
-#' cluswilcox.test(z ~ group(group) + cluster(id) + stratum(stratum), data = crdStr)
-#' ## Numeric interface, only for signed rank test.
-#' data(crsd)
-#' cluswilcox.test(z, cluster = id, data = crsd)
-#' data(crsdUnb)
-#' cluswilcox.test(z, cluster = id, data = crsdUnb)
-#' @export
-
-cluswilcox.test <- function(x, ...) {
-  pars <- as.list(match.call())
-  if( !exists(as.character(pars$x)) && !is.null(pars$data)) {
-    x <- eval(pars$data)[,deparse(substitute(x))]
-  }
-  UseMethod("cluswilcox.test", x)
+cluswilcox <- function(x, ...) {
+    UseMethod("wilcox.test")
 }
 
+cluswilcox.test.formula <- function(formula, data = NULL, subset = NULL, na.action = na.omit, ...)
+{
+    if(missing(formula) ||
+      (length(formula) != 3L)) {
+        stop("'formula' missing or incorrect")
+    }
+    m <- match.call(expand.dots = FALSE)
+    if(!missing(data)) {
+        DNAME <- paste("from", Call$data)
+    } else {
+        DNAME <- NULL
+    }
+    
+    if(is.matrix(eval(m$data, parent.frame()))) {
+        m$data <- as.data.frame(data)
+    }
+    special <- c("stratum", "cluster", "group")
+    m[[1L]] <- quote(stats::model.frame)
+    m$... <- NULL
+    m$formula <- if(missing(data))
+    terms(formula, special)
+                 else terms(formula, special, data = data)
+    
+    mf <- eval(m, parent.frame())
+    Terms <- terms(mf)
+    
+    x.name <- rownames(attr(m$formula, "factors"))[1]
+    DNAME <- paste0(paste(x.name, "from", m$data), ",")
+    response <- attr(attr(mf, "terms"), "response")
+    x <- mf[[response]]
+
+    group <- attr(Terms, "specials")$group
+  if(length(group)) {
+    gtemp <- untangle.specials(Terms, "group", 1)
+    group.name <- gsub("[\\(\\)]", "",
+                         regmatches(gtemp$vars,
+                                    gregexpr("\\(.*?\\)", gtemp$vars))[[1]])
+        DNAME <- paste0(DNAME, " group: ", group.name, ",")
+
+
+    if(length(gtemp$vars) == 1) {
+      group.keep <- mf[[gtemp$vars]]
+    } else {
+      stop("more than one variable are set as the group id")
+    }
+    group.uniq <- unique(group.keep)
+    group.uniq.l <- length(group.uniq)
+
+    if(!is.character(group.uniq) && !is.numeric(group.uniq)) {
+      stop("group id has to be numeric or character")
+    }
+
+    group <- recoderFunc(group.keep, group.uniq, c(1 : group.uniq.l))
+  }
+    
+    cluster <- attr(attr(mf, "terms"), "specials")$cluster
+     if(length(cluster)) {
+    ctemp <- untangle.specials(Terms, "cluster", 1)
+    cluster.name <- gsub("[\\(\\)]", "",
+                         regmatches(ctemp$vars,
+                                    gregexpr("\\(.*?\\)", ctemp$vars))[[1]])
+    DNAME <- paste0(DNAME, " cluster: ", cluster.name, ",")
+
+
+    if(length(ctemp$vars) == 1) {
+      cluster.keep <- mf[[ctemp$vars]]
+    } else {
+      stop("more than one variable are set as the cluster id")
+    }
+    cluster.uniq <- unique(cluster.keep)
+    cluster.uniq.l <- length(cluster.uniq)
+
+    if(is.character(cluster.uniq)) {
+      cluster <- recoderFunc(cluster.keep, cluster.uniq, c(1 : cluster.uniq.l))
+    } else {
+      if(!is.numeric(cluster.uniq)) {
+        stop("cluster id should be numeric or character")
+      }
+      cluster <- cluster.keep
+    }
+  } else {
+    cluster <- c(1 : data.n)
+  }
+    
+        
+    cluster <- mf[[cluster]]
+
+    stratum <- attr(attr(mf, "terms"), "specials")$stratum
+    if(!is.null(stratum)) {
+        strat <- mf[[stratum]]
+    }
+
+    y <- do.call("cluswilcox.test.default",
+                 list(x = x, cluster = cluster,
+                      group = group, strata = strata,
+                      DNAME = DNAME,
+                      list(...)))
+    return(y)
+}
+
+
+    
+
+
+cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
+                                    group = NULL, strata = NULL,
+                                    alternative = c("two.sided", "less", "greater"),
+                                    mu = 0, paired = FALSE, exact = NULL,
+                                    method = c("rgl", "ds"), DNAME = NULL) {
+    alternative <- match.arg(alternative)
+    method <- match.arg(method)
+    if (!missing(mu) && ((length(mu) > 1L) || !is.finite(mu)))
+    stop("'mu' must be a single number")
+    if(!is.numeric(x)){
+        stop("'x' must be numeric")
+    }
+
+    if(!is.null(y)) {
+        if(!is.numeric(y)) {
+            stop("'y' must be numeric")
+        }
+        if(length(y) != length(x)) {
+            stop("'y' must have the same length as 'x' for the clustered signed rank test")
+        }
+        paired <- TRUE
+        x <- x - y
+    }
+
+    if(is.null(cluster)) {
+        stop("'cluster' is required")
+    }
+
+    if(is.null(group) & paired == FALSE) {
+        stop("'group' is required for the clustered rank sum test")
+    }
+
+    if(!is.null(group) & paired == TRUE) {
+        warning("'group' will be ignored for the clustered signed rank test")
+    }
+
+    if(is.null(strata)) {
+        strata <- rep(1, length(x))
+    }
+
+    if(is.null(DANME)) {
+        if(is.null(y)) {
+            DNAME  <-  deparse(substitute(x))
+        } else {
+            DNAME <- paste(deparse(substitute(x)), "and", deparse(substitute(y)))
+        }
+    }
+    OK <- complete.cases(x, cluster, group, strata) & is.finite(x)
+    x <- x[OK]
+    cluster <- cluster[OK]
+    group <- group[OK]
+    strata <- strata[OK]
+
+    if(length(x) < 1L) {
+        stop("not enough (finite) 'x' observation")
+    }
+
+    if(paired == TRUE) {
+        if(length(table(strata)) > 1L) {
+            warning("'strata' will be ignored for the clustered signed rank test")
+        }
+        x <- x - mu
+        METHOD <- "Clustered Wilcoxon signed rank test"
+       if(toupper(method) == "RGL") {
+           METHOD <- paste(METHOD, "using RGL method", sep = " ")
+            arglist <- setNames(list(x, cluster, alternative, METHOD, exact),
+                            c("x", "cluster", "alternative",
+                              "mu", 
+                              "METHOD", "exact"))
+            result <- do.call("cluswilcox.test.signedrank.rgl", c(arglist))
+            return(result)
+        }
+        
+        if(toupper(method) == "DS") {
+            METHOD <- paste(METHOD, "using DS method", sep = " ")
+             arglist <- setNames(list(x, cluster, alternative, METHOD, exact),
+                            c("x", "cluster", "alternative",
+                              "mu", 
+                              "METHOD", "exact"))
+           result <-  do.call("cluswilcox.test.signedrank.ds",
+                              c(arglist))
+           return(result)
+        }
+        
+        else {
+            stop("Method should be one of 'rgl' and 'ds'")
+        }
+        
+    } else {
+        METHOD <- "Clustered Wilcoxon rank sum test"
+        if(toupper(method) == "RGL") {
+            METHOD <- paste( METHOD, "using Rosner-Glynn-Lee method", sep = " ")
+             arglist <- setNames(list(x, cluster, group, strata, alternative,
+                                 mu, DNAME, METHOD, exact),
+                            c("x", "cluster", "group", "stratum",
+                              "alternative", "mu", "DNAME", "METHOD",
+                              "exact"))
+            result <- do.call("cluswilcox.test.ranksum.rgl", c(arglist))
+            return(result)
+        }
+        
+        if(toupper(method) == "DS") {
+            METHOD <- paste( METHOD, "using Datta-Satten method", sep = " ")
+             arglist <- setNames(list(x, cluster, group, alternative,
+                                 DNAME, METHOD, exact),
+                            c("x", "cluster", "group", "stratum",
+                              "alternative", "DNAME", "METHOD",
+                              "exact"))
+             if(length(table(strata)) > 1L) {
+            warning("'strata' will be ignored for the clustered rank sum test, 'ds' method")
+        }
+            result <- do.call("cluswilcox.test.ranksum.ds", c(arglist))
+            return(result)
+        }
+        
+        else {
+            stop("Method should be one of 'rgl' and 'ds'")
+        }
+    }
+}
+        
+        
+    
