@@ -10,7 +10,7 @@ cluswilcox.test.formula <- function(formula, data = NULL, subset = NULL, na.acti
     }
     m <- match.call(expand.dots = FALSE)
     if(!missing(data)) {
-        DNAME <- paste("from", Call$data)
+        DNAME <- paste("from", m$data)
     } else {
         DNAME <- NULL
     }
@@ -32,6 +32,7 @@ cluswilcox.test.formula <- function(formula, data = NULL, subset = NULL, na.acti
     DNAME <- paste0(paste(x.name, "from", m$data), ",")
     response <- attr(attr(mf, "terms"), "response")
     x <- mf[[response]]
+    n.obs <- length(x)
 
     group <- attr(Terms, "specials")$group
   if(length(group)) {
@@ -83,21 +84,22 @@ cluswilcox.test.formula <- function(formula, data = NULL, subset = NULL, na.acti
       cluster <- cluster.keep
     }
   } else {
-    cluster <- c(1 : data.n)
+    cluster <- c(1 : n.obs)
   }
     
         
-    cluster <- mf[[cluster]]
 
     stratum <- attr(attr(mf, "terms"), "specials")$stratum
     if(!is.null(stratum)) {
-        strat <- mf[[stratum]]
+        stratum <- mf[[stratum]]
+    } else {
+        stratum <- rep(1, n.obs)
     }
 
     y <- do.call("cluswilcox.test.default",
-                 list(x = x, cluster = cluster,
-                      group = group, strata = strata,
-                      DNAME = DNAME,
+                c( list(x = x, cluster = cluster,
+                      group = group, stratum = stratum,
+                      DNAME = DNAME),
                       list(...)))
     return(y)
 }
@@ -107,17 +109,31 @@ cluswilcox.test.formula <- function(formula, data = NULL, subset = NULL, na.acti
 
 
 cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
-                                    group = NULL, strata = NULL,
+                                    group = NULL, stratum = NULL,
                                     alternative = c("two.sided", "less", "greater"),
                                     mu = 0, paired = FALSE, exact = NULL,
                                     method = c("rgl", "ds"), DNAME = NULL) {
     alternative <- match.arg(alternative)
     method <- match.arg(method)
+      pars <- as.list(match.call()[-1])
+
     if (!missing(mu) && ((length(mu) > 1L) || !is.finite(mu)))
     stop("'mu' must be a single number")
     if(!is.numeric(x)){
         stop("'x' must be numeric")
     }
+    if(is.null(DNAME)) {
+         DNAME <- (pars$x)
+
+    if(!is.null(pars$y)) {
+      DNAME <- paste(DNAME, "and", pars$y)
+    }
+    if(!is.null(pars$cluster)) {
+      DNAME <- paste0(DNAME, ", cluster: ", pars$cluster)
+    }
+    }
+    
+    
 
     if(!is.null(y)) {
         if(!is.numeric(y)) {
@@ -142,49 +158,49 @@ cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
         warning("'group' will be ignored for the clustered signed rank test")
     }
 
-    if(is.null(strata)) {
-        strata <- rep(1, length(x))
+    if(is.null(stratum)) {
+        stratum <- rep(1, length(x))
     }
-
-    if(is.null(DANME)) {
+    if(is.null(DNAME)) {
         if(is.null(y)) {
             DNAME  <-  deparse(substitute(x))
         } else {
             DNAME <- paste(deparse(substitute(x)), "and", deparse(substitute(y)))
         }
     }
-    OK <- complete.cases(x, cluster, group, strata) & is.finite(x)
+    OK <- complete.cases(x, cluster, group, stratum) & is.finite(x)
     x <- x[OK]
     cluster <- cluster[OK]
     group <- group[OK]
-    strata <- strata[OK]
+    stratum <- stratum[OK]
 
     if(length(x) < 1L) {
         stop("not enough (finite) 'x' observation")
     }
 
     if(paired == TRUE) {
-        if(length(table(strata)) > 1L) {
-            warning("'strata' will be ignored for the clustered signed rank test")
+        if(length(table(stratum)) > 1L) {
+            warning("'stratum' will be ignored for the clustered signed rank test")
         }
         x <- x - mu
         METHOD <- "Clustered Wilcoxon signed rank test"
        if(toupper(method) == "RGL") {
            METHOD <- paste(METHOD, "using RGL method", sep = " ")
-            arglist <- setNames(list(x, cluster, alternative, METHOD, exact),
+           arglist <- setNames(list(x, cluster, alternative, mu, METHOD,
+                                    DNAME, exact),
                             c("x", "cluster", "alternative",
                               "mu", 
-                              "METHOD", "exact"))
+                              "METHOD", "DNAME",  "exact"))
             result <- do.call("cluswilcox.test.signedrank.rgl", c(arglist))
             return(result)
         }
         
         if(toupper(method) == "DS") {
             METHOD <- paste(METHOD, "using DS method", sep = " ")
-             arglist <- setNames(list(x, cluster, alternative, METHOD, exact),
+             arglist <- setNames(list(x, cluster, alternative, METHOD, DNAME),
                             c("x", "cluster", "alternative",
                               "mu", 
-                              "METHOD", "exact"))
+                              "METHOD", "DNAME"))
            result <-  do.call("cluswilcox.test.signedrank.ds",
                               c(arglist))
            return(result)
@@ -198,7 +214,7 @@ cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
         METHOD <- "Clustered Wilcoxon rank sum test"
         if(toupper(method) == "RGL") {
             METHOD <- paste( METHOD, "using Rosner-Glynn-Lee method", sep = " ")
-             arglist <- setNames(list(x, cluster, group, strata, alternative,
+             arglist <- setNames(list(x, cluster, group, stratum, alternative,
                                  mu, DNAME, METHOD, exact),
                             c("x", "cluster", "group", "stratum",
                               "alternative", "mu", "DNAME", "METHOD",
@@ -214,8 +230,8 @@ cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
                             c("x", "cluster", "group", "stratum",
                               "alternative", "DNAME", "METHOD",
                               "exact"))
-             if(length(table(strata)) > 1L) {
-            warning("'strata' will be ignored for the clustered rank sum test, 'ds' method")
+             if(length(table(stratum)) > 1L) {
+            warning("'stratum' will be ignored for the clustered rank sum test, 'ds' method")
         }
             result <- do.call("cluswilcox.test.ranksum.ds", c(arglist))
             return(result)
