@@ -343,67 +343,63 @@ cluswilcox.test.ranksum.ds <- function(x, cluster, group,
     if(group.uniq == 1) {
         stop("invalid group variable, should contain at least 2 groups")
     }
+     n.obs <- length(x)
+    cluster.uniq <- unique(cluster)
+    M <- length(cluster.uniq)
+    ni <- table(cluster)
+    Fhat <- numeric(n.obs)
+    for( i in 1 : n.obs) {
+        Fhat[i] <- (sum(x <= x[i]) + sum(x < x[i])) / (2 * n.obs) 
+  }
+
+    F.prop <- numeric(n.obs)
+    for( j in 1 : n.obs) {
+        Fj <- numeric(M)
+        for( i in 1 : M) {
+            Fj[i] <- (sum(x[cluster == i] < x[j]) + 0.5 * sum(x[cluster == i] == x[j])) / ni[i]
+      }
+        F.prop[j] <- sum(Fj[-cluster[j]])
+  }
+    
  
-  if(group.uniq == 2) {
-    #####calculate quantity 2 (using the pooled estimate of F)
-      n<-length(x)
-      x[which(group == 1)] <- x[which(group == 1)] - mu
-      F.hat<-numeric(n)
-      for (i in 1:n){
-      F.hat[i] <- (sum(x <= x[i]) + sum( x < x[i])) / (2 * n)
-    }
-    #####calculate quantity 1 (using ECD-F for each cluster)
-    #### M is No. of clusters, n is No. of observations
-    M<-length(unique(cluster)) 
-    n.i <- table(cluster)
-    F.prop <-  numeric(n)
-    for(ii in 1:n){
-      F.j<-numeric(M)
-      for (i in 1:M){
-        F.j[i]<-(sum(x[cluster==i]<x[ii])+0.5*sum(x[cluster==i]==x[ii]))/(n.i[i])
-      } 
-      F.prop[ii]<-sum(F.j[-cluster[ii]])
-    }   
-    
-    ###########calculate S=E(W*|x,g)
-    a<-numeric(M)
-    b<-1+F.prop
-    for (i in 1:M){
-      a[i]<-sum(((group[cluster==i] - 1) *b[cluster==i])/(n.i[i]))
-    }    
-    c<-1/(M+1)
-    S<-c*sum(a)
-    ########note: for m groups maybe can use group[cluster==i&group=m]
-    
-#########Calculate E(S)=E(W*)
-     group.temp <- as.numeric(group == 2)
-      n.i1 <- aggregate(group.temp ~ cluster, FUN = sum)
-      n.i1 <- n.i1[, 2]
-      d<-n.i1/n.i
-    E.S<-(1/2)*sum(d)
-    
-    #######Calculate estimate of variance of S
-    W.hat<-numeric(M)        #####first calculate W.hat for each cluster
-    a<-n.i1/n.i
-      for (i in 1:M){
-          b<-1/(n.i[i]*(M+1))
-          c<-(group[cluster==i] - 1) * (M-1)
-          d<-sum(a[-i])
-      W.hat[i]<-b*sum((c-d)*F.hat[cluster==i])
-    }
-      a<-n.i1/n.i
-      E.W<-(M/(2*(M+1)))*(a-sum(a)/M)    ##second, calculate E(W)
-    
-      var.s<-sum((W.hat-E.W)^2) #calculate var(s)
-      Zc<-(S-E.S)/sqrt(var.s)   #calculate the test statistic
-      pval <- switch(alternative,
-                 less = pnorm(abs(Zc)),
-                 greater = pnorm(abs(Zc), lower.tail = FALSE),
-                 two.sided = 2 * min(pnorm(abs(Zc)),
-                                     pnorm(abs(Zc), lower.tail = FALSE)))
-      names(Zc) <- "test statistic"
+    if(group.uniq == 2) {
+#####calculate quantity 2 (using the pooled estimate of F)
+        group <- recoderFunc(group, order(unique(group)), c(0, 1))
+        x[which(group == 0)] <- x[which(group == 0)] - mu
+        ni1 <- aggregate(group ~ cluster, FUN = sum)[, 2] # number of obs under trt 2 in each cluster
+  ## Calculate S = E(W*|W, g)
+        S <- 0
+        for( i in 1 : M) {
+            S <- S + sum(group[cluster == cluster.uniq[i]] /
+                         ni[i] * ( 1 + F.prop[cluster == cluster.uniq[i]]))
+      }
+  
+        S <- S / (M + 1)
+  
+  ## Calculate E(S)
+        ES <- sum(ni1 / ni) / 2
+  
+  ## Calculate var(S)
+  
+        W <- numeric(M)
+        for(i in 1 : M) {
+            Wi <- ((M - 1) * group[cluster == cluster.uniq[i]] -
+                   sum(ni1[-i] / ni[-i])) *
+                Fhat[cluster == cluster.uniq[i]]
+            W[i] <- sum(Wi) / (ni[i] * (M+1))
+  }
+        a <- sum(ni1 / ni)
+        EW <- M / (2 * (M + 1)) * (ni1 / ni - a / M)
+        varS <- sum((W - EW)^2)
+        Z <- (S - ES) / sqrt(varS)
+      
+        pval <- switch(alternative, less = pnorm(abs(Z)),
+                       greater = pnorm(abs(Z), lower.tail = FALSE),
+                       two.sided = 2 * min(pnorm(abs(Z)),
+                                           pnorm(abs(Z), lower.tail = FALSE)))
+      names(Z) <- "test statistic"
       names(mu) <- "mu"
-      result <- list(statistic = Zc, p.value = pval,
+      result <- list(statistic = Z, p.value = pval,
                      alternative = alternative, null.value = mu,
                      data.name = DNAME, method = METHOD)
                 
@@ -417,74 +413,49 @@ cluswilcox.test.ranksum.ds <- function(x, cluster, group,
           warning("comparison between m (m > 2) groups cannot set location shift parameter")
       }
       mu <- 0
-      n<-length(x)
-      F.hat<-numeric(n)
-      for (i in 1:n){
-          F.hat[i]<-(sum(x<=x[i])+sum(x<x[i]))/(2*n)
-    }
-    #####calculate quantity 1 (using ECD-F for each cluster)
-    #### M is No. of clusters, n is No. of observations
-      M<-length(unique(cluster)) 
-      n.i<-table(cluster)
-      F.prop<-numeric(n)
-      for(ii in 1:n){
-          F.j<-numeric(M)
-      for (i in 1:M){
-        F.j[i]<-(sum(x[cluster==i]<x[ii])+0.5*sum(x[cluster==i]==x[ii]))/(n.i[i])
-      } 
-      F.prop[ii]<-sum(F.j[-cluster[ii]])
-    }   
-    
-    ###########calculate S(j)=E(W*|x,g=j), where m is the number of groups
-    m<-length(unique(group))
-    a<-matrix(0,m,M)
-    b<-1+F.prop
-    for(j in 1:m){
-      for (i in 1:M){
-        gik.j<-ifelse(group==j,1,0)
-        a[j,i]<-sum((gik.j[cluster==i]*b[cluster==i])/(n.i[i]))
-      } 
-    }   
-    c<-1/(M+1)
-    S.j<-c*(apply(a,1,sum))
-    
-    #########Calculate E(S)=E(W*)
-    n.ij<-matrix(0,m,M)
-    for (i in 1:m){
-      n.ij[i,]<-table(cluster[group==i])           
-    }
-    d<-apply(n.ij,1,FUN=function(x){x/n.i})
-    E.S.j<-(1/2)*(apply(d,2,sum))
-    
-    ## Calculate estimate of variance of S
-    W.hat<-matrix(0,m,M) 
-    a<-t(d)       # first calculate W.hat for each cluster
-    for (i in 1:M){
-      for (j in 1:m){
-        gik.j<-ifelse(group[cluster==i]==j,1,0)
-        b<-1/(n.i[i]*(M+1))
-        c<-(gik.j)*(M-1)
-        d<-sum(a[j,-i])
-        W.hat[j,i]<-b*sum((c-d)*F.hat[cluster==i])
+  m <- length(unique(group))
+  Sj <- numeric(m)
+  group.uniq <- unique(group)
+  for( j in 1 : m) {
+      for( i in 1 : M) {
+          gik.j <- ifelse(group == j, 1, 0)
+          Sj[j] <- Sj[j] + sum(gik.j[cluster == cluster.uniq[i]] *
+                                   (1 + F.prop[cluster == cluster.uniq[i]])) / ni[i]
       }
-    }
-    E.W<-matrix(0,m,M)
-    for (j in 1:m){
-      E.W[j,]<-(M/(2*(M+1)))*(a[j,]-sum(a[j,])/M)
-    }                            ##second, calculate E(W)
-    
-    ##########calculate sample variance
-    dev.W <- W.hat-E.W
-    term.old <- matrix(0,m,m)
-    for (i in 1:M){
-      term <- dev.W[,i]%*%t(dev.W[,i])
-      term.old <- term + term.old
-    }
-    V.hat <- term.old / M
-    
-    ######calculate the test statistic
-    T <- (t(S.j - E.S.j) %*% MASS::ginv(V.hat) %*% (S.j - E.S.j)) / M
-    pval <- pchisq(T, df=(m-1),lower.tail=F)
+  }
+  Sj <- Sj / (M + 1)
+
+  nij <- matrix( 0, m, M)
+  for( i in 1 : m) {
+      nij[i, ] <- table(cluster[group == group.uniq[i]])
+  }
+  d <- apply(nij, 1, FUN = function(x) {x / ni})
+  ESj <- apply(d, 2, sum) / 2
+
+  What <- matrix(0, m, M)
+  a <- t(d)
+  for( i in 1 : M) {
+      for( j in 1 : m) {
+          gik.j <- ifelse(group[cluster == cluster.uniq[i]] == j, 1, 0)
+          b <- 1 / (ni[i] * (M + 1))
+          c <- gik.j * (M - 1)
+          d <- sum(a[j, -i])
+          What[j, i] <- b * sum((c - d) * Fhat[cluster == cluster.uniq[i]])
+      }
+  }
+  EW <- matrix(0, m, M)
+  for( j in 1 : m) {
+      EW[j, ] <- (M / (2 * ( M + 1))) * (a[j, ] - sum(a[j, ]) / M)
+  }
+
+  dev.W <- What - EW
+  V <- matrix(0, m, m)
+  for( i in 1 : M) {
+      V <- V + dev.W[, i] %*% t(dev.W[, i])
+  }
+  V <- V / M
+  T <- t(Sj - ESj) %*% ginv(V) %*% (Sj - ESj) / M
+    pval <- pchisq(T, df = (m - 1),lower.tail = F)
       names(T) <- "test statistic"
       ngrp <- group.uniq
       df <- ngrp - 1
