@@ -33,7 +33,7 @@ cluswilcox.test.signedrank.rgl <- function(x, cluster, alternative,
   } else {
     balance = TRUE
   }
-  
+
   xrank <- rank(abs(data$x))
   data <- cbind(data, xrank)
   signrank <- ifelse(data$x > 0, 1, -1) * data$xrank
@@ -43,7 +43,7 @@ cluswilcox.test.signedrank.rgl <- function(x, cluster, alternative,
     if(is.null(exact)) {
         exact <- FALSE
     }
-    
+
   if(exact == TRUE) {
       Tc <- sum(data$signrank)
       srksum <-  stats::aggregate(signrank ~ cluster, FUN = sum)[, 2]
@@ -58,16 +58,16 @@ cluswilcox.test.signedrank.rgl <- function(x, cluster, alternative,
                                       1 - ecdf.tc(abs(Tc)),
                                       0.5))
        names(Tc) <- "rank statistic"
-    
+
     names(n) <- "total number of observations"
     names(m) <- "total number of clusters"
-    result <- list(rstatistic = Tc, 
+    result <- list(rstatistic = Tc,
                    p.value = pval, n = n, cn = m, null.value = mu,
                    alternative = alternative,
                    data.name = DNAME, method = METHOD)
     class(result) <- "ctest"
     return(result)
-      
+
   } else {
    if(balance == TRUE){
     T_c <- sum(data$signrank)
@@ -76,29 +76,29 @@ cluswilcox.test.signedrank.rgl <- function(x, cluster, alternative,
     Var_t <- sumsq
     W_c <- T_c / sqrt(Var_t)
     P_val <- 2 * (1 - pnorm(abs(W_c)))
-    
+
     ADJUST <- FALSE
     names(T_c) <- "rank statistic"
     names(W_c) <- "test statistic"
     names(Var_t) <- "variance of rank statistic"
-    
+
     names(n) <- "total number of observations"
     names(m) <- "total number of clusters"
     names(Var_t) <- paste("Variance of ", names(T_c))
     result <- list(rstatistic = T_c, vrstatistic = Var_t, statistic = W_c,
-                   p.value = P <- val, n = n, cn = m, null.value = mu,
+                   p.value = P_val, n = n, cn = m, null.value = mu,
                    alternative = alternative,
                    data.name = DNAME, method = METHOD,
                    adjusted = ADJUST)
     class(result) <- "ctest"
     return(result)
   } else {
-    
+
       sumclusterrank <- c(by(data$signrank, data$cluster, sum))
       sumsq <- sum(sumclusterrank ^ 2)
       meansumrank <- sumclusterrank / cluster.size
       sumsqi <- sum(cluster.size ^ 2)
-      
+
       # calculate intraclass correlation between signed ranks within the same cluster
       data$cluster.f <- as.factor(data$cluster)
       mod <- lm(signrank ~ cluster.f, data, y = TRUE)
@@ -107,7 +107,7 @@ cluswilcox.test.signedrank.rgl <- function(x, cluster, alternative,
       modeldf <- n - errordf - 1
       modelss <- sum((mod$y - mean(mod$y)) ^ 2) - errorss
       sumi <- n
-      
+
       m0 <- (sumi - (sumsqi / sumi)) / (m - 1)
       totalss <- errorss + modelss
       totaldf <- errordf + modeldf
@@ -135,12 +135,12 @@ cluswilcox.test.signedrank.rgl <- function(x, cluster, alternative,
                       greater = pnorm(abs(W_c), lower.tail = FALSE),
                       two.sided = 2 * min(pnorm(abs(W_c)),
                                           pnorm(abs(W_c), lower.tail = FALSE)))
-      
+
       names(T_c) <- "adjusted rank statistic"
       names(W_c) <- "test statistic"
-      
+
       ADJUST <- TRUE
-      
+
       names(n) <- "total number of observations"
       names(m) <- "total number of clusters"
       names(Var_t) <- paste("Variance of ", names(T_c))
@@ -152,7 +152,7 @@ cluswilcox.test.signedrank.rgl <- function(x, cluster, alternative,
                      adjusted = ADJUST)
       class(result) <- "ctest"
       return(result)
- 
+
   }
   }
 }
@@ -174,7 +174,7 @@ cluswilcox.test.signedrank.ds <- function(x, cluster, alternative,
                     greater = pnorm(abs(Z), lower.tail = FALSE),
                     two.sided = 2 * min(pnorm(abs(Z)),
                                         pnorm(abs(Z), lower.tail = FALSE)))
-  
+
     names(n) <- "total number of observations"
     names(m) <- "total number of clusters"
     names(Z) <- "Test Statistic"

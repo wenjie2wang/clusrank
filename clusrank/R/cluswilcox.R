@@ -24,11 +24,11 @@
 ##'     the \code{rhs} of the form with special term ##' cluster(x1) +
 ##'     group(x2) + stratum(x3), where ##' x1, x2, x3 are the
 ##'     corresponding variables.
-##' @param data: an optional matrix or dataframe of data used in the
+##' @param data an optional matrix or dataframe of data used in the
 ##'     formula.
-##' @param subset: an optional vector specifying a subset of
+##' @param subset an optional vector specifying a subset of
 ##'     observations to be used.
-##' @param na.action: a function which indicates what should happen
+##' @param na.action a function which indicates what should happen
 ##'     when the data contain NAs. Defaults to getOption("na.action").
 ##' @param alternative A character string specifying the alternative
 ##'     hypothesis, must be one of \code{"two sided"} (default),
@@ -88,12 +88,13 @@
 #' @examples
 #' ## Clustered signed rank test using RGL method.
 #' data(crsd)
-#' cluswilcox.test(z, cluster = id, data = crsd)
-#' ## CLustered rank sum test using RGL method.
+#' cluswilcox.test(z, cluster = id, data = crsd, paired = TRUE)
+#' \dontrun{cluswilcox.test(z, cluster = id, data = crsd) ## Default is rank sum test.}
+#' ## Clustered rank sum test using RGL method.
 #' data(crd)
-#' cluswicox.test(z ~ cluster(id) + group(group), data = crd)
+#' cluswilcox.test(z ~ cluster(id) + group(group), data = crd)
 #' ## or
-#' cluswilcox.test(z, cluster = id, data = crd)
+#' cluswilcox.test(z, cluster = id, group = group, data = crd)
 #' @author Yujing Jiang
 #' @references
 #' Bernard Rosner, Robert J. Glynn, Mei-Ling Ting Lee(2006)
@@ -241,7 +242,7 @@ cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
                                     group = NULL, stratum = NULL, data = parent.frame(),
                                     alternative = c("two.sided", "less", "greater"),
                                     mu = 0, paired = FALSE, exact = NULL,
-                                    method = c("rgl", "ds"), DNAME = NULL) {
+                                    method = c("rgl", "ds"), DNAME = NULL, ...) {
     alternative <- match.arg(alternative)
     method <- match.arg(method)
       pars <- as.list(match.call()[-1])
