@@ -279,13 +279,13 @@ cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
             }
             DNAME <- paste0(DNAME, " from ", pars$data)
           } else {
-              DNAME <- deparse(substitute(x))
+              DNAME <- (pars$x)
               if(!is.null(y)) {
-                  DNAME <- paste(DNAME, "and", deparse(substitute(y)))
+                  DNAME <- paste(DNAME, "and", (pars$y))
                 }
 
                if(!is.null(cluster)) {
-                    DNAME <- paste0(DNAME, ", cluster id: ", deparse(substitute(cluster)))
+                    DNAME <- paste0(DNAME, ", cluster id: ", pars$cluster)
                }
               if(!is.null(pars$group)) {
                 DNAME <- paste0(DNAME, ", group: ", pars$group)
