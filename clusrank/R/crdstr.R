@@ -23,13 +23,16 @@
 #'
 #' Stratified data with clustering structure, Have some missing values.
 #'
-#' @format 
+#' @format
 #' A data frame with 956 observations on 4 variables.
-#' 
+#'
 #' [, 1] id      cluster id
+#'
 #' [, 2] z       score
+#'
 #' [, 3] group   group id
-#' [, 4] stratum stratum id 
+#'
+#' [, 4] stratum stratum id
 #'
 #' @name crdStr
 #' @docType data

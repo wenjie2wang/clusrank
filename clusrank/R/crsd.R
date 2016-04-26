@@ -26,11 +26,12 @@
 #'  The data is balanced.
 #'
 #' @format A data frame with 40 rows and 2 variables.
-#' 
-#' 
+#'
+#'
 #'   [, 1] id cluster id
+#'
 #'   [, 2] z  score difference
-#' 
+#'
 #'
 #' @name crsd
 #' @docType data

@@ -26,8 +26,9 @@
 #'  The data is unbalanced.
 #'
 #' @format A data frame with 748 rows and 2 variables.
-#' 
+#'
 #'   [, 1] id cluster id
+#'
 #'   [, 2] z  score difference
 #'
 #' @name crsdUnb
