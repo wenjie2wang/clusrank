@@ -76,7 +76,7 @@ Yujing Jiang\\ University of Connecticut \And
 
 
 \Abstract{
-Rank based tests are popular distribution-free alternatives to 
+Rank based tests are popular distribution-free alternatives to
 the popular one-sample and two-sample $t$-tests.
 For independent data, they are available in
 the \pkg{base} package of \proglang{R}.
@@ -85,13 +85,13 @@ the within-cluster dependence are recently developed, but no existing
 package provides all of them at one place with ease of access.
 In package \pkg{clusrank}, the latest developments are implemented
 and wrapped under a unified high-level user-friendly function.
-Different methods are dispatched based on an input formula, 
-offering great flexibility in handling various situations such as 
-unbalanced cluster sizes, presence of ties, stratified data, 
-and heterogeneous group members from the same cluster. 
+Different methods are dispatched based on an input formula,
+offering great flexibility in handling various situations such as
+unbalanced cluster sizes, presence of ties, stratified data,
+and heterogeneous group members from the same cluster.
 Methods based on both asymptotics for large samples and
 permutation for small samples are available.
-We present some details about the implemented methods and a 
+We present some details about the implemented methods and a
 comprehensive comparison of them in a simulation study.
 }
 
@@ -121,19 +121,19 @@ comprehensive comparison of them in a simulation study.
   University of Connecticut\\
   215 Glenbrook Rd. Unit 4120, Storrs, CT 06269, USA.\\
   Email: \email{yujing.jiang@uconn.edu}, \email{jun.yan@uconn.edu}
-  
+
   Xin He and Mei-Ling Ting Lee\\
   Department of Epidemiology and Biostatistics\\
   University of Maryland\\
   EPIB 2234R, SPH Building \#255,  College Park, MD 20742, USA.\\
   Email: \email{xinhe@umd.edu}, \email{mltlee@umd.edu}
-  
+
   Bernard Rosner\\
   Department of Biostatistics\\
   Harvard University\\
   180 Longwood Avenue,  Boston, Massachusetts 02115, USA\\
   Email: \email{stbar@channing.harvard.edu}
-  
+
 }
 %% It is also possible to add a telephone and fax number
 %% before the e-mail in the following format:
@@ -151,38 +151,39 @@ comprehensive comparison of them in a simulation study.
 %% include your article here, just as usual
 %% Note that you should use the \pkg{}, \proglang{} and \code{} commands.
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 
 \section{Introduction}
 
 Clustered data arise in many applications, where the
 data are grouped into independent clusters with correlated cluster members.
-In an eye study, for instance, the measurements from each individual consist a 
+In an eye study, for instance, the measurements from each individual consist a
 cluster.
-When the goal of a study is to compare two populations or the outcome of a 
-treatment to a baseline, standard Wilcoxon rank-sum test or signed rank test 
-are popular tools if the distribution of the data is non-normal or unknown. 
-However, these tests cannot be applied to clustered data directly since the 
-effective sample size of the clustered data will be different from the number 
-of observations due to non-zero intracluster correlation. As a consequence, the 
-p-value will be either under-estimated or over-estimated. 
+When the goal of a study is to compare two populations or the outcome of a
+treatment to a baseline, standard Wilcoxon rank-sum test or signed rank test
+are popular tools if the distribution of the data is non-normal or unknown.
+However, these tests cannot be applied to clustered data directly since the
+effective sample size of the clustered data will be different from the number
+of observations due to non-zero intracluster correlation. As a consequence, the
+p-value will be either under-estimated or over-estimated.
 
-Recent developments have extended the Wilcoxon rank-sum test 
-and signed rank test to clustered data. A Mann-Whitney U statistic for 
-clustered data was first proposed by \citet{Rosn:Grov:use:1999}. The variance 
-of the test statistic is corrected by four types of intra cluster correlation. 
-However, no large sample theory was proved. A large sample test statistic for 
-clustered data by conditioning on the cluster size was introduced in 
-\citet{Rosn:Glyn:Lee:inco:2003} with asymptotic normality of the null 
-distribution justified. This approach also allows data which are stratified by 
-an extra covariant.  However, this approach requires that, first, members from 
-the same cluster have to belong to the same group; second, there have to be 
-clusters from both group for each cluster size. These two requirements was 
-later removed in \citet{Datt:Satt:rank:2005}. Also Datta and Satten's approach 
+Recent developments have extended the Wilcoxon rank-sum test
+and signed rank test to clustered data. A Mann-Whitney U statistic for
+clustered data was first proposed by \citet{Rosn:Grov:use:1999}. The variance
+of the test statistic is corrected by four types of intra cluster correlation.
+However, no large sample theory was proved. A large sample test statistic for
+clustered data by conditioning on the cluster size was introduced in
+\citet{Rosn:Glyn:Lee:inco:2003} with asymptotic normality of the null
+distribution justified. This approach also allows data which are stratified by
+an extra covariant.  However, this approach requires that, first, members from
+the same cluster have to belong to the same group; second, there have to be
+clusters from both group for each cluster size. These two requirements was
+later removed in \citet{Datt:Satt:rank:2005}. Also Datta and Satten's approach
 allows comparison between $m(m \geq 3)$ groups. Though, their method is not
-able to compare the intracluster difference between two groups. More recently, 
-\citet{Rosn:Blyn:Lee:exte:2006} extended their approach to accommodate the 
-situation where members of a single cluster may subject to different 
-treatments. 
+able to compare the intracluster difference between two groups. More recently,
+\citet{Rosn:Blyn:Lee:exte:2006} extended their approach to accommodate the
+situation where members of a single cluster may subject to different
+treatments.
 
 For the one-sample problem (for univariate data), the Wilcoxon
 signed-rank test was extended to clusterd data in
@@ -210,7 +211,7 @@ signed rank test from \citet{Rosn:Glyn:Lee:wilc:2006} and
 
 %Large-sample inference based on asymptotic distribution of test
 %statistics and small-sample inference based on permutation are
-%provided for both rank sum test and signed rank test. 
+%provided for both rank sum test and signed rank test.
 %The tests provided can also handel unbalanced data when
 %there are clusters with different sizes.
 %In addition, for rank sum test, the effect of stratification as an
@@ -266,9 +267,9 @@ as following:
 
 To derive the sampling distribution of $W_{R}$, the clusters are
 further grouped according to the size, $g = 1, \ldots, G$. Equation
-\ref{eq:rglrs} can then be written as 
+\ref{eq:rglrs} can then be written as
 \begin{equation}\label{eq:rglrs1}
-  W_{R} = \sum_{g=1}^{G}\sum_{i \in I_g}\delta_{i}R_{i+} = \sum_{j = 1}^{G}}W_g,
+  W_{R} = \sum_{g=1}^{G}\sum_{i \in I_g}\delta_{i}R_{i+} = \sum_{j = 1}^{G}W_g,
 \end{equation}
 
 where $I_g$ is the set of indices of clusters whose size is $g$ and
@@ -282,7 +283,7 @@ $W_g$'s. For large sample test, the test statistic based on $W_{R}$ is
 \begin{equation}\label{eq:rlgrs2}
   Z_{R} = \frac{W_{R} - E(W_{R})}{\sqrt{V(W_{R})}},
 \end{equation}
-where $E(W_{R}) = \sum E(W_g)$, and $V(W_{R}) = \sum V(W_g)$. 
+where $E(W_{R}) = \sum E(W_g)$, and $V(W_{R}) = \sum V(W_g)$.
 
 In addition, if the data are stratified into $V$ strata, similar to
 \ref{eq:rglrs1}, $W_{R}$ can be expressed as
@@ -311,15 +312,15 @@ applied.
 The construction of the DS test statistic involves randomly picking an
 observation from each cluster, say, $X_i^*$ from the $i$th cluster to
 form a pseudo-sample. A Wilcoxon rank sum statistic is then
-constructed from this pseudo-sample, 
-\begin{equation*} 
+constructed from this pseudo-sample,
+\begin{equation*}
   W^* = \frac{1}{N+1}\sum^N_{i = 1}\delta_i^*R_i^*,
   \end{equation*}
 where $\delta_i^*$ is the indicator of whether $X_I^*$ is under
 treatment $1$ and $R_i^*$ is the rank of $X_i^*$ among the
 pseudo-sample. The scaling factor $1 / (N+1)$ is for the ease of
 derivation of test statistic.  By averaging $W^*$ over all possible
-pseudo-samples given $\{X_{ij}, \delta_{ij}\}$, 
+pseudo-samples given $\{X_{ij}, \delta_{ij}\}$,
 \begin{equation}\label{eq:dsrsS}
   S = E(W^*|\mathbf{X}, \mathbf{\delta})
   \end{equation}
@@ -334,7 +335,7 @@ group $j \in \{1, \ldots, m\}$, a rank sum statistic $S^{j}$ is
 defined as in \eqref{eq:dsrsS} with the superscript $(j)$ noting that
 the averaging is taken over the rank sum of the $j$th group of all
 possible pseudo-samples. Let $\mathbf{S}$ be the $m-$vector of
-components $S^{(j)}$. The test statistic is then defined as 
+components $S^{(j)}$. The test statistic is then defined as
 \begin{equation*}
   T_{D} = N^{-1}\{\mathbf{S} - E(\mathbf{S})\}^{T}\hat{\mathbf{V}}^-\{\mathbf{S} - E(\mathbf{S})\},
   \end{equation*}
@@ -373,13 +374,13 @@ remaining are unexposed.
 
 A small sample permutation test can then be performed following the
 above randomization scheme. The large sample test statistic is defined
-as the following: 
+as the following:
 \begin{equation*}
-  Z_{Rs} = \frac{W_{Rs} - E(W_{Rs})}{\hat{V}(W_{Rs)}^{1/2},
+  Z_{Rs} = \frac{W_{Rs} - E(W_{Rs})}{\hat{V}(W_{Rs)}^{1/2}},
     \end{equation*}
 which converges to an $N(0, 1)$ as $N \to \infty$
 \citep{Rosn:Glyn:Lee:exte:2006}.
-    
+
 A note is that this test is equivalent to the
 RGL test for balanced data when the treatment is assigned at the
 cluster level.
@@ -443,7 +444,7 @@ large sample test statistic is defined as
 where $V(T_{R}) = \sum_{i = 1}^NS_{i+}^2$.  The null distribution of
 $W_{R}$ converges to an $N(0, 1)$ as $N$ goes to infinity.
 
-For unbalanced data, \eqref{eq:rglsign} can be generalized as 
+For unbalanced data, \eqref{eq:rglsign} can be generalized as
 \begin{equation*}
   T_{R} = \sum_{i=1}^Ng_i\bar{S}_i, \quad \text{where} \bar{S}_i = S_{i+}/g_i,
   \end{equation*}
@@ -453,7 +454,7 @@ implemented in our package, is
 \begin{equation*}
   T_{Rs} = \sum_{i=1}^Nw_i\bar{S}_i,
   \end{equation*}
-where $w_i = 1/\var(\bar{S}_i)$ under $H_0$. The randomization
+where $w_i = 1/\VAR(\bar{S}_i)$ under $H_0$. The randomization
 distribution is derived similarly as \eqref{eq:rglsignd}, which is
 represented in the following:
 \begin{equation*}
@@ -486,13 +487,12 @@ form a pseudo-sample. Then test statistic is defined as
   T_{DS} = E^*\left(\sum_{i=1}^NR_i^*V_i^*\right)
   \end{equation*}
 where the superscript $*$ denote that the quantity is based on the
-pseudo-sample, the expectation is taken with respect to the observed data. 
-To handle ties, ranks are defined as 
+pseudo-sample, the expectation is taken with respect to the observed data.
+To handle ties, ranks are defined as
 \begin{equation*}
     R_i^* = \frac{1}{2}\left\{\sum_{i` = 1}^NI(|X_{i`}^*|\leq|X_i^*|)
-    +{\sum_{i` = 1}^NI(|X_{i`}^*|<|X_i^*| \right\}
+    +{\sum_{i` = 1}^NI(|X_{i`}^*|<|X_i^*} \right\}
 \end{equation*}
-<<<<<<< HEAD
 where $R_i^*$ is the rank of $X^*$ among the set $\{X_j^*, 1 \leq j \leq M\}$.
 But this test is inefficient since only one observation from each cluster
 is used. DS proposed a test statistic which is based on the average of $W^*$
@@ -555,8 +555,7 @@ The distribution of the clustered rank sum statistic $W_{c,obs}$ is
 \begin{equation}\label{eq:Wc}
 W_c = \sum^N_{i=1}\delta_iR_{i+} \quad \text{where   }R_{i+} = \sum^g_{j=1}R_{ij}
 \end{equation}
-=======
->>>>>>> 86d69944051eeaad02d5b02e435bf91729d28e02
+
 
 As for the DS rank sum test, the formulation of DS signed rank test
 does not allow small sample permutation test since it allows arbitraty
@@ -581,8 +580,6 @@ library(clusrank)
 data(crd)
 ## Using large-sample test.
 cluswilcox.test(z ~ group(group) + cluster(id), data = crd)
-## For small sample, using the permutation test.
-cluswilcox.test(z ~ group(group) + cluster(id), data = crd, permutation = TRUE)
 @
 
 
@@ -716,10 +713,7 @@ test.
 %' <<signed rank test for balanced data>>=
 %' ## Large sample signed rank test for clustered data
 %' data(crsd)
-%' cluswilcox.test(z, cluster = id, data = crsd)
-%' ## Small sample test
-%' data(crsd)
-%' cluswilcox.test(z, cluster = id, data = crsd, permutation = TRUE)
+%' cluswilcox.test(z, cluster = id, data = crsd, paired = TRUE)
 %' @
 
 \subsubsection{Unbalanced Data}
@@ -747,7 +741,7 @@ where $\hat{w}_i = g_i/[\widehat{Var}(S_{ij})\{1 + (g_i-1)\hat{\rho}_{s,cor}\}]$
 An illustration of use of the test is as following:
 <<signed rank test for unbalanced data>>=
 data(crsdUnb)
-cluswilcox.test(z, cluster = id, data = crsdUnb)
+cluswilcox.test(z, cluster = id, data = crsdUnb, paired = TRUE)
 @
 
 
@@ -803,8 +797,8 @@ cluswilcox.test(z, cluster = id, data = crsdUnb)
 %' of the complement factor H R1210C variant.
 %' The data set contains 7 variables: ID is the
 %' subject identifier which is the cluster id.
-%' 
-%' 
+%'
+%'
 %' <<CARMS score 1, 2, 3, 4>>=
 %' ## Carry out clustered rank sum test for the subset
 %' ## with CARMS grade 1, 2, 3 and 4.
@@ -812,7 +806,7 @@ cluswilcox.test(z, cluster = id, data = crsdUnb)
 %' cluswilcox.test(CARMS ~ cluster(ID) + stratum(Agesex) + group(Variant),
 %'                 data = sedlab, subset = CARMS %in% c(1, 2, 3, 4))
 %' @
-%' 
+%'
 %' <<CARMS score 1, 2, 3, 5>>=
 %' ## Carry out clustered rank sum test for the subset
 %' ## with CARMS grade 1, 2, 3 and 5.
@@ -820,7 +814,7 @@ cluswilcox.test(z, cluster = id, data = crsdUnb)
 %' cluswilcox.test(CARMS ~ cluster(ID) + stratum(Agesex) + group(Variant),
 %'                 data = sedlab, subset = CARMS %in% c(1, 2, 3, 5))
 %' @
-%' 
+%'
 %' When controlled for the stratification covariate \code{Agesex},
 %' the p-value for CARMS grades 1-4 is less than $0.001$,
 %' which implies strong correlation between the
