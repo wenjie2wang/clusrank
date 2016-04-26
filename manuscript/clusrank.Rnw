@@ -151,7 +151,6 @@ comprehensive comparison of them in a simulation study.
 %% include your article here, just as usual
 %% Note that you should use the \pkg{}, \proglang{} and \code{} commands.
 \begin{document}
-\SweaveOpts{concordance=TRUE}
 
 \section{Introduction}
 
@@ -249,7 +248,7 @@ treatment $2$. Clusters are assumed to be independent, while
 observations within each cluster are correlated.
 
 \subsection{RGL method: cluster-level treatment}
-The RGL Wilcoxon rank sum test in \cite{ROsn:Glyn:Lee:inco:2003} was
+The RGL Wilcoxon rank sum test in \cite{Rosn:Glyn:Lee:inco:2003} was
 designed for the scenario in which treatment is assigned at cluster
 level, e,g., when both eyes of the same patient receive the same
 treatment. Therefore we denote the treatment indicator for the $i$th
@@ -359,7 +358,9 @@ of the asymptotic theory.
 \subsection{RGL method extension: treatment assigned at subunit level}
 
 Another test for the case when the treatment is assigned at subunit
-level was proposed by \citet{Rosn:Glyn:Lee:exte:2006}. Two test
+level was proposed by 
+%\citet{Rosn:Glyn:Lee:exte:2006}. 
+Two test
 statistics were constructed for balanced and unbalanced data
 respectively. For balanced data, the Wilcoxon rank sum statistic is
 \begin{equation*}
@@ -477,7 +478,7 @@ distribution of $X_{ij}$.
 
 
 \subsection{DS signed rank test}\label{sec:dssign}
-\citet{Datt:Satt:sign:2006} applied the general principle of within
+\citet{Datt:Satt:sign:2008} applied the general principle of within
 cluster resampling to obtain a signed rank test, which allows the
 cluster size distribution to be informative as long as the marginal
 distribution of $X_{ij}$ is identical, denoted with $F$.  From each
