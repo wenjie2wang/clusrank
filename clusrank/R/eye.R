@@ -47,7 +47,7 @@
 #'   5: agegroup = 2, sex = 2; 6: agegroup = 3, sex = 2;
 #' }
 #'
-#'@name sedlab
+#'@name eye
 #' @format A data frame with 283 rows and 2 variables
 #' @note CARMS grades were assessed separately for
 #' the two advanced stages (4 and 5):
