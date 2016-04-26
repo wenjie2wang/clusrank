@@ -61,7 +61,7 @@ cluswilcox.test.signedrank.rgl <- function(x, cluster, alternative,
 
     names(n) <- "total number of observations"
     names(m) <- "total number of clusters"
-    result <- list(rstatistic = Tc,
+    result <- list(Rstat = Tc,
                    p.value = pval, n = n, cn = m, null.value = mu,
                    alternative = alternative,
                    data.name = DNAME, method = METHOD)
@@ -85,7 +85,7 @@ cluswilcox.test.signedrank.rgl <- function(x, cluster, alternative,
     names(n) <- "total number of observations"
     names(m) <- "total number of clusters"
     names(Var_t) <- paste("Variance of ", names(T_c))
-    result <- list(rstatistic = T_c, vrstatistic = Var_t, statistic = W_c,
+    result <- list(Rstat = T_c, VRstat = Var_t, statistic = W_c,
                    p.value = P_val, n = n, cn = m, null.value = mu,
                    alternative = alternative,
                    data.name = DNAME, method = METHOD,
@@ -144,7 +144,7 @@ cluswilcox.test.signedrank.rgl <- function(x, cluster, alternative,
       names(n) <- "total number of observations"
       names(m) <- "total number of clusters"
       names(Var_t) <- paste("Variance of ", names(T_c))
-      result <- list(rstatistic = T_c, vrstatistic = Var_t, statistic = W_c,
+      result <- list(Rstat = T_c, VRstat = Var_t, statistic = W_c,
                      p.value = P_val, n = n, cn = m,
                      alternative = alternative,
                      null.value = mu,

@@ -49,19 +49,19 @@ print.ctest <- function (x, digits = getOption("digits"), prefix = "\t", ...)
   cat("\n")
   cat("data:  ", x$data.name, "\n", sep = "")
   out <- character()
-  if (!is.null(x$rstatistic)){
-     cat(paste(names(x$rstatistic), "=", format(signif(x$rstatistic,
+  if (!is.null(x$Rstat)){
+     cat(paste(names(x$Rstat), "=", format(signif(x$Rstat,
                                                                 max(1L, digits - 2L)))))
   cat("\n")
   }
-  if (!is.null(x$erstatistic)){
-    cat( paste(names(x$erstatistic), "=", format(signif(x$erstatistic,
+  if (!is.null(x$ERstat)){
+    cat( paste(names(x$ERstat), "=", format(signif(x$ERstat,
                                                                 max(1L, digits - 2L)))))
 
   cat("\n")}
 
-  if (!is.null(x$vrstatistic)){
-    cat(paste(names(x$vrstatistic), "=", format(signif(x$vrstatistic,
+  if (!is.null(x$VRstat)){
+    cat(paste(names(x$VRstat), "=", format(signif(x$VRstat,
                                                                  max(1L, digits - 2L)))))
   cat("\n")}
 

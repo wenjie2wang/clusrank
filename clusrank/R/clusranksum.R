@@ -80,7 +80,7 @@ cluswilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
 
         names(Wc) <- "Rank sum statistic"
 
-        result <- list(rstatistic = Wc, p.value = pval,
+        result <- list(Rstat = Wc, p.value = pval,
                        null.value = mu, alternative = alternative,
                        data.name = DNAME, method = METHOD,
                        balance = bal)
@@ -135,8 +135,8 @@ cluswilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
         names(VarWc) <- "Variance of rank sum statistic"
         names(Zc) <- "Test statistic"
         names(mu) <- "difference in locations"
-        result <- list(rstatistic = Wc, erstatistic = EWc,
-                 vrstatistic = VarWc,
+        result <- list(Rstat = Wc, ERstat = EWc,
+                 VRstat = VarWc,
                  statistic = Zc, p.value = pval,
                  alternative = alternative,
                  null.value = mu,
@@ -192,8 +192,8 @@ cluswilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
         names(VarWc) <- "Variance of rank sum statistic"
         names(Zc) <- "Test statistic"
         names(mu) <- "difference in locations"
-        result <- list(rstatistic = Wc, erstatistic = EWc,
-                 vrstatistic = VarWc,
+        result <- list(Rstat = Wc, ERstat = EWc,
+                 VRstat = VarWc,
                  statistic = Zc, p.value = pval,
                  alternative = alternative,
                  null.value = mu,

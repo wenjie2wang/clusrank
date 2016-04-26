@@ -73,9 +73,9 @@
 ##'
 ##' @return A list with class \code{"ctest"}.
 ##'
-##' \item{rstatistic}{The value of the rank statistic with a name discribing it}
-##' \item{erstatistic}{The expectation of the rank statistic}
-##' \item{vrstatistic}{The variance of the rank statistic}
+##' \item{Rstat}{The value of the rank statistic with a name discribing it}
+##' \item{ERstat}{The expectation of the rank statistic}
+##' \item{VRstat}{The variance of the rank statistic}
 ##' \item{statistic}{The value of the test statistic}
 ##' \item{p.value}{The p-value for the test}
 ##' \item{null.value}{The location parameter \code{mu}}
