@@ -62,7 +62,7 @@
 ##' clutering in the data. Both \code{"rgl"} and \code{"ds"} method
 ##' support unbalanced data (cluster size varies) and individual level
 ##' treatment assignment.
-##' 
+##'
 ##' If \code{method} is \code{"rgl"}, then a strafication variable,
 ##' \code{stratum}, is allowed for the clustered Wilcoxon rank sum
 ##' test.
@@ -104,13 +104,24 @@
 #' \emph{Incorporation of Clustering Effects for the Wilcoxon Rank
 #' Sum Test: A Large-Sample Approach.} Biometrics, \bold{59}, 1089-1098.
 #'
-#' 
+#'
 #' @importFrom  stats complete.cases na.omit terms complete.cases model.extract aggregate
 #' @importFrom MASS ginv
 #' @export
 
 cluswilcox.test <- function(x, ...) {
-    UseMethod("wilcox.test")
+   pars <- as.list(match.call()[-1])
+   if(!is.null(pars$data)) {
+     data.temp <- eval(pars$data, parent.frame())
+   }
+   if(!is.null(data.temp)) {
+     if(is.data.frame(data.temp) & as.character(pars$x) %in% names(data.temp)) {
+       x <- data.temp[, as.character(pars$x)]
+     } else if(is.matrix(data.temp) & as.character(pars$x) %in% colnames(data.temp)) {
+       x <- data.temp[, as.character(pars$x)]
+     }
+   }
+    UseMethod("cluswilcox.test", x)
 }
 
 
@@ -131,7 +142,7 @@ cluswilcox.test.formula <- function(formula, data = NULL, subset = NULL, na.acti
     } else {
         DNAME <- NULL
     }
-    
+
     if(is.matrix(eval(m$data, parent.frame()))) {
         m$data <- as.data.frame(data)
     }
@@ -141,10 +152,10 @@ cluswilcox.test.formula <- function(formula, data = NULL, subset = NULL, na.acti
     m$formula <- if(missing(data))
     terms(formula, special)
                  else terms(formula, special, data = data)
-    
+
     mf <- eval(m, parent.frame())
     Terms <- terms(mf)
-    
+
     x.name <- rownames(attr(m$formula, "factors"))[1]
     DNAME <- paste0(paste(x.name, "from", m$data), ",")
     response <- attr(attr(mf, "terms"), "response")
@@ -174,7 +185,7 @@ cluswilcox.test.formula <- function(formula, data = NULL, subset = NULL, na.acti
 
     group <- recoderFunc(group.keep, group.uniq, c(1 : group.uniq.l))
   }
-    
+
     cluster <- attr(attr(mf, "terms"), "specials")$cluster
      if(length(cluster)) {
     ctemp <- untangle.specials(Terms, "cluster", 1)
@@ -203,8 +214,8 @@ cluswilcox.test.formula <- function(formula, data = NULL, subset = NULL, na.acti
   } else {
     cluster <- c(1 : n.obs)
   }
-    
-        
+
+
 
     stratum <- attr(attr(mf, "terms"), "specials")$stratum
     if(!is.null(stratum)) {
@@ -222,12 +233,12 @@ cluswilcox.test.formula <- function(formula, data = NULL, subset = NULL, na.acti
 }
 
 
-#' @method cluswilcox.test default   
+#' @method cluswilcox.test default
 #' @describeIn cluswilcox.test Default \code{S3} method.
 #' @export
 
 cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
-                                    group = NULL, stratum = NULL,
+                                    group = NULL, stratum = NULL, data = parent.frame(),
                                     alternative = c("two.sided", "less", "greater"),
                                     mu = 0, paired = FALSE, exact = NULL,
                                     method = c("rgl", "ds"), DNAME = NULL) {
@@ -237,21 +248,56 @@ cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
 
     if (!missing(mu) && ((length(mu) > 1L) || !is.finite(mu)))
     stop("'mu' must be a single number")
+      if(!is.null(pars$data)) {
+            x <- data[, as.character(pars$x)]
+            DNAME <- (pars$x)
+
+              if(!is.null(pars$y)) {
+                  y <- data[, as.character(pars$y)]
+                  DNAME <- paste(DNAME, "and", pars$y)
+                } else {
+                    y <- NULL
+                  }
+            if(!is.null(pars$cluster)) {
+                cluster <- data[, as.character(pars$cluster)]
+                DNAME <- paste0(DNAME, ", cluster: ", pars$cluster)
+              } else {
+                  cluster <- NULL
+              }
+            if(!is.null(pars$group)) {
+              group <- data[, as.character(pars$group)]
+              DNAME <- paste0(DNAME, ", group: ", pars$group)
+            } else {
+              group <- NULL
+            }
+            if(!is.null(pars$stratum)) {
+              stratum <- data[, as.character(pars$stratum)]
+              DNAME <- paste0(DNAME, ", stratum: ", pars$stratum)
+            } else {
+              stratum <- NULL
+            }
+            DNAME <- paste0(DNAME, " from ", pars$data)
+          } else {
+              DNAME <- deparse(substitute(x))
+              if(!is.null(y)) {
+                  DNAME <- paste(DNAME, "and", deparse(substitute(y)))
+                }
+
+               if(!is.null(cluster)) {
+                    DNAME <- paste0(DNAME, ", cluster id: ", deparse(substitute(cluster)))
+               }
+              if(!is.null(pars$group)) {
+                DNAME <- paste0(DNAME, ", group: ", pars$group)
+              }
+              if(!is.null(pars$stratum)) {
+                DNAME <- paste0(DNAME, ", stratum: ", pars$stratum)
+              }
+            }
     if(!is.numeric(x)){
         stop("'x' must be numeric")
     }
-    if(is.null(DNAME)) {
-         DNAME <- (pars$x)
 
-    if(!is.null(pars$y)) {
-      DNAME <- paste(DNAME, "and", pars$y)
-    }
-    if(!is.null(pars$cluster)) {
-      DNAME <- paste0(DNAME, ", cluster: ", pars$cluster)
-    }
-    }
-    
-    
+
 
     if(!is.null(y)) {
         if(!is.numeric(y)) {
@@ -307,27 +353,27 @@ cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
            arglist <- setNames(list(x, cluster, alternative, mu, METHOD,
                                     DNAME, exact),
                             c("x", "cluster", "alternative",
-                              "mu", 
+                              "mu",
                               "METHOD", "DNAME",  "exact"))
             result <- do.call("cluswilcox.test.signedrank.rgl", c(arglist))
             return(result)
         }
-        
+
         if(toupper(method) == "DS") {
             METHOD <- paste(METHOD, "using DS method", sep = " ")
              arglist <- setNames(list(x, cluster, alternative, METHOD, DNAME),
                             c("x", "cluster", "alternative",
-                              "mu", 
+                              "mu",
                               "METHOD", "DNAME"))
            result <-  do.call("cluswilcox.test.signedrank.ds",
                               c(arglist))
            return(result)
         }
-        
+
         else {
             stop("Method should be one of 'rgl' and 'ds'")
         }
-        
+
     } else {
         METHOD <- "Clustered Wilcoxon rank sum test"
         if(toupper(method) == "RGL") {
@@ -340,7 +386,7 @@ cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
             result <- do.call("cluswilcox.test.ranksum.rgl", c(arglist))
             return(result)
         }
-        
+
         if(toupper(method) == "DS") {
             METHOD <- paste( METHOD, "using Datta-Satten method", sep = " ")
              arglist <- setNames(list(x, cluster, group, alternative,
@@ -354,12 +400,12 @@ cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
             result <- do.call("cluswilcox.test.ranksum.ds", c(arglist))
             return(result)
         }
-        
+
         else {
             stop("Method should be one of 'rgl' and 'ds'")
         }
     }
 }
-        
-        
-    
+
+
+
