@@ -227,89 +227,272 @@ study. THe last section discusses possible extensions of the package.
 
 
 
-\textbf{the name sedlab is a poor choice.}
 
 
-\section{Rank-Based Tests for Clustered Data}
-\label{sec:test} 
+
+
+
 %% note the label style. It helps to distinguish from
 %% table or figure labels.
 
 
-\subsection{Wilcoxon Rank Sum Test}
-\label{ranksum} % DO NOT define if it is not used.
+\section{Wilcoxon Rank Sum Test}
+\label{sec:ranksum} % DO NOT define if it is not used.
 
-Let $X_{ij}$ denote the $i$th observation in the $j$th cluster,
-$1 \leq i \leq N$, $1 \leq j \leq g_i $. There are $N$ clusters
-in total, the $i$th cluster contains $g_i$ observations.
-Let $\delta_{ij}$ denote the treatment placed on $X_{ij}$,
-$\delta{ij} = 1$ if $X_{ij}$ is under treatment $1$,
-$\delta{ij} = 0$ if $X_{ij}$ is under treatment $2$.
-(The DS method is able to compare $m$ groups.)
-\subsubsection{RGL method: unbalanced data}
-The RGL method requires that all individuals in a single
-cluster belong to the same treatment group, i.e., the
-group membership indicators $\delta_{ij}$ for observations in
-the $i$th cluster take a identical value, thus we denote the group membership
-of the $i$th cluster as $\delta_{i}$.
-Let $N_g$ and $m_g$ denote the number of clusters and number of clusters under
-treatment 1 with cluster size $g$, respectivly, $g \in \{1, \ldots, g_{max}\}$.
-It is also assumed
-the observations within any single cluster are exchangable.
-Let $R_{ij}$ denote the rank of each observation among all observations.
-Then the test statistic $W_{rgl}$ is defined as
-$$W_{rgl} = \sum_{i,j}\delta_{ij}R_[ij] = \sum_{i}\delta_iR_{i+}$$,
-which is exactly the same as the standard Wilcoxon rank sum test.
-The sampling distribution of this test statistic is derived by
-conditioning on the cluster size and the number of clusters under treatment $1$
-for that specific sample size, i.e., all the clusters are
-first stratified based on their cluster size, then the sampling
-distribution of each stratum is obtained. Because clusters
-are assume to be independent, the expectation and
-variance of $W_{rgl}$ are obtained by combining the corresponding
-quantities of each stratum. Therefore,
+Let $X_{ij}$ denote the $i$th observation in the $j$th cluster, $1
+\leq i \leq N$, $1 \leq j \leq n_i$. There are $N$ clusters in total,
+the $i$th cluster contains $n_i$ observations.  Let $\delta_{ij}$
+denote the treatment placed on $X_{ij}$, $\delta{ij} = 1$ if $X_{ij}$
+is under treatment $1$, $\delta{ij} = 0$ if $X_{ij}$ is under
+treatment $2$. Clusters are assumed to be independent, while
+observations within each cluster are correlated.
+
+\subsection{RGL method: cluster-level treatment}
+The RGL Wilcoxon rank sum test in \cite{ROsn:Glyn:Lee:inco:2003} was
+designed for the scenario in which treatment is assigned at cluster
+level, e,g., when both eyes of the same patient receive the same
+treatment. Therefore we denote the treatment indicator for the $i$th
+cluster as $\delta_i$ for the illustration of RGL method. The RGL
+method allows the cluster size to vary. In addition, the effect of
+stratification, if exists, can also be accounted for.  Let $R_{ij}$
+denote the rank of $X_{ij}$ among all the observations, $R_{i+} =
+\sum_{j=1}^{n_i}R_{ij}$ denote the sum of observed ranks of
+individuals in the $i$th cluster.  The Wilcoxon rank sum statistic is
+as following:
+
+\begin{equation}\label{eq:rglrs}
+  W_{R} = \sum_{i=1}^N\sum_{j=1}^{g_i}\delta_{ij}R_{ij} = \sum_{i = 1}^N\delta_{i}R_{i+}
+  \end{equation}
+
+To derive the sampling distribution of $W_{R}$, the clusters are
+further grouped according to the size, $g = 1, \ldots, G$. Equation
+\ref{eq:rglrs} can then be written as 
+\begin{equation}\label{eq:rglrs1}
+  W_{R} = \sum_{g=1}^{G}\sum_{i \in I_g}\delta_{i}R_{i+} = \sum_{j = 1}^{G}}W_g,
+\end{equation}
+
+where $I_g$ is the set of indices of clusters whose size is $g$ and
+$W_g = \sum_{i \in I_g}\delta_iR_{i+}$.  Assuming for each of these
+groups, $m_g$ clusters are assigned to treatment $1$, the rest $n_g$
+clusters to treatment $2$. Therefore, under $H_0$, $\sum_{i \in
+  I_g}\delta_{i} = m_g$ and $P(\delta_{i} = 1, i \in I_g) =
+m_g/N_g$. The null distribution of $W_{R}$, conditioning on $R_{i+}$'s,
+under permutation is obtained by combining all possible permutation of
+$W_g$'s. For large sample test, the test statistic based on $W_{R}$ is
+\begin{equation}\label{eq:rlgrs2}
+  Z_{R} = \frac{W_{R} - E(W_{R})}{\sqrt{V(W_{R})}},
+\end{equation}
+where $E(W_{R}) = \sum E(W_g)$, and $V(W_{R}) = \sum V(W_g)$. 
+
+In addition, if the data are stratified into $V$ strata, similar to
+\ref{eq:rglrs1}, $W_{R}$ can be expressed as
 \begin{equation*}
-E(W_{rgl}) = \sum_{g = 1}^{g_{max}}m_g(R_{++,g} / N_g)
-\end{equation*}
+  W_{R} = \sum_{v = 1}^V\sum_{g = 1}^{G}\sum_{i \in I_{g,v}}\delta_iR_{i+},
+  \end{equation*}
+where $I_{g,v}$ is the set of indices of clusters in the $v$th stratum
+with cluster size $g$. The permutation test and large sample test can
+be derived similarly as above.
+
+One pitfall for RGL rank sum test is that, since this method compares
+treatment effects at each cluster level, the imbalance in the
+distribution of treatment across cluster size strata will result in
+inefficiency. Additionally, the RGL rank sum test for clustered data
+where treatment is assigned at cluster level performs best when
+correlation is weak, due to the decrease in the effective number of
+independent observations as the correlation increases.
+
+\subsection{DS rank sum test}
+The above RGL rank sum test for clustered data can only be applied
+when cluster is the unit of randomization of treatment assignment.
+When the treatment is assigned at the subunit level instead of the
+cluster level, the DS rank sum test \citep{Datt:Satt:rank:2005} can be
+applied.
+
+The construction of the DS test statistic involves randomly picking an
+observation from each cluster, say, $X_i^*$ from the $i$th cluster to
+form a pseudo-sample. A Wilcoxon rank sum statistic is then
+constructed from this pseudo-sample, 
+\begin{equation*} 
+  W^* = \frac{1}{N+1}\sum^N_{i = 1}\delta_i^*R_i^*,
+  \end{equation*}
+where $\delta_i^*$ is the indicator of whether $X_I^*$ is under
+treatment $1$ and $R_i^*$ is the rank of $X_i^*$ among the
+pseudo-sample. The scaling factor $1 / (N+1)$ is for the ease of
+derivation of test statistic.  By averaging $W^*$ over all possible
+pseudo-samples given $\{X_{ij}, \delta_{ij}\}$, 
+\begin{equation}\label{eq:dsrsS}
+  S = E(W^*|\mathbf{X}, \mathbf{\delta})
+  \end{equation}
+a large sample test statistic is constructed as
 \begin{equation*}
-Var(W_{rgl}) = \sum_{g = 1} ^ {g_{max}}[m_g(N_g - m_g) / \{N_g{N_g - 1}\}]
-\sum_{i = 1}^{N_g}(R_{i+,g} - R_{++,g} / N_g)^2
-\end{equation*}
+  Z_{D} = \frac{S - E(S)}{\sqrt{\hat{V}(S)}},
+  \end{equation*}
+
+This method can also be generalized to the comparison of location
+among $m$ treatment groups, $m \geq 3$. More specifically, for each
+group $j \in \{1, \ldots, m\}$, a rank sum statistic $S^{j}$ is
+defined as in \eqref{eq:dsrsS} with the superscript $(j)$ noting that
+the averaging is taken over the rank sum of the $j$th group of all
+possible pseudo-samples. Let $\mathbf{S}$ be the $m-$vector of
+components $S^{(j)}$. The test statistic is then defined as 
+\begin{equation*}
+  T_{D} = N^{-1}\{\mathbf{S} - E(\mathbf{S})\}^{T}\hat{\mathbf{V}}^-\{\mathbf{S} - E(\mathbf{S})\},
+  \end{equation*}
+where the expectation is taken componentwise, and
+$N^{-1}\hat{\mathbf{V}}^-$ is the generalized inverse of the estimate
+of the covariance matrix of $\mathbf{S}$.  The large sample test
+statistic $T_D$ follows a chi-squared distribution with degrees of
+freedom $m - 1$.
+
+This method allows arbitrary dependence structure within each cluster
+and also works when treatment affects the correlation structure.
+Making no assumption on the intra-cluster dependence structure,
+however, renders it impossible to derive a small sample permutation
+test for DS rank sum statistic.  In addition, it cannot be applied to
+data which are strictly contralateral, e.g., when all subjects under
+an eye study has one eye under treatment $1$ and the other eye under
+treatment $2$, due to the failure of the satisfying the requirements
+of the asymptotic theory.
 
 
-RGL statistic is also capable of dealing with extra stratification
-covariate coming with the scores, e.g., data from multiple medical centers where
-each center can be treated as a stratum. The derivation of the
-$E(W_{rgl})$ and $Var(W_{rgl})$ is very similar to the derivation for
-unbalanced data. On the basis of the stratums defined by the cluster
-size, each stratum is further stratified by the stratifying
-covariate. The expectation and variance of the test statistic
-restricted to each of these strata is computed by treating each
-restriction as an ordinary Wilcoxon rank sum test. Assume there are
-$V$ strata, the expectation and variance of $W_{rgl}$ are
+\subsection{RGL method extension: treatment assigned at subunit level}
+
+Another test for the case when the treatment is assigned at subunit
+level was proposed by \citet{Rosn:Glyn:Lee:exte:2006}. Two test
+statistics were constructed for balanced and unbalanced data
+respectively. For balanced data, the Wilcoxon rank sum statistic is
 \begin{equation*}
-E(W_{rgl}) = \sum^{g_{max}}_{g = 1}\sum_{v =
-1}^{V}m_{g,v}R_{++, g, v} / N_{g,v}
-\end{equation*}
+  W_{Rs} = \sum_{i = 1}^N\sum_{j=1}^g\delta_{ij}R_{ij},
+  \end{equation*}
+The sampling distribution of $W_{Rs}$ is derived by assuming that the
+data are generated in two stages: first, each cluster are randomly
+assigned to have $q$ subunits to be exposed under treatment $1$
+according to the observed exposure distribution of $Q$, a random $q$
+out of $g$ subunits are then assigned the treatment $1$ while the
+remaining are unexposed.
+
+A small sample permutation test can then be performed following the
+above randomization scheme. The large sample test statistic is defined
+as the following: 
 \begin{equation*}
-Var(W_{rgl}) = \sum^{g_{max}}_{g=1}\sum_{v = 1}^V[m_{g,v}(N_{g,v} -
-m_{g,v}) / \{N_{g,v}(N_{g,v} - 1)\}]\times\sum^{N_{g,v}}_{i=1}(R_{i+, g, v} - R_{++,g,v}/N_{g,v})^2
-\end{equation*}
-The large sample test statistic with asymptotic normality
-is defined as $$Z_{rgl} = \frac{W_{rgl} - E(W_{rlg})}{VAR(W_{rgl})^{1/2}}$$.
+  Z_{Rs} = \frac{W_{Rs} - E(W_{Rs})}{\hat{V}(W_{Rs)}^{1/2},
+    \end{equation*}
+which converges to an $N(0, 1)$ as $N \to \infty$
+\citep{Rosn:Glyn:Lee:exte:2006}.
+    
+A note is that this test is equivalent to the
+RGL test for balanced data when the treatment is assigned at the
+cluster level.
+
+For unbalanced data, the test statistic involves splitting the
+clusters according to the cluster size and applying the 2-stage
+randomization within each stratum. The test statistic is a weighted
+average of estimated probability that an observation under treatment
+$1$ is greater than that of an observation without treatment $1$
+within each cluster group, i.e., $\theta^{(g)} = P(X_{ij}^{(g)} >
+X_{kl}^{(g)})$, where $X_{ij}^{(g)}$ is from treatment group $1$ and
+$X_{kl}^{(g)}$ from treatment group $2$, and the superscript refers to
+the size of the cluster the observation belongs to, with the weight as
+$1 / V(\hat{\theta}^{(g)})$. A common underlying rank correlation is
+assumed across all clusters in the estimation of $V(\hat{\theta}^{(g)})$.
+
+
+\section{Wilcoxon signed rank test}\label{sec:signrank}
+Suppose each cluster consists of pairs which record the observed pre-
+and post-treatment scores on the same individual. Let $X_{ij}$ be the
+pair-difference for the $j$th pair in the $i$th cluster, $i = 1,
+\ldots, N$, $j = 1, \ldots, n_i$. We assume that the clusters are
+independent while the pair-difference within each cluster are
+correlated. The null hypothesis we want to test is that the marginal
+distribution of $X_{ij}$ is symmetric around $0$, i.e., the treatment
+does not shift the location of the distribution of the baseline
+score. Note that for signed rank test, there is no issue on the group
+membership of each observation as for the rank sum test where subunit
+treatment group membership can lead to a different way of testing.
+
+\subsection{RGL signed rank test}\label{sec:rglsign}
+Assuming an exchangeable correlation structure within each cluster,
+\citet{Rosn:Glyn:Lee:wilc:2006} proposed two Wilcoxon signed rank
+tests for balanced and unbalanced data respectively. Let $R_{ij}$ be
+the rank of $|X_{ij}|$ among $\{|X_{ij}|, i = 1, \ldots, N, j = 1
+\ldots, n_i\}$, $V_{ij} = \text{sign}(X_{ij})$ and $S_{ij} =
+V_{ij}R_{ij}$ be the signed rank. In addition, $ 1 \leq n_i \leq G $.
+
+For balanced data, the clustered WIlcoxon signed rank statistic is
+defined as
+\begin{equation*}\label{eq:rglsign}
+  T_{R} = \sum_{i=1}^NS_{i+} \equiv \sum_{i=1}^N\sum_{j=1}^gR_{ij}V_{ij},
+  \end{equation*}
+where $S_{i+} = \sum^g_{j=1}S_{ij}$ and only nonzero $X_{ij}$ is
+considered in the computation of signed ranks. Since the cluster sizes
+are identical for balanced data, $n_i = G$, $i = 1, \ldots, N$.
+
+
+Assuming a design in which the unit of randomization is the cluster,
+the sampling distribution of $T_{R}$ is then expressed by
+\begin{equation}\label{eq:rglsignd}
+  T_{R} = \sum_{i=1}^N\delta_iS_{i+},
+  \end{equation}
+where $\delta_i$ are i.i.d. random variable each taking on the values
+$+1$ and $-1$ with equal probability under $H_0$. Therefore, if $N$ is
+small, a permutation test can be performed.  When $N$ is large, a
+large sample test statistic is defined as
+\begin{equation*}
+  W_{R} = \frac{T_{R}}{\sqrt{V(T_{R})}},
+  \end{equation*}
+where $V(T_{R}) = \sum_{i = 1}^NS_{i+}^2$.  The null distribution of
+$W_{R}$ converges to an $N(0, 1)$ as $N$ goes to infinity.
+
+For unbalanced data, \eqref{eq:rglsign} can be generalized as 
+\begin{equation*}
+  T_{R} = \sum_{i=1}^Ng_i\bar{S}_i, \quad \text{where} \bar{S}_i = S_{i+}/g_i,
+  \end{equation*}
+which is a weighted average of $\bar{S}_{i}$ with weights in proportion
+to the cluster size. A more efficient contruction, which is the one
+implemented in our package, is
+\begin{equation*}
+  T_{Rs} = \sum_{i=1}^Nw_i\bar{S}_i,
+  \end{equation*}
+where $w_i = 1/\var(\bar{S}_i)$ under $H_0$. The randomization
+distribution is derived similarly as \eqref{eq:rglsignd}, which is
+represented in the following:
+\begin{equation*}
+  T_{Rs} = \sum_{i=1}^N\delta_iw_i\bar{S}_i,
+  \end{equation*}
+The expression above can be implemented for the permutation test.
+The large sample test statistic is defined as
+\begin{equation*}
+  W_{Rs} = \frac{T_{Rs}}{V(T_{Rs})^{1/2}}
+  \end{equation*}
+The computation of $w_i$ uses the assumption of a common intracluster
+correlation structure. In addition, the RGL signed rank test is not
+suitable for data for which the cluster size is informative to the
+distribution of $X_{ij}$.
+
+
 
 \subsubsection{RGL method, group membership defined at the subunit level}
 
 
 
-\subsection{DS method: 2 group}
-DS construct another rank sum test based on a different idea from
-RGL's method. A single individual from each cluster is sampled,
-recorded as $X_i^*$ with its group membership $\delta_i^*$,
-$1 \leq i \leq M$. A WIlcoxon rank-sum statistic can be defined as
+\subsection{DS signed rank test}\label{sec:dssign}
+\citet{Datt:Satt:sign:2006} applied the general principle of within
+cluster resampling to obtain a signed rank test, which allows the
+cluster size distribution to be informative as long as the marginal
+distribution of $X_{ij}$ is identical, denoted with $F$.  From each
+cluster, a pair difference $X_{ij}$ is randomly picked and pooled to
+form a pseudo-sample. Then test statistic is defined as
 \begin{equation*}
-W^* = \frac{1}{M+1}\sum^M_{i=1}\delta^*_iR^*_i,
+  T_{DS} = E^*\left(\sum_{i=1}^NR_i^*V_i^*\right)
+  \end{equation*}
+where the superscript $*$ denote that the quantity is based on the
+pseudo-sample, the expectation is taken with respect to the observed data. 
+To handle ties, ranks are defined as 
+\begin{equation*}
+    R_i^* = \frac{1}{2}\left\{\sum_{i` = 1}^NI(|X_{i`}^*|\leq|X_i^*|)
+    +{\sum_{i` = 1}^NI(|X_{i`}^*|<|X_i^*| \right\}
 \end{equation*}
+<<<<<<< HEAD
 where $R_i^*$ is the rank of $X^*$ among the set $\{X_j^*, 1 \leq j \leq M\}$.
 But this test is inefficient since only one observation from each cluster
 is used. DS proposed a test statistic which is based on the average of $W^*$
@@ -372,90 +555,26 @@ The distribution of the clustered rank sum statistic $W_{c,obs}$ is
 \begin{equation}\label{eq:Wc}
 W_c = \sum^N_{i=1}\delta_iR_{i+} \quad \text{where   }R_{i+} = \sum^g_{j=1}R_{ij}
 \end{equation}
+=======
+>>>>>>> 86d69944051eeaad02d5b02e435bf91729d28e02
 
-where $R_{ij}=$rank of the $j$th subunit in the
-$i$th cluster among all $gN$ subunits over all $Z$ clusters. It is shown that under $H_0$,
-\begin{equation}\label{eq:EWc}
-E(W_c) = gm(gN + 1)/2
-\end{equation}
-and
-\begin{equation}\label{eq:VWc}
-\text{Var}(W_c) = [mn/\{N(N-1)\}]\sum^N_{i=1}\{R_{i+} - g(1+gN)/2\}^2
-\end{equation}
-So a natural large sample test statistic based on \eqref{eq:Wc}, \eqref{eq:EWc}, and \eqref{eq:VWc} is
-\begin{equation}
-Z_c = \{W_c - E(W_c)\}/\{\text{Var}(W_c)\}^{1/2}
-\end{equation}
-$Z_c$ is asymptotically normal if both $m \to \infty$ and $n \to \infty$.
-When the sample size is small, permutation test can be
-performed.
+As for the DS rank sum test, the formulation of DS signed rank test
+does not allow small sample permutation test since it allows arbitraty
+intracluster dependence structure.
 
 
-\subsubsection{Unbalanced data}\label{ubrank}
 
-For unbalanced designs, the null distribution
-of the sum of rank
-assigned to each cluster are not
-identically distributed across clusters
-with different sizes.
-Let $(m_g, n_g)=$ number of clusters of
-size $g$ assigned to the $X$ and $Y$ treatment
-respectively.
-Denote $N_g = m_g + n_g$ for $g=1,\ldots,g_{max}$
-as the total number of clusters for clusters with
-size $g$,
-and $N =\sum_{g=1}^{g_{max}}N_g$ as the total number
-of clusters in the sample.
-Let $R_{ij,g} = $ rank for the $j$th
-subunit in the $i$th cluster of size $g$,
-$g = 1, \ldots, g_{max},
-i = 1, \ldots, N_g, j = 1, \ldots, g$,
-where $R_{ij,g}$s are computed based on the
-combined sample.
-The rank sum statistic can then be
-written as:
-\begin{equation}
-W_{c, obs} = \sum_{g=1}^{g_{max}}
-\sum_{i\in I_{g, obs}}R_{i+, g}
-\end{equation}
-where $R_{i+,g}$ = sum of ranks of
-all subunits in the $i$th cluster of size $g$,
-$i = 1, \ldots, N_g$.
-The distribution corresponding to $W_{c, obs}$
-is
-\begin{equation}
-\label{eq:ubrankstat}
-W_c = = \sum_{g = 1}^{g_{max}}
- = \sum_{g = 1}^{g_max}\sum_{i = 1}^{N_g}\delta_{i, g}R_{i+, g}
-\end{equation}
-where $\delta_{i, g} = 1$ if the $i$th
-cluster of size $g$ is assigned to group $X$, and is $0$
-otherwise.
-The corresponding $E(W_c)$ and $\text{Var}(W_c)$ are
-as following:
-\begin{equation}\label{eq:uEWc}
-E(W_c) = \sum_{g=1}^{g_{max}}m_g(R_{++,g}/N_g)
-\end{equation}
-\begin{equation}\label{eq:uVWc}
-\text{Var}(W_c) = \sum_{g=1}^{g_{max}}[m_gn_g/\{N_g(N_g - 1)\}]\sum_{i=1}^{N_g}(R_{i+,g} - R_{++,g}/N_g)^2
-\end{equation}
-A large-sample test statistics based on $W_c$ is as following:
-\begin{equation}
-Z_c = \{W_c - E(W_c)\}/\{\text{Var}(W_c)\}^{1/2}
-\end{equation}
-Again, when sample size is small, permutation test can
-be applied based on \eqref{eq:ubrankstat}
 
-When applying the ranksum test for the clustered data,
-a formula is used as a interface where the response
-variable is on the righthand side and covariates on
-the lefthand side. Special functions \code{group},
-\code{cluster} and \code{stratum} are used to indicate
-the function of each variable, \code{group} indicates
-the id of the treatment group, \code{cluster} indicates
-the membership of an observation in a specific cluster
-and \code{stratum} indicates the stratum an observation
-belongs to.
+
+
+When applying the ranksum test for the clustered
+data, a formula is used as a interface where the response variable is
+on the righthand side and covariates on the lefthand side. Special
+functions \code{group}, \code{cluster} and \code{stratum} are used to
+indicate the function of each variable, \code{group} indicates the id
+of the treatment group, \code{cluster} indicates the membership of an
+observation in a specific cluster and \code{stratum} indicates the
+stratum an observation belongs to.
 
 <<rank sum test for unbalanced data>>=
 library(clusrank)
