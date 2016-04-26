@@ -19,21 +19,22 @@
 ##   along with the R package clusrank. If not, see <http://www.gnu.org/licenses/>.
 ##
 ################################################################################
-#'  Difference between pre and post treatment scores with clustering
-#'  structure with variable cluster size.
+#'  Difference between Pre and Post Treatment Scores with Clustering
+#'  Structure: Unbalanced
 #'
-#' Unbalanced data include 2 variables:
-#'  id, z.
+#'  Simulated clustered data with the difference of pre and post treatment scores recorded.
+#'  The data is unbalanced.
 #'
-#' \itemize{
-#'   \item id. cluster id
-#'   \item z. observed score
-#' }
+#' @format A data frame with 748 rows and 2 variables.
+#' 
+#'   [, 1] id cluster id
+#'   [, 2] z  score difference
 #'
 #' @name crsdUnb
-#' @format A data frame with 748 rows and 2 variables
+#' @docType data
 #' @source \url{https://sites.google.com/a/channing.harvard.edu
 #' /bernardrosner/channing/
 #' cluster-signed-rank-test-for
 #' -balancedunbalanced-design/sample-data-for-unbalanced-data-1}
+#' @keywords datasets internal
 NULL

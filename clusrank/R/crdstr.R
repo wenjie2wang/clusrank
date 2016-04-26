@@ -19,19 +19,20 @@
 ##   along with the R package clusrank. If not, see <http://www.gnu.org/licenses/>.
 ##
 ################################################################################
-#' Clustered stratified data
+#' Clustered Stratified Data for Testing the Clustered Rank Sum Test
 #'
-#' Stratified data for test with clustering structure
-#'  id, z, group, stratum. Have some missing values.
+#' Stratified data with clustering structure, Have some missing values.
 #'
-#' \itemize{
-#'   \item id. cluster id
-#'   \item z. observed score
-#'   \item group. group id
-#'   \item stratum. stratum id
-#' }
+#' @format 
+#' A data frame with 956 observations on 4 variables.
+#' 
+#' [, 1] id      cluster id
+#' [, 2] z       score
+#' [, 3] group   group id
+#' [, 4] stratum stratum id 
 #'
 #' @name crdStr
-#' @format A data frame with 956 rows and 4 variables
+#' @docType data
 #' @source \url{https://sites.google.com/a/channing.harvard.edu/bernardrosner/channing/incorporating-cluster-effects-for-the-wilcoxon-rank-sum-test-1/stratify--cluswilcox/sample-data}
+#' @keywords datasets internal
 NULL

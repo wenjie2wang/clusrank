@@ -19,20 +19,23 @@
 ##   along with the R package clusrank. If not, see <http://www.gnu.org/licenses/>.
 ##
 ################################################################################
-#'  Difference between pre and post treatment scores with clustering
-#'  structure.
+#'  Difference Between Pre and Post Treatment Scores with Clustering
+#'  Structure: Balanced
 #'
-#' Balanced data include 2 variables:
-#'  id, z.
+#'  Simulated clustered data with the difference of pre and post treatment scores recorded.
+#'  The data is balanced.
 #'
-#' \itemize{
-#'   \item id. cluster id
-#'   \item z. observed score
-#' }
+#' @format A data frame with 40 rows and 2 variables.
+#' 
+#' 
+#'   [, 1] id cluster id
+#'   [, 2] z  score difference
+#' 
 #'
 #' @name crsd
-#' @format A data frame with 40 rows and 2 variables
+#' @docType data
 #' @source \url{https://sites.google.com/a/channing.
 #' harvard.edu/bernardrosner/channing/cluster-signed
 #' -rank-test-for-balancedunbalanced-design/sample_balanced_data}
+#' @keywords datasets internal
 NULL
