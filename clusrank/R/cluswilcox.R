@@ -81,7 +81,7 @@
 ##' \item{null.value}{The location parameter \code{mu}}
 ##' \item{method}{The type of test applied}
 ##' \item{data.name}{A character string giving the names of the data}
-##' \item{balance}{An logical indicating whether the data are balanced}
+##' \item{balance}{A logical indicating whether the data are balanced}
 ##' \item{n.group}{Number of treatment, is returned when there are more than 2 treatment groups}
 ##' \item{df}{Degrees of freedom of chi-square distribution, is returned when there are more than 2##' treatment groups}
 
@@ -97,13 +97,23 @@
 #' cluswilcox.test(z, cluster = id, group = group, data = crd)
 #' @author Yujing Jiang
 #' @references
-#' Bernard Rosner, Robert J. Glynn, Mei-Ling Ting Lee(2006)
+#' Bernard Rosner, Robert J. Glynn, Mei-Ling T. Lee (2006)
 #' \emph{The Wilcoxon Signed Rank Test for Paired Comparisons of
-#'  Clustered Data.} Biometrics, \bold{62}, 185-192.
+#'  Clustered Data}. Biometrics, \bold{62}, 185-192.
 #'
-#' Bernard Rosner, Robert J. Glynn, Mei-Ling Ting Lee(2003)
+#' Bernard Rosner, Robert J. Glynn, Mei-Ling T. Lee (2003)
 #' \emph{Incorporation of Clustering Effects for the Wilcoxon Rank
-#' Sum Test: A Large-Sample Approach.} Biometrics, \bold{59}, 1089-1098.
+#' Sum Test: A Large-Sample Approach}. Biometrics, \bold{59}, 1089-1098.
+#' 
+#' Bernard Rosner, Robert J. Glynn, Mei-Ling T. Lee (2006)
+#' \emph{Extension of the Rank Sum Test for Clustered Data: 
+#' Two-Group Comparisons with Group}. Biometrics, \bold{62}, 1251-1259.
+#' 
+#' Somnath Datta, Glen A. Satten (2005) \emph{Rank-Sum Tests for Clustered Data}.
+#' Journal of the American Statistical Association, \bold{100}, 908-915.
+#' 
+#' Somath Datta, Glen A. Satten (2008) \emph{A Signed-Rank test for Clustered Data}.
+#' Biometric, \bold{64}, 501-507.
 #'
 #'
 #' @importFrom  stats complete.cases na.omit terms complete.cases model.extract aggregate
@@ -116,9 +126,9 @@ cluswilcox.test <- function(x, ...) {
      data.temp <- eval(pars$data, parent.frame())
    }
    if(!is.null(data.temp)) {
-     if(is.data.frame(data.temp) & as.character(pars$x) %in% names(data.temp)) {
+     if(is.data.frame(data.temp) & (as.character(pars$x) %in% names(data.temp))) {
        x <- data.temp[, as.character(pars$x)]
-     } else if(is.matrix(data.temp) & as.character(pars$x) %in% colnames(data.temp)) {
+     } else if(is.matrix(data.temp) & (as.character(pars$x) %in% colnames(data.temp))) {
        x <- data.temp[, as.character(pars$x)]
      }
    }
