@@ -1,5 +1,5 @@
 library(MASS)
-clus.simu.2 <- function(M, rho, n, pn, delta, pc) {
+clus.simu.2 <- function(M, rho, n, delta, pc) {
     ## Treatments are assigned at cluster level.
     ##
     ## M: A numerical vector with two entries, indicating the number of clusters under each
@@ -7,21 +7,28 @@ clus.simu.2 <- function(M, rho, n, pn, delta, pc) {
     ## rho: A numerical vector, the intracluster correlation
     ## for cluster under each treatment, the larger the strong the correlation is.
     ## n: A numerical vector, the cluster sizes.
-    ## pn: A numerical vector, the distribution of cluster size.
     ## delta: The location shift between two groups.
-    ## pc: A numerical vector, the probability distribution of a cluster of a specific size
-    ##    to be assigned treatment 0.
+    ## pc: A numerical vector or a matrix, the probability distribution
+    ## treatment. If it is a matrix, each row represent a treatment group
+    ##     
+    ## 0 to be assigned to a cluster with a specific size
+    ## Example:  clus.simu.2(c(2, 3), c(0.2, 0.5), c(2, 3), 0.2, 1, 0.2)
 
-    if(length(n) == (length(pn) + 1)) {
-        pn <- c(pn, 1 - sum(pn))
+    n.grp <- length(M)
+    grp.uniq <- c(0 : (n.grp - 1))
+    if(is.matrix(pc)) {
+        n.in.pc <- nrow(pc)
+    } else if(is.vector(pc)) {
+        n.in.pc <- length(pc)
+        pc <- replicate(length(M), pc)
+        pc <- as.matrix(pc)
     }
-    if( length(n) != length(pn)) {
-        stop("n and pn are not of equal length")
+    if(length(M) == (n.in.pc + 1)) {
+        pc <- cbind(pc, 1 - rowSums(pc))
+        n.in.pc <- n.in.pc + 1
     }
-    if(length(M) == (length(pc) + 1)) {
-        pc <- c(pc, 1 - sum(pc))
-    }
-    if( length(M) != length(pc)) {
+    
+    if( length(M) != n.in.pc) {
         stop(" M and pc are not of equal length")
     }
 
@@ -30,32 +37,37 @@ clus.simu.2 <- function(M, rho, n, pn, delta, pc) {
     for( i in 1 : n.c.uniq) {
         cov.list[[i]] <- (1 - rho[i]) * diag(n[i]) + rho[i] * matrix(1, n[i], n[i])
     }
+
     
-    n.dist <- rmultinom(1, sum(M), pn)
     c.id <- c(1 : sum(M)) ## cluster id
-    c.size <- rep.int(n, times = n.dist) ## size of each cluster
-    c.id <- rep.int(c.id, times = c.size)
 
-    n.obs <- sum(c.size)
-
-    group <- rep(0, sum(M))
-    count <- 0
-    count0 <- 1
-    for( i in 1 : n.c.uniq) {
-        count <- count +  n.dist[i]
-        group[count0 : count] <- rbinom(n.dist[i], 1, c(pc, 1 - pc))
-        count0 <- count + 1
+    n.dist.l <- c.size.l <-  vector("list", length(M))
+    for( i in 1 : length(M)) {
+        n.dist.l[[i]] <- rmultinom(1, M[i], pc[i, ])
+        c.size.l[[i]] <- rep.int(n, times = n.dist.l[[i]])
     }
+    
 
-    group <- rep.int(group, times = c.size) ## group id for each observation
-
-    Y.list <- vector("list", n.c.uniq) ## Generate multinormal data
-    X.list <- vector("list", n.c.uniq) ## STore generate data
-    for( i in 1 : n.c.uniq) {
-        Y.list[[i]] <- mvrnorm(n.dist[i], numeric(c.size[i]), cov.list[[i]])
-        X.list[[i]] <- exp(c(t(Y.list[[i]])))
+    Y.list <- vector("list", n.grp) ## Generate multinormal data
+    X.list <- vector("list", n.grp) ## STore generate data
+    x.list <- vector("list", n.grp)
+    for( i in 1 : n.grp) {
+        counter <- 1
+        for( j in 1 : length(n)) {
+            if(n.dist.l[[i]][[j]] == 0) {
+               next
+            } else {      
+                Y.list[[i]][[counter]] <- mvrnorm(n.dist.l[[i]][j],
+                                            numeric(n[j]),
+                                            cov.list[[j]])
+                X.list[[i]][[counter]] <- exp(c(t(Y.list[[i]][[counter]]))) +
+                    grp.uniq[i] * delta
+                counter <- counter + 1
+            }
+        }
+        x.list[[i]] <- unlist(X.list[[i]])
     }
-    X <- unlist(X.list)
-    X <- X + delta * group
+            
+    X <- unlist(x.list)
     X
 }
