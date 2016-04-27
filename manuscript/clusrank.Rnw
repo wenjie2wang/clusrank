@@ -3,47 +3,10 @@
 
 \documentclass[nojss]{jss}
 
-\usepackage[utf8]{inputenc}
-\usepackage{amsmath, bm}
-\usepackage{amsfonts}
-\usepackage{amssymb}
-\usepackage{graphicx}
-\usepackage{url}
+\usepackage{amsmath, bm, amssymb}
+% \usepackage{graphicx}
 \usepackage{natbib}
-\usepackage{lmodern}
-\usepackage{amssymb,amsmath}
-\usepackage{multicol}
-% use upquote if available, for straight quotes in verbatim environments
-\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
-% use microtype if available
-\IfFileExists{microtype.sty}{%
-\usepackage{microtype}
-\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
-}{}
-\usepackage[margin=1in]{geometry}
-\usepackage{color}
-\usepackage{fancyvrb}
-\newcommand{\VerbBar}{|}
-\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
-\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
-% Add ',fontsize=\small' for more characters per line
-\usepackage{framed}
-\definecolor{shadecolor}{RGB}{248,248,248}
-\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
-\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{{#1}}}}
-\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{{#1}}}
-\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{{#1}}}
-\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{{#1}}}
-\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{{#1}}}
-\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{{#1}}}
-\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{{#1}}}
-\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{{#1}}}}
-\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{{#1}}}
-\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{{#1}}}
-\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{{#1}}}
-\newcommand{\RegionMarkerTok}[1]{{#1}}
-\newcommand{\ErrorTok}[1]{\textbf{{#1}}}
-\newcommand{\NormalTok}[1]{{#1}}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -68,9 +31,12 @@ Yujing Jiang\\ University of Connecticut \And
 \pkg{clusrank}}
 
 %% for pretty printing and a nice hypersummary also set:
-\Plainauthor{Yujing Jiang, Mei-Ling Ting Lee, Jun Yan} %% comma-separated
-\Plaintitle{R package Clustered Wilcoxon Rank Sum Test and Signed Rank Test} %% without formatting
-\Shorttitle{Rank tests for cluster data} %% a short title (if necessary)
+\Plainauthor{Yujing Jiang, Xin He, Mei-Ling Ting Lee, 
+  Bernard Rosner, Jun Yan}
+%% comma-separated
+\Plaintitle{Rank-Based Tests for Clustered Data with R package clusrank}
+%% without formatting
+\Shorttitle{Rank Tests for Cluster Data} %% a short title (if necessary)
 
 %% an abstract and keywords
 
@@ -79,9 +45,9 @@ Yujing Jiang\\ University of Connecticut \And
 Rank based tests are popular distribution-free alternatives to
 the popular one-sample and two-sample $t$-tests.
 For independent data, they are available in
-the \pkg{base} package of \proglang{R}.
+the built-in \pkg{stats} package of \proglang{R}.
 For clustered data, several rank-based tests that accounts for
-the within-cluster dependence are recently developed, but no existing
+within-cluster dependence are recently developed, but no existing
 package provides all of them at one place with ease of access.
 In package \pkg{clusrank}, the latest developments are implemented
 and wrapped under a unified high-level user-friendly function.
@@ -91,8 +57,8 @@ unbalanced cluster sizes, presence of ties, stratified data,
 and heterogeneous group members from the same cluster.
 Methods based on both asymptotics for large samples and
 permutation for small samples are available.
-We present some details about the implemented methods and a
-comprehensive comparison of them in a simulation study.
+We present some details and usages of the implemented methods,
+with illustrations via simulated and real data.
 }
 
 
@@ -146,15 +112,13 @@ comprehensive comparison of them in a simulation study.
 %% end of declarations %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-
-
 %% include your article here, just as usual
 %% Note that you should use the \pkg{}, \proglang{} and \code{} commands.
 \begin{document}
 
 \section{Introduction}
 
-Clustered data arise in many applications, where the
+Clustered data arise in many applications where the
 data are grouped into independent clusters with correlated cluster members.
 In an eye study, for instance, the measurements from each individual consist a
 cluster.
