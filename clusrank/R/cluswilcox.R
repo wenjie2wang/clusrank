@@ -97,7 +97,8 @@
 #' ## Clustered signed rank test using RGL method.
 #' data(crsd)
 #' cluswilcox.test(z, cluster = id, data = crsd, paired = TRUE)
-#' \dontrun{cluswilcox.test(z, cluster = id, data = crsd) ## Default is rank sum test. The group variable is required.}
+#' \dontrun{cluswilcox.test(z, cluster = id, data = crsd)
+#' ## Default is rank sum test. The group variable is required.}
 #' ## Clustered rank sum test using RGL method.
 #' data(crd)
 #' cluswilcox.test(z ~ cluster(id) + group(group), data = crd)

@@ -42,13 +42,13 @@ Yujing Jiang\\ University of Connecticut \And
 
 
 \Abstract{
-Rank based tests are popular distribution-free alternatives to
+Rank based tests are distribution-free alternatives to
 the popular one-sample and two-sample $t$-tests.
 For independent data, they are available in
 the built-in \pkg{stats} package of \proglang{R}.
 For clustered data, several rank-based tests that accounts for
-within-cluster dependence are recently developed, but no existing
-package provides all of them at one place with ease of access.
+within-cluster dependence have been recently developed, but no existing
+package provides all of them with ease of access at one place.
 In package \pkg{clusrank}, the latest developments are implemented
 and wrapped under a unified high-level user-friendly function.
 Different methods are dispatched based on an input formula,
@@ -188,16 +188,6 @@ simulation study to compare the test statistics. Section 5 illustrates
 the usage of the package using a real data analysis for a eye
 study. THe last section discusses possible extensions of the package.
 
-
-
-
-
-
-
-
-
-%% note the label style. It helps to distinguish from
-%% table or figure labels.
 
 
 \section{Wilcoxon Rank Sum Test}

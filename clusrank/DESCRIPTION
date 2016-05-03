@@ -10,6 +10,6 @@ Authors@R: c(person(given = "Yujing", family = "Jiang",
              person(given = "Jun", family = "Yan", role = "ctb"))
 License: GPL (>=3)
 Depends:
-  R (>= 3.2.5)
+  R (>= 3.2.0)
 LazyData: true
 RoxygenNote: 5.0.1
