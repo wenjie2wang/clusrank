@@ -1,11 +1,12 @@
-##' Wilcoxon Rank SUm and Signed Rank Test for Clustered Data
+##' Wilcoxon Rank Sum and Signed Rank Test for Clustered Data
 ##'
-##' Performs one-sample and two-sample Wilcoxon test on vectors of data.
+##' Performs one-sample and two-sample Wilcoxon test for clutered data
+##' on vectors of data.
 ##'
 ##' @param x A numeric vector of data values. Non-finite (e.g.,
 ##'     infinite or missing) values will be omitted
 ##' @param y An optional numeric vector of data values: as with
-##'     \code{x} non-finite values will be omitted.
+##'     \code{x} non-finite values will be omitted
 ##' @param cluster A optional numeric vector of cluster id. Does not
 ##'     apply to the formula interface
 ##' @param group A optional numeric vector of treatment id. Does not
@@ -21,14 +22,14 @@
 ##'     be computed. Not recommended currently.
 ##' @param formula A formula of the form \code{lhs ~ rhs} where the
 ##'     \code{lhs} is a numeric variable giving the data values and
-##'     the \code{rhs} of the form with special term ##' cluster(x1) +
-##'     group(x2) + stratum(x3), where ##' x1, x2, x3 are the
+##'     the \code{rhs} of the form with special term \code{cluster(x1)
+##'     + group(x2) + stratum(x3)}, where \code{x1, x2, x3} are the
 ##'     corresponding variables.
-##' @param data an optional matrix or dataframe of data used in the
+##' @param data An optional matrix or dataframe of data used in the
 ##'     formula.
-##' @param subset an optional vector specifying a subset of
+##' @param subset An optional vector specifying a subset of
 ##'     observations to be used.
-##' @param na.action a function which indicates what should happen
+##' @param na.action A function which indicates what should happen
 ##'     when the data contain NAs. Defaults to getOption("na.action").
 ##' @param alternative A character string specifying the alternative
 ##'     hypothesis, must be one of \code{"two sided"} (default),
@@ -36,32 +37,39 @@
 ##'     initial letter
 ##' @param mu A number specifying an optional parameter used to form
 ##'     the null hypothesis. See 'Details'
-##' @param DNAME An optional character string for printing the result
+##' @param DNAME An optional character string for data name when
+##'     printing the result
 ##' @param ... Further arguments to be passed to or from methods
-##' @details The formula interface is only applicable for the m-sample
-##' tests \eqn{m \geq 2}.
+##' @details The formula interface is only applicable for the
+##'     {m}-sample rank sum tests \eqn{m \ge 2}. If the data are saved
+##'     in a data frame where the observation, cluster id, group id
+##'     and stratum id are saved as \code{z}, \code{id}, \code{grp}
+##'     and \code{strat} respectively, then the formula should be
+##'     written as \code{z ~ cluster(id) + group(grp) +
+##'     stratum(strat)}. The \code{group} variable is required.
 ##'
 ##' If both \code{x} and \code{y} are given or only \code{x} is given
-##' and \code{paired} is \code{TRUE}, a clustered Wilcoxon signed
-##' rank test of the null that the distribution of \code{x - y} or
-##' of \code{x} is symmetric about \code{mu} is performed.
+##' and \code{paired} is \code{TRUE}, a clustered Wilcoxon signed rank
+##' test of the null that the distribution of \code{x - y} or of
+##' \code{x} is symmetric about \code{mu} is performed.
 ##'
 ##' Otherwise, if only \code{x} is given and \code{paired} is
 ##' \code{FALSE}, a Wilcoxon rank sum test is carried out. In this
 ##' case, the \code{group} variable is required. If the \code{method}
-##' is \code{"rgl"} (default). the null hypothesis is that the
+##' is \code{"rgl"} (default), the null hypothesis is that the
 ##' distributions of values from the two groups differ by a location
 ##' shift of \code{mu} and the alternative is that they differ by some
 ##' other location shift. If the \code{method} is \code{"ds"}, when
 ##' the \code{group} has 2 levels, the null and hypothesis are the
-##' same; when there are more than 2 levels of \code{group}, the null
-##' hypothesis is that the locations are the same for data in all
-##' groups and the alternative is that they are not all the same.
+##' same as for \code{"rgl"} test; when \code{group} has more than 2
+##' levels, the null hypothesis is that the locations
+##' are the same for data in all groups and the alternative is that
+##' they are not all the same.
 ##'
 ##' If \code{cluster} is not provided, the default is that there is no
 ##' clutering in the data. Both \code{"rgl"} and \code{"ds"} method
-##' support unbalanced data (cluster size varies) and individual level
-##' treatment assignment.
+##' support balanced and unbalanced data (cluster size is identical or
+##' varied) and individual level and cluster level treatment assignment.
 ##'
 ##' If \code{method} is \code{"rgl"}, then a strafication variable,
 ##' \code{stratum}, is allowed for the clustered Wilcoxon rank sum
@@ -89,7 +97,7 @@
 #' ## Clustered signed rank test using RGL method.
 #' data(crsd)
 #' cluswilcox.test(z, cluster = id, data = crsd, paired = TRUE)
-#' \dontrun{cluswilcox.test(z, cluster = id, data = crsd) ## Default is rank sum test.}
+#' \dontrun{cluswilcox.test(z, cluster = id, data = crsd) ## Default is rank sum test. The group variable is required.}
 #' ## Clustered rank sum test using RGL method.
 #' data(crd)
 #' cluswilcox.test(z ~ cluster(id) + group(group), data = crd)
@@ -115,7 +123,7 @@
 #' Somath Datta, Glen A. Satten (2008) \emph{A Signed-Rank test for Clustered Data}.
 #' Biometric, \bold{64}, 501-507.
 #'
-#'
+#'@note Exact tests are not recommended in the current version of package.
 #' @importFrom  stats complete.cases na.omit terms complete.cases model.extract aggregate
 #' @importFrom MASS ginv
 #' @export
