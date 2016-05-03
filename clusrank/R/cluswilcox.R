@@ -91,7 +91,7 @@
 ##' \item{data.name}{A character string giving the names of the data}
 ##' \item{balance}{A logical indicating whether the data are balanced}
 ##' \item{n.group}{Number of treatment, is returned when there are more than 2 treatment groups}
-##' \item{df}{Degrees of freedom of chi-square distribution, is returned when there are more than 2##' treatment groups}
+##' \item{df}{Degrees of freedom of chi-square distribution, is returned when there are more than 2 treatment groups}
 
 #' @examples
 #' ## Clustered signed rank test using RGL method.
@@ -409,6 +409,7 @@ cluswilcox.test.default
 
         if(toupper(method) == "DS") {
             METHOD <- paste(METHOD, "using Datta-Satten method", sep = " ")
+            ## FIXME: The length of the list and the name do not match!
             arglist <- setNames(list(x, cluster, group, alternative,
                                      DNAME, METHOD, exact),
                                 c("x", "cluster", "group", "stratum",
@@ -426,6 +427,3 @@ cluswilcox.test.default
         }
     }
 }
-
-
-
