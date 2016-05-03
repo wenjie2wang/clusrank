@@ -527,6 +527,65 @@ does not allow small sample permutation test since it allows arbitraty
 intracluster dependence structure.
 
 
+\section{Usage}
+
+The package contains a single interface function
+\code{cluswilcox.test} which resembles the function \code{wilcox.test}
+in the \pkg{stats} package. 
+
+There are two ways to call the clustered rank sum test. The first one
+uses a formula interface, i.e., the first argument of the function is
+a formula of the form \code{lhs ~ rhs}. The \code{lhs} is the
+variable of the observation and the \code{rhs} is of the form
+\code{cluster(cid) + group(gid)}, where \code{cid} and \code{gid} are
+the variables which contain the cluster id and treatment group id. Further,
+if the observations are stratified by a categorical variable and the
+\code{rgl} method is used, then the \code{lhs} can be set to be
+\code{cluster(cid) + group(gid) + stratum(sid}, where \code{sid}
+contains the stratification id. In addition, the user can decide how
+to treat the \code{NA} values and if a subset of the data are used for
+the comparison by set the values of \code{na.action} and
+\code{subset}. The data \code{data} used in the illustration below
+contains three variables: \code{id} is the cluster id, \code{group} is
+the group id, and \code{z} contains the observations.
+<<rseg, eval = FALSE, echo = TRUE>>=
+cluswilcox.test(z ~ cluster(id) + group(group), data = data,  method = 'rgl')
+@ 
+If \code{data} contains an extra stratificaiton variable, \code{strat},
+then to incorporate the stratification effect, the following code can
+be used:
+<<rseg11, eval = FALSE, echo = TRUE>>=
+cluswilcox.test(z ~ cluster(id) + group(group) + stratum(strat), data = data)
+@ 
+
+Another interface of the clustered rank sum test is use a numerical
+vector contains the observations as the first argument. A treatment
+group id \code{group} is required and the \code{paired}
+should be set to be \code{FALSE} (default) in addition.
+<<rseg2, eval = FALSE, echo = TRUE>>=
+cluswilcox.test(z, cluster = id, group = group, data = data, method = 'rgl', paired = FALSE)
+@
+The default of \code{paired} is \code{FALSE}.
+ 
+For the signed rank test, there are two ways to input the data. First,
+if the data are the observed difference between the two groups, e.g.,
+say, dataframe \code{data} contains the observed difference \code{z}
+and cluster id \code{id}, then the function is called in the following
+way:
+<<sreg, eval = FALSE, echo = TRUE>>=
+data(crsd)
+cluswilcox.test(z, cluster = id, data = data, paired = TRUE)
+@ 
+Or, if the observations from the two groups are saved in two vectors instead, say, \code{x} and \code{y}, 
+then the function can be called in the following way:
+<<sreg2, eval = FALSE, echo = TRUE>>=
+cluswilcox.test(x, y = y, cluster = id, data = data, paired = TRUE)
+@ 
+
+There are two methods for each test, \code{rgl} and \code{ds}. The
+default method is \code{rgl}. Both methods can deal with data with
+identical or varied cluster size and with treatment assigned at
+cluster or sub-cluster level.
 %% Note: If there is markup in \(sub)section, then it has to be escape as above.
 
 
