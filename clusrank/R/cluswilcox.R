@@ -130,17 +130,19 @@
 #' @export
 
 cluswilcox.test <- function(x, ...) {
-   pars <- as.list(match.call()[-1])
-   if(!is.null(pars$data)) {
-     data.temp <- eval(pars$data, parent.frame())
-   }
-   if(!is.null(data.temp)) {
-     if(is.data.frame(data.temp) & (as.character(pars$x) %in% names(data.temp))) {
-       x <- data.temp[, as.character(pars$x)]
-     } else if(is.matrix(data.temp) & (as.character(pars$x) %in% colnames(data.temp))) {
-       x <- data.temp[, as.character(pars$x)]
-     }
-   }
+    pars <- as.list(match.call()[-1])
+    if(!is.null(pars$data)) {
+        data.temp <- eval(pars$data, parent.frame())
+    }
+    if(!is.null(data.temp)) {
+        if(is.data.frame(data.temp) & (as.character(pars$x)
+            %in% names(data.temp))) {
+            x <- data.temp[, as.character(pars$x)]
+        } else if(is.matrix(data.temp) & (as.character(pars$x)
+            %in% colnames(data.temp))) {
+            x <- data.temp[, as.character(pars$x)]
+        }
+    }
     UseMethod("cluswilcox.test", x)
 }
 
@@ -153,7 +155,7 @@ cluswilcox.test <- function(x, ...) {
 cluswilcox.test.formula <- function(formula, data = NULL, subset = NULL, na.action = na.omit, ...)
 {
     if(missing(formula) ||
-      (length(formula) != 3L)) {
+       (length(formula) != 3L)) {
         stop("'formula' missing or incorrect")
     }
     m <- match.call(expand.dots = FALSE)
@@ -169,8 +171,7 @@ cluswilcox.test.formula <- function(formula, data = NULL, subset = NULL, na.acti
     special <- c("stratum", "cluster", "group")
     m[[1L]] <- quote(stats::model.frame)
     m$... <- NULL
-    m$formula <- if(missing(data))
-    terms(formula, special)
+    m$formula <- if(missing(data)) terms(formula, special)
                  else terms(formula, special, data = data)
 
     mf <- eval(m, parent.frame())
@@ -183,31 +184,31 @@ cluswilcox.test.formula <- function(formula, data = NULL, subset = NULL, na.acti
     n.obs <- length(x)
 
     group <- attr(Terms, "specials")$group
-  if(length(group)) {
-    gtemp <- untangle.specials(Terms, "group", 1)
-    group.name <- gsub("[\\(\\)]", "",
-                         regmatches(gtemp$vars,
-                                    gregexpr("\\(.*?\\)", gtemp$vars))[[1]])
+    if(length(group)) {
+        gtemp <- untangle.specials(Terms, "group", 1)
+        group.name <- gsub("[\\(\\)]", "",
+                           regmatches(gtemp$vars,
+                                      gregexpr("\\(.*?\\)", gtemp$vars))[[1]])
         DNAME <- paste0(DNAME, " group: ", group.name, ",")
+        
 
-
-    if(length(gtemp$vars) == 1) {
-      group.keep <- mf[[gtemp$vars]]
-    } else {
-      stop("more than one variable are set as the group id")
+        if(length(gtemp$vars) == 1) {
+            group.keep <- mf[[gtemp$vars]]
+        } else {
+            stop("more than one variable are set as the group id")
+        }
+        group.uniq <- unique(group.keep)
+        group.uniq.l <- length(group.uniq)
+        
+        if(!is.character(group.uniq) && !is.numeric(group.uniq)) {
+            stop("group id has to be numeric or character")
+        }
+        
+        group <- recoderFunc(group.keep, group.uniq, c(1 : group.uniq.l))
     }
-    group.uniq <- unique(group.keep)
-    group.uniq.l <- length(group.uniq)
-
-    if(!is.character(group.uniq) && !is.numeric(group.uniq)) {
-      stop("group id has to be numeric or character")
-    }
-
-    group <- recoderFunc(group.keep, group.uniq, c(1 : group.uniq.l))
-  }
-
+    
     cluster <- attr(attr(mf, "terms"), "specials")$cluster
-     if(length(cluster)) {
+    if(length(cluster)) {
     ctemp <- untangle.specials(Terms, "cluster", 1)
     cluster.name <- gsub("[\\(\\)]", "",
                          regmatches(ctemp$vars,
@@ -216,39 +217,39 @@ cluswilcox.test.formula <- function(formula, data = NULL, subset = NULL, na.acti
 
 
     if(length(ctemp$vars) == 1) {
-      cluster.keep <- mf[[ctemp$vars]]
+        cluster.keep <- mf[[ctemp$vars]]
     } else {
-      stop("more than one variable are set as the cluster id")
+        stop("more than one variable are set as the cluster id")
     }
     cluster.uniq <- unique(cluster.keep)
     cluster.uniq.l <- length(cluster.uniq)
-
+    
     if(is.character(cluster.uniq)) {
-      cluster <- recoderFunc(cluster.keep, cluster.uniq, c(1 : cluster.uniq.l))
+        cluster <- recoderFunc(cluster.keep, cluster.uniq, c(1 : cluster.uniq.l))
     } else {
-      if(!is.numeric(cluster.uniq)) {
-        stop("cluster id should be numeric or character")
-      }
-      cluster <- cluster.keep
+        if(!is.numeric(cluster.uniq)) {
+            stop("cluster id should be numeric or character")
+        }
+        cluster <- cluster.keep
     }
-  } else {
-    cluster <- c(1 : n.obs)
-  }
+    } else {
+        cluster <- c(1 : n.obs)
+    }
 
 
-
+    
     stratum <- attr(attr(mf, "terms"), "specials")$stratum
     if(!is.null(stratum)) {
         stratum <- mf[[stratum]]
     } else {
         stratum <- rep(1, n.obs)
     }
-
+    
     y <- do.call("cluswilcox.test.default",
-                c( list(x = x, cluster = cluster,
-                      group = group, stratum = stratum,
-                      DNAME = DNAME),
-                      list(...)))
+                 c( list(x = x, cluster = cluster,
+                         group = group, stratum = stratum,
+                         DNAME = DNAME),
+                   list(...)))
     return(y)
 }
 
@@ -257,11 +258,12 @@ cluswilcox.test.formula <- function(formula, data = NULL, subset = NULL, na.acti
 #' @describeIn cluswilcox.test Default \code{S3} method.
 #' @export
 
-cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
-                                    group = NULL, stratum = NULL, data = parent.frame(),
-                                    alternative = c("two.sided", "less", "greater"),
-                                    mu = 0, paired = FALSE, exact = NULL,
-                                    method = c("rgl", "ds"), DNAME = NULL, ...) {
+cluswilcox.test.default
+<- function(x, y = NULL, cluster = NULL,
+            group = NULL, stratum = NULL, data = parent.frame(),
+            alternative = c("two.sided", "less", "greater"),
+            mu = 0, paired = FALSE, exact = NULL,
+            method = c("rgl", "ds"), DNAME = NULL, ...) {
     alternative <- match.arg(alternative)
     method <- match.arg(method)
       pars <- as.list(match.call()[-1])
@@ -388,12 +390,10 @@ cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
            result <-  do.call("cluswilcox.test.signedrank.ds",
                               c(arglist))
            return(result)
-        }
-
-        else {
+        } else {
             stop("Method should be one of 'rgl' and 'ds'")
         }
-
+        
     } else {
         METHOD <- "Clustered Wilcoxon rank sum test"
         if(toupper(method) == "RGL") {
@@ -408,19 +408,19 @@ cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
         }
 
         if(toupper(method) == "DS") {
-            METHOD <- paste( METHOD, "using Datta-Satten method", sep = " ")
-             arglist <- setNames(list(x, cluster, group, alternative,
-                                 DNAME, METHOD, exact),
-                            c("x", "cluster", "group", "stratum",
-                              "alternative", "DNAME", "METHOD",
-                              "exact"))
-             if(length(table(stratum)) > 1L) {
-            warning("'stratum' will be ignored for the clustered rank sum test, 'ds' method")
-        }
+            METHOD <- paste(METHOD, "using Datta-Satten method", sep = " ")
+            arglist <- setNames(list(x, cluster, group, alternative,
+                                     DNAME, METHOD, exact),
+                                c("x", "cluster", "group", "stratum",
+                                  "alternative", "DNAME", "METHOD",
+                                  "exact"))
+            if(length(table(stratum)) > 1L) {
+                warning("'stratum' will be ignored for the clustered rank sum test, 'ds' method")
+            }
             result <- do.call("cluswilcox.test.ranksum.ds", c(arglist))
             return(result)
         }
-
+        
         else {
             stop("Method should be one of 'rgl' and 'ds'")
         }

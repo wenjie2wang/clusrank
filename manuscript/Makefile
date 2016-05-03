@@ -16,6 +16,8 @@ pdf : tex
 	pdflatex $(filestem)
 	pdflatex $(filestem)
 
+clean:
+	rm *.aux *.bbl *.log *.blg
 # watch:
 #     $(info ************  WATCHING FOR CHANGES  ************)
 #     watchman watch "$(shell pwd)"
