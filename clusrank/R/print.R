@@ -21,26 +21,26 @@
 ################################################################################
 
 
-#'Print Function for Nonparametric Test for Clustered Data
+#' Print Function for Nonparametric Test for Clustered Data
 #'
-#'Printing objects of class "\code{ctest}", by simple \link{print}
-#'methods.
+#' Printing objects of class "\code{ctest}", by simple \link{print}
+#' methods.
 #'
-#'@author Yujing Jiang
+#' @author Yujing Jiang
 #'
-#'@param x object of class "\code{ctest}".
-#'@param digits number of significant digits to be used.
-#'@param prefix string, passed to \link{strwrap}
-#'for displaying the method component of the htest object.
-#'@param ... further arguments to be passed to or from methods.
+#' @param x object of class "\code{ctest}".
+#' @param digits number of significant digits to be used.
+#' @param prefix string, passed to \link{strwrap}
+#' for displaying the method component of the htest object.
+#' @param ... further arguments to be passed to or from methods.
 #'
 #' @return the argument \code{x}, invisibly, as for all \link{print}
 #' methods.
 #' @examples
 #' data(crd)
-#'clt <- cluswilcox.test(z ~ group(group) + cluster(id), data = crd)
-#'print(clt, digits = 2)
-#'@export
+#' clt <- cluswilcox.test(z ~ group(group) + cluster(id), data = crd)
+#' print(clt, digits = 2)
+#' @export
 
 print.ctest <- function (x, digits = getOption("digits"), prefix = "\t", ...)
 {
@@ -50,76 +50,76 @@ print.ctest <- function (x, digits = getOption("digits"), prefix = "\t", ...)
   cat("data:  ", x$data.name, "\n", sep = "")
   out <- character()
   if (!is.null(x$Rstat)){
-     cat(paste(names(x$Rstat), "=", format(signif(x$Rstat,
-                                                                max(1L, digits - 2L)))))
-  cat("\n")
+      cat(paste(names(x$Rstat), "=", format(signif(x$Rstat,
+                                                   max(1L, digits - 2L)))))
+      cat("\n")
   }
   if (!is.null(x$ERstat)){
-    cat( paste(names(x$ERstat), "=", format(signif(x$ERstat,
-                                                                max(1L, digits - 2L)))))
-
-  cat("\n")}
-
+      cat( paste(names(x$ERstat), "=", format(signif(x$ERstat,
+                                                     max(1L, digits - 2L)))))
+      
+      cat("\n")}
+  
   if (!is.null(x$VRstat)){
-    cat(paste(names(x$VRstat), "=", format(signif(x$VRstat,
-                                                                 max(1L, digits - 2L)))))
-  cat("\n")}
-
+      cat(paste(names(x$VRstat), "=", format(signif(x$VRstat,
+                                                    max(1L, digits - 2L)))))
+      cat("\n")}
+  
   out <- character()
   if (!is.null(x$statistic))
-    out <- c(out, paste(names(x$statistic), "=", format(signif(x$statistic,
-                                                               max(1L, digits - 2L)))))
- # if (!is.null(x$parameter))
-  #  out <- c(out, paste(names(x$parameter), "=", format(signif(x$parameter,
-   #                                                            max(1L, digits - 2L)))))
+      out <- c(out, paste(names(x$statistic), "=", format(signif(x$statistic,
+                                                                 max(1L, digits - 2L)))))
+  ## if (!is.null(x$parameter))
+  ##  out <- c(out, paste(names(x$parameter), "=", format(signif(x$parameter,
+  ##                                                            max(1L, digits - 2L)))))
   if (!is.null(x$p.value)) {
-    fp <- format.pval(x$p.value, digits = max(1L, digits -
-                                                3L))
-    out <- c(out, paste("p-value", if (substr(fp, 1L, 1L) ==
-                                       "<") fp else paste("=", fp)))
+      fp <- format.pval(x$p.value, digits = max(1L, digits -
+                                                    3L))
+      out <- c(out, paste("p-value", if (substr(fp, 1L, 1L) ==
+                                         "<") fp else paste("=", fp)))
   }
   cat(strwrap(paste(out, collapse = ", ")), sep = "\n")
   out <- character()
-
+  
   if(!is.null(x$n) | !is.null(x$cn)){
-  if(!is.null(x$n))
-    out <- c(out, paste(names(x$n), "=", format(signif(x$n, max(1L, digits - 2L)))))
-  if(!is.null(x$cn))
-    out <- c(out, paste(names(x$cn), "=", format(signif(x$cn,
-                                                        max(1L, digits - 2L)))))
-  cat(strwrap(paste(out, collapse = ", ")), sep = "\n")}
-
+      if(!is.null(x$n))
+          out <- c(out, paste(names(x$n), "=", format(signif(x$n, max(1L, digits - 2L)))))
+      if(!is.null(x$cn))
+          out <- c(out, paste(names(x$cn), "=", format(signif(x$cn,
+                                                              max(1L, digits - 2L)))))
+      cat(strwrap(paste(out, collapse = ", ")), sep = "\n")}
+  
   if(!is.null(x$n.group) | !is.null(x$df)) {
- out <- character()
-  if(!is.null(x$n.group))
-    out <- c(out, paste(names(x$n.group), "=", format(signif(x$n.group, max(1L, digits - 2L)))))
-  if(!is.null(x$df))
-    out <- c(out, paste(names(x$df), "=", format(signif(x$df,
-                                                       max(1L, digits - 2L)))))
-  cat(strwrap(paste(out, collapse = ", ")), sep = "\n")
+      out <- character()
+      if(!is.null(x$n.group))
+          out <- c(out, paste(names(x$n.group), "=", format(signif(x$n.group, max(1L, digits - 2L)))))
+      if(!is.null(x$df))
+          out <- c(out, paste(names(x$df), "=", format(signif(x$df,
+                                                              max(1L, digits - 2L)))))
+      cat(strwrap(paste(out, collapse = ", ")), sep = "\n")
   }
   if(!is.null(x$adjusted) && x$adjusted == TRUE)
-    cat("The signed rank test statistics is adjusted since the data is unbalanced.")
+      cat("The signed rank test statistics is adjusted since the data is unbalanced.")
   if(!is.null(x$balance) && x$balance == FALSE) {
-        cat("The data is unbalanced")
-        cat("\n")
+      cat("The data is unbalanced")
+      cat("\n")
   }
-
+  
   if (!is.null(x$alternative)) {
-    cat("alternative hypothesis: ")
-    if (!is.null(x$null.value)) {
-      if (length(x$null.value) == 1L) {
-        alt.char <- switch(x$alternative, two.sided = "not equal to",
-                           less = "less than", greater = "greater than")
-        cat("true ", names(x$null.value), " is ", alt.char,
-            " ", x$null.value, "\n", sep = "")
+      cat("alternative hypothesis: ")
+      if (!is.null(x$null.value)) {
+          if (length(x$null.value) == 1L) {
+              alt.char <- switch(x$alternative, two.sided = "not equal to",
+                                 less = "less than", greater = "greater than")
+              cat("true ", names(x$null.value), " is ", alt.char,
+                  " ", x$null.value, "\n", sep = "")
+          }
+          else {
+              cat(x$alternative, "\nnull values:\n", sep = "")
+              print(x$null.value, digits = digits, ...)
+          }
       }
-      else {
-        cat(x$alternative, "\nnull values:\n", sep = "")
-        print(x$null.value, digits = digits, ...)
-      }
-    }
-    else cat(x$alternative, "\n", sep = "")
+      else cat(x$alternative, "\n", sep = "")
   }
   
   cat("\n")
