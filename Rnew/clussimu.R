@@ -186,7 +186,7 @@ clus.simu.sr1 <- function(M, n, delta, rho) {
         rho <- rep(rho, sum(M))
     }
     if(length(rho) == length(M)) {
-        rho <- rho[tep.int(1 : length(M), times = M)]
+        rho <- rho[rep.int(1 : length(M), times = M)]
     }
     clus.size <- rep.int(n, times = M)
     cluster <- rep.int(1 : sum(M), times = clus.size)
@@ -200,7 +200,6 @@ clus.simu.sr1 <- function(M, n, delta, rho) {
     e <- rnorm(n.obs)
     e <- e * sqrt(1 - rho)[rep.int( 1 : sum(M), times = clus.size)]
     H <- W + e
-    H <- H + e
     X <- sign(H) * exp(abs(H))
     data.frame(X, cluster)
 }
@@ -224,7 +223,7 @@ clus.simu.sr2 <- function(M, n, delta, rho, phi, gamma) {
         rho <- rep(rho, sum(M))
     }
     if(length(rho) == length(M)) {
-        rho <- rho[tep.int(1 : length(M), times = M)]
+        rho <- rho[rep.int(1 : length(M), times = M)]
     }
     clus.size <- rep.int(n, times = M)
     cluster <- rep.int(1 : sum(M), times = clus.size)
@@ -304,3 +303,28 @@ clus.simu.sr.info <- function(M, n, beta, delta, rho) {
     X <- sn * exp(abs(H))
     data.frame(X, cluster)
 }
+
+
+do1.sr1 <- function(M, n, delta, rho, method = c("rgl", "ds"), paired = FALSE) {
+    dat <- clus.simu.sr1(M, n, delta, rho)
+    method <- match.arg(method)
+    if(method == "rgl") {
+        pval <- cluswilcox.test(X, cluster = cluster, data = dat, paired) $ p.value
+    }
+    if(method == "ds") {
+                pval <- cluswilcox.test(X, cluster = cluster, data = dat, paired, method = "ds") $ p.value
+    }
+    return(pval)
+}
+
+do.sr1 <- function(simn, M, n, delta, rho, method = c("rgl", "ds"), paired = FALSE) {
+    res <- replicate(simn, do1.sr1(M, n, delta, rho, method, paired))
+    return(res)
+}
+
+power.sr1 <- function(th, simn, M, n, delta, rho, method = c("rgl", "ds"), paired = FALSE) {
+    res <- do.sr1(simn, M, n, delta, rho, method, paired)
+    power <- mean(res < th)
+    return(power)
+}
+    
