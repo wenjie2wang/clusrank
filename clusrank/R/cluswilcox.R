@@ -134,11 +134,11 @@ cluswilcox.test <- function(x, ...) {
     if(!is.null(pars$data)) {
         data.temp <- eval(pars$data, parent.frame())
     }
-    if(!is.null(data.temp)) {
-        if(is.data.frame(data.temp) & (as.character(pars$x)
+    if(!is.null(data.temp) & length(pars$x) == 1) {
+        if(is.data.frame(data.temp) & any(as.character(pars$x)
             %in% names(data.temp))) {
             x <- data.temp[, as.character(pars$x)]
-        } else if(is.matrix(data.temp) & (as.character(pars$x)
+        } else if(is.matrix(data.temp) & any(as.character(pars$x)
             %in% colnames(data.temp))) {
             x <- data.temp[, as.character(pars$x)]
         }
@@ -258,8 +258,7 @@ cluswilcox.test.formula <- function(formula, data = NULL, subset = NULL, na.acti
 #' @describeIn cluswilcox.test Default \code{S3} method.
 #' @export
 
-cluswilcox.test.default
-<- function(x, y = NULL, cluster = NULL,
+cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
             group = NULL, stratum = NULL, data = parent.frame(),
             alternative = c("two.sided", "less", "greater"),
             mu = 0, paired = FALSE, exact = NULL,
@@ -269,11 +268,11 @@ cluswilcox.test.default
       pars <- as.list(match.call()[-1])
 
     if (!missing(mu) && ((length(mu) > 1L) || !is.finite(mu)))
-    stop("'mu' must be a single number")
-      if(!is.null(pars$data)) {
+        stop("'mu' must be a single number")
+    if(is.null(DNAME))  {
+ if(!is.null(pars$data)) {
             x <- data[, as.character(pars$x)]
             DNAME <- (pars$x)
-
               if(!is.null(pars$y)) {
                   y <- data[, as.character(pars$y)]
                   DNAME <- paste(DNAME, "and", pars$y)
@@ -315,6 +314,36 @@ cluswilcox.test.default
                 DNAME <- paste0(DNAME, ", stratum: ", pars$stratum)
               }
             }
+    }
+    
+      if(!is.null(pars$data)) {
+            x <- data[, as.character(pars$x)]
+              if(!is.null(pars$y)) {
+                  y <- data[, as.character(pars$y)]
+
+                } else {
+                    y <- NULL
+                  }
+            if(!is.null(pars$cluster)) {
+                cluster <- data[, as.character(pars$cluster)]
+
+              } else {
+                  cluster <- NULL
+              }
+            if(!is.null(pars$group)) {
+              group <- data[, as.character(pars$group)]
+
+            } else {
+              group <- NULL
+            }
+            if(!is.null(pars$stratum)) {
+              stratum <- data[, as.character(pars$stratum)]
+
+            } else {
+              stratum <- NULL
+            }
+
+          }
     if(!is.numeric(x)){
         stop("'x' must be numeric")
     }
@@ -383,7 +412,7 @@ cluswilcox.test.default
 
         if(toupper(method) == "DS") {
             METHOD <- paste(METHOD, "using DS method", sep = " ")
-             arglist <- setNames(list(x, cluster, alternative, METHOD, DNAME),
+             arglist <- setNames(list(x, cluster, alternative, mu, METHOD, DNAME),
                             c("x", "cluster", "alternative",
                               "mu",
                               "METHOD", "DNAME"))
@@ -427,3 +456,8 @@ cluswilcox.test.default
         }
     }
 }
+
+
+
+
+
