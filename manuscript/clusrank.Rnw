@@ -7,6 +7,9 @@
 % \usepackage{graphicx}
 \usepackage{natbib}
 
+\usepackage{color}
+\newcommand{\blue}[1]{\textcolor{blue}{(#1)}}
+\newcommand{\red}[1]{\textcolor{red}{(#1)}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -116,8 +119,18 @@ with illustrations via simulated and real data.
 %% Note that you should use the \pkg{}, \proglang{} and \code{} commands.
 \begin{document}
 
+
+%% STYLE GUIDE
+%% No more than 75 characters each line.
+%% Start a new sentence at a new line.
+%% Two blank lines to break paragraph.
+%% Use spell check.
+
+
 \section{Introduction}
 
+
+\red{Give more specifics of the eye study and use it as a motivating example.}
 Clustered data arise in many applications where the
 data are grouped into independent clusters with correlated cluster members.
 In an eye study, for instance, the measurements from each individual consist a
@@ -129,6 +142,8 @@ However, these tests cannot be applied to clustered data directly since the
 effective sample size of the clustered data will be different from the number
 of observations due to non-zero intracluster correlation. As a consequence, the
 p-value will be either under-estimated or over-estimated.
+
+
 
 Recent developments have extended the Wilcoxon rank-sum test
 and signed rank test to clustered data. A Mann-Whitney U statistic for
