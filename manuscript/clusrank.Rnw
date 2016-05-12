@@ -3,47 +3,13 @@
 
 \documentclass[nojss]{jss}
 
-\usepackage[utf8]{inputenc}
-\usepackage{amsmath, bm}
-\usepackage{amsfonts}
-\usepackage{amssymb}
-\usepackage{graphicx}
-\usepackage{url}
+\usepackage{amsmath, bm, amssymb}
+% \usepackage{graphicx}
 \usepackage{natbib}
-\usepackage{lmodern}
-\usepackage{amssymb,amsmath}
-\usepackage{multicol}
-% use upquote if available, for straight quotes in verbatim environments
-\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
-% use microtype if available
-\IfFileExists{microtype.sty}{%
-\usepackage{microtype}
-\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
-}{}
-\usepackage[margin=1in]{geometry}
+
 \usepackage{color}
-\usepackage{fancyvrb}
-\newcommand{\VerbBar}{|}
-\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
-\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
-% Add ',fontsize=\small' for more characters per line
-\usepackage{framed}
-\definecolor{shadecolor}{RGB}{248,248,248}
-\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
-\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{{#1}}}}
-\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{{#1}}}
-\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{{#1}}}
-\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{{#1}}}
-\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{{#1}}}
-\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{{#1}}}
-\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{{#1}}}
-\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{{#1}}}}
-\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{{#1}}}
-\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{{#1}}}
-\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{{#1}}}
-\newcommand{\RegionMarkerTok}[1]{{#1}}
-\newcommand{\ErrorTok}[1]{\textbf{{#1}}}
-\newcommand{\NormalTok}[1]{{#1}}
+\newcommand{\blue}[1]{\textcolor{blue}{(#1)}}
+\newcommand{\red}[1]{\textcolor{red}{(#1)}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -68,21 +34,24 @@ Yujing Jiang\\ University of Connecticut \And
 \pkg{clusrank}}
 
 %% for pretty printing and a nice hypersummary also set:
-\Plainauthor{Yujing Jiang, Mei-Ling Ting Lee, Jun Yan} %% comma-separated
-\Plaintitle{R package Clustered Wilcoxon Rank Sum Test and Signed Rank Test} %% without formatting
-\Shorttitle{Rank tests for cluster data} %% a short title (if necessary)
+\Plainauthor{Yujing Jiang, Xin He, Mei-Ling Ting Lee, 
+  Bernard Rosner, Jun Yan}
+%% comma-separated
+\Plaintitle{Rank-Based Tests for Clustered Data with R package clusrank}
+%% without formatting
+\Shorttitle{Rank Tests for Cluster Data} %% a short title (if necessary)
 
 %% an abstract and keywords
 
 
 \Abstract{
-Rank based tests are popular distribution-free alternatives to
+Rank based tests are distribution-free alternatives to
 the popular one-sample and two-sample $t$-tests.
 For independent data, they are available in
-the \pkg{base} package of \proglang{R}.
+the built-in \pkg{stats} package of \proglang{R}.
 For clustered data, several rank-based tests that accounts for
-the within-cluster dependence are recently developed, but no existing
-package provides all of them at one place with ease of access.
+within-cluster dependence have been recently developed, but no existing
+package provides all of them with ease of access at one place.
 In package \pkg{clusrank}, the latest developments are implemented
 and wrapped under a unified high-level user-friendly function.
 Different methods are dispatched based on an input formula,
@@ -91,8 +60,8 @@ unbalanced cluster sizes, presence of ties, stratified data,
 and heterogeneous group members from the same cluster.
 Methods based on both asymptotics for large samples and
 permutation for small samples are available.
-We present some details about the implemented methods and a
-comprehensive comparison of them in a simulation study.
+We present some details and usages of the implemented methods,
+with illustrations via simulated and real data.
 }
 
 
@@ -146,15 +115,23 @@ comprehensive comparison of them in a simulation study.
 %% end of declarations %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-
-
 %% include your article here, just as usual
 %% Note that you should use the \pkg{}, \proglang{} and \code{} commands.
 \begin{document}
 
+
+%% STYLE GUIDE
+%% No more than 75 characters each line.
+%% Start a new sentence at a new line.
+%% Two blank lines to break paragraph.
+%% Use spell check.
+
+
 \section{Introduction}
 
-Clustered data arise in many applications, where the
+
+\red{Give more specifics of the eye study and use it as a motivating example.}
+Clustered data arise in many applications where the
 data are grouped into independent clusters with correlated cluster members.
 In an eye study, for instance, the measurements from each individual consist a
 cluster.
@@ -165,6 +142,8 @@ However, these tests cannot be applied to clustered data directly since the
 effective sample size of the clustered data will be different from the number
 of observations due to non-zero intracluster correlation. As a consequence, the
 p-value will be either under-estimated or over-estimated.
+
+
 
 Recent developments have extended the Wilcoxon rank-sum test
 and signed rank test to clustered data. A Mann-Whitney U statistic for
@@ -180,7 +159,7 @@ clusters from both group for each cluster size. These two requirements was
 later removed in \citet{Datt:Satt:rank:2005}. Also Datta and Satten's approach
 allows comparison between $m(m \geq 3)$ groups. Though, their method is not
 able to compare the intracluster difference between two groups. More recently,
-\citet{Rosn:Blyn:Lee:exte:2006} extended their approach to accommodate the
+\citet{Rosn:Glyn:Lee:exte:2006} extended their approach to accommodate the
 situation where members of a single cluster may subject to different
 treatments.
 
@@ -217,23 +196,14 @@ signed rank test from \citet{Rosn:Glyn:Lee:wilc:2006} and
 %extra cofounding variable can also be accounted for.
 
 
-The order of this paper is as following, Section~\ref{sec:test}
+The rest of the article is organized as follows.
+\red{Rewrite}
 introduces test statistics implemented in the package. The interface
 of the test functions are presented in Section 3. Section 4 uses a
 simulation study to compare the test statistics. Section 5 illustrates
 the usage of the package using a real data analysis for a eye
 study. THe last section discusses possible extensions of the package.
 
-
-
-
-
-
-
-
-
-%% note the label style. It helps to distinguish from
-%% table or figure labels.
 
 
 \section{Wilcoxon Rank Sum Test}
@@ -563,6 +533,85 @@ does not allow small sample permutation test since it allows arbitraty
 intracluster dependence structure.
 
 
+\section{Usage}
+The single interface function \code{cluswilcox.test} in the package
+resembles the function \code{wilcox.test} in the \pkg{stats} package
+which is shared by the ranksum test and signed rnak test.
+ 
+
+There are two ways to call the clustered rank sum test. The first one
+uses a formula interface, i.e., the first argument of the function is
+a formula of the form \code{lhs ~ rhs}. The \code{lhs} is the
+variable of the observation and the \code{rhs} is of the form
+\code{cluster(cid) + group(gid)}, where \code{cid} and \code{gid} are
+the variables which contain the cluster id and treatment group id. Further,
+if the observations are stratified by a categorical variable and the
+\code{rgl} method is used, then the \code{lhs} can be set to be
+\code{cluster(cid) + group(gid) + stratum(sid}, where \code{sid}
+contains the stratification id. In addition, the user can decide how
+to treat the \code{NA} values and if a subset of the data are used for
+the comparison by set the values of \code{na.action} and
+\code{subset}. The data \code{data} used in the illustration below
+contains three variables: \code{id} is the cluster id, \code{group} is
+the group id, and \code{z} contains the observations.
+
+<<rseg, eval = FALSE, echo = TRUE>>=
+cluswilcox.test(z ~ cluster(id) + group(group), data = data)
+@ 
+
+If \code{data} contains an extra stratificaiton variable, \code{strat},
+then to incorporate the stratification effect, the following code can
+be used:
+
+<<rseg11, eval = FALSE, echo = TRUE>>=
+cluswilcox.test(z ~ cluster(id) + group(group) + stratum(strat), 
+                data = data, method = "rgl")
+@ 
+
+If the group variable contains more than $2$ levels, then the
+\code{ds} method should be used:
+
+<<rseg12, eval = FALSE, echo = TRUE>>=
+cluswilcox.test(z ~ cluster(id) + group(group), data = data, 
+                method = "ds")
+@ 
+
+Note that the stratification variable is only allowed for the method
+\code{rgl} when the treatment is assgiend at the cluster level.
+
+
+Another interface for the clustered rank sum test uses a numerical
+vector contains the observations as the first argument. A treatment
+group id \code{group} is required and the \code{paired} should be set
+to be \code{FALSE} (default) in addition.
+
+<<rseg2, eval = FALSE, echo = TRUE>>=
+cluswilcox.test(z, cluster = id, group = group, data = data,
+                method = 'rgl', paired = FALSE)
+@
+
+ 
+For the clustered signed rank test, there are two ways to call the
+function. First, if the data are the observed difference between the
+two dependent groups, e.g., dataframe \code{data} contains the
+observed difference \code{z} and cluster id \code{id}, then the
+function is called as the following:
+
+<<sreg, eval = FALSE, echo = TRUE>>=
+cluswilcox.test(z, cluster = id, data = data, paired = TRUE)
+@
+
+If the observations from the two groups are saved in two vectors instead, say, \code{x} and \code{y}, 
+then the function can be called as the following:
+
+<<sreg2, eval = FALSE, echo = TRUE>>=
+cluswilcox.test(x, y = y, cluster = id, data = data, paired = TRUE)
+@ 
+
+There are two methods for each test, \code{rgl} and \code{ds}. The
+default method is \code{rgl}. Both methods can deal with data with
+identical or varied cluster size and with treatment assigned at
+cluster or sub-cluster level.
 %% Note: If there is markup in \(sub)section, then it has to be escape as above.
 
 

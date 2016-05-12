@@ -161,6 +161,7 @@ cluswilcox.test.signedrank.ds <- function(x, cluster, alternative,
                                           mu, DNAME, METHOD) {
     x <- x - mu
     csize <- as.vector(table(cluster))
+    l.csize <- length(csize)
     cid <- as.numeric(names(csize))
     m <- length(csize)
     n <- sum(csize)
@@ -169,7 +170,39 @@ cluswilcox.test.signedrank.ds <- function(x, cluster, alternative,
     niplus <- aggregate(plus ~ cluster, FUN = sum)[, 2]
     niminus <- aggregate(minus ~ cluster, FUN = sum)[, 2]
     ni <- table(cluster)
-    Z <- sum((niplus - niminus) / ni) / sqrt(sum(((niplus - niminus) / ni) ^ 2))
+
+    csize.cum <- cumsum(csize)
+    csize.cum <- c(0, csize.cum)
+
+    Fi <- function(X, i) {
+        xi <- x[(csize.cum[i] + 1) : csize.cum[i +  1]]
+        (sum(abs(xi) <= X) + sum(abs(xi) < X)) / (2 * csize[i])
+    }
+
+    Ftot <- function(X) {
+        st <- 0
+        for( i in 1 : l.csize) {
+            st <- st + Fi(X, i)
+        }
+        return(st)
+    }
+    Fcom <- function(X) {
+        st <- 0
+        for ( i in 1 : l.csize) {
+            st <- st + Fi(X, i) * csize[i]
+        }
+        return(st / n)
+    }
+    
+    Ftot.vec <- Vectorize(Ftot)
+    Fi.vec <- Vectorize(Fi)
+    Fcom.vec <- Vectorize(Fcom)
+    T <- sum((niplus - niminus) / ni) + sum((sign(x) * (Ftot.vec(abs(x)) - Fi.vec(abs(x), cluster)) / rep.int(ni, times = ni)))
+
+    temp <- sign(x) * Fcom.vec(abs(x))
+    temp <- aggregate(temp ~ cluster, FUN = sum)[, 2]
+    VTS <- sum(((niplus - niminus) / ni + (l.csize - 1) / ni * temp) ^ 2 )
+    Z <- T / sqrt(VTS)
     P_val <- switch(alternative, less = pnorm(abs(Z)),
                     greater = pnorm(abs(Z), lower.tail = FALSE),
                     two.sided = 2 * min(pnorm(abs(Z)),
