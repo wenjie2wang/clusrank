@@ -34,7 +34,7 @@ Yujing Jiang\\ University of Connecticut \And
 \pkg{clusrank}}
 
 %% for pretty printing and a nice hypersummary also set:
-\Plainauthor{Yujing Jiang, Xin He, Mei-Ling Ting Lee, 
+\Plainauthor{Yujing Jiang, Xin He, Mei-Ling Ting Lee,
   Bernard Rosner, Jun Yan}
 %% comma-separated
 \Plaintitle{Rank-Based Tests for Clustered Data with R package clusrank}
@@ -328,8 +328,8 @@ of the asymptotic theory.
 \subsection{RGL method extension: treatment assigned at subunit level}
 
 Another test for the case when the treatment is assigned at subunit
-level was proposed by 
-%\citet{Rosn:Glyn:Lee:exte:2006}. 
+level was proposed by
+%\citet{Rosn:Glyn:Lee:exte:2006}.
 Two test
 statistics were constructed for balanced and unbalanced data
 respectively. For balanced data, the Wilcoxon rank sum statistic is
@@ -534,10 +534,33 @@ intracluster dependence structure.
 
 
 \section{Usage}
-The single interface function \code{cluswilcox.test} in the package
-resembles the function \code{wilcox.test} in the \pkg{stats} package
-which is shared by the ranksum test and signed rnak test.
- 
+The package \pkg{clusrank} provides a single interface function for
+both Wilcoxon rank sum test and signed rank for clustered data. We
+illustrate the usage on simulated data sets which are included in the
+package for the two tests.
+
+<<crsd, eval = TRUE, echo = TRUE>>=
+library("clusrank")
+load("crdStr", package = "clusrank")
+head(crdStr, 8)
+@
+
+The dataset \code{crdStr} contains $956$ observations of $4$ variables
+where \code{id}, \code{z}, \code{group} and \code{stratum} are cluster
+id, observed score of each subject, treatment group id and stratum id
+respectively. To compare the locations of the observed score of the
+two treatment groups, we apply the clustered Wilcoxon rank sum test:
+
+<<rksum1, eval = FALSE, echo = TRUE>>=
+cluswilcox.test(z, cluster = id, group = group, stratum = stratum,
+                data = crdStr, alternative = "two.sided",
+                mu = 0, paired = FALSE, method = "rgl")
+@
+
+
+
+
+
 
 There are two ways to call the clustered rank sum test. The first one
 uses a formula interface, i.e., the first argument of the function is
@@ -557,24 +580,24 @@ the group id, and \code{z} contains the observations.
 
 <<rseg, eval = FALSE, echo = TRUE>>=
 cluswilcox.test(z ~ cluster(id) + group(group), data = data)
-@ 
+@
 
 If \code{data} contains an extra stratificaiton variable, \code{strat},
 then to incorporate the stratification effect, the following code can
 be used:
 
 <<rseg11, eval = FALSE, echo = TRUE>>=
-cluswilcox.test(z ~ cluster(id) + group(group) + stratum(strat), 
+cluswilcox.test(z ~ cluster(id) + group(group) + stratum(strat),
                 data = data, method = "rgl")
-@ 
+@
 
 If the group variable contains more than $2$ levels, then the
 \code{ds} method should be used:
 
 <<rseg12, eval = FALSE, echo = TRUE>>=
-cluswilcox.test(z ~ cluster(id) + group(group), data = data, 
+cluswilcox.test(z ~ cluster(id) + group(group), data = data,
                 method = "ds")
-@ 
+@
 
 Note that the stratification variable is only allowed for the method
 \code{rgl} when the treatment is assgiend at the cluster level.
@@ -590,7 +613,7 @@ cluswilcox.test(z, cluster = id, group = group, data = data,
                 method = 'rgl', paired = FALSE)
 @
 
- 
+
 For the clustered signed rank test, there are two ways to call the
 function. First, if the data are the observed difference between the
 two dependent groups, e.g., dataframe \code{data} contains the
@@ -601,12 +624,12 @@ function is called as the following:
 cluswilcox.test(z, cluster = id, data = data, paired = TRUE)
 @
 
-If the observations from the two groups are saved in two vectors instead, say, \code{x} and \code{y}, 
+If the observations from the two groups are saved in two vectors instead, say, \code{x} and \code{y},
 then the function can be called as the following:
 
 <<sreg2, eval = FALSE, echo = TRUE>>=
 cluswilcox.test(x, y = y, cluster = id, data = data, paired = TRUE)
-@ 
+@
 
 There are two methods for each test, \code{rgl} and \code{ds}. The
 default method is \code{rgl}. Both methods can deal with data with

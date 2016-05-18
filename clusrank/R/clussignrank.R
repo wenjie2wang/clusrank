@@ -140,6 +140,7 @@ cluswilcox.test.signedrank.rgl <- function(x, cluster, alternative,
       names(W_c) <- "test statistic"
 
       ADJUST <- TRUE
+      names(mu) <- "shift in location"
 
       names(n) <- "total number of observations"
       names(m) <- "total number of clusters"
@@ -160,6 +161,9 @@ cluswilcox.test.signedrank.rgl <- function(x, cluster, alternative,
 cluswilcox.test.signedrank.ds <- function(x, cluster, alternative,
                                           mu, DNAME, METHOD) {
     x <- x - mu
+    order.c <- order(cluster)
+    x <- x[order.c]
+    cluster <- cluster[order.c]
     csize <- as.vector(table(cluster))
     l.csize <- length(csize)
     cid <- as.numeric(names(csize))
@@ -181,14 +185,14 @@ cluswilcox.test.signedrank.ds <- function(x, cluster, alternative,
 
     Ftot <- function(X) {
         st <- 0
-        for( i in 1 : l.csize) {
+        for( i in 1 : (l.csize - 1)) {
             st <- st + Fi(X, i)
         }
         return(st)
     }
     Fcom <- function(X) {
         st <- 0
-        for ( i in 1 : l.csize) {
+        for ( i in 1 : (l.csize - 1)) {
             st <- st + Fi(X, i) * csize[i]
         }
         return(st / n)
@@ -197,7 +201,10 @@ cluswilcox.test.signedrank.ds <- function(x, cluster, alternative,
     Ftot.vec <- Vectorize(Ftot)
     Fi.vec <- Vectorize(Fi)
     Fcom.vec <- Vectorize(Fcom)
-    T <- sum((niplus - niminus) / ni) + sum((sign(x) * (Ftot.vec(abs(x)) - Fi.vec(abs(x), cluster)) / rep.int(ni, times = ni)))
+    cluster.reco <- recoderFunc(cluster, unique(cluster), c(1 : l.csize))
+    T <- sum((niplus - niminus) / ni) +
+        sum((sign(x) * (Ftot.vec(abs(x)) - Fi.vec(abs(x), (cluster.reco))) /
+             rep.int(ni, times = ni)))
 
     temp <- sign(x) * Fcom.vec(abs(x))
     temp <- aggregate(temp ~ cluster, FUN = sum)[, 2]
@@ -211,7 +218,7 @@ cluswilcox.test.signedrank.ds <- function(x, cluster, alternative,
     names(n) <- "total number of observations"
     names(m) <- "total number of clusters"
     names(Z) <- "Test Statistic"
-    names(mu) <- "mu"
+    names(mu) <- "shift in location"
     result <- list(statistic = Z,
                  p.value = P_val, n = n, cn = m,
                  alternative = alternative,

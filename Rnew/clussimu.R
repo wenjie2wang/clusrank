@@ -272,7 +272,7 @@ clus.simu.sr.info <- function(M, n, beta, delta, rho) {
     ##  n: a vector or a numeric, possible cluster size
     ##  beta: a numeric, the parameter of the beta distribution for
     ##      determine the sample size and sign of the observation
-    ## rho: rho is suppposed to have the length of hte number of clusters
+    ##  rho: rho is suppposed to have the length of hte number of clusters
     ran <- rbeta(M, 1, beta)
     cluster.size <- ifelse(ran < 0.5, n[1], n[2])
     sn <- ifelse(ran < 0.5, 1, -1)
@@ -312,7 +312,7 @@ do1.sr1 <- function(M, n, delta, rho, method = c("rgl", "ds"), paired = FALSE) {
         pval <- cluswilcox.test(X, cluster = cluster, data = dat, paired) $ p.value
     }
     if(method == "ds") {
-                pval <- cluswilcox.test(X, cluster = cluster, data = dat, paired, method = "ds") $ p.value
+        pval <- cluswilcox.test(X, cluster = cluster, data = dat, paired, method = "ds") $ p.value
     }
     return(pval)
 }

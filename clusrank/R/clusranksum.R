@@ -335,6 +335,7 @@ cluswilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
 }
 
 #' @importFrom MASS ginv
+
 cluswilcox.test.ranksum.ds <- function(x, cluster, group,
                                        alternative,
                                        mu,
@@ -343,130 +344,134 @@ cluswilcox.test.ranksum.ds <- function(x, cluster, group,
     if(group.uniq == 1) {
         stop("invalid group variable, should contain at least 2 groups")
     }
-     n.obs <- length(x)
+    n.obs <- length(x)
+    
+    Fhat <- numeric(n.obs)
+    order.c <- order(cluster)
+    cluster <- cluster[order.c]
+    x <- x[order.c]
+    group <- group[order.c]
     cluster.uniq <- unique(cluster)
     M <- length(cluster.uniq)
+
     ni <- table(cluster)
-    Fhat <- numeric(n.obs)
-    for( i in 1 : n.obs) {
-        Fhat[i] <- (sum(x <= x[i]) + sum(x < x[i])) / (2 * n.obs)
-  }
-
-    F.prop <- numeric(n.obs)
-    for( j in 1 : n.obs) {
-        Fj <- numeric(M)
-        for( i in 1 : M) {
-            Fj[i] <- (sum(x[cluster == i] < x[j]) + 0.5 * sum(x[cluster == i] == x[j])) / ni[i]
-      }
-        F.prop[j] <- sum(Fj[-cluster[j]])
-  }
-
-
+    
+    temp <- unique(sort(abs(x)))
+    diff.min <- min(diff(temp)) / 10 ## A quntity 1 / 10 of the minimum difference between scores
+    
+    FHat <- ecdf(x)
+    Fhat <- FHat(x) / 2 + FHat(x - diff.min) / 2
+     
+    
+    F.prop <- Fprop(x, cluster, ni, M, n.obs)
+    F.prop2 <<- F.prop
+    
     if(group.uniq == 2) {
 #####calculate quantity 2 (using the pooled estimate of F)
         group <- recoderFunc(group, order(unique(group)), c(0, 1))
         x[which(group == 0)] <- x[which(group == 0)] - mu
         ni1 <- aggregate(group ~ cluster, FUN = sum)[, 2] # number of obs under trt 2 in each cluster
-  ## Calculate S = E(W*|W, g)
+        ## Calculate S = E(W*|W, g)
         S <- 0
         for( i in 1 : M) {
             S <- S + sum(group[cluster == cluster.uniq[i]] /
                          ni[i] * ( 1 + F.prop[cluster == cluster.uniq[i]]))
-      }
-
+        }
+        
         S <- S / (M + 1)
-
-  ## Calculate E(S)
+        
+        ## Calculate E(S)
         ES <- sum(ni1 / ni) / 2
-
-  ## Calculate var(S)
-
+        
+        ## Calculate var(S)
+        
         W <- numeric(M)
         for(i in 1 : M) {
             Wi <- ((M - 1) * group[cluster == cluster.uniq[i]] -
                    sum(ni1[-i] / ni[-i])) *
                 Fhat[cluster == cluster.uniq[i]]
             W[i] <- sum(Wi) / (ni[i] * (M+1))
-  }
+        }
         a <- sum(ni1 / ni)
         EW <- M / (2 * (M + 1)) * (ni1 / ni - a / M)
         varS <- sum((W - EW)^2)
         Z <- (S - ES) / sqrt(varS)
-
+        
         pval <- switch(alternative, less = pnorm(abs(Z)),
                        greater = pnorm(abs(Z), lower.tail = FALSE),
                        two.sided = 2 * min(pnorm(abs(Z)),
                                            pnorm(abs(Z), lower.tail = FALSE)))
-      names(Z) <- "test statistic"
-      names(mu) <- "mu"
-      result <- list(statistic = Z, p.value = pval,
-                     alternative = alternative, null.value = mu,
-                     data.name = DNAME, method = METHOD)
+        names(Z) <- "test statistic"
+        names(mu) <- "difference in locations"
 
-      class(result) <- "ctest"
-      result
+        result <- list(statistic = Z, p.value = pval,
+                       alternative = alternative, null.value = mu,
+                       data.name = DNAME, method = METHOD)
 
-
-  } else {
+        class(result) <- "ctest"
+        result
+        
+        
+    } else {
 #####calculate quantity 2 (using the pooled estimate of F)
-      if(!is.null(mu) & mu != 0) {
-          warning("comparison between m (m > 2) groups cannot set location shift parameter")
-      }
-      mu <- 0
-  m <- length(unique(group))
-  Sj <- numeric(m)
-  group.uniq <- unique(group)
-  for( j in 1 : m) {
-      for( i in 1 : M) {
-          gik.j <- ifelse(group == j, 1, 0)
-          Sj[j] <- Sj[j] + sum(gik.j[cluster == cluster.uniq[i]] *
-                                   (1 + F.prop[cluster == cluster.uniq[i]])) / ni[i]
-      }
-  }
-  Sj <- Sj / (M + 1)
+        if(!is.null(mu) & mu != 0) {
+            warning("comparison between m (m > 2) groups cannot set location shift parameter")
+        }
+        mu <- 0
+        m <- length(unique(group))
+        Sj <- numeric(m)
+        group.uniq <- unique(group)
+        for( j in 1 : m) {
+            for( i in 1 : M) {
+                gik.j <- ifelse(group == j, 1, 0)
+                Sj[j] <- Sj[j] + sum(gik.j[cluster == cluster.uniq[i]] *
+                                     (1 + F.prop[cluster == cluster.uniq[i]])) / ni[i]
+            }
+        }
+        Sj <- Sj / (M + 1)
+        
+        nij <- matrix( 0, m, M)
+        for( i in 1 : m) {
+            nij[i, ] <- table(cluster[group == group.uniq[i]])
+        }
+        d <- apply(nij, 1, FUN = function(x) {x / ni})
+        ESj <- apply(d, 2, sum) / 2
+        
+        What <- matrix(0, m, M)
+        a <- t(d)
+        for( i in 1 : M) {
+            for( j in 1 : m) {
+                gik.j <- ifelse(group[cluster == cluster.uniq[i]] == j, 1, 0)
+                b <- 1 / (ni[i] * (M + 1))
+                c <- gik.j * (M - 1)
+                d <- sum(a[j, -i])
+                What[j, i] <- b * sum((c - d) * Fhat[cluster == cluster.uniq[i]])
+            }
+        }
+        EW <- matrix(0, m, M)
+        for( j in 1 : m) {
+            EW[j, ] <- (M / (2 * ( M + 1))) * (a[j, ] - sum(a[j, ]) / M)
+        }
 
-  nij <- matrix( 0, m, M)
-  for( i in 1 : m) {
-      nij[i, ] <- table(cluster[group == group.uniq[i]])
-  }
-  d <- apply(nij, 1, FUN = function(x) {x / ni})
-  ESj <- apply(d, 2, sum) / 2
-
-  What <- matrix(0, m, M)
-  a <- t(d)
-  for( i in 1 : M) {
-      for( j in 1 : m) {
-          gik.j <- ifelse(group[cluster == cluster.uniq[i]] == j, 1, 0)
-          b <- 1 / (ni[i] * (M + 1))
-          c <- gik.j * (M - 1)
-          d <- sum(a[j, -i])
-          What[j, i] <- b * sum((c - d) * Fhat[cluster == cluster.uniq[i]])
-      }
-  }
-  EW <- matrix(0, m, M)
-  for( j in 1 : m) {
-      EW[j, ] <- (M / (2 * ( M + 1))) * (a[j, ] - sum(a[j, ]) / M)
-  }
-
-  dev.W <- What - EW
-  V <- matrix(0, m, m)
+        dev.W <- What - EW
+        V <- matrix(0, m, m)
   for( i in 1 : M) {
       V <- V + dev.W[, i] %*% t(dev.W[, i])
   }
-  V <- V / M
-  T <- t(Sj - ESj) %*% ginv(V) %*% (Sj - ESj) / M
-    pval <- pchisq(T, df = (m - 1),lower.tail = F)
-      names(T) <- "test statistic"
-      ngrp <- group.uniq
-      df <- ngrp - 1
-      names(ngrp) <- "Number of groups: "
-      names(df) <- "Degree of freedom: "
-      METHOD <- paste(METHOD, "using Chisq test")
-                                        #calculate the test statistic
-      result <- list(statistic = T, p.value = pval, n.group = ngrp,
-                     df = df,
-                     data.name = DNAME, method = METHOD)
-      class(result) <- "ctest"
-      result
-  }
+        V <- V / M
+        T <- t(Sj - ESj) %*% ginv(V) %*% (Sj - ESj) / M
+        pval <- pchisq(T, df = (m - 1),lower.tail = F)
+        names(T) <- "test statistic"
+        ngrp <- group.uniq
+        df <- ngrp - 1
+        names(ngrp) <- "Number of groups: "
+        names(df) <- "Degree of freedom: "
+        METHOD <- paste(METHOD, "using Chisq test")
+#calculate the test statistic
+        result <- list(statistic = T, p.value = pval, n.group = ngrp,
+                       df = df,
+                       data.name = DNAME, method = METHOD)
+        class(result) <- "ctest"
+        result
+    }
 }

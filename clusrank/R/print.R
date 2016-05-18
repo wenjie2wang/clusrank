@@ -67,7 +67,7 @@ print.ctest <- function (x, digits = getOption("digits"), prefix = "\t", ...)
   
   out <- character()
   if (!is.null(x$statistic))
-      out <- c(out, paste(names(x$statistic), "=", format(signif(x$statistic,
+     out <- c(out, paste(names(x$statistic), "=", format(signif(x$statistic,
                                                                  max(1L, digits - 2L)))))
   ## if (!is.null(x$parameter))
   ##  out <- c(out, paste(names(x$parameter), "=", format(signif(x$parameter,
@@ -81,9 +81,9 @@ print.ctest <- function (x, digits = getOption("digits"), prefix = "\t", ...)
   cat(strwrap(paste(out, collapse = ", ")), sep = "\n")
   out <- character()
   
-  if(!is.null(x$n) | !is.null(x$cn)){
-      if(!is.null(x$n))
-          out <- c(out, paste(names(x$n), "=", format(signif(x$n, max(1L, digits - 2L)))))
+  if(!is.null(x$n.obs) | !is.null(x$cn)){
+      if(!is.null(x$n.obs))
+          out <- c(out, paste(names(x$n.obs), "=", format(signif(x$n.obs, max(1L, digits - 2L)))))
       if(!is.null(x$cn))
           out <- c(out, paste(names(x$cn), "=", format(signif(x$cn,
                                                               max(1L, digits - 2L)))))
@@ -98,8 +98,12 @@ print.ctest <- function (x, digits = getOption("digits"), prefix = "\t", ...)
                                                               max(1L, digits - 2L)))))
       cat(strwrap(paste(out, collapse = ", ")), sep = "\n")
   }
-  if(!is.null(x$adjusted) && x$adjusted == TRUE)
+  if(!is.null(x$adjusted) && x$adjusted == TRUE) {
       cat("The signed rank test statistics is adjusted since the data is unbalanced.")
+      cat("\n")
+  }
+
+      
   if(!is.null(x$balance) && x$balance == FALSE) {
       cat("The data is unbalanced")
       cat("\n")
