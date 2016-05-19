@@ -1,35 +1,62 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 Rcpp::IntegerVector score_, w;
-int crksum(int rks, int I, int J) {
-  int minrks, i, j;
-  Rcpp::IntegerVector score_sub, idx = seq_len(I) - 1;
+//[[Rcpp::export]]
+
+int crksum(int rks, int I, int J, int sumrks) {
+  int minrks, maxrks,  i, j, c;
+  Rcpp::IntegerVector score_sub, idx, idx_sum, score_sum;
   if( I < 0 | J < 0) return(0);    
-  if( rks < 0) {
-    if( I >= 0) {
-      return(0);
-    }
+
+  c = (int) (sumrks / 2); 
+  if(rks > c | rks > c) {
+    rks = sumrks - rks;
+    i = J;
+    j = I;
+  } else {
+    i = I;
+    j = J;
   }
+  
+  idx = seq_len(i) - 1;
   score_sub = score_[idx];
-  minrks = sum(score_sub);
-  if(rks < J) return(crksum(rks, I, rks));
-  if(rks < minrks) return(0);  
-  if( I == 0) return(1);
-  if( J == 0) {
-    if( sum(score_sub) > rks) return(0);
-    return(1);
+  minrks = sum(score_sub); /* Smallest possible rank sum */
+  idx = I + J - idx - 1;
+  score_sub = score_[idx];
+  maxrks = sum(score_sub);
+  
+  if(rks < minrks |  (rks > (maxrks))) return(0);
+
+  /* Rcpp::Rcout << " i = " << i << " j = " << j <<"rks = " << rks <<  std::endl; */
+  if( i == 0) {
+    return( rks == 0);
   }
-  if( I > 0 & J >= 0) {
-    return(crksum(rks - score_[I+J-1], I-1, J) + crksum(rks, I, J-1));
+  
+ 
+  if(rks < j) {
+    idx_sum = seq_len(i + rks) - 1;
+    score_sum = score_[idx_sum];
+    sumrks = sum(score_sum);
+    return(crksum(rks, i, rks, sumrks));
+  }
+  if( j == 0) {
+
+    return( rks == 0);
+  } else {
+    /*Rcpp::Rcout << rks <<  " score_[i + j - 1] = " << score_[i + j - 1] << std::endl;*/
+    sumrks = sumrks - score_[i + j - 1];
+    return(crksum(rks - score_[i+j-1], i-1, j, sumrks) + crksum(rks, i, j-1, sumrks));
   }
 }
 
 //[[Rcpp::export]]
-double pcrksumg(int rks, int I, int J, IntegerVector Score) {
-  int sumrks, i;
+double pcrksumg(int rks, int I, IntegerVector Score) {
+  int sumrks, i, n, J;
   int N;
   double p, nrksum;
   score_ = Score;
+  n = Score.size();
+  J = n - I;
   N = Rf_choose(I + J, I);
   Rcpp::Rcout<<N<<std::endl;
   sumrks = sum(Score);
@@ -38,10 +65,13 @@ double pcrksumg(int rks, int I, int J, IntegerVector Score) {
     i = I;
     I = J;
     J = i;
-    nrksum = crksum(rks, I, J);
+    nrksum = crksum(rks, I, J, sumrks);
+    Rcpp::Rcout << nrksum << std::endl;
     return( 1 - nrksum / N );
   } else {
-    nrksum = crksum(rks, I, J);    
+    nrksum = crksum(rks, I, J, sumrks);
+    
+    Rcpp::Rcout << nrksum << std::endl;
     return(nrksum / N);
   }
 }
@@ -54,7 +84,8 @@ int csrkg(int srk, IntegerVector Score) {
   /* Count the no of combination with a sum rank less than srk */
   /* The sum rank is sum(rank[ rank > 0]) in the programme*/
   /* The input sum rank is sum(sign(rank) * rank) */
-  int N, max_s, sum_s,u, c, j;
+  int N, max_s, sum_s,u, c, j
+    ;
   IntegerVector compare(2), w1;
   N = Score.size();
 
