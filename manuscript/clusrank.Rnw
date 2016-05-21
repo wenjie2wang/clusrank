@@ -50,7 +50,7 @@ the popular one-sample and two-sample $t$-tests.
 For independent data, they are available in
 the built-in \pkg{stats} package of \proglang{R}.
 For clustered data, several rank-based tests that accounts for
-within-cluster dependence have been recently developed, but no existing
+intracluster dependence have been recently developed, but no existing
 package provides all of them with ease of access at one place.
 In package \pkg{clusrank}, the latest developments are implemented
 and wrapped under a unified high-level user-friendly function.
@@ -129,28 +129,32 @@ with illustrations via simulated and real data.
 
 \section{Introduction}
 
+Wilcoxon rank-sum and signed rank tests are important tools for
+two-group comparison and paired comparison, respectively. 
+Unlike their counterparts under the normality assumption, they are
+based on ranks with no need for distributional specification.
+Implementations of Wilcoxon rank-sum and signed rank tests have been
+available in standard software packages, such as \proglang{R} package
+\pkg{stats}, and \proglang{SAS PROC RANK}.
+Nonetheless, the existing implementations assume independent data,
+which cannot be applied to clustered data arising in many fields. 
+Clustered data consists of data from clusters, where clusters are
+mutually independent but there is dependence within each cluster.
+For example, in longitudinal studies or familial studies, measures
+from the same subject are not independent but correlated.
+The effective sample size of the clustered data will be different from
+the number of individual observations due to intracluster dependence.
+The variance of the testing statistics under independence are invalid.
+As a consequence, the resulting p-values would be misleading.
 
-\red{Give more specifics of the eye study and use it as a motivating example.}
-Clustered data arise in many applications where the
-data are grouped into independent clusters with correlated cluster members.
-In an eye study, for instance, the measurements from each individual consist a
-cluster.
-When the goal of a study is to compare two populations or the outcome of a
-treatment to a baseline, standard Wilcoxon rank-sum test or signed rank test
-are popular tools if the distribution of the data is non-normal or unknown.
-However, these tests cannot be applied to clustered data directly since the
-effective sample size of the clustered data will be different from the number
-of observations due to non-zero intracluster correlation. As a consequence, the
-p-value will be either under-estimated or over-estimated.
 
-
-
-Recent developments have extended the Wilcoxon rank-sum test
-and signed rank test to clustered data. A Mann-Whitney U statistic for
-clustered data was first proposed by \citet{Rosn:Grov:use:1999}. The variance
-of the test statistic is corrected by four types of intra cluster correlation.
-However, no large sample theory was proved. A large sample test statistic for
-clustered data by conditioning on the cluster size was introduced in
+Several recent developments have extended the Wilcoxon rank-sum test
+and signed rank test to clustered data. 
+\citet{Rosn:Grov:use:1999} proposed a Mann--Whitney $U$-statistic for
+clustered data which corrects the variance of the test statistic for four 
+types of intracluster correlation, but provided no large sample theory.
+\citet{Rosn:Glyn:Lee:inco:2003} 
+A large sample test statistic for clustered data by conditioning on the cluster size was introduced in
 \citet{Rosn:Glyn:Lee:inco:2003} with asymptotic normality of the null
 distribution justified. This approach also allows data which are stratified by
 an extra covariant.  However, this approach requires that, first, members from
