@@ -241,7 +241,7 @@ the individuals in the $i$th cluster.
 The Wilcoxon rank-sum statistic is 
 \begin{equation}
 \label{eq:rglrs}
-W_{R} = \sum_{i = 1}^N \delta_{i}R_{i+}.
+W = \sum_{i = 1}^N \delta_{i}R_{i+}.
 \end{equation}
 
 
@@ -257,7 +257,7 @@ Let $G$ be the maximum cluster size; i.e., $G = \max_{1 \le i \le N} n_i$.
 The rank-sum statistic in Equation~\ref{eq:rglrs} can be written as
 \begin{equation}
 \label{eq:rglrs1}
-W_{R} = \sum_{g=1}^{G}\sum_{i \in I_g}\delta_{i}R_{i+} = \sum_{j = 1}^{G}W_g,
+W = \sum_{g=1}^{G}\sum_{i \in I_g}\delta_{i}R_{i+} = \sum_{j = 1}^{G}W_g,
 \end{equation}
 where $I_g$ is the set of indices of clusters whose size is $g$ and
 $W_g = \sum_{i \in I_g} \delta_i R_{i+}$.  
@@ -270,11 +270,9 @@ $\prod_{g = 1}^G {N_g \choose m_g}$.
 
 When $N$ is large, exhaustive permutation is infeasible, and 
 \citet{Rosn:Glyn:Lee:inco:2003} proposed an asymptotic test statistic
-\begin{equation*}
-Z_{R} = \frac{W_{R} - \E (W_{R}) } {\sqrt{\VAR(W_{R})}},
-\end{equation*}
-where $\E(W_{R}) = \sum_{g = 1}^G \E(W_g)$, and 
-$\VAR(W_{R}) = \sum_{i=1}^G \VAR(W_g)$.
+$Z = {W - \E (W) } /  {\sqrt{\VAR(W)}},$
+where $\E(W) = \sum_{g = 1}^G \E(W_g)$, and 
+$\VAR(W) = \sum_{g=1}^G \VAR(W_g)$.
 Suppose that among the $N_g$ clusters of size $g$, there are $m_g$
 clusters in group~1 and $n_g$ clusters in group~2.
 Under $H_0$, for clusters with size $g$, the distribution of
@@ -304,32 +302,31 @@ dependence is weak; otherwise, because the effective number of
 independent observations per cluster becomes smaller, it overweights
 larger clusters, and, hence, may have lower efficiency.
 
-\subsection{DS rank sum test}
-The above RGL rank sum test for clustered data can only be applied
-when cluster is the unit of randomization of treatment assignment.
-When the treatment is assigned at the subunit level instead of the
-cluster level, the DS rank sum test \citep{Datt:Satt:rank:2005} can be
-applied.
+\subsection{DS method: individual-level grouping}
 
+We use DS to denote the method of \citet{Datt:Satt:rank:2005}.
 The construction of the DS test statistic involves randomly picking an
 observation from each cluster, say, $X_i^*$ from the $i$th cluster to
-form a pseudo-sample. A Wilcoxon rank sum statistic is then
-constructed from this pseudo-sample,
+form a pseudo-sample, and then calculating the Wilcoxon rank-sum
+statistic for the pseudo-sample,
 \begin{equation*}
   W^* = \frac{1}{N+1}\sum^N_{i = 1}\delta_i^*R_i^*,
   \end{equation*}
-where $\delta_i^*$ is the indicator of whether $X_I^*$ is under
-treatment $1$ and $R_i^*$ is the rank of $X_i^*$ among the
-pseudo-sample. The scaling factor $1 / (N+1)$ is for the ease of
-derivation of test statistic.  By averaging $W^*$ over all possible
-pseudo-samples given $\{X_{ij}, \delta_{ij}\}$,
+where $\delta_i^*$ is the indicator of whether $X_I^*$ is in group~1
+and $R_i^*$ is the rank of $X_i^*$ among the pseudo-sample. 
+By averaging $W^*$ over all possible pseudo-samples given $\{X_{ij},
+\delta_{ij}\}$, 
 \begin{equation}\label{eq:dsrsS}
-  S = E(W^*|\mathbf{X}, \mathbf{\delta})
-  \end{equation}
+  S = \E(W^* | \mathbf{X}, \mathbf{\delta}),
+\end{equation}
+FIXME: define notations!  
 a large sample test statistic is constructed as
 \begin{equation*}
-  Z_{D} = \frac{S - E(S)}{\sqrt{\hat{V}(S)}},
-  \end{equation*}
+  Z_{\mathrm{DS}} = \frac{S - E(\S)}{\sqrt{\hat{\VAR}(S)}},
+\end{equation*}
+FIXME: define.
+\red{Discuss the conditions of the theoretical results}
+
 
 This method can also be generalized to the comparison of location
 among $m$ treatment groups, $m \geq 3$. More specifically, for each
@@ -351,14 +348,15 @@ This method allows arbitrary dependence structure within each cluster
 and also works when treatment affects the correlation structure.
 Making no assumption on the intra-cluster dependence structure,
 however, renders it impossible to derive a small sample permutation
-test for DS rank sum statistic.  In addition, it cannot be applied to
+test for DS rank sum statistic. \red{why not?}
+In addition, it cannot be applied to
 data which are strictly contralateral, e.g., when all subjects under
 an eye study has one eye under treatment $1$ and the other eye under
 treatment $2$, due to the failure of the satisfying the requirements
 of the asymptotic theory.
 
 
-\subsection{RGL method extension: treatment assigned at subunit level}
+\subsection{RGL method: individual-level grouping}
 
 Another test for the case when the treatment is assigned at subunit
 level was proposed by
