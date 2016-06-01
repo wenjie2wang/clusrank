@@ -126,8 +126,10 @@
 #'
 #'@note Exact tests are not recommended in the current version of package.
 #' @importFrom  stats complete.cases na.omit terms complete.cases model.extract aggregate
-#' @importFrom stats lm ecdf pnorm qnorm var  pchisq setNames
+#' @importFrom stats lm ecdf pnorm qnorm var  pchisq setNames lag
 #' @importFrom MASS ginv
+#' @importFrom Rcpp evalCpp
+#' @useDynLib clusrank 
 #' @export
 
 cluswilcox.test <- function(x, ...) {
