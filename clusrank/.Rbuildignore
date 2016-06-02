@@ -1,9 +1,0 @@
-^.*\.Rproj$
-^\.Rproj\.user$
-^Makefile$
-^README.md$
-^simulation$
-^manuscript$
-^tests$
-^vignettes/jss.cls$
-^HEADER$

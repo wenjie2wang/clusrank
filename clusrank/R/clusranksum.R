@@ -80,7 +80,7 @@ cluswilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
                       two.sided = 2 * min(p.val.l, 1 - p.val.l))
         names(mu) <- "location"
 
-        names(Wc) <- "Rank sum statistic"
+        names(Wc) <- "rank sum statistic"
 
         result <- list(Rstat = Wc, p.value = pval,
                        null.value = mu, alternative = alternative,
@@ -132,10 +132,10 @@ cluswilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
                        two.sided = 2 * min(pnorm(abs(Zc)),
                                            pnorm(abs(Zc), lower.tail = FALSE)))
 
-        names(Wc) <- "Rank sum statistic"
-        names(EWc) <- "Expected value of rank sum statistic"
-        names(VarWc) <- "Variance of rank sum statistic"
-        names(Zc) <- "Test statistic"
+        names(Wc) <- "rank sum statistic"
+        names(EWc) <- "expected value of rank sum statistic"
+        names(VarWc) <- "variance of rank sum statistic"
+        names(Zc) <- "test statistic"
         names(mu) <- "difference in locations"
         result <- list(Rstat = Wc, ERstat = EWc,
                  VRstat = VarWc,
@@ -199,10 +199,10 @@ cluswilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
                        greater = pnorm(abs(Zc), lower.tail = FALSE),
                        two.sided = 2 * min(pnorm(abs(Zc)),
                                            pnorm(abs(Zc), lower.tail = FALSE)))
-        names(Wc) <- "Rank sum statistic"
-        names(EWc) <- "Expected value of rank sum statistic"
-        names(VarWc) <- "Variance of rank sum statistic"
-        names(Zc) <- "Test statistic"
+        names(Wc) <- "rank sum statistic"
+        names(EWc) <- "expected value of rank sum statistic"
+        names(VarWc) <- "variance of rank sum statistic"
+        names(Zc) <- "test statistic"
         names(mu) <- "difference in locations"
         result <- list(Rstat = Wc, ERstat = EWc,
                  VRstat = VarWc,
@@ -338,7 +338,7 @@ cluswilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
                                            pnorm(abs(Zc), lower.tail = FALSE)))
 
         names(Zc) <- "Test statistic"
-
+        
         names(mu) <- "difference in locations"
         result <- list( statistic = Zc, p.value = pval,
                        alternative = alternative, null.value = mu,
@@ -479,8 +479,8 @@ cluswilcox.test.ranksum.ds <- function(x, cluster, group,
         names(T) <- "test statistic"
         ngrp <- group.uniq
         df <- ngrp - 1
-        names(ngrp) <- "Number of groups: "
-        names(df) <- "Degree of freedom: "
+        names(ngrp) <- "number of groups: "
+        names(df) <- "degree of freedom: "
         METHOD <- paste(METHOD, "using Chisq test")
 #calculate the test statistic
         result <- list(statistic = T, p.value = pval, n.group = ngrp,

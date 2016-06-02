@@ -48,7 +48,7 @@ print.ctest <- function (x, digits = getOption("digits"), prefix = "\t", ...) {
         if(x$exact == TRUE) {
             x$method <- paste(x$method, "(exact distribution)")
         }
-        }
+    }
     cat(strwrap(x$method, prefix = prefix), sep = "\n")
     cat("\n")
     cat("data:  ", x$data.name, "\n", sep = "")
