@@ -223,6 +223,9 @@ where $n_i$ is the size of cluster $i$.
 Let $\delta_{ij}$ be the group indicator of $X_{ij}$;
 $\delta{ij} = 1$ if $X_{ij}$ is in group $1$, and 
 $\delta{ij} = 0$ if $X_{ij}$ is in group $2$. 
+The observed data consist of 
+$(\mathbf{X}, \boldsymbol{\delta}) = 
+\{X_{ij, \delta_{ij}: 1 \le j \le n_i; 1 \le i \le N$.
 Clusters are assumed to be independent, while
 individual observations within each cluster are not.
 The null hypothesis $H_0$ to be tested is that
@@ -305,44 +308,34 @@ larger clusters, and, hence, may have lower efficiency.
 \subsection{DS method: individual-level grouping}
 
 We use DS to denote the method of \citet{Datt:Satt:rank:2005}.
-The construction of the DS test statistic involves randomly picking an
-observation from each cluster, say, $X_i^*$ from the $i$th cluster to
-form a pseudo-sample, and then calculating the Wilcoxon rank-sum
-statistic for the pseudo-sample,
+Unlike the RGL method, the DS method allows individual observations 
+within the same cluster to have different group memberships.
+The test statistic is constructed from randomly picking one observation 
+from each cluster to form a pseudo-sample and averaging the standard 
+Wilcoxon rank-sum statistic over all possible pseudo-samples. 
+Let $X_i^*$ be the random pick from the $i$th cluster in a
+pseudo-sample, and $\delta_i^*$ be its group membership.
+The Wilcoxon rank-sum statistic for the pseudo-sample is
 \begin{equation*}
-  W^* = \frac{1}{N+1}\sum^N_{i = 1}\delta_i^*R_i^*,
-  \end{equation*}
-where $\delta_i^*$ is the indicator of whether $X_I^*$ is in group~1
-and $R_i^*$ is the rank of $X_i^*$ among the pseudo-sample. 
-By averaging $W^*$ over all possible pseudo-samples given $\{X_{ij},
-\delta_{ij}\}$, 
-\begin{equation}\label{eq:dsrsS}
-  S = \E(W^* | \mathbf{X}, \mathbf{\delta}),
-\end{equation}
-FIXME: define notations!  
-a large sample test statistic is constructed as
-\begin{equation*}
-  Z_{\mathrm{DS}} = \frac{S - E(\S)}{\sqrt{\hat{\VAR}(S)}},
+  W^* = \frac{1}{N+1}\sum^N_{i = 1}\delta_i^* R_i^*,
 \end{equation*}
-FIXME: define.
+where $R_i^*$ is the rank of $X_i^*$ among the pseudo-sample. 
+The test statistic of the DS method is
+\begin{equation*}
+  Z = \frac{S - \E(\S)}{\sqrt{\widehat{\VAR}(S)}},
+\end{equation*}
+where $S = \E(W^* | \mathbf{X}, \boldsymbol{\delta})$.
+
+
+
 \red{Discuss the conditions of the theoretical results}
 
 
-This method can also be generalized to the comparison of location
-among $m$ treatment groups, $m \geq 3$. More specifically, for each
-group $j \in \{1, \ldots, m\}$, a rank sum statistic $S^{j}$ is
-defined as in \eqref{eq:dsrsS} with the superscript $(j)$ noting that
-the averaging is taken over the rank sum of the $j$th group of all
-possible pseudo-samples. Let $\mathbf{S}$ be the $m-$vector of
-components $S^{(j)}$. The test statistic is then defined as
-\begin{equation*}
-  T_{D} = N^{-1}\{\mathbf{S} - E(\mathbf{S})\}^{T}\hat{\mathbf{V}}^-\{\mathbf{S} - E(\mathbf{S})\},
-  \end{equation*}
-where the expectation is taken componentwise, and
-$N^{-1}\hat{\mathbf{V}}^-$ is the generalized inverse of the estimate
-of the covariance matrix of $\mathbf{S}$.  The large sample test
-statistic $T_D$ follows a chi-squared distribution with degrees of
-freedom $m - 1$.
+The DS method can be generalized to the comparison of location among 
+$m$ treatment groups, $m \geq 3$, with the testing statistic constructed
+from a quadratic form of group-wise rank-sum vector.
+
+
 
 This method allows arbitrary dependence structure within each cluster
 and also works when treatment affects the correlation structure.
