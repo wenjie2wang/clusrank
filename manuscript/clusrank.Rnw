@@ -225,7 +225,7 @@ $\delta{ij} = 1$ if $X_{ij}$ is in group $1$, and
 $\delta{ij} = 0$ if $X_{ij}$ is in group $2$. 
 The observed data consist of 
 $(\mathbf{X}, \boldsymbol{\delta}) = 
-\{X_{ij, \delta_{ij}: 1 \le j \le n_i; 1 \le i \le N$.
+\{X_{ij}, \delta_{ij}: 1 \le j \le n_i; 1 \le i \le N\}$.
 Clusters are assumed to be independent, while
 individual observations within each cluster are not.
 The null hypothesis $H_0$ to be tested is that
@@ -327,26 +327,50 @@ The test statistic of the DS method is
 where $S = \E(W^* | \mathbf{X}, \boldsymbol{\delta})$.
 
 
-
-\red{Discuss the conditions of the theoretical results}
+\citet{Datt:Satt:rank:2005} derived the quantities needed to calculate
+the testing statistics, using mid-rank to allow for ties in the data.
+Let $F_i(x) = n_i^{-1} \sum_{k = 1}^{n_i} I(X_{ik} \le x)$ be the
+empirical distribution function of the observations from cluster~$i$.
+It can be shown that 
+\[
+S = \frac{1}{N+1} \sum_{i=1}^N\sum_{k=1}^{n_i} \frac{\delta_{ik}}{n_i} 
+\left[1 + \frac{1}{2}\sum_{j\ne i}\Big\{F_j(X_{ik}) + F_j(X_{ik}-)\Big\}\right].
+\]
+The expectation turns out to be
+\[
+\E(S) = \E(W^*) = \frac{1}{2}\sum_{i=1}^N \frac{n_i} {N}.
+\]
+The variance term $\VAR(S)$ is estimated by 
+\red{Check: there is no scalor like $1/ N$?}
+$\widehat\VAR(S) = \sum_{i=1}^N\big\{ \hat W_i - \E(W_i)\big\}^2,$
+where \red{define $n_{j1}$}
+\[
+\hat W_i = \frac{1}{2 n_i (N + 1)}
+\sum_{k=1}^{n_i}\left[(N - 1) \delta_{ik} - \sum_{j\ne i}^N \frac{n_{j1}}{n_j}\right]
+\left[\hat F(X_{ik}) + \hat F(X_{ik}-)\right],
+\]
+\[
+E(W_i) = \frac{N}{N + 1}\left(\frac{n_{i1}}{n_i} - \frac{1}{N}\sum_{j=1}\frac{n_{j1}}{n_j}\right),
+\]
+with $n_{j1}$ being the number of individuals in group~1 from cluster~$j$,
+and $\hat F = \sum_{i=1}^N n_i F_i / \sum_{i=1}^N n_i$,
+the pooled empirical distribution function of the observations.
+The asymptotic distribution of $Z$ is standard normal under mild
+conditions \citep[p.910]{Datt:Satt:rank:2005}.
 
 
 The DS method can be generalized to the comparison of location among 
 $m$ treatment groups, $m \geq 3$, with the testing statistic constructed
 from a quadratic form of group-wise rank-sum vector.
-
-
-
-This method allows arbitrary dependence structure within each cluster
-and also works when treatment affects the correlation structure.
-Making no assumption on the intra-cluster dependence structure,
-however, renders it impossible to derive a small sample permutation
-test for DS rank sum statistic. \red{why not?}
-In addition, it cannot be applied to
-data which are strictly contralateral, e.g., when all subjects under
-an eye study has one eye under treatment $1$ and the other eye under
-treatment $2$, due to the failure of the satisfying the requirements
-of the asymptotic theory.
+This method allows arbitrary intracluster dependence structure (not
+necessarily exchangeable as assumed in the RGL method) within each
+cluster and remains valid when treatment affects the correlation structure. 
+Making no assumption on the intracluster dependence structure,
+however, renders it impossible to derive a small sample permutation test.  
+In addition, it cannot be applied to data which are strictly
+contralateral (e.g., when all subjects in an eye study have exactly
+one eye under each treatment) due to the failure of the satisfying the
+requirements of the asymptotic theory.
 
 
 \subsection{RGL method: individual-level grouping}
