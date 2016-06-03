@@ -126,7 +126,10 @@
 #'
 #'@note Exact tests are not recommended in the current version of package.
 #' @importFrom  stats complete.cases na.omit terms complete.cases model.extract aggregate
+#' @importFrom stats lm ecdf pnorm qnorm var  pchisq setNames lag
 #' @importFrom MASS ginv
+#' @importFrom Rcpp evalCpp
+#' @useDynLib clusrank 
 #' @export
 
 cluswilcox.test <- function(x, ...) {
@@ -261,7 +264,7 @@ cluswilcox.test.formula <- function(formula, data = NULL, subset = NULL, na.acti
 cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
             group = NULL, stratum = NULL, data = parent.frame(),
             alternative = c("two.sided", "less", "greater"),
-            mu = 0, paired = FALSE, exact = NULL,
+            mu = 0, paired = FALSE, exact = FALSE,
             method = c("rgl", "ds"), DNAME = NULL, ...) {
     alternative <- match.arg(alternative)
     method <- match.arg(method)
@@ -332,7 +335,6 @@ cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
               }
             if(!is.null(pars$group)) {
               group <- data[, as.character(pars$group)]
-
             } else {
               group <- NULL
             }
@@ -439,11 +441,14 @@ cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
         if(toupper(method) == "DS") {
             METHOD <- paste(METHOD, "using Datta-Satten method", sep = " ")
             ## FIXME: The length of the list and the name do not match!
-            arglist <- setNames(list(x, cluster, group, alternative,
-                                     DNAME, METHOD, exact),
-                                c("x", "cluster", "group", "stratum",
-                                  "alternative", "DNAME", "METHOD",
-                                  "exact"))
+            arglist <- setNames(list(x, cluster, group, mu, alternative,
+                                     DNAME, METHOD),
+                                c("x", "cluster", "group", "mu",
+                                  "alternative", "DNAME", "METHOD"))
+            if(exact == TRUE) {
+                warning(" No exact test is provided for 'ds' method")
+            }
+
             if(length(table(stratum)) > 1L) {
                 warning("'stratum' will be ignored for the clustered rank sum test, 'ds' method")
             }

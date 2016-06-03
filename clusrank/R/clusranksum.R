@@ -31,7 +31,7 @@ cluswilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
     strt <- stats::aggregate(stratum ~ cluster, FUN = mean)[, 2]
     clus <- unique(cluster)
     dat <- data.frame(clus, strt, grp, csize, rksum)
-    bal <- (!(length(table(cluster)) != 1L))
+    bal <- (!(length(unique(table(cluster))) != 1L))
 
     csize.uniq <- unique(csize)
     strt.uniq <- unique(strt)
@@ -47,10 +47,13 @@ cluswilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
         exact <- FALSE
     }
     if(exact == TRUE) {
+        Wc <- sum(dat[dat$grp == 1, "rksum"])
+        n.layer <- l.csu * l.stu
+        mgv <- ngv <- rep(0, n.layer)
+        ct <- 1
+        rkx <- rkxc <- as.matrix(matrix(0, Wc + 1, n.layer))
         ## Small sample permutation test
-        perm.l <- vector("list", l.csu * l.stu)
         counter <- 1
-        perm.len <- rep(0, l.csu * l.stu)
         for( i in csize.uniq) {
             for( j in strt.uniq) {
                 j.ch <- as.character(j)
@@ -58,32 +61,31 @@ cluswilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
                 temp <- dat.l[[j.ch]][[i.ch]] ## data with csize i and stratum j
                 temp.rksum <- temp[, "rksum"]
                 temp.grp <- temp[, "grp"]
-                mgv <- length(temp.grp[temp.grp == 1])
-                perm.l[[counter]] <- utils::combn(temp.rksum, mgv, FUN = sum)
-                perm.len[counter] <- length(perm.l[[counter]])
+                mgv[counter] <- length(temp.grp[temp.grp == 1])
+                ngv[counter] <- length(temp.grp)
+                temp.x <- cumcrksum(Wc, mgv[counter], sort(temp.rksum))
+                rkx[, counter] <- temp.x[, 1]
+                rkxc[, counter] <- temp.x[, 2]
                 counter <- counter + 1
              }
          }
-        all.perm <- expand.grid(perm.l)
-        all.Wc <- rowSums(all.perm)
-        ##all.Wc is all possible values of Wc
-        Wc <- sum(dat[dat$grp == 1, "rksum"])
-        ecdf.Wc <- ecdf(all.Wc)
+        rkxi <- apply(rkxc, 1, function(x) all(x > 0))
+        rkx <- as.matrix(rkx[rkxi, ])
+        rkxc <- as.matrix(rkxc[rkxi, ])
+        p.val.l <- pcrksum_str(Wc, rkx, rkxc, mgv, ngv, rep(nrow(rkx), n.layer))
+        
         pval<- switch(alternative,
-                      less = ecdf.Wc(abs(Wc)),
-                      greater = 1 - ecdf.Wc(abs(Wc)),
-                      two.sided = 2 * min(ecdf.Wc(abs(Wc)),
-                                          1 - ecdf.Wc(abs(Wc)),
-                                          0.5))
-
+                      less = p.val.l,
+                      greater = 1 - p.val.l,
+                      two.sided = 2 * min(p.val.l, 1 - p.val.l))
         names(mu) <- "location"
 
-        names(Wc) <- "Rank sum statistic"
+        names(Wc) <- "rank sum statistic"
 
         result <- list(Rstat = Wc, p.value = pval,
                        null.value = mu, alternative = alternative,
                        data.name = DNAME, method = METHOD,
-                       balance = bal)
+                       balance = bal, exact = exact)
         class(result) <- "ctest"
         return(result)
 
@@ -130,10 +132,77 @@ cluswilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
                        two.sided = 2 * min(pnorm(abs(Zc)),
                                            pnorm(abs(Zc), lower.tail = FALSE)))
 
-        names(Wc) <- "Rank sum statistic"
-        names(EWc) <- "Expected value of rank sum statistic"
-        names(VarWc) <- "Variance of rank sum statistic"
-        names(Zc) <- "Test statistic"
+        names(Wc) <- "rank sum statistic"
+        names(EWc) <- "expected value of rank sum statistic"
+        names(VarWc) <- "variance of rank sum statistic"
+        names(Zc) <- "test statistic"
+        names(mu) <- "difference in locations"
+        result <- list(Rstat = Wc, ERstat = EWc,
+                 VRstat = VarWc,
+                 statistic = Zc, p.value = pval,
+                 alternative = alternative,
+                 null.value = mu,
+                 data.name = DNAME,
+                 method = METHOD,
+                 balance = bal, exact = exact)
+        class(result) <- "ctest"
+        return(result)
+    }
+
+}
+
+
+
+cluswilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
+                                       exact, mu, DNAME = NULL, METHOD = NULL, stratum) {
+    ## The input data should be already arranged
+    ## check balance of data.
+
+    bal <- (length(table(table(cluster))) == 1)
+    clus <- unique(cluster)
+    cluster <- recoderFunc(cluster, clus, c(1 : length(clus)))
+    n.clus <- length(clus)
+    n.obs <- length(x)
+    group <- recoderFunc(group, unique(group), c(1, 2))
+    x[which(group == 1)] <- x[which(group == 1)] - mu
+
+    temp <- order(cluster)
+    x <- x[temp]
+    cluster <- cluster[temp]
+    group <- group[temp]
+
+    
+    if(bal == TRUE) {
+        xrank <- rank(x)
+        rksum <- stats::aggregate(xrank ~ cluster, FUN = sum)[, 2]
+        csize <- (table(cluster))
+        count.grp <- function(x) length(x[ x==1])
+        ## q: obs under trt x in each cluster
+        q <-stats::aggregate(group ~ cluster, FUN = count.grp)[, 2]
+        
+        ones <- rep(1, n.clus)
+        nq.mat <- stats::aggregate(ones ~ q, FUN = sum)
+        vrk <- stats::aggregate(xrank ~ cluster, FUN = var)[, 2]
+        q.uniq <- nq.mat[, 1]
+        nq <- nq.mat[, 2]
+        varQ <- (sum(q.uniq^2 * nq) - (sum(q.uniq * nq)) ^ 2 / n.clus) / n.clus
+        sb.2 <- sum((rksum - csize * (csize * n.clus + 1) / 2) ^ 2) / n.clus
+        sw.2 <- sum(vrk) / n.clus
+        Wc <- sum(as.numeric(group == 1) * xrank)
+        EWc <- (n.clus * unique(csize) + 1) / 2 * sum(q.uniq * nq)
+        G <- unique(csize)
+        varb <- sum(nq * (G - q.uniq) * q.uniq * sw.2) / G
+        VarWc <- n.clus * (n.clus / (n.clus - 1) * varQ * sb.2 / unique(csize) ^ 2 + varb / n.clus)
+        Zc <- (Wc - EWc) / sqrt(VarWc)
+        pval <- switch(alternative,
+                       less = pnorm(abs(Zc)),
+                       greater = pnorm(abs(Zc), lower.tail = FALSE),
+                       two.sided = 2 * min(pnorm(abs(Zc)),
+                                           pnorm(abs(Zc), lower.tail = FALSE)))
+        names(Wc) <- "rank sum statistic"
+        names(EWc) <- "expected value of rank sum statistic"
+        names(VarWc) <- "variance of rank sum statistic"
+        names(Zc) <- "test statistic"
         names(mu) <- "difference in locations"
         result <- list(Rstat = Wc, ERstat = EWc,
                  VRstat = VarWc,
@@ -145,62 +214,6 @@ cluswilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
                  balance = bal)
         class(result) <- "ctest"
         return(result)
-    }
-
-}
-
-
-
-cluswilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
-                                       exact, mu, DNAME = NULL, METHOD = NULL) {
-    ## The input data should be already arranged
-    ## check balance of data.
-
-    bal <- (length(table(table(cluster))) == 1)
-    clus <- unique(cluster)
-    n.clus <- length(clus)
-    n.obs <- length(x)
-    x[which(group == 1)] <- x[which(group == 1)] - mu
-    if(bal == TRUE) {
-        xrank <- rank(x)
-        rksum <- stats::aggregate(xrank ~ cluster, FUN = sum)[, 2]
-        csize <- table(table(cluster))
-        count.grp <- function(x) length(x[ x==1])
-        ## q: obs under trt x in each cluster
-        q <-stats::aggregate(group ~ cluster, FUN = count.grp)[, 2]
-        ones <- rep(1, n.clus)
-        nq.mat <- stats::aggregate(ones ~ q, FUN = sum)
-        vrk <- stats::aggregate(xrank ~ cluster, FUN = var)[, 2]
-        q.uniq <- nq.mat[, 1]
-        nq <- nq.mat[, 2]
-        varQ <- (sum(q.uniq^2 * nq) - (sum(q.uniq * nq)) ^ 2 / n.clus) / n.clus
-        sb.2 <- sum((rksum - csize * (csize * n.clus + 1) / 2) ^ 2) / n.clus
-        sw.2 <- sum(vrk) / n.clus
-        Wc <- sum(as.numeric(group == 1) * xrank)
-        EWc <- (n.clus * csize + 1) / 2 * sum(q.uniq * nq)
-        VarWc <- n.clus *
-            ((n.clus / (n.clus - 1)) * varQ * sb.2 / csize ^ 2) +
-            sum(q.uniq * (csize - q.uniq) * nq) * sw.2 / csize
-        Zc <- (Wc - EWc) / sqrt(VarWc)
-         pval <- switch(alternative,
-                 less = pnorm(abs(Zc)),
-                 greater = pnorm(abs(Zc), lower.tail = FALSE),
-                 two.sided = 2 * min(pnorm(abs(Zc)),
-                                     pnorm(abs(Zc), lower.tail = FALSE)))
-        names(Wc) <- "Rank sum statistic"
-        names(EWc) <- "Expected value of rank sum statistic"
-        names(VarWc) <- "Variance of rank sum statistic"
-        names(Zc) <- "Test statistic"
-        names(mu) <- "difference in locations"
-        result <- list(Rstat = Wc, ERstat = EWc,
-                 VRstat = VarWc,
-                 statistic = Zc, p.value = pval,
-                 alternative = alternative,
-                 null.value = mu,
-                 data.name = DNAME,
-                 method = METHOD,
-                 balance = bal)
-        class(result) <- "ctest"
 
     } else {
         dat <- data.frame(x, cluster, group)
@@ -229,13 +242,14 @@ cluswilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
 
         N.clus <- lapply(dat.l, CountN)
         N.clus <- unlist(N.clus)
+        N.obs <- csize.grp * N.clus
 
         getRank <- function(dat) {
             rank(dat[, "x"])
         }
         rank.l <- lapply(dat.l, getRank)
 
-        varR <- lapply(rank.l, var)
+        varR <- unlist(lapply(rank.l, var)) * (N.obs - 1) / N.obs
         varR <- unlist(varR)
         getGrp <- function(dat) {
             dat[, "group"]
@@ -250,27 +264,27 @@ cluswilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
         for( i in 1 : n.csize) {
             theta[i] <-( Wc[i] - Qplus[i] * (Qplus[i] + 1) / 2 ) / (Qplus[i] * (csize.grp[i] * N.clus[i] - Qplus[i]))
             deno[i] <- csize.grp[i] * N.clus[i] + 1
-            trans.rk[[i]] <- rank.l[[i]] / deno[i]
+            trans.rk[[i]] <- qnorm(rank.l[[i]] / deno[i])
         }
-        pscore <- unlist(lapply(trans.rk, qnorm))
-        aovout <- stats::aov(pscore ~ as.factor(unlist(grp.l)))
+        pscore <- unlist(trans.rk)
+        aovout <- stats::aov(pscore ~ as.factor(cluster))
         aovout <- summary(aovout)
 
-         errorms <- aovout[[1]][["Mean Sq"]][2]
+        errorms <- aovout[[1]][["Mean Sq"]][2]
         modelms <- aovout[[1]][["Mean Sq"]][1]
         sumn <- n.obs
         sumnsq <- sum(unlist(N.clus) * csize.grp ^ 2)
 
-        g0 <- (sumn - sumnsq / sumn) / (n.obs - 1)
+        g0 <- (sumn - sumnsq / sumn) / (n.clus - 1)
         sigsqa <- (modelms - errorms) / g0
         rhoh <- sigsqa / (sigsqa + errorms)
         if(rhoh < 0) {
-      rhoh <- 0
-    }
-    rhoh <- rhoh * ( 1 + ( 1 - rhoh ^ 2) / (2 * (n.obs - 4)))
+            rhoh <- 0
+        }
+        rhoh <- rhoh * ( 1 + ( 1 - rhoh ^ 2) / (2 * (n.clus - 4)))
         rhor <- (6 / pi) * asin(rhoh / 2)
         varR <- unlist(varR)
-        ssb <- csize.grp * varR * ( 1 + (csize.grp - 1) * rhoh)
+        ssb <- csize.grp * varR * ( 1 + (csize.grp - 1) * rhor)
         ssw <- varR * ( 1 - rhor)
 
         getEQgQ <- function(dat) {
@@ -301,16 +315,17 @@ cluswilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
             return(V)
         }
 
+
         VarQ <- lapply(dat.l, getVarQ)
         VarQ <- unlist(VarQ)
-
+        
         VarTheta <- N.clus * (N.clus / (N.clus - 1) * as.numeric(N.clus > 1) *
                               VarQ * ssb / csize.grp ^ 2 + EQgQ * ssw / csize.grp) /
             (Qplus * (csize.grp * N.clus - Qplus)) ^ 2
         VarTheta[which(N.clus < 2)] <- 0
-        wt <- rep(0, length(csize.grp))
-        wt[which(VarTheta > 0)] <- VarTheta[which(VarTheta > 0)]
+        wt <- 1 / VarTheta[which(VarTheta > 0)]
 
+        theta <- theta[which(VarTheta > 0)]
         sumtheta <- sum(theta * wt)
         sumwt <- sum(wt)
 
@@ -323,7 +338,7 @@ cluswilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
                                            pnorm(abs(Zc), lower.tail = FALSE)))
 
         names(Zc) <- "Test statistic"
-
+        
         names(mu) <- "difference in locations"
         result <- list( statistic = Zc, p.value = pval,
                        alternative = alternative, null.value = mu,
@@ -335,6 +350,7 @@ cluswilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
 }
 
 #' @importFrom MASS ginv
+
 cluswilcox.test.ranksum.ds <- function(x, cluster, group,
                                        alternative,
                                        mu,
@@ -343,130 +359,134 @@ cluswilcox.test.ranksum.ds <- function(x, cluster, group,
     if(group.uniq == 1) {
         stop("invalid group variable, should contain at least 2 groups")
     }
-     n.obs <- length(x)
+    n.obs <- length(x)
+    
+    Fhat <- numeric(n.obs)
+    order.c <- order(cluster)
+    cluster <- cluster[order.c]
+    x <- x[order.c]
+    group <- group[order.c]
     cluster.uniq <- unique(cluster)
     M <- length(cluster.uniq)
+
     ni <- table(cluster)
-    Fhat <- numeric(n.obs)
-    for( i in 1 : n.obs) {
-        Fhat[i] <- (sum(x <= x[i]) + sum(x < x[i])) / (2 * n.obs)
-  }
-
-    F.prop <- numeric(n.obs)
-    for( j in 1 : n.obs) {
-        Fj <- numeric(M)
-        for( i in 1 : M) {
-            Fj[i] <- (sum(x[cluster == i] < x[j]) + 0.5 * sum(x[cluster == i] == x[j])) / ni[i]
-      }
-        F.prop[j] <- sum(Fj[-cluster[j]])
-  }
-
-
+    
+    temp <- unique(sort(abs(x)))
+    diff.min <- min(diff(temp)) / 10 ## A quntity 1 / 10 of the minimum difference between scores
+    
+    FHat <- ecdf(x)
+    Fhat <- FHat(x) / 2 + FHat(x - diff.min) / 2
+     
+    
+    F.prop <- Fprop(x, cluster, ni, M, n.obs)
+    F.prop2 <- F.prop
+    
     if(group.uniq == 2) {
 #####calculate quantity 2 (using the pooled estimate of F)
         group <- recoderFunc(group, order(unique(group)), c(0, 1))
         x[which(group == 0)] <- x[which(group == 0)] - mu
         ni1 <- aggregate(group ~ cluster, FUN = sum)[, 2] # number of obs under trt 2 in each cluster
-  ## Calculate S = E(W*|W, g)
+        ## Calculate S = E(W*|W, g)
         S <- 0
         for( i in 1 : M) {
             S <- S + sum(group[cluster == cluster.uniq[i]] /
                          ni[i] * ( 1 + F.prop[cluster == cluster.uniq[i]]))
-      }
-
+        }
+        
         S <- S / (M + 1)
-
-  ## Calculate E(S)
+        
+        ## Calculate E(S)
         ES <- sum(ni1 / ni) / 2
-
-  ## Calculate var(S)
-
+        
+        ## Calculate var(S)
+        
         W <- numeric(M)
         for(i in 1 : M) {
             Wi <- ((M - 1) * group[cluster == cluster.uniq[i]] -
                    sum(ni1[-i] / ni[-i])) *
                 Fhat[cluster == cluster.uniq[i]]
             W[i] <- sum(Wi) / (ni[i] * (M+1))
-  }
+        }
         a <- sum(ni1 / ni)
         EW <- M / (2 * (M + 1)) * (ni1 / ni - a / M)
         varS <- sum((W - EW)^2)
         Z <- (S - ES) / sqrt(varS)
-
+        
         pval <- switch(alternative, less = pnorm(abs(Z)),
                        greater = pnorm(abs(Z), lower.tail = FALSE),
                        two.sided = 2 * min(pnorm(abs(Z)),
                                            pnorm(abs(Z), lower.tail = FALSE)))
-      names(Z) <- "test statistic"
-      names(mu) <- "mu"
-      result <- list(statistic = Z, p.value = pval,
-                     alternative = alternative, null.value = mu,
-                     data.name = DNAME, method = METHOD)
+        names(Z) <- "test statistic"
+        names(mu) <- "difference in locations"
 
-      class(result) <- "ctest"
-      result
+        result <- list(statistic = Z, p.value = pval,
+                       alternative = alternative, null.value = mu,
+                       data.name = DNAME, method = METHOD)
 
-
-  } else {
+        class(result) <- "ctest"
+        result
+        
+        
+    } else {
 #####calculate quantity 2 (using the pooled estimate of F)
-      if(!is.null(mu) & mu != 0) {
-          warning("comparison between m (m > 2) groups cannot set location shift parameter")
-      }
-      mu <- 0
-  m <- length(unique(group))
-  Sj <- numeric(m)
-  group.uniq <- unique(group)
-  for( j in 1 : m) {
-      for( i in 1 : M) {
-          gik.j <- ifelse(group == j, 1, 0)
-          Sj[j] <- Sj[j] + sum(gik.j[cluster == cluster.uniq[i]] *
-                                   (1 + F.prop[cluster == cluster.uniq[i]])) / ni[i]
-      }
-  }
-  Sj <- Sj / (M + 1)
+        if(!is.null(mu) & mu != 0) {
+            warning("comparison between m (m > 2) groups cannot set location shift parameter")
+        }
+        mu <- 0
+        m <- length(unique(group))
+        Sj <- numeric(m)
+        group.uniq <- unique(group)
+        for( j in 1 : m) {
+            for( i in 1 : M) {
+                gik.j <- ifelse(group == j, 1, 0)
+                Sj[j] <- Sj[j] + sum(gik.j[cluster == cluster.uniq[i]] *
+                                     (1 + F.prop[cluster == cluster.uniq[i]])) / ni[i]
+            }
+        }
+        Sj <- Sj / (M + 1)
+        
+        nij <- matrix( 0, m, M)
+        for( i in 1 : m) {
+            nij[i, ] <- table(cluster[group == group.uniq[i]])
+        }
+        d <- apply(nij, 1, FUN = function(x) {x / ni})
+        ESj <- apply(d, 2, sum) / 2
+        
+        What <- matrix(0, m, M)
+        a <- t(d)
+        for( i in 1 : M) {
+            for( j in 1 : m) {
+                gik.j <- ifelse(group[cluster == cluster.uniq[i]] == j, 1, 0)
+                b <- 1 / (ni[i] * (M + 1))
+                c <- gik.j * (M - 1)
+                d <- sum(a[j, -i])
+                What[j, i] <- b * sum((c - d) * Fhat[cluster == cluster.uniq[i]])
+            }
+        }
+        EW <- matrix(0, m, M)
+        for( j in 1 : m) {
+            EW[j, ] <- (M / (2 * ( M + 1))) * (a[j, ] - sum(a[j, ]) / M)
+        }
 
-  nij <- matrix( 0, m, M)
-  for( i in 1 : m) {
-      nij[i, ] <- table(cluster[group == group.uniq[i]])
-  }
-  d <- apply(nij, 1, FUN = function(x) {x / ni})
-  ESj <- apply(d, 2, sum) / 2
-
-  What <- matrix(0, m, M)
-  a <- t(d)
-  for( i in 1 : M) {
-      for( j in 1 : m) {
-          gik.j <- ifelse(group[cluster == cluster.uniq[i]] == j, 1, 0)
-          b <- 1 / (ni[i] * (M + 1))
-          c <- gik.j * (M - 1)
-          d <- sum(a[j, -i])
-          What[j, i] <- b * sum((c - d) * Fhat[cluster == cluster.uniq[i]])
-      }
-  }
-  EW <- matrix(0, m, M)
-  for( j in 1 : m) {
-      EW[j, ] <- (M / (2 * ( M + 1))) * (a[j, ] - sum(a[j, ]) / M)
-  }
-
-  dev.W <- What - EW
-  V <- matrix(0, m, m)
+        dev.W <- What - EW
+        V <- matrix(0, m, m)
   for( i in 1 : M) {
       V <- V + dev.W[, i] %*% t(dev.W[, i])
   }
-  V <- V / M
-  T <- t(Sj - ESj) %*% ginv(V) %*% (Sj - ESj) / M
-    pval <- pchisq(T, df = (m - 1),lower.tail = F)
-      names(T) <- "test statistic"
-      ngrp <- group.uniq
-      df <- ngrp - 1
-      names(ngrp) <- "Number of groups: "
-      names(df) <- "Degree of freedom: "
-      METHOD <- paste(METHOD, "using Chisq test")
-                                        #calculate the test statistic
-      result <- list(statistic = T, p.value = pval, n.group = ngrp,
-                     df = df,
-                     data.name = DNAME, method = METHOD)
-      class(result) <- "ctest"
-      result
-  }
+        V <- V / M
+        T <- t(Sj - ESj) %*% ginv(V) %*% (Sj - ESj) / M
+        pval <- pchisq(T, df = (m - 1),lower.tail = F)
+        names(T) <- "test statistic"
+        ngrp <- group.uniq
+        df <- ngrp - 1
+        names(ngrp) <- "number of groups: "
+        names(df) <- "degree of freedom: "
+        METHOD <- paste(METHOD, "using Chisq test")
+#calculate the test statistic
+        result <- list(statistic = T, p.value = pval, n.group = ngrp,
+                       df = df,
+                       data.name = DNAME, method = METHOD)
+        class(result) <- "ctest"
+        result
+    }
 }
