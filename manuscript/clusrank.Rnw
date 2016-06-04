@@ -131,17 +131,17 @@ with illustrations via simulated and real data.
 \section{Introduction}
 
 Wilcoxon rank-sum and signed rank tests are important tools for
-two-group comparison and paired comparison, respectively. 
+two-group comparison and paired comparison, respectively.
 Unlike their counterparts under the normality assumption, they are
 based on ranks with no need for distributional specification.
-Implementations of Wilcoxon rank-sum and signed rank tests have 
+Implementations of Wilcoxon rank-sum and signed rank tests have
 been available in standard software packages, such as function
 \code{wilcox.test} in the built-in \proglang{R} package \pkg{stats},
 and \code{PROC RANK} in \proglang{SAS}.
 Nonetheless, the existing implementations assume independent data,
-which cannot be applied to clustered data frequently arising in many fields. 
+which cannot be applied to clustered data frequently arising in many fields.
 Clustered data consists of data from clusters, where clusters are
-independent but individual measures within each cluster are not. 
+independent but individual measures within each cluster are not.
 For example, in longitudinal studies or familial studies, measures
 from the same subject are not independent but correlated.
 The effective sample size of the clustered data will be different from
@@ -152,20 +152,20 @@ variances are underestimated, and as a consequence, the resulting
 p-values are smaller than what they should be.
 The popular generalized estimating equations (GEE) approach provides a
 general modeling strategy that accounts for intracluster dependence,
-and can be used for two sample comparison as a special case. 
+and can be used for two sample comparison as a special case.
 Unlike rank-based procedures, however, it is not invariant to
-monotonic transformations of the data. 
+monotonic transformations of the data.
 
 
-Several recent developments have extended the Wilcoxon rank-sum 
+Several recent developments have extended the Wilcoxon rank-sum
 test to allow clustered data for two sample comparison.
 \citet{Rosn:Grov:use:1999} proposed a Mann--Whitney $U$-statistic for
-clustered data which corrects the variance of the test statistic for four 
+clustered data which corrects the variance of the test statistic for four
 types of intracluster correlation, but provided no large sample theory.
 \citet{Rosn:Glyn:Lee:inco:2003} proposed a test under the assumptions
 that all individuals from the same cluster belong to the same group,
 that cluster members are exchangeable, and that the intracluster
-dependence does not vary across groups. 
+dependence does not vary across groups.
 Their testing statistic is the same as the standard Wilcox rank-sum
 test after ranking all the observations, but the asymptotic mean and
 the variance under the null hypothesis are derived under the clustered
@@ -175,7 +175,7 @@ the approach of \citet{Datt:Satt:rank:2005}, which is based on FIXME.
 \citet{Rosn:Glyn:Lee:exte:2006} extended their approach earlier to
 accommodate the situation where members of a single cluster may
 subject to different treatments, but still assumes exchangeable
-cluster members and the same intracluster dependence across groups. 
+cluster members and the same intracluster dependence across groups.
 
 
 For the one-sample problem or paired comparison problem,
@@ -184,21 +184,21 @@ to clustered data by adjusting the variance of the standard test
 statistic, assuming a common intercluster correlation across clusters.
 The cluster sizes are allowed to vary, but the method does not
 consider the informative cluster sizes where the distribution of
-paired difference within a cluster depends on the cluster size.  
+paired difference within a cluster depends on the cluster size.
 \citet{Datt:Satt:sign:2008} proposed a signed-rank test based on
-sampling within cluster that accounts for informative cluster sizes. 
+sampling within cluster that accounts for informative cluster sizes.
 
 
 Despite the popularity of clustered data arising from a wide range of
-applications such as biomedical studies and social science research, 
+applications such as biomedical studies and social science research,
 the extensions of Wilcoxon rank-sum and signed-rank tests reviewed
-above have not been implemented in any existing \proglang{R} package. 
+above have not been implemented in any existing \proglang{R} package.
 This motivated our development of package \pkg{clusrank}.
 Under a unified interface similar to \code{wilcox.test}, the package
 provides these recently available rank-sum tests
 \citep{Rosn:Glyn:Lee:inco:2003, Datt:Satt:rank:2005,
   Deni:etal:two:2010} and signed-rank tests
-\citep{Rosn:Glyn:Lee:wilc:2006, Datt:Satt:sign:2008} for clustered data.  
+\citep{Rosn:Glyn:Lee:wilc:2006, Datt:Satt:sign:2008} for clustered data.
 The package makes it very easy to compare the performances of the
 different approaches under various settings.
 
@@ -206,25 +206,25 @@ different approaches under various settings.
 The rest of the article is organized as follows.
 The recently available Wilcoxon rank-sum tests and signed-rank tests
 for clustered data are briefly reviewed in Section~\ref{s:ranksum} and
-Section~\ref{s:signedrank},  respectively.  
+Section~\ref{s:signedrank},  respectively.
 The usage of the main user-level function and major input arguments
-are described in Section~\ref{s:usage}. 
+are described in Section~\ref{s:usage}.
 Numerical illustrations and comparison of the different methods with
 simulated data are presented in Section~\ref{s:illus}.
 A discussion concludes in Section~\ref{s:disc}
 
 
 \section{Rank-Sum Test}
-\label{s:ranksum} 
+\label{s:ranksum}
 
-Let $X_{ij}$ be the $i$th observation in the $j$th cluster, 
+Let $X_{ij}$ be the $i$th observation in the $j$th cluster,
 $1 \leq i \le N$, $1 \le j \leq n_i$,
 where $n_i$ is the size of cluster $i$.
 Let $\delta_{ij}$ be the group indicator of $X_{ij}$;
-$\delta{ij} = 1$ if $X_{ij}$ is in group $1$, and 
-$\delta{ij} = 0$ if $X_{ij}$ is in group $2$. 
-The observed data consist of 
-$(\mathbf{X}, \boldsymbol{\delta}) = 
+$\delta{ij} = 1$ if $X_{ij}$ is in group $1$, and
+$\delta{ij} = 0$ if $X_{ij}$ is in group $2$.
+The observed data consist of
+$(\mathbf{X}, \boldsymbol{\delta}) =
 \{X_{ij}, \delta_{ij}: 1 \le j \le n_i; 1 \le i \le N\}$.
 Clusters are assumed to be independent, while
 individual observations within each cluster are not.
@@ -236,12 +236,12 @@ of the group indicator $\delta_{ij}$.
 \subsection{RGL method: cluster-level grouping}
 We use RGL to denote the method of \cite{Rosn:Glyn:Lee:inco:2003}.
 The RGL Wilcoxon rank sum test was designed for the scenario where the
-group is assigned at the cluster level:  
+group is assigned at the cluster level:
 $\delta_{ij} = \delta_i$ for all $1 \le j \le n_i$.
 Let $R_{ij}$ be the rank of $X_{ij}$ among all the observations.
 Define $R_{i+} =\sum_{j=1}^{n_i}R_{ij}$, the sum of observed ranks of
-the individuals in the $i$th cluster.  
-The Wilcoxon rank-sum statistic is 
+the individuals in the $i$th cluster.
+The Wilcoxon rank-sum statistic is
 \begin{equation}
 \label{eq:rglrs}
 W = \sum_{i = 1}^N \delta_{i}R_{i+}.
@@ -252,7 +252,7 @@ The rationale of the RGL test procedure is random permutation
 conditioning on the observed $R_{i+}$, $i = 1, \ldots, N$.
 Like all permutation method, the RGL method assumes that the
 individuals within each cluster are exchangeable and that the
-intracluster dependence remains the same across groups. 
+intracluster dependence remains the same across groups.
 To derive the sampling distribution of $W_{R}$ given $R_{i+}$'s,
 \citet{Rosn:Glyn:Lee:inco:2003} stratified on the clusters sizes and
 investigated $R_{i+}$ between two groups for each cluster size.
@@ -263,24 +263,24 @@ The rank-sum statistic in Equation~\ref{eq:rglrs} can be written as
 W = \sum_{g=1}^{G}\sum_{i \in I_g}\delta_{i}R_{i+} = \sum_{j = 1}^{G}W_g,
 \end{equation}
 where $I_g$ is the set of indices of clusters whose size is $g$ and
-$W_g = \sum_{i \in I_g} \delta_i R_{i+}$.  
+$W_g = \sum_{i \in I_g} \delta_i R_{i+}$.
 The null distribution of $W_{R}$ conditioning on $R_{i+}$'s is
-obtained by combining all possible permutations of $W_g$ for 
-each cluster size $g \in \{1, \ldots, G\}$. 
-The total number of permutation is 
+obtained by combining all possible permutations of $W_g$ for
+each cluster size $g \in \{1, \ldots, G\}$.
+The total number of permutation is
 $\prod_{g = 1}^G {N_g \choose m_g}$.
 
 
-When $N$ is large, exhaustive permutation is infeasible, and 
+When $N$ is large, exhaustive permutation is infeasible, and
 \citet{Rosn:Glyn:Lee:inco:2003} proposed an asymptotic test statistic
 $Z = {W - \E (W) } /  {\sqrt{\VAR(W)}},$
-where $\E(W) = \sum_{g = 1}^G \E(W_g)$, and 
+where $\E(W) = \sum_{g = 1}^G \E(W_g)$, and
 $\VAR(W) = \sum_{g=1}^G \VAR(W_g)$.
 Suppose that among the $N_g$ clusters of size $g$, there are $m_g$
 clusters in group~1 and $n_g$ clusters in group~2.
 Under $H_0$, for clusters with size $g$, the distribution of
 $\delta_i$ is Bernoulli with rate $m_g/N_g$, and we have
-$\E(\delta_i) = m_g / N_g$, 
+$\E(\delta_i) = m_g / N_g$,
 $\VAR(\delta_i) = m_g n_g / N_g^2$, and
 $\COV(\delta_i, \delta_j) = - m_g n_g / [N_g^2(N_g - 1)]$.
 The specific expressions needed are shown to be
@@ -292,13 +292,13 @@ $\E(W_g) = m_g R_{++, g}  / N_g$ and
 where $R_{++,g} = \sum_{i\in I_g} R_{i+}$.
 \citet{Rosn:Glyn:Lee:inco:2003} showed that the asymptotic
 distribution of $Z_R$ as $N \to \infty$ is standard normal.
-The method can be easily extended to the case of stratified data. 
+The method can be easily extended to the case of stratified data.
 
 
 Since the RGL method compares the groups at each cluster size, the
 imbalance of sample sizes between the two groups across cluster size
 strata may result in inefficiency \citep[p.911]{Datt:Satt:rank:2005}.
-If only one group shows up at a cluster size, their data will be ignored. 
+If only one group shows up at a cluster size, their data will be ignored.
 Further, the rank-sum statistic scores clusters by the sum of ranks of
 cluster members, which is expected to perform best if intracluster
 dependence is weak; otherwise, because the effective number of
@@ -308,18 +308,18 @@ larger clusters, and, hence, may have lower efficiency.
 \subsection{DS method: individual-level grouping}
 
 We use DS to denote the method of \citet{Datt:Satt:rank:2005}.
-Unlike the RGL method, the DS method allows individual observations 
+Unlike the RGL method, the DS method allows individual observations
 within the same cluster to have different group memberships.
-The test statistic is constructed from randomly picking one observation 
-from each cluster to form a pseudo-sample and averaging the standard 
-Wilcoxon rank-sum statistic over all possible pseudo-samples. 
+The test statistic is constructed from randomly picking one observation
+from each cluster to form a pseudo-sample and averaging the standard
+Wilcoxon rank-sum statistic over all possible pseudo-samples.
 Let $X_i^*$ be the random pick from the $i$th cluster in a
 pseudo-sample, and $\delta_i^*$ be its group membership.
 The Wilcoxon rank-sum statistic for the pseudo-sample is
 \begin{equation*}
   W^* = \frac{1}{N+1}\sum^N_{i = 1}\delta_i^* R_i^*,
 \end{equation*}
-where $R_i^*$ is the rank of $X_i^*$ among the pseudo-sample. 
+where $R_i^*$ is the rank of $X_i^*$ among the pseudo-sample.
 The test statistic of the DS method is
 \begin{equation*}
   Z = \frac{S - \E(\S)}{\sqrt{\widehat{\VAR}(S)}},
@@ -331,16 +331,16 @@ where $S = \E(W^* | \mathbf{X}, \boldsymbol{\delta})$.
 the testing statistics, using mid-rank to allow for ties in the data.
 Let $F_i(x) = n_i^{-1} \sum_{k = 1}^{n_i} I(X_{ik} \le x)$ be the
 empirical distribution function of the observations from cluster~$i$.
-It can be shown that 
+It can be shown that
 \[
-S = \frac{1}{N+1} \sum_{i=1}^N\sum_{k=1}^{n_i} \frac{\delta_{ik}}{n_i} 
+S = \frac{1}{N+1} \sum_{i=1}^N\sum_{k=1}^{n_i} \frac{\delta_{ik}}{n_i}
 \left[1 + \frac{1}{2}\sum_{j\ne i}\Big\{F_j(X_{ik}) + F_j(X_{ik}-)\Big\}\right].
 \]
 The expectation turns out to be
 \[
 \E(S) = \E(W^*) = \frac{1}{2}\sum_{i=1}^N \frac{n_i} {N}.
 \]
-The variance term $\VAR(S)$ is estimated by 
+The variance term $\VAR(S)$ is estimated by
 \red{Check: there is no scalor like $1/ N$?}
 $\widehat\VAR(S) = \sum_{i=1}^N\big\{ \hat W_i - \E(W_i)\big\}^2,$
 where \red{define $n_{j1}$}
@@ -359,14 +359,14 @@ The asymptotic distribution of $Z$ is standard normal under mild
 conditions \citep[p.910]{Datt:Satt:rank:2005}.
 
 
-The DS method can be generalized to the comparison of location among 
+The DS method can be generalized to the comparison of location among
 $m$ treatment groups, $m \geq 3$, with the testing statistic constructed
 from a quadratic form of group-wise rank-sum vector.
 This method allows arbitrary intracluster dependence structure (not
 necessarily exchangeable as assumed in the RGL method) within each
-cluster and remains valid when treatment affects the correlation structure. 
+cluster and remains valid when treatment affects the correlation structure.
 Making no assumption on the intracluster dependence structure,
-however, renders it impossible to derive a small sample permutation test.  
+however, renders it impossible to derive a small sample permutation test.
 In addition, it cannot be applied to data which are strictly
 contralateral (e.g., when all subjects in an eye study have exactly
 one eye under each treatment) due to the failure of the satisfying the
@@ -583,26 +583,28 @@ intracluster dependence structure.
 
 \section{Usage}
 The package \pkg{clusrank} provides a single interface function for
-both Wilcoxon rank sum test and signed rank for clustered data. We
-illustrate the usage on simulated data sets which are included in the
-package for the two tests.
+both Wilcoxon rank sum test and signed rank for clustered data. The
+function requires a dataframe. For clustered rank sum test, this data
+frame should consist of cluster id, group id and observed scores (an
+extra stratum variable for method \code{RGL}). For clustered signed
+rank test, this data frame should consist of cluster id and observed
+score before and after the treatment, or consist of cluster id and the
+observed difference in scores before and after the treatment. For the
+signed rank test, the argument \code{paired} should be set to
+\code{TRUE}. Other conventional arguments that can be tuned are
+\code{alternative}, \code{mu} and \code{exact}. There are $2$ methods
+provided for each of the test through setting the argument
+\code{method} to \code{``rgl''} and \code{``ds''}. Note that the exact
+permutation tests are only available for RGL rank sum test when the
+treatment is assigned at the cluster level and for RGL signed rank
+test and should be applied to sample size which is larger than 50.
 
 <<crsd, eval = TRUE, echo = TRUE>>=
 library("clusrank")
-load("crdStr", package = "clusrank")
-head(crdStr, 8)
-@
-
-The dataset \code{crdStr} contains $956$ observations of $4$ variables
-where \code{id}, \code{z}, \code{group} and \code{stratum} are cluster
-id, observed score of each subject, treatment group id and stratum id
-respectively. To compare the locations of the observed score of the
-two treatment groups, we apply the clustered Wilcoxon rank sum test:
-
-<<rksum1, eval = FALSE, echo = TRUE>>=
-cluswilcox.test(z, cluster = id, group = group, stratum = stratum,
-                data = crdStr, alternative = "two.sided",
-                mu = 0, paired = FALSE, method = "rgl")
+data(crd)
+str(crd)
+cluswilcox.test(z, cluster = id, group = group, data = crd, alternative = "two.sided", mu = 0, paired = FALSE, method = "rgl")
+cluswilcox.test(z, cluster = id, group = group, data = crd, alternative = "two.sided", mu = 0, paired = FALSE, method = "ds")
 @
 
 
@@ -610,80 +612,10 @@ cluswilcox.test(z, cluster = id, group = group, stratum = stratum,
 
 
 
-There are two ways to call the clustered rank sum test. The first one
-uses a formula interface, i.e., the first argument of the function is
-a formula of the form \code{lhs ~ rhs}. The \code{lhs} is the
-variable of the observation and the \code{rhs} is of the form
-\code{cluster(cid) + group(gid)}, where \code{cid} and \code{gid} are
-the variables which contain the cluster id and treatment group id. Further,
-if the observations are stratified by a categorical variable and the
-\code{rgl} method is used, then the \code{lhs} can be set to be
-\code{cluster(cid) + group(gid) + stratum(sid}, where \code{sid}
-contains the stratification id. In addition, the user can decide how
-to treat the \code{NA} values and if a subset of the data are used for
-the comparison by set the values of \code{na.action} and
-\code{subset}. The data \code{data} used in the illustration below
-contains three variables: \code{id} is the cluster id, \code{group} is
-the group id, and \code{z} contains the observations.
-
-<<rseg, eval = FALSE, echo = TRUE>>=
-cluswilcox.test(z ~ cluster(id) + group(group), data = data)
-@
-
-If \code{data} contains an extra stratificaiton variable, \code{strat},
-then to incorporate the stratification effect, the following code can
-be used:
-
-<<rseg11, eval = FALSE, echo = TRUE>>=
-cluswilcox.test(z ~ cluster(id) + group(group) + stratum(strat),
-                data = data, method = "rgl")
-@
-
-If the group variable contains more than $2$ levels, then the
-\code{ds} method should be used:
-
-<<rseg12, eval = FALSE, echo = TRUE>>=
-cluswilcox.test(z ~ cluster(id) + group(group), data = data,
-                method = "ds")
-@
-
-Note that the stratification variable is only allowed for the method
-\code{rgl} when the treatment is assgiend at the cluster level.
 
 
-Another interface for the clustered rank sum test uses a numerical
-vector contains the observations as the first argument. A treatment
-group id \code{group} is required and the \code{paired} should be set
-to be \code{FALSE} (default) in addition.
-
-<<rseg2, eval = FALSE, echo = TRUE>>=
-cluswilcox.test(z, cluster = id, group = group, data = data,
-                method = 'rgl', paired = FALSE)
-@
 
 
-For the clustered signed rank test, there are two ways to call the
-function. First, if the data are the observed difference between the
-two dependent groups, e.g., dataframe \code{data} contains the
-observed difference \code{z} and cluster id \code{id}, then the
-function is called as the following:
-
-<<sreg, eval = FALSE, echo = TRUE>>=
-cluswilcox.test(z, cluster = id, data = data, paired = TRUE)
-@
-
-If the observations from the two groups are saved in two vectors instead, say, \code{x} and \code{y},
-then the function can be called as the following:
-
-<<sreg2, eval = FALSE, echo = TRUE>>=
-cluswilcox.test(x, y = y, cluster = id, data = data, paired = TRUE)
-@
-
-There are two methods for each test, \code{rgl} and \code{ds}. The
-default method is \code{rgl}. Both methods can deal with data with
-identical or varied cluster size and with treatment assigned at
-cluster or sub-cluster level.
-%% Note: If there is markup in \(sub)section, then it has to be escape as above.
 
 
 %\bibliographystyle{jss}
