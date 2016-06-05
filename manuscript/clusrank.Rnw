@@ -343,7 +343,7 @@ The expectation turns out to be
 The variance term $\VAR(S)$ is estimated by
 \red{Check: there is no scalor like $1/ N$?}
 $\widehat\VAR(S) = \sum_{i=1}^N\big\{ \hat W_i - \E(W_i)\big\}^2,$
-where \red{define $n_{j1}$}
+where 
 \[
 \hat W_i = \frac{1}{2 n_i (N + 1)}
 \sum_{k=1}^{n_i}\left[(N - 1) \delta_{ik} - \sum_{j\ne i}^N \frac{n_{j1}}{n_j}\right]
@@ -367,6 +367,7 @@ necessarily exchangeable as assumed in the RGL method) within each
 cluster and remains valid when treatment affects the correlation structure.
 Making no assumption on the intracluster dependence structure,
 however, renders it impossible to derive a small sample permutation test.
+\red{FIXME: need smoothing}
 In addition, it cannot be applied to data which are strictly
 contralateral (e.g., when all subjects in an eye study have exactly
 one eye under each treatment) due to the failure of the satisfying the
@@ -375,34 +376,54 @@ requirements of the asymptotic theory.
 
 \subsection{RGL method: individual-level grouping}
 
-Another test for the case when the treatment is assigned at subunit
-level was proposed by
-%\citet{Rosn:Glyn:Lee:exte:2006}.
-Two test
-statistics were constructed for balanced and unbalanced data
-respectively. For balanced data, the Wilcoxon rank sum statistic is
+\citet{Rosn:Glyn:Lee:exte:2006} extended the RGL method to allow
+individual-level grouping; i.e., $\delta_{ij}$, $j = 1, \ldots, n_i$, 
+can take different values for the same $i$.
+The idea of the method is best explained with balanced data first,
+where all cluster sizes are all the same, $g$.
+The rank-sum statistic is
 \begin{equation*}
-  W_{Rs} = \sum_{i = 1}^N\sum_{j=1}^g\delta_{ij}R_{ij},
-  \end{equation*}
-The sampling distribution of $W_{Rs}$ is derived by assuming that the
-data are generated in two stages: first, each cluster are randomly
-assigned to have $q$ subunits to be exposed under treatment $1$
-according to the observed exposure distribution of $Q$, a random $q$
-out of $g$ subunits are then assigned the treatment $1$ while the
-remaining are unexposed.
+  W_g = \sum_{i = 1}^N\sum_{j=1}^g\delta_{ij}R_{ij},
+\end{equation*}
+where $R_{ij}$ is the rank of $X_{ij}$ among all the observed data.
+A cluster may have $q \in \{0, 1, \ldots, g\}$ individuals in group~1.
+The sampling distribution of $W_g$ is derived from a two-stage
+randomization: first, each cluster $i$ is randomly assigned to a
+random number $Q_i$ according to the observed grouping distribution
+$Q$; then, within cluster $i$, a random $Q_i$ out of $g$ individuals
+are assigned to group~1 while all the rest are assigned to group~2.  
+Essensially, the first stage determines how many individuals are in
+group~1 in a cluster and the second stage determins which they are.
+The two-stage randomization process can be used to devise a random
+permutation test to exhaust all possibilities for small $N$ and $g$.
 
-A small sample permutation test can then be performed following the
-above randomization scheme. The large sample test statistic is defined
-as the following:
-\begin{equation*}
-  Z_{Rs} = \frac{W_{Rs} - E(W_{Rs})}{\hat{V}(W_{Rs)}^{1/2}},
-    \end{equation*}
-which converges to an $N(0, 1)$ as $N \to \infty$
-\citep{Rosn:Glyn:Lee:exte:2006}.
 
-A note is that this test is equivalent to the
-RGL test for balanced data when the treatment is assigned at the
-cluster level.
+It was shown that 
+\[
+\E(W_g) = \frac{gN + 1}{2} \sum_{q=0}^g q N_q,
+\]
+where $N_q$ is the number of clusters with $q$ members in group~1.
+The variance of $W_g$ can be estimated by
+\[
+\widehat\VAR(W_g) = \frac{N^2}{(N - 1)g^2} \widehat\VAR(Q) s_B^2
++ N \hat\E[Q (g - Q)] s_W^2 / g,
+\]
+where
+$s_B^2 = \sum_{i=1}^N \{R_{i+} - g(gN + 1) / 2\}^2 / N$,
+$s_W^2 = \sum_{i=1}^N\sum_{j = 1}^g (R_{ij} - R_{i+} / g)^2 / \{N (g - 1)\}$,
+and $\widehat\VAR$ and $\hat\E$ are operated on the observed
+distribution of $Q$.
+\citet{Rosn:Glyn:Lee:exte:2006} showed that
+\[
+Z_g = \frac{W_g - E(W_g)}{\sqrt{\widehat{\VAR}(W_g)}}
+\]
+converges to a standard normal distribution $N \to \infty$
+provided that $\lim_{N\to\infty} N_q / N = \xi_q$, where
+$0 \le \xi_q \le 1$, if $0 < q < g$ or $0 \le \xi_q < 1$ if 
+$q \in \{0, g\}$.
+This test is equivalent to the RGL test for balanced data when the
+treatment is assigned at the cluster level.
+
 
 For unbalanced data, the test statistic involves splitting the
 clusters according to the cluster size and applying the 2-stage
@@ -417,7 +438,8 @@ $1 / V(\hat{\theta}^{(g)})$. A common underlying rank correlation is
 assumed across all clusters in the estimation of $V(\hat{\theta}^{(g)})$.
 
 
-\section{Wilcoxon signed rank test}\label{sec:signrank}
+\section{Signed Rank Test}
+\label{sec:signedrank}
 Suppose each cluster consists of pairs which record the observed pre-
 and post-treatment scores on the same individual. Let $X_{ij}$ be the
 pair-difference for the $j$th pair in the $i$th cluster, $i = 1,
