@@ -137,7 +137,7 @@ based on ranks with no need for distributional specification.
 Implementations of Wilcoxon rank-sum and signed rank tests have
 been available in standard software packages, such as function
 \code{wilcox.test} in the built-in \proglang{R} package \pkg{stats},
-and \code{PROC RANK} in \proglang{SAS}.
+and \code{PROC NPAR1WAY} in \proglang{SAS}.
 Nonetheless, the existing implementations assume independent data,
 which cannot be applied to clustered data frequently arising in many fields.
 Clustered data consists of data from clusters, where clusters are
@@ -221,8 +221,8 @@ Let $X_{ij}$ be the $i$th observation in the $j$th cluster,
 $1 \leq i \le N$, $1 \le j \leq n_i$,
 where $n_i$ is the size of cluster $i$.
 Let $\delta_{ij}$ be the group indicator of $X_{ij}$;
-$\delta{ij} = 1$ if $X_{ij}$ is in group $1$, and
-$\delta{ij} = 0$ if $X_{ij}$ is in group $2$.
+$\delta_{ij} = 1$ if $X_{ij}$ is in group $1$, and
+$\delta_{ij} = 0$ if $X_{ij}$ is in group $2$.
 The observed data consist of
 $(\mathbf{X}, \boldsymbol{\delta}) =
 \{X_{ij}, \delta_{ij}: 1 \le j \le n_i; 1 \le i \le N\}$.
@@ -257,7 +257,7 @@ To derive the sampling distribution of $W_{R}$ given $R_{i+}$'s,
 \citet{Rosn:Glyn:Lee:inco:2003} stratified on the clusters sizes and
 investigated $R_{i+}$ between two groups for each cluster size.
 Let $G$ be the maximum cluster size; i.e., $G = \max_{1 \le i \le N} n_i$.
-The rank-sum statistic in Equation~\ref{eq:rglrs} can be written as
+Then $W$ in Equation~\eqref{eq:rglrs} can be written as
 \begin{equation}
 \label{eq:rglrs1}
 W = \sum_{g=1}^{G}\sum_{i \in I_g}\delta_{i}R_{i+} = \sum_{j = 1}^{G}W_g,
@@ -292,7 +292,7 @@ $\E(W_g) = m_g R_{++, g}  / N_g$ and
 where $R_{++,g} = \sum_{i\in I_g} R_{i+}$.
 \citet{Rosn:Glyn:Lee:inco:2003} showed that the asymptotic
 distribution of $Z_R$ as $N \to \infty$ is standard normal.
-The method can be easily extended to the case of stratified data.
+The method can be extended to the case of stratified data.
 
 
 Since the RGL method compares the groups at each cluster size, the
@@ -322,7 +322,7 @@ The Wilcoxon rank-sum statistic for the pseudo-sample is
 where $R_i^*$ is the rank of $X_i^*$ among the pseudo-sample.
 The test statistic of the DS method is
 \begin{equation*}
-  Z = \frac{S - \E(\S)}{\sqrt{\widehat{\VAR}(S)}},
+  Z = \frac{S - \E(S)}{\sqrt{\widehat{\VAR}(S)}},
 \end{equation*}
 where $S = \E(W^* | \mathbf{X}, \boldsymbol{\delta})$.
 
@@ -379,15 +379,15 @@ requirements of the asymptotic theory.
 \citet{Rosn:Glyn:Lee:exte:2006} extended the RGL method to allow
 individual-level grouping; i.e., $\delta_{ij}$, $j = 1, \ldots, n_i$, 
 can take different values for the same $i$.
-The idea of the method is best explained with balanced data first,
-where all cluster sizes are all the same, $g$.
+The idea of the method is best explained with balanced data,
+where all cluster sizes are all the same; i.e., $n_i = g$ for all $i$.
 The rank-sum statistic is
 \begin{equation*}
-  W_g = \sum_{i = 1}^N\sum_{j=1}^g\delta_{ij}R_{ij},
+  W_{g,N} = \sum_{i = 1}^N\sum_{j=1}^g\delta_{ij}R_{ij},
 \end{equation*}
 where $R_{ij}$ is the rank of $X_{ij}$ among all the observed data.
 A cluster may have $q \in \{0, 1, \ldots, g\}$ individuals in group~1.
-The sampling distribution of $W_g$ is derived from a two-stage
+The sampling distribution of $W_{g,N}$ is derived from a two-stage
 randomization: first, each cluster $i$ is randomly assigned to a
 random number $Q_i$ according to the observed grouping distribution
 $Q$; then, within cluster $i$, a random $Q_i$ out of $g$ individuals
@@ -400,22 +400,22 @@ permutation test to exhaust all possibilities for small $N$ and $g$.
 
 It was shown that 
 \[
-\E(W_g) = \frac{gN + 1}{2} \sum_{q=0}^g q N_q,
+\E(W_{g,N}) = \frac{gN + 1}{2} \sum_{q=0}^g q N_q,
 \]
 where $N_q$ is the number of clusters with $q$ members in group~1.
-The variance of $W_g$ can be estimated by
+The variance of $W_{g,N}$ can be estimated by
 \[
-\widehat\VAR(W_g) = \frac{N^2}{(N - 1)g^2} \widehat\VAR(Q) s_B^2
+\widehat\VAR(W_{g,N}) = \frac{N^2}{(N - 1)g^2} \widehat\VAR(Q) s_B^2
 + N \hat\E[Q (g - Q)] s_W^2 / g,
 \]
 where
 $s_B^2 = \sum_{i=1}^N \{R_{i+} - g(gN + 1) / 2\}^2 / N$,
 $s_W^2 = \sum_{i=1}^N\sum_{j = 1}^g (R_{ij} - R_{i+} / g)^2 / \{N (g - 1)\}$,
-and $\widehat\VAR$ and $\hat\E$ are operated on the observed
-distribution of $Q$.
+and $\widehat\VAR$ and $\hat\E$ are operated on the empirical
+distribution of $Q$. 
 \citet{Rosn:Glyn:Lee:exte:2006} showed that
 \[
-Z_g = \frac{W_g - E(W_g)}{\sqrt{\widehat{\VAR}(W_g)}}
+Z_g = \frac{W_{g,N} - E(W_{g,N})}{\sqrt{\widehat{\VAR}(W_{g,N})}}
 \]
 converges to a standard normal distribution $N \to \infty$
 provided that $\lim_{N\to\infty} N_q / N = \xi_q$, where
@@ -425,21 +425,25 @@ This test is equivalent to the RGL test for balanced data when the
 treatment is assigned at the cluster level.
 
 
-For unbalanced data, the test statistic involves splitting the
-clusters according to the cluster size and applying the 2-stage
-randomization within each stratum. The test statistic is a weighted
-average of estimated probability that an observation under treatment
-$1$ is greater than that of an observation without treatment $1$
-within each cluster group, i.e., $\theta^{(g)} = P(X_{ij}^{(g)} >
-X_{kl}^{(g)})$, where $X_{ij}^{(g)}$ is from treatment group $1$ and
-$X_{kl}^{(g)}$ from treatment group $2$, and the superscript refers to
-the size of the cluster the observation belongs to, with the weight as
-$1 / V(\hat{\theta}^{(g)})$. A common underlying rank correlation is
-assumed across all clusters in the estimation of $V(\hat{\theta}^{(g)})$.
+For unbalanced data, let $N^{(g)}$ be the number of clusters of size
+$g$ such that $N = \sum_{g=1}^G N^{(g)}$, where
+$G = \max_{1\le i \le  N} n_i$ is the maximum cluster size.
+A test procedure can be constructed by efficiently combining
+$W_{g, N^{(g)}}$ across all $g \in \{1, \ldots, G\}$.
+\citet{Rosn:Glyn:Lee:exte:2006} proposed to base the test on a
+combined estimator $\hat\theta_N$ of $\theta$, the probability that an
+observation in group~1 is greater than that of an observation in
+group~2, which is 1/2 under the null hypothesis.
+Standardized by a variance estimator $\widehat\VAR(\hat\theta_N)$,
+the test statistic 
+$(\hat\theta_N- 1/2) / \widehat\VAR^{1/2}(\hat\theta_N)$ 
+converges to a standard normal distribution as $N \to \infty$
+under mild conditions.
+
 
 
 \section{Signed Rank Test}
-\label{sec:signedrank}
+\label{s:signedrank}
 Suppose each cluster consists of pairs which record the observed pre-
 and post-treatment scores on the same individual. Let $X_{ij}$ be the
 pair-difference for the $j$th pair in the $i$th cluster, $i = 1,
@@ -510,11 +514,6 @@ The computation of $w_i$ uses the assumption of a common intracluster
 correlation structure. In addition, the RGL signed rank test is not
 suitable for data for which the cluster size is informative to the
 distribution of $X_{ij}$.
-
-
-
-\subsubsection{RGL method, group membership defined at the subunit level}
-
 
 
 \subsection{DS signed rank test}\label{sec:dssign}
@@ -604,6 +603,8 @@ intracluster dependence structure.
 
 
 \section{Usage}
+\label{s:usage}
+
 The package \pkg{clusrank} provides a single interface function for
 both Wilcoxon rank sum test and signed rank for clustered data. The
 function requires a dataframe. For clustered rank sum test, this data
