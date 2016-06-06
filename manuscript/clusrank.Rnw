@@ -62,7 +62,9 @@ and heterogeneous group members from the same cluster.
 Methods based on both asymptotics for large samples and
 permutation for small samples are available.
 We present some details and usages of the implemented methods,
-with illustrations via simulated and real data.
+with illustrations via simulated and real data. 
+Some comparison of selected methods that have not been studied before
+are easily performed with the package and the results are discussed.
 }
 
 
@@ -444,6 +446,7 @@ under mild conditions.
 
 \section{Signed Rank Test}
 \label{s:signedrank}
+
 Suppose each cluster consists of pairs which record the observed pre-
 and post-treatment scores on the same individual. Let $X_{ij}$ be the
 pair-difference for the $j$th pair in the $i$th cluster, $i = 1,
@@ -456,13 +459,15 @@ score. Note that for signed rank test, there is no issue on the group
 membership of each observation as for the rank sum test where subunit
 treatment group membership can lead to a different way of testing.
 
-\subsection{RGL signed rank test}\label{sec:rglsign}
+
+\subsection{RGL method}
 Assuming an exchangeable correlation structure within each cluster,
 \citet{Rosn:Glyn:Lee:wilc:2006} proposed two Wilcoxon signed rank
 tests for balanced and unbalanced data respectively. Let $R_{ij}$ be
 the rank of $|X_{ij}|$ among $\{|X_{ij}|, i = 1, \ldots, N, j = 1
 \ldots, n_i\}$, $V_{ij} = \text{sign}(X_{ij})$ and $S_{ij} =
 V_{ij}R_{ij}$ be the signed rank. In addition, $ 1 \leq n_i \leq G $.
+
 
 For balanced data, the clustered WIlcoxon signed rank statistic is
 defined as
