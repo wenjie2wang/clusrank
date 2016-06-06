@@ -47,7 +47,7 @@ Yujing Jiang\\ University of Connecticut \And
 
 \Abstract{
 Rank based tests are distribution-free alternatives to
-the popular one-sample and two-sample $t$-tests.
+the popular two-sample and paired $t$-test.
 For independent data, they are available in
 the built-in \pkg{stats} package of \proglang{R}.
 For clustered data, several rank-based tests that accounts for
@@ -219,6 +219,7 @@ A discussion concludes in Section~\ref{s:disc}
 \section{Rank-Sum Test}
 \label{s:ranksum}
 
+The Wilcoxon rank-sum test is used for two-sample comparison. 
 Let $X_{ij}$ be the $i$th observation in the $j$th cluster,
 $1 \leq i \le N$, $1 \le j \leq n_i$,
 where $n_i$ is the size of cluster $i$.
@@ -269,6 +270,8 @@ $W_g = \sum_{i \in I_g} \delta_i R_{i+}$.
 The null distribution of $W_{R}$ conditioning on $R_{i+}$'s is
 obtained by combining all possible permutations of $W_g$ for
 each cluster size $g \in \{1, \ldots, G\}$.
+Let $N_g$ be the number of clusters of size $g$, 
+among which $m_g$ are in group~1 and $n_g$ are in group~2.
 The total number of permutation is
 $\prod_{g = 1}^G {N_g \choose m_g}$.
 
@@ -278,8 +281,6 @@ When $N$ is large, exhaustive permutation is infeasible, and
 $Z = {W - \E (W) } /  {\sqrt{\VAR(W)}},$
 where $\E(W) = \sum_{g = 1}^G \E(W_g)$, and
 $\VAR(W) = \sum_{g=1}^G \VAR(W_g)$.
-Suppose that among the $N_g$ clusters of size $g$, there are $m_g$
-clusters in group~1 and $n_g$ clusters in group~2.
 Under $H_0$, for clusters with size $g$, the distribution of
 $\delta_i$ is Bernoulli with rate $m_g/N_g$, and we have
 $\E(\delta_i) = m_g / N_g$,
@@ -312,6 +313,8 @@ larger clusters, and, hence, may have lower efficiency.
 We use DS to denote the method of \citet{Datt:Satt:rank:2005}.
 Unlike the RGL method, the DS method allows individual observations
 within the same cluster to have different group memberships.
+The rationale is rooted in the within-cluster resampling principal
+of \citet{Hoff:Sen:Wein:with:2001}. 
 The test statistic is constructed from randomly picking one observation
 from each cluster to form a pseudo-sample and averaging the standard
 Wilcoxon rank-sum statistic over all possible pseudo-samples.
@@ -343,7 +346,7 @@ The expectation turns out to be
 \E(S) = \E(W^*) = \frac{1}{2}\sum_{i=1}^N \frac{n_i} {N}.
 \]
 The variance term $\VAR(S)$ is estimated by
-\red{Check: there is no scalor like $1/ N$?}
+\red{Check: there is no scalar like $1/ N$?}
 $\widehat\VAR(S) = \sum_{i=1}^N\big\{ \hat W_i - \E(W_i)\big\}^2,$
 where 
 \[
@@ -394,8 +397,8 @@ randomization: first, each cluster $i$ is randomly assigned to a
 random number $Q_i$ according to the observed grouping distribution
 $Q$; then, within cluster $i$, a random $Q_i$ out of $g$ individuals
 are assigned to group~1 while all the rest are assigned to group~2.  
-Essensially, the first stage determines how many individuals are in
-group~1 in a cluster and the second stage determins which they are.
+Essentially, the first stage determines how many individuals are in
+group~1 in a cluster and the second stage determines which they are.
 The two-stage randomization process can be used to devise a random
 permutation test to exhaust all possibilities for small $N$ and $g$.
 
@@ -417,7 +420,7 @@ and $\widehat\VAR$ and $\hat\E$ are operated on the empirical
 distribution of $Q$. 
 \citet{Rosn:Glyn:Lee:exte:2006} showed that
 \[
-Z_g = \frac{W_{g,N} - E(W_{g,N})}{\sqrt{\widehat{\VAR}(W_{g,N})}}
+Z_{g,N} = \frac{W_{g,N} - E(W_{g,N})}{\sqrt{\widehat{\VAR}(W_{g,N})}}
 \]
 converges to a standard normal distribution $N \to \infty$
 provided that $\lim_{N\to\infty} N_q / N = \xi_q$, where
@@ -441,170 +444,92 @@ the test statistic
 $(\hat\theta_N- 1/2) / \widehat\VAR^{1/2}(\hat\theta_N)$ 
 converges to a standard normal distribution as $N \to \infty$
 under mild conditions.
-
+\red{Why the corrected intracluster correlation has a different
+  formula in the Biometrics paper for signed rank test?}
 
 
 \section{Signed Rank Test}
 \label{s:signedrank}
 
-Suppose each cluster consists of pairs which record the observed pre-
-and post-treatment scores on the same individual. Let $X_{ij}$ be the
-pair-difference for the $j$th pair in the $i$th cluster, $i = 1,
-\ldots, N$, $j = 1, \ldots, n_i$. We assume that the clusters are
-independent while the pair-difference within each cluster are
-correlated. The null hypothesis we want to test is that the marginal
-distribution of $X_{ij}$ is symmetric around $0$, i.e., the treatment
-does not shift the location of the distribution of the baseline
-score. Note that for signed rank test, there is no issue on the group
-membership of each observation as for the rank sum test where subunit
-treatment group membership can lead to a different way of testing.
+The Wilcoxon signed rank test is often used for paired data comparison.
+Let $X_{ij}$ be the paired-difference score for the $j$th pair in the
+$i$th cluster,  $i = 1, \ldots, N$, $j = 1, \ldots, n_i$. 
+The null hypothesis $H_0$ is that the marginal
+distribution of $X_{ij}$ is symmetric around $0$.
+Note that, unlike for the rank-sum test, there is no issue on the group
+membership of each observation in the paired comparison setting.
 
 
-\subsection{RGL method}
-Assuming an exchangeable correlation structure within each cluster,
-\citet{Rosn:Glyn:Lee:wilc:2006} proposed two Wilcoxon signed rank
-tests for balanced and unbalanced data respectively. Let $R_{ij}$ be
-the rank of $|X_{ij}|$ among $\{|X_{ij}|, i = 1, \ldots, N, j = 1
-\ldots, n_i\}$, $V_{ij} = \text{sign}(X_{ij})$ and $S_{ij} =
-V_{ij}R_{ij}$ be the signed rank. In addition, $ 1 \leq n_i \leq G $.
-
-
-For balanced data, the clustered WIlcoxon signed rank statistic is
-defined as
-\begin{equation*}\label{eq:rglsign}
-  T_{R} = \sum_{i=1}^NS_{i+} \equiv \sum_{i=1}^N\sum_{j=1}^gR_{ij}V_{ij},
-  \end{equation*}
+\subsection{RGL method: uninformative cluster size}
+The RGL method for the rank-sum test \citep{Rosn:Glyn:Lee:inco:2003}
+was adapted to the signed rank test in \citet{Rosn:Glyn:Lee:wilc:2006}.
+Let $R_{ij}$ be the rank of $|X_{ij}|$ among 
+$\{|X_{ij}|, i = 1, \ldots, N, j = 1 \ldots, n_i\}$.
+Let $S_{ij} = V_{ij}R_{ij}$ be the signed rank, where
+$V_{ij} = \mathrm{sign}(X_{ij})$.
+For balanced data where $n_i = g$ for all $i$,
+the clustered WIlcoxon signed rank statistic is 
+\[
+T^{(obs)} = \sum_{i=1}^N S_{i+} = \sum_{i=1}^N  \sum_{j=1}^g R_{ij} V_{ij},
+\]
 where $S_{i+} = \sum^g_{j=1}S_{ij}$ and only nonzero $X_{ij}$ is
-considered in the computation of signed ranks. Since the cluster sizes
-are identical for balanced data, $n_i = G$, $i = 1, \ldots, N$.
+considered in the computation of signed ranks. 
+The null sampling distribution of $T_g$ can be obtained from a
+randomization at the cluster level conditional on $S_{i+}$'s. 
+Let $\delta_i$, $i = 1, \ldots, N$, be independent and identically
+distributed random variables with equal probability being 1 and $-1$;
+this distribution has variance 1.
+The conditional distribution of $T^{(obs)}$ given $S_{i+}$'s is the
+same as that of $T = \sum_{i=1}^N \delta_i S_{i+}$.
+For small $N$, it is possible to assess the significance of $T_g$ by
+enumerating all $2^N$ possibilities and computing the tail probability. 
+A large sample test can be constructed with
+$\E(T_g) = 0$ and $\VAR(T_g) = \sum_{i=1}^n S_{i+}^2$.
+As $N \to \infty$, $T_g / \VAR^{1/2}(T_g)$ converges to a standard
+normal distribution provided $g < \infty$.
 
 
-Assuming a design in which the unit of randomization is the cluster,
-the sampling distribution of $T_{R}$ is then expressed by
-\begin{equation}\label{eq:rglsignd}
-  T_{R} = \sum_{i=1}^N\delta_iS_{i+},
-  \end{equation}
-where $\delta_i$ are i.i.d. random variable each taking on the values
-$+1$ and $-1$ with equal probability under $H_0$. Therefore, if $N$ is
-small, a permutation test can be performed.  When $N$ is large, a
-large sample test statistic is defined as
-\begin{equation*}
-  W_{R} = \frac{T_{R}}{\sqrt{V(T_{R})}},
-  \end{equation*}
-where $V(T_{R}) = \sum_{i = 1}^NS_{i+}^2$.  The null distribution of
-$W_{R}$ converges to an $N(0, 1)$ as $N$ goes to infinity.
-
-For unbalanced data, \eqref{eq:rglsign} can be generalized as
-\begin{equation*}
-  T_{R} = \sum_{i=1}^Ng_i\bar{S}_i, \quad \text{where} \bar{S}_i = S_{i+}/g_i,
-  \end{equation*}
-which is a weighted average of $\bar{S}_{i}$ with weights in proportion
-to the cluster size. A more efficient contruction, which is the one
-implemented in our package, is
-\begin{equation*}
-  T_{Rs} = \sum_{i=1}^Nw_i\bar{S}_i,
-  \end{equation*}
-where $w_i = 1/\VAR(\bar{S}_i)$ under $H_0$. The randomization
-distribution is derived similarly as \eqref{eq:rglsignd}, which is
-represented in the following:
-\begin{equation*}
-  T_{Rs} = \sum_{i=1}^N\delta_iw_i\bar{S}_i,
-  \end{equation*}
-The expression above can be implemented for the permutation test.
-The large sample test statistic is defined as
-\begin{equation*}
-  W_{Rs} = \frac{T_{Rs}}{V(T_{Rs})^{1/2}}
-  \end{equation*}
-The computation of $w_i$ uses the assumption of a common intracluster
-correlation structure. In addition, the RGL signed rank test is not
-suitable for data for which the cluster size is informative to the
-distribution of $X_{ij}$.
+For unbalanced data, \citet{Rosn:Glyn:Lee:wilc:2006} considered a
+stratified statistic
+\[
+T^{(obs)} = \sum_{i=1}^N w_i\bar{S}_i,
+\]
+where $\bar{S}_i = S_{i+} / n_i$ and $w_i = 1/\VAR(\bar{S}_i)$ under $H_0$. 
+The variance estimator $\widehat\VAR(\bar S_i)$ is obtained 
+assuming a shared intracluster correlation coefficient.
+The randomization distribution of $T^{(obs)}$ given $\bar{S}_i$'s is
+that of 
+$T = \sum_{i=1}^N \delta_i w_i \bar{S}_i$,
+which facilitates a random permutation test for small $N$.
+The large sample test statistic is
+$T^{(obs)} / (\sum_{i=1}^N \hat w_i^2 \bar S_i^2)^{1/2}$,
+where $\hat w_i = 1 / \widehat\VAR(\bar S_i)$.
+It converges to a standard normal distribution as $N\to \infty$
+provided that $G < \infty$ and $\lim_{N\to\infty} N_g / N \to \xi_g$
+where $0 \le \xi_g \le 1$ for all $g \in \{1, \ldots, G\}$.
+This method assumes that the cluster size distribution is
+uninformative, and, hence, is not valid when the distribution of
+paired differences within a cluster depends on the cluster size.
 
 
-\subsection{DS signed rank test}\label{sec:dssign}
-\citet{Datt:Satt:sign:2008} applied the general principle of within
-cluster resampling to obtain a signed rank test, which allows the
-cluster size distribution to be informative as long as the marginal
-distribution of $X_{ij}$ is identical, denoted with $F$.  From each
-cluster, a pair difference $X_{ij}$ is randomly picked and pooled to
-form a pseudo-sample. Then test statistic is defined as
-\begin{equation*}
-  T_{DS} = E^*\left(\sum_{i=1}^NR_i^*V_i^*\right)
-  \end{equation*}
-where the superscript $*$ denote that the quantity is based on the
-pseudo-sample, the expectation is taken with respect to the observed data.
-To handle ties, ranks are defined as
-\begin{equation*}
-    R_i^* = \frac{1}{2}\left\{\sum_{i` = 1}^NI(|X_{i`}^*|\leq|X_i^*|)
-    +{\sum_{i` = 1}^NI(|X_{i`}^*|<|X_i^*} \right\}
-\end{equation*}
-where $R_i^*$ is the rank of $X^*$ among the set $\{X_j^*, 1 \leq j \leq M\}$.
-But this test is inefficient since only one observation from each cluster
-is used. DS proposed a test statistic which is based on the average of $W^*$
-over all possible samples of $\{X_i^*, \delta_i^*\}$, i.e.,
-$$Z_{ds} = \frac{S - E(S)}{\sqrt{\hat{var}(S)}}$$, where
-$$S = E(W^*|\bm{X}, \bm{\delta})$$.
-$$E(W^*) = \frac{1}{2}\sum^M_{i=1}\frac{n_{g_{i1}}}{g_i}$$.
-The computation of $Var(S)$ is complicated therefore is not included here in the draft.
+\subsection{DS method: informative cluster size}
+\citet{Datt:Satt:sign:2008} followed the same principle of
+within-cluster resampling as in \citet{Datt:Satt:rank:2005} in the 
+context of clustered paired data to develop a signed rank test.
+This method allows informative cluster sizes as long as the marginal
+distributions of $X_{ij}$'s are identical for all $i$ and $j$.
+Suppose that from cluster, one paired difference $X_{ij}$, denoted by
+$X_i^*$, is randomly picked and pooled to form a pseudo-sample.
+Let $R_i^*$ be the rank of $|X_i^*|$, $i = 1, \ldots, N$, which can be
+mid-rank when ties are present, and let $V_i = \mathrm{sign}(X_i^*)$.
+A standard Wilcoxon signed rank test statistic for the pseudo-sample is
+$\sum_{i=1}^N S_i^*$, where $S_i = V_i^* R_i^*$.
+The marginal signed-rank test statistic of the DS method is based on
+$T_M = \E (\sum_{i=1}^N S_i^* | \mathbf{X})$, 
+where $\mathbr{X} = \{X_{ij}: 1 \le i \le N; 1 \le j \le n_i\}$.
 
-Following the same derivation, the DS test can be extended to the comparison
-among $m$ groups, $m \geq 3$.
+\red{Fill the specific expressions and conditions for asymptotics}
 
-
-
-
-Suppose there are two groups under different treatments,
-$X$ and $Y$, the null hypothesis of the rank sum test
-is that the probability of an observation from a
-treatment $X$ exceeding an observation from treatment
-$Y$ is the same as an observation from treatment $Y$
-exceeding an observation from treatment $X$.
-Specifically,
-assume the data came in clusters and
-let $X_{ij}$ denote the score for the $j$th subunit
-from the $i$th cluster in the first group,
-$i = 1,\ldots,m; j = 1,\ldots,g_i$ and $Y_{kl}$
-denote the score for the $l$th subunit from
-the $k$th cluster in the second group,
-$k=1, \ldots,n;l=1,\ldots,h_k$.
-The clustered Wilcoxon rank sum statistic
-$W_{c,obs}$ is defined as
-\begin{equation} \label{eq:Wco}
-W_{c,obs} = \sum_{i=1}^m\sum_{j=1}^{g_i}\text{Rank}(X_{ij})
-\end{equation}
-where ranks are determined based on the
-combined sample of all subunits over the
-$X$ and $Y$ clusters. Subunits
-for a given cluster are assumed to be exchangeable and each
-cluster only contains members from one treatment group.
-
-
-\subsubsection{Balanced data}\label{brank}
-Under balanced designs, the cluster sizes are the same.
-Since the score assigned to clusters under treatments
-$X$ and $Y$ are
-identically distributed under the null hypothesis,
-we can pool $X$ and $Y$ clusters together and refer
-to a combined set of $Z$ clusters, where $Z_{ij} = $score
-for the $j$th subunit of the $i$th cluster,
-$j = 1,\ldots,g, i=1,\ldots, m+n = N$.
-Under $H_0$,
-suppose that $m$ of the $N$ clusters are assigned
-at random to the $X$ treatment and the remaining $n$
-clusters to the $Y$ treatment.
-Let $\delta_i$ be
-an indicator function that equals $1$ when the $i$th cluster
-is assigned to the $X$ group and $0$ when the $i$th cluster
-is assigned to the $Y$ group.
-The distribution of the clustered rank sum statistic $W_{c,obs}$ is
-\begin{equation}\label{eq:Wc}
-W_c = \sum^N_{i=1}\delta_iR_{i+} \quad \text{where   }R_{i+} = \sum^g_{j=1}R_{ij}
-\end{equation}
-
-
-As for the DS rank sum test, the formulation of DS signed rank test
-does not allow small sample permutation test since it allows arbitraty
-intracluster dependence structure.
 
 
 \section{Usage}
