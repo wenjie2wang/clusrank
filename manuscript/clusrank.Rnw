@@ -226,6 +226,7 @@ where $n_i$ is the size of cluster $i$.
 Let $\delta_{ij}$ be the group indicator of $X_{ij}$;
 $\delta_{ij} = 1$ if $X_{ij}$ is in group $1$, and
 $\delta_{ij} = 0$ if $X_{ij}$ is in group $2$.
+Let $R_{ij}$ be the rank of $X_{ij}$ among all the observations. 
 The observed data consist of
 $(\mathbf{X}, \boldsymbol{\delta}) =
 \{X_{ij}, \delta_{ij}: 1 \le j \le n_i; 1 \le i \le N\}$.
@@ -241,7 +242,6 @@ We use RGL to denote the method of \cite{Rosn:Glyn:Lee:inco:2003}.
 The RGL Wilcoxon rank sum test was designed for the scenario where the
 group is assigned at the cluster level:
 $\delta_{ij} = \delta_i$ for all $1 \le j \le n_i$.
-Let $R_{ij}$ be the rank of $X_{ij}$ among all the observations.
 Define $R_{i+} =\sum_{j=1}^{n_i}R_{ij}$, the sum of observed ranks of
 the individuals in the $i$th cluster.
 The Wilcoxon rank-sum statistic is
@@ -458,15 +458,15 @@ The null hypothesis $H_0$ is that the marginal
 distribution of $X_{ij}$ is symmetric around $0$.
 Note that, unlike for the rank-sum test, there is no issue on the group
 membership of each observation in the paired comparison setting.
+Let $R_{ij}$ be the rank of $|X_{ij}|$ among 
+$\{|X_{ij}|, i = 1, \ldots, N, j = 1 \ldots, n_i\}$.
+Let $S_{ij} = V_{ij}R_{ij}$ be the signed rank, where
+$V_{ij} = \mathrm{sign}(X_{ij})$.
 
 
 \subsection{RGL method: uninformative cluster size}
 The RGL method for the rank-sum test \citep{Rosn:Glyn:Lee:inco:2003}
 was adapted to the signed rank test in \citet{Rosn:Glyn:Lee:wilc:2006}.
-Let $R_{ij}$ be the rank of $|X_{ij}|$ among 
-$\{|X_{ij}|, i = 1, \ldots, N, j = 1 \ldots, n_i\}$.
-Let $S_{ij} = V_{ij}R_{ij}$ be the signed rank, where
-$V_{ij} = \mathrm{sign}(X_{ij})$.
 For balanced data where $n_i = g$ for all $i$,
 the clustered WIlcoxon signed rank statistic is 
 \[
@@ -520,15 +520,42 @@ This method allows informative cluster sizes as long as the marginal
 distributions of $X_{ij}$'s are identical for all $i$ and $j$.
 Suppose that from cluster, one paired difference $X_{ij}$, denoted by
 $X_i^*$, is randomly picked and pooled to form a pseudo-sample.
-Let $R_i^*$ be the rank of $|X_i^*|$, $i = 1, \ldots, N$, which can be
-mid-rank when ties are present, and let $V_i = \mathrm{sign}(X_i^*)$.
+Let $R_i^*$ be the mid-rank of $|X_i^*|$, $i = 1, \ldots, N$ to allow
+ties in the data, and let $V_i^* = \mathrm{sign}(X_i^*)$.
 A standard Wilcoxon signed rank test statistic for the pseudo-sample is
 $\sum_{i=1}^N S_i^*$, where $S_i = V_i^* R_i^*$.
-The marginal signed-rank test statistic of the DS method is based on
-$T_M = \E (\sum_{i=1}^N S_i^* | \mathbf{X})$, 
-where $\mathbr{X} = \{X_{ij}: 1 \le i \le N; 1 \le j \le n_i\}$.
+The DS method is based on
+$T = \E (\sum_{i=1}^N S_i^* | \mathbf{X})$, 
+where $\mathbf{X} = \{X_{ij}: 1 \le i \le N; 1 \le j \le n_i\}$.
 
-\red{Fill the specific expressions and conditions for asymptotics}
+
+To compute $T$, let
+\[
+\hat H_i(x) = \frac{1}{2}\{ F_i(x) + F_i(x-)\},
+\]
+where $F_i$ is the empirical distribution function of the observations
+in cluster~$i$ as in the DS method for the rank-sum test.
+It turns out that
+\[
+T = \sum_{i=1}^N \frac{n_i^+ - n_i^-}{n_i} 
++ \sum_{i=1}^N \frac{1}{n_i} \sum_{k=1}^{n_i} V_{ik} \sum_{j \ne i} H_j(|X_{ij}|),
+\]
+where $n_i^+ = \sum_{j=1}^{n_i} I(X_{ij} > 0)$ and
+$n_i^- = \sum_{j=1}^{n_i} I(X_{ij} < 0)$.
+The variance can be estimated by
+$\widehat\VAR(T) = \sum_{i=1}^N \hat S_i^2$, where
+\[
+\hat S_i = \frac{n_i^+ - n_i^-}{n_i} + 
+\frac{N - 1}{n_i} \sum_{k=1}^{n_i} V_{ik} \hat H(|X_{ik}|),
+\]
+with $\hat H(x) = \sum_{i=1}^N n_i \hat H_i(x) / \sum_{i=1}^N n_i$.
+The standardized testing statistic 
+$Z = T / \sqrt{\widehat\VAR(T)}$ converges to a standard normal
+distribution under mild conditions.
+
+
+\red{FIXME: add discussion on informative cluster size;
+  the difference between F and F' in the paper.}
 
 
 
