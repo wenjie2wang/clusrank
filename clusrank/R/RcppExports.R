@@ -21,10 +21,6 @@ pcrksum_str <- function(k, x, xc, xn, n, max) {
     .Call('clusrank_pcrksum_str', PACKAGE = 'clusrank', k, x, xc, xn, n, max)
 }
 
-test <- function(depth, max) {
-    invisible(.Call('clusrank_test', PACKAGE = 'clusrank', depth, max))
-}
-
 csrkg <- function(srk, Score) {
     .Call('clusrank_csrkg', PACKAGE = 'clusrank', srk, Score)
 }
