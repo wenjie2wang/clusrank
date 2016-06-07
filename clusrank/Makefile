@@ -6,7 +6,7 @@ Rpkg: Rd build
 	make INSTALL
 
 Rd:
-	Rscript -e "library(methods); devtools::document();" 
+	Rscript -e "library(roxygen2); roxygenize();  library(methods); devtools::document();" 
 
 build:  Rd
 	R CMD build ../$(pkg) --compact-vignettes="gs+qpdf"
