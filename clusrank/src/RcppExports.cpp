@@ -76,17 +76,6 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
-// test
-void test(int depth, int max);
-RcppExport SEXP clusrank_test(SEXP depthSEXP, SEXP maxSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< int >::type depth(depthSEXP);
-    Rcpp::traits::input_parameter< int >::type max(maxSEXP);
-    test(depth, max);
-    return R_NilValue;
-END_RCPP
-}
 // csrkg
 int csrkg(int srk, IntegerVector Score);
 RcppExport SEXP clusrank_csrkg(SEXP srkSEXP, SEXP ScoreSEXP) {

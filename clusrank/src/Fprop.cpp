@@ -75,9 +75,7 @@ NumericVector Fi_vec(NumericVector x,
                      int N, int M) {
   Rcpp::NumericVector  Fivec(N);
   for( int i = 0; i < N; i ++ ) {
-    for( int j = 0; j < M; j ++ ) {
-      Fivec[i] += Fi(x[i], (j + 1), x, clus, nvec, N);
-    }
+      Fivec[i] = Fi(x[i], clus[i], x, clus, nvec, N);
   }
   return Fivec;
 }

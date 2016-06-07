@@ -100,34 +100,30 @@ int crksum_str(int k, IntegerMatrix x, IntegerMatrix xc, IntegerVector max) {
   int id = 0, zero = 0, counter = 0;
   while(true) {
     counter += 1;
-    if( counter > 300) {
-   
-      return 0;
-    }
        for( int i = 0; i < d; i ++ ) {
-      if(xc(slots[i], i) <= 0) {
-        zero = 1;
-        break;
-      }
-      temp += x(slots[i], i);
-    }
-    if(zero == 0 & temp < k) {
-      for( int i = 0; i < d; i ++ ) {
-        ctp *= xc(slots[i], i);
-      }
-      ct += ctp;
-    }
-    temp = 0;
-    ctp = 1;
-    slots[0]++;
-    while(slots[id] == max[id]) {
-        if( id == d - 1) {
-        return(ct);
-      }
-      slots[id++] = 0;
-      slots[id]++;
-    }
-    id = 0;
+         if(xc(slots[i], i) < 0) {
+           zero = 1;
+           break;
+         }
+         temp += x(slots[i], i);
+       }
+       if(zero == 0 & temp < k) {
+         for( int i = 0; i < d; i ++ ) {
+           ctp *= xc(slots[i], i);
+         }
+         ct += ctp;
+       }
+       temp = 0;
+       ctp = 1;
+       slots[0]++;
+       while(slots[id] == max[id]) {
+         if( id == d - 1) {
+           return(ct);
+         }
+         slots[id++] = 0;
+         slots[id]++;
+       }
+       id = 0;
   }
 }
     
@@ -147,30 +143,6 @@ double pcrksum_str(int k, IntegerMatrix x, IntegerMatrix xc, IntegerVector xn, I
 }
 
 
-
-
-//[[Rcpp::export]]
-void test(int depth, int max) {
-  int* slots = (int*)alloca(sizeof(int) * depth);
-  for( int i = 0; i < depth; i ++ ) {
-    slots[i] = 0;
-  }
-  int index = 0;
-  while (true) {
-    slots[0]++;
-    while(slots[index] == max) {
-      Rcpp::Rcout<<index<< " slots " << slots << std::endl;
-  
-      if(index == depth - 1) {
-        return;
-      }
-      slots[index++] = 0;
-      slots[index]++;
-    }
-    index=0;
-  }
-}
-  
 
 
 
