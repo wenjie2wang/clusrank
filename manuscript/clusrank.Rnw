@@ -655,6 +655,8 @@ cluswilcox.test(score ~ group(grp) + cluster(id), data = dat1.cls, method = "ds"
 \red{FIXME: can a user specify \code{method = c('rgl', 'ds')} to request
   both tests in one call?}
 
+\red{FIXME: print from rgl method can be made more compact.}
+
 \red{FIXME: can illustrate exact permutation test for this sample size.}
 
 
