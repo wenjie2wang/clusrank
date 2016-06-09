@@ -1,6 +1,7 @@
 filestem := clusrank
 knitrfile := $(filestem).Rnw
 texfile := $(filestem).tex
+bibfile := $(filestem).bib
 pdffile := $(filestem).pdf
 
 all: tex pdf
@@ -8,8 +9,10 @@ all: tex pdf
 tex : $(knitrfile)
 	$(info ************  CONVERTING KNITR TO TEX  ************)
 	Rscript -e "require(knitr); knit('$(knitrfile)')"
+bib : $(bibfile)
+	bibtex $(filestem)
 
-pdf : tex
+pdf : tex bib
 	$(info ************  COMPILING PDF  ************)
 	pdflatex $(filestem)
 	bibtex $(filestem)

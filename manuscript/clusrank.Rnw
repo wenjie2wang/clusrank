@@ -308,13 +308,14 @@ dependence is weak; otherwise, because the effective number of
 independent observations per cluster becomes smaller, it overweights
 larger clusters, and, hence, may have lower efficiency.
 
+
 \subsection{DS method: individual-level grouping}
 
 We use DS to denote the method of \citet{Datt:Satt:rank:2005}.
 Unlike the RGL method, the DS method allows individual observations
 within the same cluster to have different group memberships.
 The rationale is rooted in the within-cluster resampling principal
-of \citet{Hoff:Sen:Wein:with:2001}. 
+of \citet{Hoff:Sen:Weib:with:2001}. 
 The test statistic is constructed from randomly picking one observation
 from each cluster to form a pseudo-sample and averaging the standard
 Wilcoxon rank-sum statistic over all possible pseudo-samples.
@@ -562,6 +563,31 @@ distribution under mild conditions.
 \section{Usage}
 \label{s:usage}
 
+Package \pkg{clusrank} provides a unified interface to all the 
+methods reviewed in Sections~\ref{s:ranksum} and~\ref{s:signedrank}
+through a function \code{cluswilcox.test}:
+
+
+<<args, echo=TRUE>>=
+library(clusrank)
+args(cluswilcox.test)
+@ 
+
+The argument \code{x} can be either a formula or numeric vector.
+The formula interface is simple to start with.
+<<formula, echo=TRUE>>=
+args(clusrank:::cluswilcox.test.formula)
+@ 
+
+\red{FIXME: explain all the arguments;
+separate ranksum and signed rank.}
+
+
+\red{FIXME: at the very end, give the default interface
+  similar to wilcox.test}
+
+
+
 The package \pkg{clusrank} provides a single interface function for
 both Wilcoxon rank sum test and signed rank for clustered data. The
 function requires a dataframe. For clustered rank sum test, this data
@@ -572,33 +598,110 @@ score before and after the treatment, or consist of cluster id and the
 observed difference in scores before and after the treatment. For the
 signed rank test, the argument \code{paired} should be set to
 \code{TRUE}. Other conventional arguments that can be tuned are
-\code{alternative}, \code{mu} and \code{exact}. There are $2$ methods
+\code{alternative}, \code{mu} and \code{exact}. 
+There are $2$ methods
 provided for each of the test through setting the argument
-\code{method} to \code{``rgl''} and \code{``ds''}. Note that the exact
+\code{method} to \code{'rgl'} and \code{'ds'}. 
+Note that the exact
 permutation tests are only available for RGL rank sum test when the
 treatment is assigned at the cluster level and for RGL signed rank
 test and should be applied to sample size which is larger than 50.
 
-<<crsd, eval = TRUE, echo = TRUE>>=
-library("clusrank")
-data(crd)
-str(crd)
-cluswilcox.test(z, cluster = id, group = group, data = crd, alternative = "two.sided", mu = 0, paired = FALSE, method = "rgl")
-cluswilcox.test(z, cluster = id, group = group, data = crd, alternative = "two.sided", mu = 0, paired = FALSE, method = "ds")
-@
+
+\section{Illustrations}
+\label{s:illus}
+
+\subsection{Rank-sum test}
+We use the following function to generate data.
+<<datgen, echo=TRUE>>=
+library(mvtnorm)
+datgen <- function(nclus, maxclsize, delta = 0.,
+                   rho = c(0.9, -.1), rate = 1,
+                   grplevel = c("cluster", "individual")) {
+    nn <- nclus * maxclsize
+    Sigma1 <- diag(1 - rho[1], nrow = maxclsize) + rho[1]
+    x <- c(t(rmvnorm(nclus, sigma = Sigma1)))
+    Sigma2 <- diag(1 - rho[2], nrow = maxclsize) + rho[2]
+    y <- c(t(rmvnorm(nclus, sigma = Sigma2)))
+    group <- rep(c(1, 2), each = nn)
+    if (grplevel == "individual") group <- sample(group, nn, FALSE)
+    id <- rep(1:(2 * nclus), each = maxclsize)
+    score <- exp(c(x, y)) + delta * group
+    dat <- data.frame(score = score, grp = group, id = id)
+    keep <- sort(sample(1:(2 * nn), size = rate * (2 * nn), FALSE))
+    if (rate == 1) dat else dat[keep,]
+}
+@ 
+\red{FIXME: explain the arguments so that readers know what it does.}
+
+
+The first datset has 10 clusters in each of the two groups,
+and the grouping is at the cluster level.
+<<dat-clus>>=
+set.seed(616)
+dat0.cls <- datgen(10, 5, rho=c(.9, .9), grplevel="cluster")
+head(dat0.cls)
+cluswilcox.test(score ~ group(grp) + cluster(id), data = dat0.cls, method = "rgl")
+cluswilcox.test(score ~ group(grp) + cluster(id), data = dat0.cls, method = "ds")
+@ 
+
+The next dataset has individual level grouping. 
+<<dat-indi>>=
+dat1.cls <- datgen(10, 5, rho=c(.9, .9), delta = 1, grplevel="individual")
+head(dat1.cls)
+cluswilcox.test(score ~ group(grp) + cluster(id), data = dat1.cls, method = "rgl")
+cluswilcox.test(score ~ group(grp) + cluster(id), data = dat1.cls, method = "ds")
+@ 
+\red{FIXME: can a user specify \code{method = c('rgl', 'ds')} to request
+  both tests in one call?}
+
+\red{FIXME: can illustrate exact permutation test for this sample size.}
+
+
+A simulation to compare the two methods become can be easily done:
+<<simpower>>=
+simpower <- function(nrep, level, delta, rho, rate, grplevel, nclus, maxclsize) {
+    do1rep <- function() {
+        dat <- datgen(nclus, maxclsize, delta, rho, rate, grplevel);
+        p.rgl <- cluswilcox.test(score, cluster = id, group = grp, 
+                                 data = dat, method = "rgl")$p.value
+        p.ds  <- cluswilcox.test(score, cluster = id, group = grp, 
+                                 data = dat, method = "ds" )$p.value
+        c(rgl = p.rgl, ds = p.ds)
+    }
+    sim <- t(replicate(nrep, do1rep()))
+    apply(sim, 2, function(x) mean(x < level))
+}
+@ 
+
+\red{FIXME: can add a small size study and small power study that has not been
+done in the literature. need to make sure the sizes are fine before checking power.}
+<<size>>=
+simpower(1000, 0.05, 0, c(.9, -.1), 1, "cluster", 10, 5)
+simpower(1000, 0.05, 0, c(.9,  .9), 1, "cluster", 10, 5)
+@ 
+
+<<power>>=
+simpower(1000, 0.05, 1, c(.9,  .9), 1, "cluster",    10, 5)
+simpower(1000, 0.05, 1, c(.9,  .9), 1, "individual", 10, 5)
+@ 
+
+\subsection{Signed rank test}
+
+\red{FIXME: can you do something similar? Use some simple function to generate data, illustrate usage of each function, and do some simulation that has not been done before if possible.}
+
+
+\section{Discussion}
+\label{s:disc}
+
+What points can be discussed?
+
+Applicability of each method.
 
 
 
 
 
-
-
-
-
-
-
-
-%\bibliographystyle{jss}
 
 \bibliography{clusrank}
 
