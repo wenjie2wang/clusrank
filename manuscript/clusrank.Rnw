@@ -563,6 +563,11 @@ distribution under mild conditions.
 \section{Usage}
 \label{s:usage}
 
+<<knitr, echo=FALSE>>=
+library(knitr)
+opts_chunk$set(cache=TRUE, autodep=TRUE)
+@ 
+
 Package \pkg{clusrank} provides a unified interface to all the 
 methods reviewed in Sections~\ref{s:ranksum} and~\ref{s:signedrank}
 through a function \code{cluswilcox.test}:
