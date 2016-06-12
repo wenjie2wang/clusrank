@@ -62,7 +62,7 @@ and heterogeneous group members from the same cluster.
 Methods based on both asymptotics for large samples and
 permutation for small samples are available.
 We present some details and usages of the implemented methods,
-with illustrations via simulated and real data. 
+with illustrations via simulated and real data.
 Some comparison of selected methods that have not been studied before
 are easily performed with the package and the results are discussed.
 }
@@ -219,14 +219,14 @@ A discussion concludes in Section~\ref{s:disc}
 \section{Rank-Sum Test}
 \label{s:ranksum}
 
-The Wilcoxon rank-sum test is used for two-sample comparison. 
+The Wilcoxon rank-sum test is used for two-sample comparison.
 Let $X_{ij}$ be the $i$th observation in the $j$th cluster,
 $1 \leq i \le N$, $1 \le j \leq n_i$,
 where $n_i$ is the size of cluster $i$.
 Let $\delta_{ij}$ be the group indicator of $X_{ij}$;
 $\delta_{ij} = 1$ if $X_{ij}$ is in group $1$, and
 $\delta_{ij} = 0$ if $X_{ij}$ is in group $2$.
-Let $R_{ij}$ be the rank of $X_{ij}$ among all the observations. 
+Let $R_{ij}$ be the rank of $X_{ij}$ among all the observations.
 The observed data consist of
 $(\mathbf{X}, \boldsymbol{\delta}) =
 \{X_{ij}, \delta_{ij}: 1 \le j \le n_i; 1 \le i \le N\}$.
@@ -270,7 +270,7 @@ $W_g = \sum_{i \in I_g} \delta_i R_{i+}$.
 The null distribution of $W_{R}$ conditioning on $R_{i+}$'s is
 obtained by combining all possible permutations of $W_g$ for
 each cluster size $g \in \{1, \ldots, G\}$.
-Let $N_g$ be the number of clusters of size $g$, 
+Let $N_g$ be the number of clusters of size $g$,
 among which $m_g$ are in group~1 and $n_g$ are in group~2.
 The total number of permutation is
 $\prod_{g = 1}^G {N_g \choose m_g}$.
@@ -315,7 +315,7 @@ We use DS to denote the method of \citet{Datt:Satt:rank:2005}.
 Unlike the RGL method, the DS method allows individual observations
 within the same cluster to have different group memberships.
 The rationale is rooted in the within-cluster resampling principal
-of \citet{Hoff:Sen:Weib:with:2001}. 
+of \citet{Hoff:Sen:Weib:with:2001}.
 The test statistic is constructed from randomly picking one observation
 from each cluster to form a pseudo-sample and averaging the standard
 Wilcoxon rank-sum statistic over all possible pseudo-samples.
@@ -349,7 +349,7 @@ The expectation turns out to be
 The variance term $\VAR(S)$ is estimated by
 \red{Check: there is no scalar like $1/ N$?}
 $\widehat\VAR(S) = \sum_{i=1}^N\big\{ \hat W_i - \E(W_i)\big\}^2,$
-where 
+where
 \[
 \hat W_i = \frac{1}{2 n_i (N + 1)}
 \sum_{k=1}^{n_i}\left[(N - 1) \delta_{ik} - \sum_{j\ne i}^N \frac{n_{j1}}{n_j}\right]
@@ -383,7 +383,7 @@ requirements of the asymptotic theory.
 \subsection{RGL method: individual-level grouping}
 
 \citet{Rosn:Glyn:Lee:exte:2006} extended the RGL method to allow
-individual-level grouping; i.e., $\delta_{ij}$, $j = 1, \ldots, n_i$, 
+individual-level grouping; i.e., $\delta_{ij}$, $j = 1, \ldots, n_i$,
 can take different values for the same $i$.
 The idea of the method is best explained with balanced data,
 where all cluster sizes are all the same; i.e., $n_i = g$ for all $i$.
@@ -397,14 +397,14 @@ The sampling distribution of $W_{g,N}$ is derived from a two-stage
 randomization: first, each cluster $i$ is randomly assigned to a
 random number $Q_i$ according to the observed grouping distribution
 $Q$; then, within cluster $i$, a random $Q_i$ out of $g$ individuals
-are assigned to group~1 while all the rest are assigned to group~2.  
+are assigned to group~1 while all the rest are assigned to group~2.
 Essentially, the first stage determines how many individuals are in
 group~1 in a cluster and the second stage determines which they are.
 The two-stage randomization process can be used to devise a random
 permutation test to exhaust all possibilities for small $N$ and $g$.
 
 
-It was shown that 
+It was shown that
 \[
 \E(W_{g,N}) = \frac{gN + 1}{2} \sum_{q=0}^g q N_q,
 \]
@@ -418,14 +418,14 @@ where
 $s_B^2 = \sum_{i=1}^N \{R_{i+} - g(gN + 1) / 2\}^2 / N$,
 $s_W^2 = \sum_{i=1}^N\sum_{j = 1}^g (R_{ij} - R_{i+} / g)^2 / \{N (g - 1)\}$,
 and $\widehat\VAR$ and $\hat\E$ are operated on the empirical
-distribution of $Q$. 
+distribution of $Q$.
 \citet{Rosn:Glyn:Lee:exte:2006} showed that
 \[
 Z_{g,N} = \frac{W_{g,N} - E(W_{g,N})}{\sqrt{\widehat{\VAR}(W_{g,N})}}
 \]
 converges to a standard normal distribution $N \to \infty$
 provided that $\lim_{N\to\infty} N_q / N = \xi_q$, where
-$0 \le \xi_q \le 1$, if $0 < q < g$ or $0 \le \xi_q < 1$ if 
+$0 \le \xi_q \le 1$, if $0 < q < g$ or $0 \le \xi_q < 1$ if
 $q \in \{0, g\}$.
 This test is equivalent to the RGL test for balanced data when the
 treatment is assigned at the cluster level.
@@ -441,8 +441,8 @@ combined estimator $\hat\theta_N$ of $\theta$, the probability that an
 observation in group~1 is greater than that of an observation in
 group~2, which is 1/2 under the null hypothesis.
 Standardized by a variance estimator $\widehat\VAR(\hat\theta_N)$,
-the test statistic 
-$(\hat\theta_N- 1/2) / \widehat\VAR^{1/2}(\hat\theta_N)$ 
+the test statistic
+$(\hat\theta_N- 1/2) / \widehat\VAR^{1/2}(\hat\theta_N)$
 converges to a standard normal distribution as $N \to \infty$
 under mild conditions.
 \red{Why the corrected intracluster correlation has a different
@@ -454,12 +454,12 @@ under mild conditions.
 
 The Wilcoxon signed rank test is often used for paired data comparison.
 Let $X_{ij}$ be the paired-difference score for the $j$th pair in the
-$i$th cluster,  $i = 1, \ldots, N$, $j = 1, \ldots, n_i$. 
+$i$th cluster,  $i = 1, \ldots, N$, $j = 1, \ldots, n_i$.
 The null hypothesis $H_0$ is that the marginal
 distribution of $X_{ij}$ is symmetric around $0$.
 Note that, unlike for the rank-sum test, there is no issue on the group
 membership of each observation in the paired comparison setting.
-Let $R_{ij}$ be the rank of $|X_{ij}|$ among 
+Let $R_{ij}$ be the rank of $|X_{ij}|$ among
 $\{|X_{ij}|, i = 1, \ldots, N, j = 1 \ldots, n_i\}$.
 Let $S_{ij} = V_{ij}R_{ij}$ be the signed rank, where
 $V_{ij} = \mathrm{sign}(X_{ij})$.
@@ -469,21 +469,21 @@ $V_{ij} = \mathrm{sign}(X_{ij})$.
 The RGL method for the rank-sum test \citep{Rosn:Glyn:Lee:inco:2003}
 was adapted to the signed rank test in \citet{Rosn:Glyn:Lee:wilc:2006}.
 For balanced data where $n_i = g$ for all $i$,
-the clustered WIlcoxon signed rank statistic is 
+the clustered WIlcoxon signed rank statistic is
 \[
 T^{(obs)} = \sum_{i=1}^N S_{i+} = \sum_{i=1}^N  \sum_{j=1}^g R_{ij} V_{ij},
 \]
 where $S_{i+} = \sum^g_{j=1}S_{ij}$ and only nonzero $X_{ij}$ is
-considered in the computation of signed ranks. 
+considered in the computation of signed ranks.
 The null sampling distribution of $T_g$ can be obtained from a
-randomization at the cluster level conditional on $S_{i+}$'s. 
+randomization at the cluster level conditional on $S_{i+}$'s.
 Let $\delta_i$, $i = 1, \ldots, N$, be independent and identically
 distributed random variables with equal probability being 1 and $-1$;
 this distribution has variance 1.
 The conditional distribution of $T^{(obs)}$ given $S_{i+}$'s is the
 same as that of $T = \sum_{i=1}^N \delta_i S_{i+}$.
 For small $N$, it is possible to assess the significance of $T_g$ by
-enumerating all $2^N$ possibilities and computing the tail probability. 
+enumerating all $2^N$ possibilities and computing the tail probability.
 A large sample test can be constructed with
 $\E(T_g) = 0$ and $\VAR(T_g) = \sum_{i=1}^n S_{i+}^2$.
 As $N \to \infty$, $T_g / \VAR^{1/2}(T_g)$ converges to a standard
@@ -495,11 +495,11 @@ stratified statistic
 \[
 T^{(obs)} = \sum_{i=1}^N w_i\bar{S}_i,
 \]
-where $\bar{S}_i = S_{i+} / n_i$ and $w_i = 1/\VAR(\bar{S}_i)$ under $H_0$. 
-The variance estimator $\widehat\VAR(\bar S_i)$ is obtained 
+where $\bar{S}_i = S_{i+} / n_i$ and $w_i = 1/\VAR(\bar{S}_i)$ under $H_0$.
+The variance estimator $\widehat\VAR(\bar S_i)$ is obtained
 assuming a shared intracluster correlation coefficient.
 The randomization distribution of $T^{(obs)}$ given $\bar{S}_i$'s is
-that of 
+that of
 $T = \sum_{i=1}^N \delta_i w_i \bar{S}_i$,
 which facilitates a random permutation test for small $N$.
 The large sample test statistic is
@@ -515,7 +515,7 @@ paired differences within a cluster depends on the cluster size.
 
 \subsection{DS method: informative cluster size}
 \citet{Datt:Satt:sign:2008} followed the same principle of
-within-cluster resampling as in \citet{Datt:Satt:rank:2005} in the 
+within-cluster resampling as in \citet{Datt:Satt:rank:2005} in the
 context of clustered paired data to develop a signed rank test.
 This method allows informative cluster sizes as long as the marginal
 distributions of $X_{ij}$'s are identical for all $i$ and $j$.
@@ -526,7 +526,7 @@ ties in the data, and let $V_i^* = \mathrm{sign}(X_i^*)$.
 A standard Wilcoxon signed rank test statistic for the pseudo-sample is
 $\sum_{i=1}^N S_i^*$, where $S_i = V_i^* R_i^*$.
 The DS method is based on
-$T = \E (\sum_{i=1}^N S_i^* | \mathbf{X})$, 
+$T = \E (\sum_{i=1}^N S_i^* | \mathbf{X})$,
 where $\mathbf{X} = \{X_{ij}: 1 \le i \le N; 1 \le j \le n_i\}$.
 
 
@@ -538,7 +538,7 @@ where $F_i$ is the empirical distribution function of the observations
 in cluster~$i$ as in the DS method for the rank-sum test.
 It turns out that
 \[
-T = \sum_{i=1}^N \frac{n_i^+ - n_i^-}{n_i} 
+T = \sum_{i=1}^N \frac{n_i^+ - n_i^-}{n_i}
 + \sum_{i=1}^N \frac{1}{n_i} \sum_{k=1}^{n_i} V_{ik} \sum_{j \ne i} H_j(|X_{ij}|),
 \]
 where $n_i^+ = \sum_{j=1}^{n_i} I(X_{ij} > 0)$ and
@@ -546,11 +546,11 @@ $n_i^- = \sum_{j=1}^{n_i} I(X_{ij} < 0)$.
 The variance can be estimated by
 $\widehat\VAR(T) = \sum_{i=1}^N \hat S_i^2$, where
 \[
-\hat S_i = \frac{n_i^+ - n_i^-}{n_i} + 
+\hat S_i = \frac{n_i^+ - n_i^-}{n_i} +
 \frac{N - 1}{n_i} \sum_{k=1}^{n_i} V_{ik} \hat H(|X_{ik}|),
 \]
 with $\hat H(x) = \sum_{i=1}^N n_i \hat H_i(x) / \sum_{i=1}^N n_i$.
-The standardized testing statistic 
+The standardized testing statistic
 $Z = T / \sqrt{\widehat\VAR(T)}$ converges to a standard normal
 distribution under mild conditions.
 
@@ -563,27 +563,55 @@ distribution under mild conditions.
 \section{Usage}
 \label{s:usage}
 
-<<knitr, echo=FALSE>>=
-library(knitr)
-opts_chunk$set(cache=TRUE, autodep=TRUE)
-@ 
 
-Package \pkg{clusrank} provides a unified interface to all the 
+Package \pkg{clusrank} provides a unified interface to all the
 methods reviewed in Sections~\ref{s:ranksum} and~\ref{s:signedrank}
 through a function \code{cluswilcox.test}:
 
 
-<<args, echo=TRUE>>=
+<<args, echo=FALSE>>=
 library(clusrank)
 args(cluswilcox.test)
-@ 
+@
 
 The argument \code{x} can be either a formula or numeric vector.
-The formula interface is simple to start with.
-<<formula, echo=TRUE>>=
-args(clusrank:::cluswilcox.test.formula)
-@ 
+When \code{x} is a formula, the formula interface is called with
+synopsis as the following.
 
+<<formula, echo=FALSE>>=
+args(clusrank:::cluswilcox.test.formula)
+@
+
+The formula interface works for both rank sum test and signed rank test.
+For rank sum test, the left hand side of the formula is the observed
+score and the right hand side comprises the required covariates
+including \code{cluster} id and \code{group} id. Additional covariate
+for specific method can also be added, e.g., \code{stratum} for
+\code{rgl} method.
+The \code{data} argument needs the name of a data frame
+which should consist of the observed score and required covaraites.
+The \code{subset} and \code{na.action} have the same effect as they have
+in the \code{model.frame} function.
+Other conventional arguments that can be tuned are \code{alternative},
+\code{mu} and \code{exact}. Note that the exact permutation tests are only available for rank sum test using \code{rgl} method when the
+treatment is assigned at cluster level and should be applied to sample with number of clusters less than 50.
+
+
+Clustered signed rank test is performed when \code{paired} is set to
+be \code{TRUE}.
+For clustered signed rank test, the variable on the
+left hand side of the formula should be the observed difference in
+scores before and after the treatment and the right hand side of the
+formula only requires the cluster id of each observation.
+The exact permutation test is only available when the \code{rgl} method is used.
+
+By setting the argument \code{method} to \code{'rgl'} or \code{'ds'}
+we can apply one of the two methods introduced in~\ref{s:ranksum}
+and~\ref{s:signedrank} for each test.
+
+When \code{x} is a numerical vector, the default interface is called.
+For the clustered rank sum test, besides \code{x}, \code{cluster} and \code{group} are required and an optional \code{stratum} id can be provided if using \code{rgl} method.
+For the clustered signed rank test, \code{x} can be either the observed difference in scores or the observed score before treatment in addition to which the observed score after treatment is required as \code{y}. All other arguments can be set exactly the same as using the formula interface.
 \red{FIXME: explain all the arguments;
 separate ranksum and signed rank.}
 
@@ -603,10 +631,10 @@ score before and after the treatment, or consist of cluster id and the
 observed difference in scores before and after the treatment. For the
 signed rank test, the argument \code{paired} should be set to
 \code{TRUE}. Other conventional arguments that can be tuned are
-\code{alternative}, \code{mu} and \code{exact}. 
+\code{alternative}, \code{mu} and \code{exact}.
 There are $2$ methods
 provided for each of the test through setting the argument
-\code{method} to \code{'rgl'} and \code{'ds'}. 
+\code{method} to \code{'rgl'} and \code{'ds'}.
 Note that the exact
 permutation tests are only available for RGL rank sum test when the
 treatment is assigned at the cluster level and for RGL signed rank
@@ -636,7 +664,7 @@ datgen <- function(nclus, maxclsize, delta = 0.,
     keep <- sort(sample(1:(2 * nn), size = rate * (2 * nn), FALSE))
     if (rate == 1) dat else dat[keep,]
 }
-@ 
+@
 \red{FIXME: explain the arguments so that readers know what it does.}
 
 
@@ -648,15 +676,15 @@ dat0.cls <- datgen(10, 5, rho=c(.9, .9), grplevel="cluster")
 head(dat0.cls)
 cluswilcox.test(score ~ group(grp) + cluster(id), data = dat0.cls, method = "rgl")
 cluswilcox.test(score ~ group(grp) + cluster(id), data = dat0.cls, method = "ds")
-@ 
+@
 
-The next dataset has individual level grouping. 
+The next dataset has individual level grouping.
 <<dat-indi>>=
 dat1.cls <- datgen(10, 5, rho=c(.9, .9), delta = 1, grplevel="individual")
 head(dat1.cls)
 cluswilcox.test(score ~ group(grp) + cluster(id), data = dat1.cls, method = "rgl")
 cluswilcox.test(score ~ group(grp) + cluster(id), data = dat1.cls, method = "ds")
-@ 
+@
 \red{FIXME: can a user specify \code{method = c('rgl', 'ds')} to request
   both tests in one call?}
 
@@ -670,28 +698,28 @@ A simulation to compare the two methods become can be easily done:
 simpower <- function(nrep, level, delta, rho, rate, grplevel, nclus, maxclsize) {
     do1rep <- function() {
         dat <- datgen(nclus, maxclsize, delta, rho, rate, grplevel);
-        p.rgl <- cluswilcox.test(score, cluster = id, group = grp, 
+        p.rgl <- cluswilcox.test(score, cluster = id, group = grp,
                                  data = dat, method = "rgl")$p.value
-        p.ds  <- cluswilcox.test(score, cluster = id, group = grp, 
+        p.ds  <- cluswilcox.test(score, cluster = id, group = grp,
                                  data = dat, method = "ds" )$p.value
         c(rgl = p.rgl, ds = p.ds)
     }
     sim <- t(replicate(nrep, do1rep()))
     apply(sim, 2, function(x) mean(x < level))
 }
-@ 
+@
 
 \red{FIXME: can add a small size study and small power study that has not been
 done in the literature. need to make sure the sizes are fine before checking power.}
 <<size>>=
 simpower(1000, 0.05, 0, c(.9, -.1), 1, "cluster", 10, 5)
 simpower(1000, 0.05, 0, c(.9,  .9), 1, "cluster", 10, 5)
-@ 
+@
 
 <<power>>=
 simpower(1000, 0.05, 1, c(.9,  .9), 1, "cluster",    10, 5)
 simpower(1000, 0.05, 1, c(.9,  .9), 1, "individual", 10, 5)
-@ 
+@
 
 \subsection{Signed rank test}
 
