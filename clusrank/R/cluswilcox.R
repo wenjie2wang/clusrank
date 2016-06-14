@@ -3,7 +3,7 @@
 ##' Performs one-sample and two-sample Wilcoxon test for clutered data
 ##' on vectors of data.
 ##'
-##' @param x A numeric vector of data values. Non-finite (e.g.,
+##' @param x A numeric vector of data values or a formula. Non-finite (e.g.,
 ##'     infinite or missing) values will be omitted
 ##' @param y An optional numeric vector of data values: as with
 ##'     \code{x} non-finite values will be omitted
@@ -37,8 +37,6 @@
 ##'     initial letter
 ##' @param mu A number specifying an optional parameter used to form
 ##'     the null hypothesis. See 'Details'
-##' @param DNAME An optional character string for data name when
-##'     printing the result
 ##' @param ... Further arguments to be passed to or from methods
 ##' @details The formula interface is only applicable for the
 ##'     {m}-sample rank sum tests \eqn{m \ge 2}. If the data are saved
@@ -48,10 +46,11 @@
 ##'     written as \code{z ~ cluster(id) + group(grp) +
 ##'     stratum(strat)}. The \code{group} variable is required.
 ##'
-##' If both \code{x} and \code{y} are given or only \code{x} is given
-##' and \code{paired} is \code{TRUE}, a clustered Wilcoxon signed rank
-##' test of the null that the distribution of \code{x - y} or of
-##' \code{x} is symmetric about \code{mu} is performed.
+##' Given the cluster id, if both \code{x} and \code{y} are provided
+##' or only \code{x} is provided and \code{paired} is \code{TRUE}, a
+##' clustered Wilcoxon signed rank test of the null hypothesis that
+##' the distribution of \code{x - y} or of \code{x} is symmetric about
+##' \code{mu} is performed.
 ##'
 ##' Otherwise, if only \code{x} is given and \code{paired} is
 ##' \code{FALSE}, a Wilcoxon rank sum test is carried out. In this
@@ -66,6 +65,7 @@
 ##' are the same for data in all groups and the alternative is that
 ##' they are not all the same.
 ##'
+##' 
 ##' If \code{cluster} is not provided, the default is that there is no
 ##' clutering in the data. Both \code{"rgl"} and \code{"ds"} method
 ##' support balanced and unbalanced data (cluster size is identical or
@@ -76,9 +76,14 @@
 ##' test.
 ##'
 ##' The exact test is still under development and is only available
-##' for ranksum test and signed rank test when the \code{method} is
-##' \code{"rgl"}. Currently the exact test is not recommended.
+##' for ranksum test when treatment is assigned at cluster level and
+##' signed rank test for \code{rgl} method and can be applied when
+##' number of cluster is small (under 50). It will be slow if number
+##' of cluster is too large.
 ##'
+##' There is also a formula interface for both tests. For details look
+##' at the examples.
+##' 
 ##' @return A list with class \code{"ctest"}.
 ##'
 ##' \item{Rstat}{The value of the rank statistic with a name discribing it}
@@ -97,6 +102,8 @@
 #' ## Clustered signed rank test using RGL method.
 #' data(crsd)
 #' cluswilcox.test(z, cluster = id, data = crsd, paired = TRUE)
+#' ## or
+#' cluswilcox.test(z ~ cluster(id), data = crsd, paired = TRUE)
 #' \dontrun{cluswilcox.test(z, cluster = id, data = crsd)
 #' ## Default is rank sum test. The group variable is required.}
 #' ## Clustered rank sum test using RGL method.
@@ -136,7 +143,9 @@ cluswilcox.test <- function(x, ...) {
     pars <- as.list(match.call()[-1])
     if(!is.null(pars$data)) {
         data.temp <- eval(pars$data, parent.frame())
-    }
+    } else {
+        data.temp <- NULL
+        }
     if(!is.null(data.temp) & length(pars$x) == 1) {
         if(is.data.frame(data.temp) & any(as.character(pars$x)
             %in% names(data.temp))) {
@@ -181,6 +190,8 @@ cluswilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
     m$formula <- if(missing(data)) terms(formula, special)
                  else terms(formula, special, data = data)
 
+    m <- if(missing(data)) m <- m[1 : 2]
+         else m <- m[1 : 3]
     mf <- eval(m, parent.frame())
     Terms <- terms(mf)
 

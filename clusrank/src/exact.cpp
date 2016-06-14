@@ -191,8 +191,9 @@ int csrkg(int srk, IntegerVector Score) {
 //[[Rcpp::export]]
 
 double psrkg(int srk, IntegerVector Score) {
-  int n = Score.size();
-  double N = pow(n, 2), p = 0;
+  int n0 = Score.size();
+  double n = (double)n0;
+  double N = pow(2.0, n), p = 0;
   p = csrkg(srk, Score);
   p = p / N;
   return(p);
