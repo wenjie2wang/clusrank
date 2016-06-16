@@ -621,25 +621,6 @@ separate ranksum and signed rank.}
 
 
 
-The package \pkg{clusrank} provides a single interface function for
-both Wilcoxon rank sum test and signed rank for clustered data. The
-function requires a dataframe. For clustered rank sum test, this data
-frame should consist of cluster id, group id and observed scores (an
-extra stratum variable for method \code{RGL}). For clustered signed
-rank test, this data frame should consist of cluster id and observed
-score before and after the treatment, or consist of cluster id and the
-observed difference in scores before and after the treatment. For the
-signed rank test, the argument \code{paired} should be set to
-\code{TRUE}. Other conventional arguments that can be tuned are
-\code{alternative}, \code{mu} and \code{exact}.
-There are $2$ methods
-provided for each of the test through setting the argument
-\code{method} to \code{'rgl'} and \code{'ds'}.
-Note that the exact
-permutation tests are only available for RGL rank sum test when the
-treatment is assigned at the cluster level and for RGL signed rank
-test and should be applied to sample size which is larger than 50.
-
 
 \section{Illustrations}
 \label{s:illus}
@@ -724,10 +705,53 @@ simpower(1000, 0.05, 1, c(.9,  .9), 1, "individual", 10, 5)
 \subsection{Signed rank test}
 
 \red{FIXME: can you do something similar? Use some simple function to generate data, illustrate usage of each function, and do some simulation that has not been done before if possible.}
+<<datagen_sr, echo = TREU>>=
+datgen.sr <- function(nclus, maxclsize, delta = 0.,
+                      rho = 0.9, rate = 1) {
+    nn <- nclus * maxclsize
+    Sigma <- diag(1 - rho, nrow = maxclsize) + rho
+    x <- c(t(rmvnorm(nclus, sigma = Sigma)))
+    y <- c(t(rmvnorm(nclus, sigma = Sigma)))
+    score <- exp(x) - exp(y) - delta
+    id <- rep(1:(2 * nclus), each = maxclsize)
+    dat <- data.frame(score = score, id = id)
+    keep <- sort(sample(1:(2 * nn),
+                 size = rate * (2 * nn), FALSE))
+    if (rate == 1) dat else dat[keep,]
+}
+@ 
+
+<<simpower_sr, echo = TRUE>>=
+simpower.sr <- function(nrep, level,  delta, rho, rate,  nclus, maxclsize) {
+    do1rep <- function() {
+        dat <- datgen.sr(nclus, maxclsize, delta, rho, rate);
+        p.rgl <- cluswilcox.test(score, cluster = id, group = grp,
+                                 data = dat, paired = TRUE, method = "rgl")$p.value
+        p.ds  <- cluswilcox.test(score, cluster = id, group = grp,
+                                 data = dat, paired = TRUE,  method = "ds" )$p.value
+        c(rgl = p.rgl, ds = p.ds)
+    }
+    sim <- t(replicate(nrep, do1rep()))
+    apply(sim, 2, function(x) mean(x < level))
+}
+@ 
+
+<<size_sr>>=
+simpower.sr(1000, 0.05, 0, 0.9, 1, 10, 5)
+ismpower.sr(1000, 0.05, 0, -0.1, 1, 10, 5)
+@ 
+
+
+<<power_sr>>=
+simpower.sr(1000, 0.05, 0, 0.9, 1, 10, 5)
+simpower.sr(1000, 0.05, 0, -0.1, 1, 10, 5)
+@ 
 
 
 \section{Discussion}
 \label{s:disc}
+
+
 
 What points can be discussed?
 
