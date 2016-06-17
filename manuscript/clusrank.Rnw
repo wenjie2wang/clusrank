@@ -558,6 +558,12 @@ distribution under mild conditions.
 \red{FIXME: add discussion on informative cluster size;
   the difference between F and F' in the paper.}
 
+The sampling scheme of the DS method assumes that the clusters of observations
+($n_i$ and $X_{ij}$) are i.i.d. generated whereas the marginal
+distribution of a randomly picked $X_{ij}$ is identical across the data. 
+The conditional distribution of $X_{ij}$ given $n_i$, however, can vary 
+with the magnitude of $n_i$, therefore allows more flexibility in the structure 
+of the data.
 
 
 \section{Usage}
@@ -577,7 +583,6 @@ through a function \code{cluswilcox.test}:
 <<knitr, echo=FALSE>>=
 
 library(knitr)
-
 opts_chunk$set(cache=TRUE, autodep=TRUE)
 
 @ 
@@ -595,42 +600,51 @@ synopsis as the following.
 args(clusrank:::cluswilcox.test.formula)
 @
 
-The formula interface works for both rank sum test and signed rank test.
-For rank sum test, the left hand side of the formula is the observed
-score and the right hand side comprises the required covariates
-including \code{cluster} id and \code{group} id. Additional covariate
-for specific method can also be added, e.g., \code{stratum} for
-\code{rgl} method.
-The \code{data} argument needs the name of a data frame
-which should consist of the observed score and required covaraites.
-The \code{subset} and \code{na.action} have the same effect as they have
-in the \code{model.frame} function.
+The formula interface works for both rank sum test and signed rank
+test.  For rank sum test, the left hand side of the formula is the
+observed score and the right hand side comprises the required
+covariates including \code{cluster} id and \code{group} id.
+Additional covariate for specific method can also be added, e.g.,
+\code{stratum} for \code{rgl} method.  
+The \code{data} argument needs the name of a data frame which should
+consist of the observed score and required covaraites.  
+The \code{subset} and \code{na.action} have the same effect as they 
+have in the \code{model.frame} function.
 Other conventional arguments that can be tuned are \code{alternative},
-\code{mu} and \code{exact}. Note that the exact permutation tests are only available for rank sum test using \code{rgl} method when the
-treatment is assigned at cluster level and should be applied to sample with number of clusters less than 50.
+\code{mu} and \code{exact}.
+Note that the exact permutation tests are only available for 
+rank sum test using \code{rgl} method when the treatment is assigned 
+at cluster level and should be applied to sample with number of 
+clusters less than 50.
 
 
 Clustered signed rank test is performed when \code{paired} is set to
-be \code{TRUE}.
-For clustered signed rank test, the variable on the
-left hand side of the formula should be the observed difference in
+be \code{TRUE}. 
+For clustered signed rank test, the variable on the left hand side 
+of the formula should be the observed difference in
 scores before and after the treatment and the right hand side of the
-formula only requires the cluster id of each observation.
-The exact permutation test is only available when the \code{rgl} method is used.
+formula only requires the cluster id of each observation. 
+The exact permutation test is only available when the \code{rgl}
+method is used.
 
 By setting the argument \code{method} to \code{'rgl'} or \code{'ds'}
 we can apply one of the two methods introduced in~\ref{s:ranksum}
 and~\ref{s:signedrank} for each test.
 
 When \code{x} is a numerical vector, the default interface is called.
-For the clustered rank sum test, besides \code{x}, \code{cluster} and \code{group} are required and an optional \code{stratum} id can be provided if using \code{rgl} method.
-For the clustered signed rank test, \code{x} can be either the observed difference in scores or the observed score before treatment in addition to which the observed score after treatment is required as \code{y}. All other arguments can be set exactly the same as using the formula interface.
-\red{FIXME: explain all the arguments;
-separate ranksum and signed rank.}
+For the clustered rank sum test, besides \code{x}, \code{cluster} and
+\code{group} are required and an optional \code{stratum} id can be
+provided if using \code{rgl} method.  For the clustered signed rank
+test, \code{x} can be either the observed difference in scores or the
+observed score before treatment in addition to which the observed
+score after treatment is required as \code{y}.  All other arguments
+can be set exactly the same as using the formula interface.
+\red{FIXME: explain all the arguments; separate ranksum and signed
+  rank.}
 
 
-\red{FIXME: at the very end, give the default interface
-  similar to wilcox.test}
+\red{FIXME: at the very end, give the default interface similar to
+wilcox.test}
 
 
 
@@ -638,58 +652,72 @@ separate ranksum and signed rank.}
 \section{Illustrations}
 \label{s:illus}
 
-\subsection{Rank-sum test}
-We use the following function to generate data.
-<<datgen, echo=TRUE>>=
+\subsection{Rank-sum test} We use the following function to generate
+data. 
+<<datgen, echo=TRUE>>= 
 library(mvtnorm)
-datgen <- function(nclus, maxclsize, delta = 0.,
-                   rho = c(0.9, -.1), rate = 1,
-                   grplevel = c("cluster", "individual")) {
+datgen <- function(nclus, maxclsize, delta = 0., rho = c(0.9, -.1), rate = 1,
+                   grplevel = c("cluster", "individual")) { 
     nn <- nclus * maxclsize
-    Sigma1 <- diag(1 - rho[1], nrow = maxclsize) + rho[1]
-    x <- c(t(rmvnorm(nclus, sigma = Sigma1)))
-    Sigma2 <- diag(1 - rho[2], nrow = maxclsize) + rho[2]
+    Sigma1 <- diag(1 - rho[1], nrow = maxclsize) + rho[1] 
+    x <- c(t(rmvnorm(nclus, sigma = Sigma1))) 
+    Sigma2 <- diag(1 - rho[2], nrow = maxclsize) + rho[2] 
     y <- c(t(rmvnorm(nclus, sigma = Sigma2)))
-    group <- rep(c(1, 2), each = nn)
-    if (grplevel == "individual") group <- sample(group, nn, FALSE)
+    group <- rep(c(1, 2), each = nn) 
+    if (grplevel == "individual") 
+        group  <- sample(group, nn, FALSE) 
     id <- rep(1:(2 * nclus), each = maxclsize)
-    score <- exp(c(x, y)) + delta * group
-    dat <- data.frame(score = score, grp = group, id = id)
-    keep <- sort(sample(1:(2 * nn), size = rate * (2 * nn), FALSE))
-    if (rate == 1) dat else dat[keep,]
+    score <- exp(c(x, y)) + delta * group 
+    dat <- data.frame(score = score, grp = group, id = id) 
+    keep <-  sort(sample(1:(2 * nn), size = rate * (2 * nn), FALSE))
+    if (rate ==  1) dat else dat[keep,] 
 }
 @
 \red{FIXME: explain the arguments so that readers know what it does.}
 
-
-The first datset has 10 clusters in each of the two groups,
-and the grouping is at the cluster level.
+\code{nclus} determines the number of clusters to be generated,
+\code{maxclsize} sets the maximum cluster size, \code{delta} sets the
+difference in the location of the two treatment groups, \code{rho}
+sets the intra-cluster correlaiton of each treatment group which
+enables the one-to-one correspondence between treatment and
+intra-cluster correlation structure. The function will first generate
+a balanced data set and each cluster has size \code{maxclsize},
+unbalancedness can be introduced by keeping \code{rate} of the whole
+data randomly. Finally the \code{grplevel} is a switch of the level on
+which the treatment is assigned.  The first datset has 10 clusters in
+each of the two groups, and the grouping is at the cluster level.
 <<dat-clus>>=
 set.seed(616)
 dat0.cls <- datgen(10, 5, rho=c(.9, .9), grplevel="cluster")
 head(dat0.cls)
-cluswilcox.test(score ~ group(grp) + cluster(id), data = dat0.cls, method = "rgl")
-cluswilcox.test(score ~ group(grp) + cluster(id), data = dat0.cls, method = "ds")
+cluswilcox.test(score ~ group(grp) + cluster(id), data = dat0.cls, 
+                method = "rgl")
+cluswilcox.test(score ~ group(grp) + cluster(id), data = dat0.cls, 
+                method = "ds")
+cluswilcox.test(score ~ group(grp) + cluster(id), data = dat0.cls,
+                method = "rgl", exact = TRUE)
 @
 
 The next dataset has individual level grouping.
 <<dat-indi>>=
 dat1.cls <- datgen(10, 5, rho=c(.9, .9), delta = 1, grplevel="individual")
 head(dat1.cls)
-cluswilcox.test(score ~ group(grp) + cluster(id), data = dat1.cls, method = "rgl")
-cluswilcox.test(score ~ group(grp) + cluster(id), data = dat1.cls, method = "ds")
+cluswilcox.test(score ~ group(grp) + cluster(id), data = dat1.cls,
+                method = "rgl")
+cluswilcox.test(score ~ group(grp) + cluster(id), data = dat1.cls, 
+                method = "ds")
 @
-\red{FIXME: can a user specify \code{method = c('rgl', 'ds')} to request
-  both tests in one call?}
+
+\red{FIXME: can a user specify \code{method = c('rgl', 'ds')} to
+  request both tests in one call? No. Otherwise the default method is
+  both instead of ``ds''}
 
 \red{FIXME: print from rgl method can be made more compact.}
 
-\red{FIXME: can illustrate exact permutation test for this sample size.}
-
-
 A simulation to compare the two methods become can be easily done:
 <<simpower>>=
-simpower <- function(nrep, level, delta, rho, rate, grplevel, nclus, maxclsize) {
+simpower <- function(nrep, level, delta, rho, rate, grplevel, 
+                     nclus, maxclsize) {
     do1rep <- function() {
         dat <- datgen(nclus, maxclsize, delta, rho, rate, grplevel);
         p.rgl <- cluswilcox.test(score, cluster = id, group = grp,
@@ -703,8 +731,11 @@ simpower <- function(nrep, level, delta, rho, rate, grplevel, nclus, maxclsize) 
 }
 @
 
-\red{FIXME: can add a small size study and small power study that has not been
-done in the literature. need to make sure the sizes are fine before checking power.}
+
+\red{FIXME: can add a small size study and small power study that has
+  not been done in the literature. need to make sure the sizes are
+  fine before checking power.}
+
 <<size>>=
 simpower(1000, 0.05, 0, c(.9, -.1), 1, "cluster", 10, 5)
 simpower(1000, 0.05, 0, c(.9,  .9), 1, "cluster", 10, 5)
@@ -717,7 +748,9 @@ simpower(1000, 0.05, 1, c(.9,  .9), 1, "individual", 10, 5)
 
 \subsection{Signed rank test}
 
-\red{FIXME: can you do something similar? Use some simple function to generate data, illustrate usage of each function, and do some simulation that has not been done before if possible.}
+\red{FIXME: can you do something similar? Use some simple function to
+  generate data, illustrate usage of each function, and do some
+  simulation that has not been done before if possible.}
 <<datagen_sr, echo = TREU>>=
 datgen.sr <- function(nclus, maxclsize, delta = 0.,
                       rho = 0.9, rate = 1) {
@@ -735,13 +768,15 @@ datgen.sr <- function(nclus, maxclsize, delta = 0.,
 @ 
 
 <<simpower_sr, echo = TRUE>>=
-simpower.sr <- function(nrep, level,  delta, rho, rate,  nclus, maxclsize) {
+simpower.sr <- function(nrep, level,  delta, rho, rate, nclus, maxclsize) {
     do1rep <- function() {
         dat <- datgen.sr(nclus, maxclsize, delta, rho, rate);
         p.rgl <- cluswilcox.test(score, cluster = id, group = grp,
-                                 data = dat, paired = TRUE, method = "rgl")$p.value
+                                 data = dat, paired = TRUE,
+                                 method = "rgl")$p.value
         p.ds  <- cluswilcox.test(score, cluster = id, group = grp,
-                                 data = dat, paired = TRUE,  method = "ds" )$p.value
+                                 data = dat, paired = TRUE, 
+                                 method = "ds" )$p.value
         c(rgl = p.rgl, ds = p.ds)
     }
     sim <- t(replicate(nrep, do1rep()))
