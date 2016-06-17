@@ -568,6 +568,19 @@ Package \pkg{clusrank} provides a unified interface to all the
 methods reviewed in Sections~\ref{s:ranksum} and~\ref{s:signedrank}
 through a function \code{cluswilcox.test}:
 
+ \section{Usage}
+
+ \label{s:usage}
+
+ 
+
+<<knitr, echo=FALSE>>=
+
+library(knitr)
+
+opts_chunk$set(cache=TRUE, autodep=TRUE)
+
+@ 
 
 <<args, echo=FALSE>>=
 library(clusrank)
