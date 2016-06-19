@@ -584,7 +584,6 @@ through a function \code{cluswilcox.test}:
 
 library(knitr)
 opts_chunk$set(cache=TRUE, autodep=TRUE)
-
 @ 
 
 <<args, echo=FALSE>>=
@@ -600,30 +599,36 @@ synopsis as the following.
 args(clusrank:::cluswilcox.test.formula)
 @
 
-The formula interface works for both rank sum test and signed rank
-test.  For rank sum test, the left hand side of the formula is the
-observed score and the right hand side comprises the required
-covariates including \code{cluster} id and \code{group} id.
-Additional covariate for specific method can also be added, e.g.,
-\code{stratum} for \code{rgl} method.  
-The \code{data} argument needs the name of a data frame which should
-consist of the observed score and required covaraites.  
+The formula interface serves both rank sum test and signed rank
+test. The form of the formula mimics a mixed effect model, 
+where cluster id and treatment group (for rank sum test) are 
+counterparts of random effect and fixed effect. 
+Marks are needed to indicate the role of each input variable 
+(see section ~\ref{s:illus} for detail).
+Additional covariate (effect) is allowed if provided by
+a particular method, e.g., the RGL method of clustered rank sum
+test also allowed a \code{stratum} variable to adjust for the 
+stratification effect in the data (e.g., the effect of treatment
+center).
+The \code{data} argument needs the name of a data frame which
+comprise the necessary variables. 
 The \code{subset} and \code{na.action} have the same effect as they 
 have in the \code{model.frame} function.
-Other conventional arguments that can be tuned are \code{alternative},
-\code{mu} and \code{exact}.
-Note that the exact permutation tests are only available for 
-rank sum test using \code{rgl} method when the treatment is assigned 
-at cluster level and should be applied to sample with number of 
-clusters less than 50.
+Other conventional arguments for test that can be tuned 
+are \code{alternative}, \code{mu} and \code{exact} which have the 
+same function as they are in the \code{wilcox.test}.
+
+Clustered rank sum test is performed when \code{paired = FALSE} (default)
+and response variable in the formula should be the observed score. 
+Note that for clustered rank sum test, the exact permutation test is
+only available for RGL method when the treatment is assigned 
+at cluster level and it is not recommended for data with number
+of clusters more than 50.
 
 
 Clustered signed rank test is performed when \code{paired} is set to
-be \code{TRUE}. 
-For clustered signed rank test, the variable on the left hand side 
-of the formula should be the observed difference in
-scores before and after the treatment and the right hand side of the
-formula only requires the cluster id of each observation. 
+be \code{TRUE}. The response variable for clustered signed rank
+should be the difference in the observed pairs. 
 The exact permutation test is only available when the \code{rgl}
 method is used.
 
