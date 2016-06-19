@@ -605,7 +605,7 @@ where cluster id and treatment group (for rank sum test) are
 counterparts of random effect and fixed effect. 
 Marks are needed to indicate the role of each input variable 
 (see section ~\ref{s:illus} for detail).
-Additional covariate (effect) is allowed if provided by
+Optional covariate (effect) can be added if it is provided by
 a particular method, e.g., the RGL method of clustered rank sum
 test also allowed a \code{stratum} variable to adjust for the 
 stratification effect in the data (e.g., the effect of treatment
@@ -627,7 +627,7 @@ of clusters more than 50.
 
 
 Clustered signed rank test is performed when \code{paired} is set to
-be \code{TRUE}. The response variable for clustered signed rank
+be \code{TRUE} and the response variable
 should be the difference in the observed pairs. 
 The exact permutation test is only available when the \code{rgl}
 method is used.
@@ -636,22 +636,20 @@ By setting the argument \code{method} to \code{'rgl'} or \code{'ds'}
 we can apply one of the two methods introduced in~\ref{s:ranksum}
 and~\ref{s:signedrank} for each test.
 
-When \code{x} is a numerical vector, the default interface is called.
+When \code{x} is a numerical vector, the default interface is called
+whose synopsis is as the following: 
+
+<<formula, echo=FALSE>>=
+args(clusrank:::cluswilcox.test.default)
+@
+
 For the clustered rank sum test, besides \code{x}, \code{cluster} and
 \code{group} are required and an optional \code{stratum} id can be
 provided if using \code{rgl} method.  For the clustered signed rank
 test, \code{x} can be either the observed difference in scores or the
 observed score before treatment in addition to which the observed
-score after treatment is required as \code{y}.  All other arguments
-can be set exactly the same as using the formula interface.
-\red{FIXME: explain all the arguments; separate ranksum and signed
-  rank.}
-
-
-\red{FIXME: at the very end, give the default interface similar to
-wilcox.test}
-
-
+score after treatment is required as \code{y}.  All other arguments are 
+exactly the same as using the formula interface.
 
 
 \section{Illustrations}
@@ -678,18 +676,23 @@ datgen <- function(nclus, maxclsize, delta = 0., rho = c(0.9, -.1), rate = 1,
     if (rate ==  1) dat else dat[keep,] 
 }
 @
-\red{FIXME: explain the arguments so that readers know what it does.}
 
-\code{nclus} determines the number of clusters to be generated,
-\code{maxclsize} sets the maximum cluster size, \code{delta} sets the
-difference in the location of the two treatment groups, \code{rho}
-sets the intra-cluster correlaiton of each treatment group which
-enables the one-to-one correspondence between treatment and
-intra-cluster correlation structure. The function will first generate
-a balanced data set and each cluster has size \code{maxclsize},
-unbalancedness can be introduced by keeping \code{rate} of the whole
-data randomly. Finally the \code{grplevel} is a switch of the level on
-which the treatment is assigned.  The first datset has 10 clusters in
+This function generates clustered data which contain \code{nclus} clusters,
+each with a maximum cluster size \code{maxclsize}. 
+\code{rate} is used to control the unbalancedness of the data by randomly
+keeping a proportion of \code{rate} of the orignal balanced data where each 
+cluster has the size \code{maxclsize}. Therefore, to genearte balanced data
+the \code{rate} can simply be set to $1$.
+\code{rho} sets the intra-cluster correlaiton of each treatment group which
+enables the one-to-one correspondence between the treatment and the 
+magnitude of intra-cluster correlation.
+The difference in the location of the two treatment groups 
+is set by \codedelta} 
+Finally the \code{grplevel} is a switch of the level on
+which the treatment is assigned, if \code{grplevel = TRUE}, the treatment 
+is assigned at cluster level, otherwise, is is assigned at individual level.
+
+The first dataset has 10 clusters in
 each of the two groups, and the grouping is at the cluster level.
 <<dat-clus>>=
 set.seed(616)
