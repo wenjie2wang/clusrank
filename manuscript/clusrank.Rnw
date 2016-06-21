@@ -371,6 +371,9 @@ from a quadratic form of group-wise rank-sum vector.
 This method allows arbitrary intracluster dependence structure (not
 necessarily exchangeable as assumed in the RGL method) within each
 cluster and remains valid when treatment affects the correlation structure.
+As can be seen from the construction of the test statistic, 
+there is no room for randomization test since $S$ is a conditional
+expectation given observed data.
 Making no assumption on the intracluster dependence structure,
 however, renders it impossible to derive a small sample permutation test.
 \red{FIXME: need smoothing}
@@ -447,7 +450,8 @@ converges to a standard normal distribution as $N \to \infty$
 under mild conditions.
 \red{Why the corrected intracluster correlation has a different
   formula in the Biometrics paper for signed rank test?}
-
+The original estimate of correlation is known to be negativel
+biased in finite samples.
 
 \section{Signed Rank Test}
 \label{s:signedrank}
@@ -639,7 +643,7 @@ and~\ref{s:signedrank} for each test.
 When \code{x} is a numerical vector, the default interface is called
 whose synopsis is as the following: 
 
-<<formula, echo=FALSE>>=
+<<default, echo=FALSE>>=
 args(clusrank:::cluswilcox.test.default)
 @
 
@@ -687,7 +691,7 @@ the \code{rate} can simply be set to $1$.
 enables the one-to-one correspondence between the treatment and the 
 magnitude of intra-cluster correlation.
 The difference in the location of the two treatment groups 
-is set by \codedelta} 
+is set by \code{delta} 
 Finally the \code{grplevel} is a switch of the grouping level:
 if \code{grplevel = TRUE}, the grouping is assigned at cluster level, 
 otherwise, it is assigned at individual level.
@@ -754,7 +758,7 @@ simpower(1000, 0.05, 1, c(.9,  .9), 1, "individual", 10, 5)
 
 A similar data generation function can be easily realized:
 
-<<datagen_sr, echo = TREU>>=
+<<datagen_sr, echo = TRUE>>=
 datgen.sr <- function(nclus, maxclsize, delta = 0.,
                       rho = 0.9, rate = 1) {
     nn <- nclus * maxclsize
@@ -762,30 +766,30 @@ datgen.sr <- function(nclus, maxclsize, delta = 0.,
     x <- c(t(rmvnorm(nclus, sigma = Sigma)))
     y <- c(t(rmvnorm(nclus, sigma = Sigma)))
     score <- exp(x) - exp(y) - delta
-    id <- rep(1:(2 * nclus), each = maxclsize)
+    id <- rep(1:nclus, each = maxclsize)
     dat <- data.frame(score = score, id = id)
-    keep <- sort(sample(1:(2 * nn),
-                 size = rate * (2 * nn), FALSE))
+    keep <- sort(sample(1: nn,
+                 size = rate * nn, FALSE))
     if (rate == 1) dat else dat[keep,]
 }
 @ 
 
 The function \code{datgen.sr} generates clustered differences, 
-the arguments \code{nclus}, \code{maxclsize}, \code{delta}
+the arguments \code{nclus}, \code{maxclsize}, \code{delta}, \code{rho}
 and \code{rate} have the same usage as they have in \code{datgen}
-for the rank sum test. Since unlike rank sum test which invovles two 
-groups, there is no grouping for signed rank test, therefore
-\code{rho} is a numerical which determines the magnitude of
-intra-cluster correlation.
+for the rank sum test. Note that unlike rank sum test, no 
+grouping is involved in the data for signed rank test.
+
+A size and power study can be easily performed similarly.
 
 <<simpower_sr, echo = TRUE>>=
 simpower.sr <- function(nrep, level,  delta, rho, rate, nclus, maxclsize) {
     do1rep <- function() {
         dat <- datgen.sr(nclus, maxclsize, delta, rho, rate);
-        p.rgl <- cluswilcox.test(score, cluster = id, group = grp,
+        p.rgl <- cluswilcox.test(score, cluster = id,
                                  data = dat, paired = TRUE,
                                  method = "rgl")$p.value
-        p.ds  <- cluswilcox.test(score, cluster = id, group = grp,
+        p.ds  <- cluswilcox.test(score, cluster = id, 
                                  data = dat, paired = TRUE, 
                                  method = "ds" )$p.value
         c(rgl = p.rgl, ds = p.ds)
@@ -797,7 +801,7 @@ simpower.sr <- function(nrep, level,  delta, rho, rate, nclus, maxclsize) {
 
 <<size_sr>>=
 simpower.sr(1000, 0.05, 0, 0.9, 1, 10, 5)
-ismpower.sr(1000, 0.05, 0, -0.1, 1, 10, 5)
+simpower.sr(1000, 0.05, 0, -0.1, 1, 10, 5)
 @ 
 
 
@@ -809,6 +813,12 @@ simpower.sr(1000, 0.05, 0, -0.1, 1, 10, 5)
 
 \section{Discussion}
 \label{s:disc}
+
+For rank sum test, ds method cannot be applied to collateral data due to the 
+violation of the assumption on which the asymptotic null distribution is
+derived. The rgl method works better when the intra-cluster correlation is 
+higher, the ds method works better when the intra-cluster correlation is lower 
+(due to?). The scheme of randomization implicitly requires for each 
 
 
 
