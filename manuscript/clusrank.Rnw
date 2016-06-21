@@ -817,8 +817,10 @@ simpower.sr(1000, 0.05, 1, -0.1, 1, 10, 5)
 For rank sum test, ds method cannot be applied to collateral data due to the 
 violation of the assumption on which the asymptotic null distribution is
 derived. The rgl method works better when the intra-cluster correlation is 
-higher, the ds method works better when the intra-cluster correlation is lower 
-(due to?). The scheme of randomization implicitly requires for each 
+higher, the ds method works better when the intra-cluster correlation is lower. 
+DS method is more flexible with the cluster size, whereas the construction size
+are more suitable for the case where there are at least several clusters for each 
+cluster size. 
 
 
 
