@@ -651,11 +651,11 @@ same as those of the default interface.
 \section{Illustrations}
 \label{s:illus}
 
-\subsection{Rank-sum test} We use the following function to generate
-data. 
+\subsection{Rank-sum test} 
+The following function generates clustered data (balanced or unbalanced) from two treatment groups.
 <<datgen, echo=TRUE>>= 
 library(mvtnorm)
-datgen <- function(nclus, maxclsize, delta = 0., rho = c(0.9, -.1), rate = 1,
+datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.9, -.1), rate = 1,
                    grplevel = c("cluster", "individual")) { 
     nn <- nclus * maxclsize
     Sigma1 <- diag(1 - rho[1], nrow = maxclsize) + rho[1] 
@@ -673,7 +673,7 @@ datgen <- function(nclus, maxclsize, delta = 0., rho = c(0.9, -.1), rate = 1,
 }
 @
 
-This function generates clustered data which contain \code{nclus} clusters,
+The generated data contain \code{nclus} clusters,
 each with a maximum cluster size \code{maxclsize}. 
 \code{rate} is used to control the unbalancedness of the data by randomly
 keeping a proportion of \code{rate} of the orignal balanced data where each 
@@ -692,38 +692,52 @@ The first dataset has 10 clusters in each of the two groups,
 and the grouping is at the cluster level.
 <<dat-clus>>=
 set.seed(616)
-dat0.cls <- datgen(10, 5, rho=c(.9, .9), grplevel="cluster")
+dat0.cls <- datgen.rs(10, 5, rho=c(.9, .9), grplevel="cluster")
 head(dat0.cls)
-cluswilcox.test(score ~ group(grp) + cluster(id), data = dat0.cls, 
-                method = "rgl")
-cluswilcox.test(score ~ group(grp) + cluster(id), data = dat0.cls,
-                method = "rgl", exact = TRUE)
-cluswilcox.test(score ~ group(grp) + cluster(id), data = dat0.cls, 
-                method = "ds")
+@ 
+To apply \code{``rgl''} method on this dataset with asymptotic test 
+and exact test:
+<<clus-rs-rgl>>=
+cluswilcox.test(score ~ group(grp) + cluster(id), data = dat0.cls, method = "rgl")
+cluswilcox.test(score ~ group(grp) + cluster(id), data = dat0.cls, method = "rgl", exact = TRUE)
+@ 
+To apply \code{``ds''} method on this dataset:
+<<clus-rs-ds>>=
+cluswilcox.test(score ~ group(grp) + cluster(id), data = dat0.cls, method = "ds")
+@ 
 
-@
 
-The next dataset has individual level grouping.
-<<dat-indi>>=
-dat1.cls <- datgen(10, 5, rho=c(.9, .9), delta = 1, grplevel="individual")
+The next dataset involves individual level grouping.
+<<dat-rs-rgl-indi>>=
+dat1.cls <- datgen.rs(10, 5, rho=c(.9, .9), delta = 1, grplevel="individual")
 head(dat1.cls)
-cluswilcox.test(score ~ group(grp) + cluster(id), data = dat1.cls,
-                method = "rgl")
-cluswilcox.test(score ~ group(grp) + cluster(id), data = dat1.cls, 
-                method = "ds")
-@
+@ 
+Apply the clustered signed-rank test on the dataset using the two available methods:
+<<clus-rs-indi>>=
+cluswilcox.test(score ~ group(grp) + cluster(id), data = dat1.cls, method = "rgl")
+cluswilcox.test(score ~ group(grp) + cluster(id), data = dat1.cls, method = "ds")
+
+@ 
+
 
 
 A simulation to compare the two methods can be easily done:
 <<simpower>>=
-simpower <- function(nrep, level, delta, rho, rate, grplevel, 
-                     nclus, maxclsize) {
+simpower <- function(nrep, level, paired, delta, rho, rate, nclus, maxclsize, ...) {
     do1rep <- function() {
-        dat <- datgen(nclus, maxclsize, delta, rho, rate, grplevel);
-        p.rgl <- cluswilcox.test(score, cluster = id, group = grp,
-                                 data = dat, method = "rgl")$p.value
-        p.ds  <- cluswilcox.test(score, cluster = id, group = grp,
-                                 data = dat, method = "ds" )$p.value
+        datgen <- ifelse(paired, datgen.sr, datgen.rs)
+        dat <- datgen(nclus, maxclsize, delta, rho, rate, ...);
+        if( "grp" %in colnames(dat)) { # Signed-rank tests
+            p.rgl <- cluswilcox.test(score, cluster = id, paired = FALSE, 
+                                     data = dat, method = "rgl")$p.value
+            p.ds  <- cluswilcox.test(score, cluster = id, paired = FALSE, 
+                                     data = dat, method = "ds" )$p.value
+        } else { # Rank-sum tests
+             p.rgl <- cluswilcox.test(score, cluster = id, group = grp,
+                                      data = dat, method = "rgl")$p.value
+             p.ds  <- cluswilcox.test(score, cluster = id, group = grp, 
+                                     data = dat, method = "ds" )$p.value
+        }
         c(rgl = p.rgl, ds = p.ds)
     }
     sim <- t(replicate(nrep, do1rep()))
@@ -731,20 +745,16 @@ simpower <- function(nrep, level, delta, rho, rate, grplevel,
 }
 @
 
-
-\red{FIXME: can add a small size study and small power study that has
-  not been done in the literature. need to make sure the sizes are
-  fine before checking power.}
 Following is an illustration of the two methods by comparing them on dataset
 where grouping is assigned at individual level.
 <<size>>=
-simpower(1000, 0.05, 0, c(.9, -.1), 1, "individual", 10, 5)
-simpower(1000, 0.05, 0, c(.9,  .9), 1, "individual", 10, 5)
+simpower(1000, 0.05, FALSE, 0, c(.9, -.1), 1, 10, 5, "individual")
+simpower(1000, 0.05, FALSE, 0, c(.9,  .9), 1, 10, 5, "individual")
 @
 
 <<power>>=
-simpower(1000, 0.05, 1, c(.9,  .9), 1, "individual", 10, 5)
-simpower(1000, 0.05, 1, c(.9,  .9), 1, "individual", 10, 5)
+simpower(1000, 0.05, FALSE, 1, c(.9,  -.1), 1, 10, 5, "individual")
+simpower(1000, 0.05, FALSE, 1, c(.9,  .9), 1, 10, 5, "individual")
 @
 
 \subsection{Signed rank test}
