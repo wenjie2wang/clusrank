@@ -590,70 +590,62 @@ library(knitr)
 opts_chunk$set(cache=TRUE, autodep=TRUE)
 @ 
 
-<<args, echo=FALSE>>=
+<<args-c, echo=TRUE>>=
 library(clusrank)
 args(cluswilcox.test)
 @
 
 The argument \code{x} can be either a formula or numeric vector.
-When \code{x} is a formula, the formula interface is called with
-synopsis as the following.
+The default interface is called if \code{x} is a numeric vector 
+and the synopsis is as the following:
+<<args-cd, echo = FALSE>>=
+args(clusrank:::cluswilcox.test.default)
+@
 
+The clustered rank-sum test is performed when \code{paired} 
+is set to be \code{FALSE}.
+For clustered rank-sum test, the data frame \code{data} should
+at least include $3$ variables: the observed score \code{x},
+the cluster id \code{cluster} and the treatment group \code{group}.
+The argument \code{y} is for clustered signed-rank test. 
+There are $2$ methods available, \code{``rgl''} and \code{``ds''}.
+Note that for \code{``rgl''} method, an extra \code{stratum} can be
+supplied to account for the effect of stratification in the data, 
+e.g., the effect of treatment center when data are collected from 
+several centers. In addition, an exact test is carried out if 
+\code{exact == TRUE}. Nevertheless, the exact test is only available for
+\code{``rgl''} method when the grouping is at cluster level. In addition, the
+exact test is not recommended for data with number of clusters is greater than
+$50$. Other arguments, \code{alternative} and \code{mu} set the shape of the
+alternative hypothesis and the null value respectively.
+
+To run clustered signed-rank test, \code{paired} needs to be set as
+\code{TRUE}. There are two ways to supply the response variable, 
+supply the observed difference as \code{x}, or supply the pair of 
+observed scores as \code{x} and \code{y} respectively. Currently 
+there is no method which can control the effect of stratification.
+In addition, exact test is only available for \code{``rgl''} method.
+Other arguments are set in the same way as for the clustered rank-sum test. 
+ 
+
+The arguments of the formula interface is as the following:
 <<formula, echo=FALSE>>=
 args(clusrank:::cluswilcox.test.formula)
 @
 
-The formula interface serves both rank sum test and signed rank
-test. The form of the formula mimics a mixed effect model, 
-where cluster id and treatment group (for rank sum test) are 
-counterparts of random effect and fixed effect. 
-Marks are needed to indicate the role of each input variable 
-(see section ~\ref{s:illus} for detail).
-Optional covariate (effect) can be added if it is provided by
-a particular method, e.g., the RGL method of clustered rank sum
-test also allowed a \code{stratum} variable to adjust for the 
-stratification effect in the data (e.g., the effect of treatment
-center).
-The \code{data} argument needs the name of a data frame which
-comprise the necessary variables. 
+
+
+For rank-sum test, the left hand side of the formula is the observed
+score and the right hand side comprises the required covariates
+including \code{cluster} id and \code{group} id (see section~\ref{s:illus} for detail). 
+Additional covariate for specific method can also be added, e.g., \code{stratum} for
+\code{rgl} method.
+For signed-rank test, the left hand site of the formula is the 
+observed paired difference and the right hand site comprises the cluster id, note that no group id is needed for signed-rank test.
 The \code{subset} and \code{na.action} have the same effect as they 
-have in the \code{model.frame} function.
-Other conventional arguments for test that can be tuned 
-are \code{alternative}, \code{mu} and \code{exact} which have the 
-same function as they are in the \code{wilcox.test}.
+have in the \code{model.frame} function. Other arguments are the
+same as those of the default interface.
 
-Clustered rank sum test is performed when \code{paired = FALSE} (default)
-and response variable in the formula should be the observed score. 
-Note that for clustered rank sum test, the exact permutation test is
-only available for RGL method when the treatment is assigned 
-at cluster level and it is not recommended for data with number
-of clusters more than 50.
-
-
-Clustered signed rank test is performed when \code{paired} is set to
-be \code{TRUE} and the response variable
-should be the difference in the observed pairs. 
-The exact permutation test is only available when the \code{rgl}
-method is used.
-
-By setting the argument \code{method} to \code{'rgl'} or \code{'ds'}
-we can apply one of the two methods introduced in~\ref{s:ranksum}
-and~\ref{s:signedrank} for each test.
-
-When \code{x} is a numerical vector, the default interface is called
-whose synopsis is as the following: 
-
-<<default, echo=FALSE>>=
-args(clusrank:::cluswilcox.test.default)
-@
-
-For the clustered rank sum test, besides \code{x}, \code{cluster} and
-\code{group} are required and an optional \code{stratum} id can be
-provided if using \code{rgl} method.  For the clustered signed rank
-test, \code{x} can be either the observed difference in scores or the
-observed score before treatment in addition to which the observed
-score after treatment is required as \code{y}.  All other arguments are 
-exactly the same as using the formula interface.
 
 
 \section{Illustrations}
@@ -704,10 +696,11 @@ dat0.cls <- datgen(10, 5, rho=c(.9, .9), grplevel="cluster")
 head(dat0.cls)
 cluswilcox.test(score ~ group(grp) + cluster(id), data = dat0.cls, 
                 method = "rgl")
-cluswilcox.test(score ~ group(grp) + cluster(id), data = dat0.cls, 
-                method = "ds")
 cluswilcox.test(score ~ group(grp) + cluster(id), data = dat0.cls,
                 method = "rgl", exact = TRUE)
+cluswilcox.test(score ~ group(grp) + cluster(id), data = dat0.cls, 
+                method = "ds")
+
 @
 
 The next dataset has individual level grouping.
@@ -821,6 +814,7 @@ higher, the ds method works better when the intra-cluster correlation is lower.
 DS method is more flexible with the cluster size, whereas the construction size
 are more suitable for the case where there are at least several clusters for each 
 cluster size. 
+DS rank sum test is conservative when the number of clusters is small.
 
 
 
