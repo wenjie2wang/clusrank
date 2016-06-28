@@ -559,7 +559,7 @@ $Z = T / \sqrt{\widehat\VAR(T)}$ converges to a standard normal
 distribution under mild conditions.
 
 
-\red{FIXME: add discussion on informative cluster size;
+K\red{FIXME: add discussion on informative cluster size;
   the difference between F and F' in the paper.}
 
 The sampling scheme of the DS method assumes that the clusters of observations
@@ -725,12 +725,13 @@ A simulation to compare the two methods can be easily done:
 <<simpower>>=
 simpower <- function(nrep, level, paired, delta, rho, rate, nclus, maxclsize, ...) {
     do1rep <- function() {
-        datgen <- ifelse(paired, datgen.sr, datgen.rs)
+        if(paired) datgen <- datgen.sr
+        else datgen <- datgen.rs
         dat <- datgen(nclus, maxclsize, delta, rho, rate, ...);
-        if( "grp" %in colnames(dat)) { # Signed-rank tests
-            p.rgl <- cluswilcox.test(score, cluster = id, paired = FALSE, 
+        if( !("grp" %in% colnames(dat))) { # Signed-rank test
+            p.rgl <- cluswilcox.test(score, cluster = id, paired = TRUE, 
                                      data = dat, method = "rgl")$p.value
-            p.ds  <- cluswilcox.test(score, cluster = id, paired = FALSE, 
+            p.ds  <- cluswilcox.test(score, cluster = id, paired = TRUE, 
                                      data = dat, method = "ds" )$p.value
         } else { # Rank-sum tests
              p.rgl <- cluswilcox.test(score, cluster = id, group = grp,
@@ -751,14 +752,14 @@ where grouping is assigned at individual level.
 simpower(1000, 0.05, FALSE, 0, c(.9, -.1), 1, 10, 5, "individual")
 simpower(1000, 0.05, FALSE, 0, c(.9,  .9), 1, 10, 5, "individual")
 @
-
+In both cases, the size of ``ds'' method is closer to the nominal value.
 <<power>>=
 simpower(1000, 0.05, FALSE, 1, c(.9,  -.1), 1, 10, 5, "individual")
 simpower(1000, 0.05, FALSE, 1, c(.9,  .9), 1, 10, 5, "individual")
 @
+Nevertheless, the power of ``rgl'' method is slightly higher.
 
 \subsection{Signed rank test}
-
 A similar data generation function can be easily realized:
 
 <<datagen_sr, echo = TRUE>>=
@@ -783,36 +784,21 @@ and \code{rate} have the same usage as they have in \code{datgen}
 for the rank sum test. Note that unlike rank sum test, no 
 grouping is involved in the data for signed rank test.
 
-A size and power study can be easily performed similarly.
-
-<<simpower_sr, echo = TRUE>>=
-simpower.sr <- function(nrep, level,  delta, rho, rate, nclus, maxclsize) {
-    do1rep <- function() {
-        dat <- datgen.sr(nclus, maxclsize, delta, rho, rate);
-        p.rgl <- cluswilcox.test(score, cluster = id,
-                                 data = dat, paired = TRUE,
-                                 method = "rgl")$p.value
-        p.ds  <- cluswilcox.test(score, cluster = id, 
-                                 data = dat, paired = TRUE, 
-                                 method = "ds" )$p.value
-        c(rgl = p.rgl, ds = p.ds)
-    }
-    sim <- t(replicate(nrep, do1rep()))
-    apply(sim, 2, function(x) mean(x < level))
-}
-@ 
-
+A size study with strong and weak intra-cluster correlation is as following:
 <<size_sr>>=
-simpower.sr(1000, 0.05, 0, 0.9, 1, 10, 5)
-simpower.sr(1000, 0.05, 0, -0.1, 1, 10, 5)
+simpower(1000, 0.05, TRUE, 0, 0.9, 1, 10, 5)
+simpower(1000, 0.05, TRUE, 0, -0.1, 1, 10, 5)
 @ 
+The ``rgl'' method has an empirical size closer to the true size $0.05$ when the 
+intra-cluster correlation is large. Both methods have a smaller empirical size
+when intra-cluster correlation is slightly negative.
 
-
+A power size under same setting with a shift equals $1$ is as the following:
 <<power_sr>>=
-simpower.sr(1000, 0.05, 1, 0.9, 1, 10, 5)
-simpower.sr(1000, 0.05, 1, -0.1, 1, 10, 5)
+simpower(1000, 0.05, TRUE, 1, 0.9, 1, 10, 5)
+simpower(1000, 0.05, TRUE, 1, -0.1, 1, 10, 5)
 @ 
-
+In both cases, ``ds'' method has a higher power.  
 
 \section{Discussion}
 \label{s:disc}
