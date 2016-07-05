@@ -57,8 +57,7 @@ In package \pkg{clusrank}, the latest developments are implemented
 and wrapped under a unified high-level user-friendly function.
 Different methods are dispatched based on an input formula,
 offering great flexibility in handling various situations such as
-unbalanced cluster sizes, presence of ties, stratified data,
-and heterogeneous group members from the same cluster.
+presence of ties and stratified data, 
 Methods based on both asymptotics for large samples and
 permutation for small samples are available.
 We present some details and usages of the implemented methods,
@@ -151,7 +150,7 @@ the number of individual observations due to intracluster dependence.
 The variance of the testing statistics under independence are invalid.
 Often times, because of the positive intracluster dependence, the
 variances are underestimated, and as a consequence, the resulting
-p-values are smaller than what they should be.
+p-values are greater than what they should be.
 The popular generalized estimating equations (GEE) approach provides a
 general modeling strategy that accounts for intracluster dependence,
 and can be used for two sample comparison as a special case.
@@ -173,7 +172,8 @@ test after ranking all the observations, but the asymptotic mean and
 the variance under the null hypothesis are derived under the clustered
 setting that accommodates unequal cluster sizes and possible strata.
 The assumptions of \citet{Rosn:Glyn:Lee:inco:2003} were relaxed in
-the approach of \citet{Datt:Satt:rank:2005}, which is based on FIXME.
+the approach of \citet{Datt:Satt:rank:2005}, which is based on
+sampling within cluster.
 \citet{Rosn:Glyn:Lee:exte:2006} extended their approach earlier to
 accommodate the situation where members of a single cluster may
 subject to different treatments, but still assumes exchangeable
@@ -294,7 +294,8 @@ $\E(W_g) = m_g R_{++, g}  / N_g$ and
 \]
 where $R_{++,g} = \sum_{i\in I_g} R_{i+}$.
 \citet{Rosn:Glyn:Lee:inco:2003} showed that the asymptotic
-distribution of $Z_R$ as $N \to \infty$ is standard normal.
+distribution of $Z_R$ as $N \to \infty$ is standard normal under
+mild conditions.
 The method can be extended to the case of stratified data.
 
 
@@ -347,7 +348,6 @@ The expectation turns out to be
 \E(S) = \E(W^*) = \frac{1}{2}\sum_{i=1}^N \frac{n_i} {N}.
 \]
 The variance term $\VAR(S)$ is estimated by
-\red{Check: there is no scalar like $1/ N$?}
 $\widehat\VAR(S) = \sum_{i=1}^N\big\{ \hat W_i - \E(W_i)\big\}^2,$
 where
 \[
@@ -374,12 +374,9 @@ cluster and remains valid when treatment affects the correlation structure.
 As can be seen from the construction of the test statistic, 
 there is no room for randomization test since $S$ is a conditional
 expectation given observed data.
-Making no assumption on the intracluster dependence structure,
-however, renders it impossible to derive a small sample permutation test.
-\red{FIXME: need smoothing}
 In addition, it cannot be applied to data which are strictly
-contralateral (e.g., when all subjects in an eye study have exactly
-one eye under each treatment) due to the failure of the satisfying the
+contralateral (e.g., when each subject in an eye study have exactly
+one eye under each treatment) due to the failure in satisfying the
 requirements of the asymptotic theory.
 
 
@@ -448,10 +445,7 @@ the test statistic
 $(\hat\theta_N- 1/2) / \widehat\VAR^{1/2}(\hat\theta_N)$
 converges to a standard normal distribution as $N \to \infty$
 under mild conditions.
-\red{Why the corrected intracluster correlation has a different
-  formula in the Biometrics paper for signed rank test?}
-The original estimate of correlation is known to be negativel
-biased in finite samples.
+
 
 \section{Signed Rank Test}
 \label{s:signedrank}
@@ -523,7 +517,7 @@ within-cluster resampling as in \citet{Datt:Satt:rank:2005} in the
 context of clustered paired data to develop a signed rank test.
 This method allows informative cluster sizes as long as the marginal
 distributions of $X_{ij}$'s are identical for all $i$ and $j$.
-Suppose that from cluster, one paired difference $X_{ij}$, denoted by
+Suppose that from each cluster, one paired difference $X_{ij}$, denoted by
 $X_i^*$, is randomly picked and pooled to form a pseudo-sample.
 Let $R_i^*$ be the mid-rank of $|X_i^*|$, $i = 1, \ldots, N$ to allow
 ties in the data, and let $V_i^* = \mathrm{sign}(X_i^*)$.
@@ -557,17 +551,14 @@ with $\hat H(x) = \sum_{i=1}^N n_i \hat H_i(x) / \sum_{i=1}^N n_i$.
 The standardized testing statistic
 $Z = T / \sqrt{\widehat\VAR(T)}$ converges to a standard normal
 distribution under mild conditions.
+ 
+Note that as long as members from the same cluster have identical
+distribution, DS method does not require the distribution of members from
+clusters with different size to be identical, while this is
+usually an assumption that has to be made by tests designed for
+the same purpose.
 
 
-K\red{FIXME: add discussion on informative cluster size;
-  the difference between F and F' in the paper.}
-
-The sampling scheme of the DS method assumes that the clusters of observations
-($n_i$ and $X_{ij}$) are i.i.d. generated whereas the marginal
-distribution of a randomly picked $X_{ij}$ is identical across the data. 
-The conditional distribution of $X_{ij}$ given $n_i$, however, can vary 
-with the magnitude of $n_i$, therefore allows more flexibility in the structure 
-of the data.
 
 
 \section{Usage}
@@ -577,12 +568,6 @@ of the data.
 Package \pkg{clusrank} provides a unified interface to all the
 methods reviewed in Sections~\ref{s:ranksum} and~\ref{s:signedrank}
 through a function \code{cluswilcox.test}:
-
- \section{Usage}
-
- \label{s:usage}
-
- 
 
 <<knitr, echo=FALSE>>=
 
@@ -605,27 +590,27 @@ args(clusrank:::cluswilcox.test.default)
 The clustered rank-sum test is performed when \code{paired} 
 is set to be \code{FALSE}.
 For clustered rank-sum test, the data frame \code{data} should
-at least include $3$ variables: the observed score \code{x},
-the cluster id \code{cluster} and the treatment group \code{group}.
-The argument \code{y} is for clustered signed-rank test. 
-There are $2$ methods available, \code{``rgl''} and \code{``ds''}.
-Note that for \code{``rgl''} method, an extra \code{stratum} can be
-supplied to account for the effect of stratification in the data, 
-e.g., the effect of treatment center when data are collected from 
-several centers. In addition, an exact test is carried out if 
-\code{exact == TRUE}. Nevertheless, the exact test is only available for
-\code{``rgl''} method when the grouping is at cluster level. In addition, the
-exact test is not recommended for data with number of clusters is greater than
-$50$. Other arguments, \code{alternative} and \code{mu} set the shape of the
-alternative hypothesis and the null value respectively.
+at least include $3$ variables: the observed score, \code{x},
+the cluster id, \code{cluster} and the treatment group, \code{group}.
+The argument \code{y} is reserved for clustered signed-rank test. 
+Both RGL and DS methods are available using asymptotic statistic. 
+Note that for RGL method, an extra varaible \code{stratum} can be
+supplied to account for the effect of stratification in the data.
+In addition, for RGL method, when the treatment group is assigned at cluster
+level, an exact test is available by setting \code{exact ==TRUE}.
+Nevertheless, exact test is not recommended for data with number of
+clusters is greater than $50$ due to computational issue. The other arguments, \code{alternative} and \code{mu}, set the shape of the
+alternative hypothesis and the null value respectively. 
 
-To run clustered signed-rank test, \code{paired} needs to be set as
-\code{TRUE}. There are two ways to supply the response variable, 
-supply the observed difference as \code{x}, or supply the pair of 
-observed scores as \code{x} and \code{y} respectively. Currently 
-there is no method which can control the effect of stratification.
-In addition, exact test is only available for \code{``rgl''} method.
-Other arguments are set in the same way as for the clustered rank-sum test. 
+Clustered signed-rank test is run if \code{paired} is set as
+\code{TRUE}. There are two ways to supply the response variable:
+supply the observed difference as \code{x}, or supply the pair of
+observed scores as \code{x} and \code{y} respectively.  
+Same as
+clustered rank-sum test, exact test is only available for RGL method.
+The other arguments are set in the same way as for the clustered
+rank-sum test.  Note that there is no available method that can
+control the effect of stratification.
  
 
 The arguments of the formula interface is as the following:
@@ -639,12 +624,14 @@ For rank-sum test, the left hand side of the formula is the observed
 score and the right hand side comprises the required covariates
 including \code{cluster} id and \code{group} id (see section~\ref{s:illus} for detail). 
 Additional covariate for specific method can also be added, e.g., \code{stratum} for
-\code{rgl} method.
+RGL method.
+
+
 For signed-rank test, the left hand site of the formula is the 
-observed paired difference and the right hand site comprises the cluster id, note that no group id is needed for signed-rank test.
+observed paired difference and the right hand side comprises the cluster id, note that no group id is needed for signed-rank test.
 The \code{subset} and \code{na.action} have the same effect as they 
 have in the \code{model.frame} function. Other arguments are the
-same as those of the default interface.
+same as those in the default interface.
 
 
 
@@ -675,14 +662,16 @@ datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.9, -.1), rate = 1,
 
 The generated data contain \code{nclus} clusters,
 each with a maximum cluster size \code{maxclsize}. 
-\code{rate} is used to control the unbalancedness of the data by randomly
+Argument \code{rate} is used to control the unbalancedness of the data by randomly
 keeping a proportion of \code{rate} of the orignal balanced data where each 
-cluster has the size \code{maxclsize}. Therefore, to genearte balanced data
+cluster has the size \code{maxclsize}.
+Therefore, to genearte balanced data
 the \code{rate} can simply be set to $1$.
-\code{rho} sets the intra-cluster correlaiton of each treatment group which
-enables the one-to-one correspondence between the treatment and the 
+The intra-cluster correlation of each treatment group is set through
+\code{rho} which also
+enables a one-to-one correspondence between the treatment and the 
 magnitude of intra-cluster correlation.
-The difference in the location of the two treatment groups 
+The shift in the location of the two treatment groups 
 is set by \code{delta} 
 Finally the \code{grplevel} is a switch of the grouping level:
 if \code{grplevel = TRUE}, the grouping is assigned at cluster level, 
