@@ -122,11 +122,15 @@ cluswilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
             summary.mat[which(Csize == i & Str == j), "mgv"] <- length(temp.grp[temp.grp == 1])
             summary.mat[which(Csize == i & Str == j), "Ngv"] <- length(temp.clus)
             summary.mat[which(Csize == i & Str == j), "Rsumgv"] <- sum(temp.rksum)
-            summary.mat[which(Csize == i & Str == j), "VRgv"] <- var(temp.rksum) * (length(temp.clus) - 1)
+            VRgv.temp <- 0
+            if(length(temp.clus) > 1) {
+                VRgv.temp <- var(temp.rksum) * (length(temp.clus) - 1)
+            } 
+            summary.mat[which(Csize == i & Str == j), "VRgv"] <- VRgv.temp
         }
     }
         summary.mat[, "ngv"] <- summary.mat[, "Ngv"] - summary.mat[, "mgv"]
-    ## Wc is the ranksum stat
+        ## Wc is the ranksum stat
         Wc <- sum(dat[dat$grp == 1, "rksum"])
         Ngv <- summary.mat[, "Ngv"]
         mgv <- summary.mat[, "mgv"]
@@ -134,7 +138,7 @@ cluswilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
         VRgv <- summary.mat[, "VRgv"]
         Rsumgv <- summary.mat[, "Rsumgv"]
         EWc <- sum(mgv * Rsumgv / Ngv)
-        VarWc <- sum(mgv * ngv / (Ngv * (Ngv - 1)) * VRgv)
+        VarWc <- sum((mgv * ngv / (Ngv * (Ngv - 1)) * VRgv)[VRgv > 0])
         Zc <- (Wc - EWc) / sqrt(VarWc)
 
         pval <- switch(alternative, less = pnorm(abs(Zc)),
@@ -158,7 +162,7 @@ cluswilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
         class(result) <- "ctest"
         return(result)
     }
-
+    
 }
 
 
@@ -503,6 +507,5 @@ cluswilcox.test.ranksum.ds <- function(x, cluster, group,
                        df = df,
                        data.name = DNAME, method = METHOD)
         class(result) <- "ctest"
-        result
-    }
+        result    }
 }
