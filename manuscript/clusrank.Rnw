@@ -656,7 +656,8 @@ datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.9, -.1), rate = 1,
     score <- exp(c(x, y)) + delta * group 
     dat <- data.frame(score = score, grp = group, id = id) 
     keep <-  sort(sample(1:(2 * nn), size = rate * (2 * nn), FALSE))
-    if (rate ==  1) dat else dat[keep,] 
+    if (rate ==  1) dat else dat[keep, ]
+       
 }
 @
 
@@ -677,10 +678,10 @@ The intra-cluster correlation of each treatment group is set through
 enables a one-to-one correspondence between the treatment and the 
 magnitude of intra-cluster correlation.
 The shift in the location of the two treatment groups 
-is set by \code{delta} 
-Finally the \code{grplevel} is a switch of the grouping level:
+is set by \code{delta}. 
+The last argument, \code{grplevel}, is a switch of the grouping level:
 if \code{grplevel = TRUE}, the grouping is assigned at cluster level, 
-otherwise, it is assigned at individual level.
+otherwise, it is assigned at individual level. The generated data set contains three columns: \code{score}, \code{grp} and \code{id} which correspond to the observation, treatment group id and cluster id.
 
 The first dataset has 10 clusters in each of the two groups, 
 and the grouping is at the cluster level.
@@ -753,22 +754,109 @@ simpower(nrep = 1000, level = 0.05, paired = FALSE, delta = 0,
 simpower(1000, 0.05, FALSE, 0, c(0.9, 0.9), 1, 10, 5, "cluster")
 @
 When the data set is balanced (\code{rate} = 1), the empirical sizes of
-the two methods are close to the nominal size $0.05$ both with a high
-intra-cluster correlation and with a low intra-cluster correlation.
+the two methods are close to the nominal size $0.05$ despite of the
+magnitude of the intra-cluster correlation.
 
 <<power-clus-bal>>=
 simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 1, 10, 5, "cluster")
 simpower(1000, 0.05, FALSE, 0.5, c(0.9, 0.9), 1, 10, 5, "cluster")
 @
 When the true difference in the location is $0.5$, the power of both
-methods are comparable, and decreases as the intra-cluster correlation
+methods is comparable, and decreases as the intra-cluster correlation
 increases. 
+
+
+<<size-clus-bal-diff>>=
+simpower(1000, 0.05, FALSE, 0, c(0.1, 0.9), 1, 10, 5, "cluster")
+simpower(1000, 0.05, FALSE, 0, c(0.5, 0.9), 1, 10, 5, "cluster")
+simpower(1000, 0.05, FALSE, 0, c(0.5, 0.1), 1, 10, 5, "cluster")
+@
+
+
+<<power-clus-bal-diff>>=
+simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.9), 1, 10, 5, "cluster")
+simpower(1000, 0.05, FALSE, 0.5, c(0.5, 0.9), 1, 10, 5, "cluster")
+simpower(1000, 0.05, FALSE, 0.5, c(0.5, 0.1), 1, 10, 5, "cluster")
+@
+
+<<size-clus-bal-diff-10>>=
+simpower(1000, 0.05, FALSE, 0, c(0.1, 0.9), 1, 10, 10, "cluster")
+simpower(1000, 0.05, FALSE, 0, c(0.5, 0.9), 1, 10, 10, "cluster")
+simpower(1000, 0.05, FALSE, 0, c(0.5, 0.1), 1, 10, 10, "cluster")
+@
+
+
+<<power-clus-bal-diff-10>>=
+simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.9), 1, 10, 10, "cluster")
+simpower(1000, 0.05, FALSE, 0.5, c(0.5, 0.9), 1, 10, 10, "cluster")
+simpower(1000, 0.05, FALSE, 0.5, c(0.5, 0.1), 1, 10, 10, "cluster")
+@
+
+
+<<size-ind-bal-diff>>=
+simpower(1000, 0.05, FALSE, 0, c(0.1, 0.9), 1, 10, 5, "individual")
+simpower(1000, 0.05, FALSE, 0, c(0.5, 0.9), 1, 10, 5, "individual")
+simpower(1000, 0.05, FALSE, 0, c(0.5, 0.1), 1, 10, 5, "individual")
+@
+
+
+<<power-ind-bal-diff>>=
+simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.9), 1, 10, 5, "individual")
+simpower(1000, 0.05, FALSE, 0.5, c(0.5, 0.9), 1, 10, 5, "individual")
+simpower(1000, 0.05, FALSE, 0.5, c(0.5, 0.1), 1, 10, 5, "individual")
+@
+
+
+
+<<size-ind-unbal-diff>>=
+simpower(1000, 0.05, FALSE, 0, c(0.1, 0.9), 0.5, 10, 5, "individual")
+simpower(1000, 0.05, FALSE, 0, c(0.5, 0.9), 0.5, 10, 5, "individual")
+simpower(1000, 0.05, FALSE, 0, c(0.5, 0.1), 0.5, 10, 5, "individual")
+@
+
+
+<<power-ind-unbal-diff>>=
+simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.9), 0.5, 10, 5, "individual")
+simpower(1000, 0.05, FALSE, 0.5, c(0.5, 0.9), 0.5, 10, 5, "individual")
+simpower(1000, 0.05, FALSE, 0.5, c(0.5, 0.1), 0.5, 10, 5, "individual")
+@
+
+
+<<size-ind-bal-diff-10>>=
+simpower(1000, 0.05, FALSE, 0, c(0.1, 0.9), 1, 10,10, "individual")
+simpower(1000, 0.05, FALSE, 0, c(0.5, 0.9), 1, 10,10, "individual")
+simpower(1000, 0.05, FALSE, 0, c(0.5, 0.1), 1, 10,10, "individual")
+@
+
+
+<<power-ind-bal-diff-10>>=
+simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.9), 1, 10,10, "individual")
+simpower(1000, 0.05, FALSE, 0.5, c(0.5, 0.9), 1, 10,10, "individual")
+simpower(1000, 0.05, FALSE, 0.5, c(0.5, 0.1), 1, 10,10, "individual")
+@
+
+
+
+<<size-ind-unbal-diff-10>>=
+simpower(1000, 0.05, FALSE, 0, c(0.1, 0.9), 0.5, 10,10, "individual")
+simpower(1000, 0.05, FALSE, 0, c(0.5, 0.9), 0.5, 10,10, "individual")
+simpower(1000, 0.05, FALSE, 0, c(0.5, 0.1), 0.5, 10,10, "individual")
+@
+
+
+<<power-ind-unbal-diff-10>>=
+simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.9), 0.5, 10,10, "individual")
+simpower(1000, 0.05, FALSE, 0.5, c(0.5, 0.9), 0.5, 10,10, "individual")
+simpower(1000, 0.05, FALSE, 0.5, c(0.5, 0.1), 0.5, 10,10, "individual")
+@
+
+
 <<size-clus-unbal>>=
 simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), 0.5, 10, 5, "cluster")
 simpower(1000, 0.05, FALSE, 0, c(0.9, 0.9), 0.5, 10, 5, "cluster")
 @
-For unbalanced data sets which are generated by randomly deleting
-half of the balanced data as in the previous simulation, 
+For unbalanced data which are generated by randomly deleting
+half of a balanced data set, 
 the RGL method is still able to be close to the nominal size, 
 whereas the empirical size of DS
 method is more than two folds of the nominal size and deviates more
@@ -779,20 +867,25 @@ simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 0.5, 10, 5, "cluster")
 simpower(1000, 0.05, FALSE, 0.5, c(0.9, 0.9), 0.5, 10, 5, "cluster")
 @
 
+The empirical power of RGL method is less than that of the DS method,
+however, the DS method does not have the correct size in this case.
 
 <<size-clus-unbal-10>>=
 simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), 0.5, 10, 10, "cluster")
 simpower(1000, 0.05, FALSE, 0, c(0.9, 0.9), 0.5, 10, 10, "cluster")
 @
 
+When the maximum cluster size is increased from $5$ to $10$, where
+more variability in the cluster size is introduced,  the empirical
+size of both methods is close to the nominal level for the unbalanced data.
+
 <<power-clus-unbal-10>>=
 simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 0.5, 10, 10, "cluster")
 simpower(1000, 0.05, FALSE, 0.5, c(0.9, 0.9), 0.5, 10, 10, "cluster")
 @
-The empirical power of RGL method is less than that of the DS method
-when the intra-cluster correlation is low as $0.1$ and high as
-$0.9$. Note, however, the empirical size of DS method is biased in
-this situation.
+For the same setting, the empirical power of RGL method is less than
+that of  DS method despite of the magnitude of the intra-cluster
+correlation. 
 <<size-ind>>=
 simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), 1, 10, 5, "individual")
 simpower(1000, 0.05, FALSE, 0, c(0.9, 0.9), 1, 10, 5, "individual")
@@ -817,12 +910,18 @@ simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 0.5, 10, 5, "individual")
 simpower(1000, 0.05, FALSE, 0.5, c(0.9, 0.9), 0.5, 10, 5, "individual")
 @
 
-For unbalanced data, the empirical 
+For unbalanced data, the empirical power of RGL method is close to
+that of the DS method, however, as the intra-cluster correlation
+increases, RGL method is increasingly more powerful than DS method.
 
 <<size-ind-unbal-10>>=
 simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), 0.5, 10, 10, "individual")
 simpower(1000, 0.05, FALSE, 0, c(0.9, 0.9), 0.5, 10, 10, "individual")
 @
+
+If maximum cluster size is increased from $5$ to $10$, similar to the
+simulation result when treatment group is assigned at cluster level,
+both methods retain size close to the nominal level.
 
 <<power-ind-unbal-10>>=
 simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 0.5, 10, 10, "individual")
@@ -830,9 +929,36 @@ simpower(1000, 0.05, FALSE, 0.5, c(0.9, 0.9), 0.5, 10, 10, "individual")
 @
 
 
+<<size-ind-unbal-5-20>>=
+simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), 0.5, 20, 5, "individual")
+simpower(1000, 0.05, FALSE, 0, c(0.9, 0.9), 0.5, 20, 5, "individual")
+@
+<<power-ind-unbal-5-20>>=
+simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 0.5, 20, 5, "individual")
+simpower(1000, 0.05, FALSE, 0.5, c(0.9, 0.9), 0.5, 20, 5, "individual")
+@
+
+
+<<size-ind-unbal-5-20-8>>=
+simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), 0.8, 20, 5, "individual")
+simpower(1000, 0.05, FALSE, 0, c(0.9, 0.9), 0.8, 20, 5, "individual")
+@
+<<power-ind-unbal-5-20-8>>=
+simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 0.8, 20, 5, "individual")
+simpower(1000, 0.05, FALSE, 0.5, c(0.9, 0.9), 0.8, 20, 5, "individual")
+@
+
+
+
+
+With a low intra-cluster correlation, the empirical of both methods
+are close, as the correlation increases, the RGL method becomes
+increasingly more powerful than the DS method.
 
 For unbalanced data sets which are obtained by randomly deleting half of
-the observations from the balanced data, the empirical power of RGL method is still higher than that of the DS method. Note that the size of the DS method is biased in this case. 
+the observations from the balanced data, the empirical power of RGL
+method is still higher than that of the DS method.  
+Note that the size of the DS method is biased in this case. 
  
 
 \subsection{Signed rank test}
