@@ -383,6 +383,8 @@ cluswilcox.test.ranksum.ds <- function(x, cluster, group,
     group <- group[order.c]
     cluster.uniq <- unique(cluster)
     M <- length(cluster.uniq)
+    cluster <- recoderFunc(cluster, cluster.uniq, c(1 : M))
+   
 
     ni <- table(cluster)
     
@@ -422,9 +424,9 @@ cluswilcox.test.ranksum.ds <- function(x, cluster, group,
         
         W <- numeric(M)
         for(i in 1 : M) {
-            Wi <- ((M - 1) * group[cluster == cluster.uniq[i]] -
+            Wi <- ((M - 1) * group[cluster == i] -
                    sum(ni1[-i] / ni[-i])) *
-                Fhat[cluster == cluster.uniq[i]]
+                Fhat[cluster == i]
             W[i] <- sum(Wi) / (ni[i] * (M+1))
         }
         a <- sum(ni1 / ni)
@@ -459,8 +461,8 @@ cluswilcox.test.ranksum.ds <- function(x, cluster, group,
         for( j in 1 : m) {
             for( i in 1 : M) {
                 gik.j <- ifelse(group == j, 1, 0)
-                Sj[j] <- Sj[j] + sum(gik.j[cluster == cluster.uniq[i]] *
-                                     (1 + F.prop[cluster == cluster.uniq[i]])) / ni[i]
+                Sj[j] <- Sj[j] + sum(gik.j[cluster == i] *
+                                     (1 + F.prop[cluster == i])) / ni[i]
             }
         }
         Sj <- Sj / (M + 1)
@@ -476,11 +478,11 @@ cluswilcox.test.ranksum.ds <- function(x, cluster, group,
         a <- t(d)
         for( i in 1 : M) {
             for( j in 1 : m) {
-                gik.j <- ifelse(group[cluster == cluster.uniq[i]] == j, 1, 0)
+                gik.j <- ifelse(group[cluster == i] == j, 1, 0)
                 b <- 1 / (ni[i] * (M + 1))
                 c <- gik.j * (M - 1)
                 d <- sum(a[j, -i])
-                What[j, i] <- b * sum((c - d) * Fhat[cluster == cluster.uniq[i]])
+                What[j, i] <- b * sum((c - d) * Fhat[cluster == i])
             }
         }
         EW <- matrix(0, m, M)
@@ -507,5 +509,6 @@ cluswilcox.test.ranksum.ds <- function(x, cluster, group,
                        df = df,
                        data.name = DNAME, method = METHOD)
         class(result) <- "ctest"
-        result    }
+        result
+    }
 }
