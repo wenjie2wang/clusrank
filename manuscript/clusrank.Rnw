@@ -552,6 +552,7 @@ The standardized testing statistic
 $Z = T / \sqrt{\widehat\VAR(T)}$ converges to a standard normal
 distribution under mild conditions.
  
+
 Note that as long as members from the same cluster have identical
 distribution, DS method does not require the distribution of members from
 clusters with different size to be identical, while this is
@@ -559,47 +560,49 @@ usually an assumption that has to be made by tests designed for
 the same purpose.
 
 
-
-
 \section{Usage}
 \label{s:usage}
 
-
-Package \pkg{clusrank} provides a unified interface to all the
-methods reviewed in Sections~\ref{s:ranksum} and~\ref{s:signedrank}
-through a function \code{cluswilcox.test}:
-
 <<knitr, echo=FALSE>>=
-
 library(knitr)
 opts_chunk$set(cache=TRUE, autodep=TRUE)
 @ 
 
+
+Package \pkg{clusrank} provides a unified interface to all the
+methods reviewed in Sections~\ref{s:ranksum} and~\ref{s:signedrank}
+through function \code{cluswilcox.test}:
 <<args-c, echo=TRUE>>=
 library(clusrank)
 args(cluswilcox.test)
 @
-
-The argument \code{x} can be either a formula or numeric vector.
-The default interface is called if \code{x} is a numeric vector 
-and the synopsis is as the following:
-<<args-cd, echo = FALSE>>=
+Argument \code{x} can be either a numeric vector or a formula. 
+The default interface is called if \code{x} is a numeric vector, in
+which case, the interface is designed to mimic that of
+\code{wilcox.test}: 
+<<args-cd, echo=TRUE>>=
 args(clusrank:::cluswilcox.test.default)
 @
+Depending on whether \code{paired} is set to be \code{TRUE} or
+\code{FALSE}, clustered rank-sum test or the clustered signed-rank
+test is performed, respectively.
 
-The clustered rank-sum test is performed when \code{paired} 
-is set to be \code{FALSE}.
+{\bf describe the arguments that are inherited from \code{wilcox.test}
+  first and then describe those extra that are specific for clustered version}
+
 For clustered rank-sum test, the data frame \code{data} should
 at least include $3$ variables: the observed score, \code{x},
 the cluster id, \code{cluster} and the treatment group, \code{group}.
 The argument \code{y} is reserved for clustered signed-rank test. 
+{\bf need to match RGL with rgl and DS with ds}
 Both RGL and DS methods are available using asymptotic statistic. 
 Note that for RGL method, an extra varaible \code{stratum} can be
 supplied to account for the effect of stratification in the data.
 In addition, for RGL method, when the treatment group is assigned at cluster
 level, an exact test is available by setting \code{exact ==TRUE}.
 Nevertheless, exact test is not recommended for data with number of
-clusters is greater than $50$ due to computational issue. The other arguments, \code{alternative} and \code{mu}, set the shape of the
+clusters is greater than $50$ due to computational issue. 
+The other arguments, \code{alternative} and \code{mu}, set the shape of the
 alternative hypothesis and the null value respectively. 
 
 Clustered signed-rank test is run if \code{paired} is set as
@@ -627,6 +630,7 @@ Additional covariate for specific method can also be added, e.g., \code{stratum}
 RGL method.
 
 
+{\bf watch line width}
 For signed-rank test, the left hand site of the formula is the 
 observed paired difference and the right hand side comprises the cluster id, note that no group id is needed for signed-rank test.
 The \code{subset} and \code{na.action} have the same effect as they 
@@ -639,11 +643,15 @@ same as those in the default interface.
 \label{s:illus}
 
 \subsection{Rank-sum test} 
+{\bf what is the reference of this simulation scheme?}
+
+{\bf watch line width? what editor are you using?}
+
 The following function generates clustered data (balanced or unbalanced) from two treatment groups.
 <<datgen, echo=TRUE>>= 
 library(mvtnorm)
-datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.9, -.1), rate = 1,
-                   grplevel = c("cluster", "individual")) { 
+datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.9, -.1), 
+                      rate = 1, grplevel = c("cluster", "individual")) { 
     nn <- nclus * maxclsize
     Sigma1 <- diag(1 - rho[1], nrow = maxclsize) + rho[1] 
     x <- c(t(rmvnorm(nclus, sigma = Sigma1))) 
@@ -656,10 +664,11 @@ datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.9, -.1), rate = 1,
     score <- exp(c(x, y)) + delta * group 
     dat <- data.frame(score = score, grp = group, id = id) 
     keep <-  sort(sample(1:(2 * nn), size = rate * (2 * nn), FALSE))
-    if (rate ==  1) dat else dat[keep, ]
-       
+    if (rate ==  1) dat else dat[keep, ]      
 }
 @
+
+{\bf watch line width}
 
 When \code{grplevel} is set as \code{"cluster"}, the generated data frame contains
 \code{nclus} clusters under each treatment group with corresponding
@@ -667,6 +676,8 @@ intra-cluster correlation; whereas if \code{grplevel} set as
 \code{"individual"}, a data set with individual level grouping is
 obtained by randomly re-assigning the treatment id at indivudual level. The maximum cluster size is set as
 \code{maxclsize}. 
+
+{\bf no need for another paragraph. Watch line widht}
 
 Argument \code{rate} is used to control the unbalancedness of the data by randomly
 keeping a proportion of \code{rate} of the orignal balanced data where each 
@@ -683,6 +694,8 @@ The last argument, \code{grplevel}, is a switch of the grouping level:
 if \code{grplevel = TRUE}, the grouping is assigned at cluster level, 
 otherwise, it is assigned at individual level. The generated data set contains three columns: \code{score}, \code{grp} and \code{id} which correspond to the observation, treatment group id and cluster id.
 
+
+{\bf please use two blank lines to separate paragraphs}
 The first dataset has 10 clusters in each of the two groups, 
 and the grouping is at the cluster level.
 <<dat-clus>>=
@@ -690,17 +703,24 @@ set.seed(616)
 dat0.cls <- datgen.rs(10, 5, rho=c(.9, .9), grplevel="cluster")
 head(dat0.cls)
 @ 
-To apply \code{``rgl''} method on this dataset with asymptotic test 
+To apply RGL method on this dataset with asymptotic test 
+
+{\bf the group in group(grp) is not needed. You always have a right
+  hand side variable, which is your group. Cluster and strata can be
+  specified using cluster and strata, but no need for group.}
 and exact test:
 <<clus-rs-rgl>>=
 cluswilcox.test(score ~ group(grp) + cluster(id), data = dat0.cls, method = "rgl")
-cluswilcox.test(score ~ group(grp) + cluster(id), data = dat0.cls, method = "rgl", exact = TRUE)
+cluswilcox.test(score ~ group(grp) + cluster(id), data = dat0.cls, method = "rgl", 
+                exact = TRUE)
 @ 
-To apply \code{``ds''} method on this dataset:
+To apply DS method on this dataset:
 <<clus-rs-ds>>=
 cluswilcox.test(score ~ group(grp) + cluster(id), data = dat0.cls, method = "ds")
 @ 
 
+
+{\bf what is 184756?}
 
 The next dataset involves individual level grouping.
 <<dat-rs-rgl-indi>>=
@@ -711,12 +731,12 @@ Apply the clustered signed-rank test on the dataset using the two available meth
 <<clus-rs-indi>>=
 cluswilcox.test(score ~ group(grp) + cluster(id), data = dat1.cls, method = "rgl")
 cluswilcox.test(score ~ group(grp) + cluster(id), data = dat1.cls, method = "ds")
-
 @ 
 
 
 
 A simulation to compare the two methods can be easily done:
+{\bf this function looks clumsy. Might be better to separate it into two for readability}
 <<simpower>>=
 simpower <- function(nrep, level, paired, delta, rho, rate, nclus, maxclsize, ...) {
     do1rep <- function() {
@@ -765,6 +785,9 @@ When the true difference in the location is $0.5$, the power of both
 methods is comparable, and decreases as the intra-cluster correlation
 increases. 
 
+{\bf These experiments should be done outside of the manuscript.
+  Put them in a r markdown file; study them and make your selection.
+  In the manuscript you present only those you selected to present.}
 
 <<size-clus-bal-diff>>=
 simpower(1000, 0.05, FALSE, 0, c(0.1, 0.9), 1, 10, 5, "cluster")
@@ -859,6 +882,7 @@ For unbalanced data which are generated by randomly deleting
 half of a balanced data set, 
 the RGL method is still able to be close to the nominal size, 
 whereas the empirical size of DS
+{\bf is this setting what DS is designed for?}
 method is more than two folds of the nominal size and deviates more
 from the nominal size when the intra-cluster correlation is low.
 
@@ -894,7 +918,11 @@ simpower(1000, 0.05, FALSE, 0, c(0.9, 0.9), 0.5, 10, 5, "individual")
 @
 Under a similar setting with treatment assigned at individual level, 
 it is also observed that with balanced data, both methods can attain
-the norminal size, whereas when the data is unbalanced by randomly deleting half of the observations, the DS method cannot attain the nominal size. 
+the norminal size, whereas when the data is unbalanced by randomly
+deleting half of the observations, the DS method cannot attain the
+nominal size. {\bf Make sure what DS method is designed for.}
+
+{\bf watch line width}
 
 
 <<power-ind-bal>>=
@@ -948,7 +976,9 @@ simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 0.8, 20, 5, "individual")
 simpower(1000, 0.05, FALSE, 0.5, c(0.9, 0.9), 0.8, 20, 5, "individual")
 @
 
-
+{\bf Please make an effor to select and present. The discussions from
+  the DS and RGL methods should give us a hint on which method is
+  better in what situation.}
 
 
 With a low intra-cluster correlation, the empirical of both methods
