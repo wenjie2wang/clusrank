@@ -51,7 +51,7 @@ print.ctest <- function (x, digits = getOption("digits"), prefix = "\t", ...) {
     }
     cat(strwrap(x$method, prefix = prefix), sep = "\n")
     cat("\n")
-    cat("data:  ", x$data.name, "\n", sep = "")
+    cat("data: ", x$data.name, "\n", sep = "")
     out <- character()
     if (!is.null(x$Rstat)){
         cat(paste(names(x$Rstat), "=", format(signif(x$Rstat,
