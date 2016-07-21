@@ -738,22 +738,20 @@ cluswilcox.test(score ~ group(grp) + cluster(id), data = dat1.cls, method = "ds"
 A simulation to compare the two methods can be easily done:
 {\bf this function looks clumsy. Might be better to separate it into two for readability}
 <<simpower>>=
-simpower <- function(nrep, level, paired, delta, rho, rate, nclus, maxclsize, ...) {
+simpower <- function(nrep, level, paired, delta, rho, rate,
+                     nclus, maxclsize, ...) {
     do1rep <- function() {
-        if(paired) datgen <- datgen.sr
-        else datgen <- datgen.rs
-        dat <- datgen(nclus, maxclsize, delta, rho, rate, ...);
-        if( !("grp" %in% colnames(dat))) { # Signed-rank test
-            p.rgl <- cluswilcox.test(score, cluster = id, paired = TRUE, 
-                                     data = dat, method = "rgl")$p.value
-            p.ds  <- cluswilcox.test(score, cluster = id, paired = TRUE, 
-                                     data = dat, method = "ds" )$p.value
-        } else { # Rank-sum tests
-             p.rgl <- cluswilcox.test(score, cluster = id, group = grp,
-                                      data = dat, method = "rgl")$p.value
-             p.ds  <- cluswilcox.test(score, cluster = id, group = grp, 
-                                     data = dat, method = "ds" )$p.value
+        datgen <- ifelse(paired, datgen.sr, datgen.rs)
+        dat <- datgen(nclus, maxclsize, delta, rho, rate, ...)
+        if(paired) {
+            formula <- score ~ cluster(id)
+        } else {
+            formula <- score ~ cluster(id) + grp
         }
+        p.rgl <- cluswilcox.test(formula, paired = paired, 
+                                 data = dat, method = "rgl")$p.value
+        p.ds <- cluswilcox.test(formula, paired = paired, 
+                                data = dat, method = "ds")$p.value
         c(rgl = p.rgl, ds = p.ds)
     }
     sim <- t(replicate(nrep, do1rep()))
