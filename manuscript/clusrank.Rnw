@@ -741,13 +741,14 @@ A simulation to compare the two methods can be easily done:
 simpower <- function(nrep, level, paired, delta, rho, rate,
                      nclus, maxclsize, ...) {
     do1rep <- function() {
-        datgen <- ifelse(paired, datgen.sr, datgen.rs)
-        dat <- datgen(nclus, maxclsize, delta, rho, rate, ...)
         if(paired) {
+            atgen <- datgen.sr
             formula <- score ~ cluster(id)
         } else {
+            datgen <- datgen.rs
             formula <- score ~ cluster(id) + grp
         }
+        dat <- datgen(nclus, maxclsize, delta, rho, rate, ...)
         p.rgl <- cluswilcox.test(formula, paired = paired, 
                                  data = dat, method = "rgl")$p.value
         p.ds <- cluswilcox.test(formula, paired = paired, 
