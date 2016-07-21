@@ -184,7 +184,7 @@ cluswilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
     if(is.matrix(eval(m$data, parent.frame()))) {
         m$data <- as.data.frame(data)
     }
-    special <- c("stratum", "cluster", "group")
+    special <- c("stratum", "cluster")
     m[[1L]] <- quote(stats::model.frame)
     m$... <- NULL
     m$formula <- if(missing(data)) terms(formula, special)
@@ -197,21 +197,18 @@ cluswilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
 
     x.name <- rownames(attr(m$formula, "factors"))[1]
     DNAME <- paste0(paste(x.name, "from", m$data), ",")
-    response <- attr(attr(mf, "terms"), "response")
+    response <- attr(terms(mf), "response")
     x <- mf[[response]]
     n.obs <- length(x)
 
-    group <- attr(Terms, "specials")$group
+    ## group <- attr(Terms, "specials")$group
+    Term.labels <- attr(Terms, "term.labels")
+    group <- Term.labels[!grepl("[\\(\\)]", Term.labels)]
     if(length(group)) {
-        gtemp <- untangle.specials(Terms, "group", 1)
-        group.name <- gsub("[\\(\\)]", "",
-                           regmatches(gtemp$vars,
-                                      gregexpr("\\(.*?\\)", gtemp$vars))[[1]])
+        group.name <- group
         DNAME <- paste0(DNAME, " group: ", group.name, ",")
-        
-
-        if(length(gtemp$vars) == 1) {
-            group.keep <- mf[[gtemp$vars]]
+        if(length(group.name) == 1) {
+            group.keep <- mf[[group.name]]
         } else {
             stop("more than one variable are set as the group id")
         }
@@ -221,8 +218,12 @@ cluswilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
         if(!is.character(group.uniq) && !is.numeric(group.uniq)) {
             stop("group id has to be numeric or character")
         }
-        
+        if(group.uniq.l == 1) {
+            stop("group id has to contain at least two levels")
+        }
         group <- recoderFunc(group.keep, group.uniq, c(1 : group.uniq.l))
+    } else {
+        stop("group variable is missing")
     }
     
     cluster <- attr(attr(mf, "terms"), "specials")$cluster
