@@ -38,7 +38,7 @@
 #' methods.
 #' @examples
 #' data(crd)
-#' clt <- cluswilcox.test(z ~ group(group) + cluster(id), data = crd)
+#' clt <- cluswilcox.test(z ~ group + cluster(id), data = crd)
 #' print(clt, digits = 2)
 #' @export
 

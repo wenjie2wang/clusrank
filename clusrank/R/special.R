@@ -13,7 +13,7 @@
 #'
 #' @examples
 #' data(crd)
-#' cluswilcox.test(z ~ cluster(id) + group(group), data = crd)
+#' cluswilcox.test(z ~ group + cluster(id), data = crd)
 #' @keywords internal
 #' @export
 group <- function(x) {x}
@@ -36,7 +36,7 @@ group <- function(x) {x}
 #'
 #' @examples
 #' data(crd)
-#' cluswilcox.test(z ~ cluster(id) + group(group), data = crd)
+#' cluswilcox.test(z ~ group + cluster(id), data = crd)
 #' @keywords internal
 #' @export
 cluster <- function(x) {x}
@@ -57,7 +57,7 @@ cluster <- function(x) {x}
 #'
 #' @examples
 #' data(crdStr)
-#' cluswilcox.test(z ~ cluster(id) + group(group) + stratum(stratum), data = crdStr)
+#' cluswilcox.test(z ~ group + cluster(id) + stratum(stratum), data = crdStr)
 #' @keywords internal
 #' @export
 stratum <- function(x) {x}
@@ -71,6 +71,6 @@ untangle.specials <- function (tt, special, order = 1)
   facs <- attr(tt, "factors")
   fname <- dimnames(facs)
   ff <- apply(facs[spc, , drop = FALSE], 2, sum)
-  list(vars = (fname[[1]])[spc], terms = seq(ff)[ff & match(attr(tt, 
-                                                                 "order"), order, nomatch = 0)])
+  list(vars = (fname[[1]])[spc],
+       terms = seq(ff)[ff & match(attr(tt, "order"), order, nomatch = 0)])
 }

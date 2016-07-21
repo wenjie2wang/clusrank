@@ -43,8 +43,7 @@
 ##'     in a data frame where the observation, cluster id, group id
 ##'     and stratum id are saved as \code{z}, \code{id}, \code{grp}
 ##'     and \code{strat} respectively, then the formula should be
-##'     written as \code{z ~ cluster(id) + group(grp) +
-##'     stratum(strat)}. The \code{group} variable is required.
+##'     written as \code{z ~ grp + cluster(id) + stratum(strat)}.
 ##'
 ##' Given the cluster id, if both \code{x} and \code{y} are provided
 ##' or only \code{x} is provided and \code{paired} is \code{TRUE}, a
@@ -108,7 +107,7 @@
 #' ## Default is rank sum test. The group variable is required.}
 #' ## Clustered rank sum test using RGL method.
 #' data(crd)
-#' cluswilcox.test(z ~ cluster(id) + group(group), data = crd)
+#' cluswilcox.test(z ~ group + cluster(id), data = crd)
 #' ## or
 #' cluswilcox.test(z, cluster = id, group = group, data = crd)
 #' @author Yujing Jiang
