@@ -21,10 +21,12 @@
 ##' @param exact A logical indicating whether an exact p-value should
 ##'     be computed. Not recommended currently.
 ##' @param formula A formula of the form \code{lhs ~ rhs} where the
-##'     \code{lhs} is a numeric variable giving the data values and
-##'     the \code{rhs} of the form with special term \code{cluster(x1)
-##'     + group(x2) + stratum(x3)}, where \code{x1, x2, x3} are the
-##'     corresponding variables.
+##'     \code{lhs} is the observed values and
+##'     the \code{rhs} of the form group + \code{cluster}(x1) +
+##'     \code{stratum}(x2) for clustered rank sum test, where
+##'     \code{x1} and \code{x2} are cluster id and stratum id in the
+##'     data.  For clustered signed rank test, only \code{cluster}(x1)
+##'     should appear on the right hand side.
 ##' @param data An optional matrix or dataframe of data used in the
 ##'     formula.
 ##' @param subset An optional vector specifying a subset of
@@ -38,12 +40,8 @@
 ##' @param mu A number specifying an optional parameter used to form
 ##'     the null hypothesis. See 'Details'
 ##' @param ... Further arguments to be passed to or from methods
-##' @details The formula interface is only applicable for the
-##'     {m}-sample rank sum tests \eqn{m \ge 2}. If the data are saved
-##'     in a data frame where the observation, cluster id, group id
-##'     and stratum id are saved as \code{z}, \code{id}, \code{grp}
-##'     and \code{strat} respectively, then the formula should be
-##'     written as \code{z ~ grp + cluster(id) + stratum(strat)}.
+##' @details The formula interface is to both clustered signed rank
+##'     test and clustered rank sum test.
 ##'
 ##' Given the cluster id, if both \code{x} and \code{y} are provided
 ##' or only \code{x} is provided and \code{paired} is \code{TRUE}, a
@@ -221,8 +219,10 @@ cluswilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
             stop("group id has to contain at least two levels")
         }
         group <- recoderFunc(group.keep, group.uniq, c(1 : group.uniq.l))
-    } else {
+    } else if (!paired){
         stop("group variable is missing")
+    } else {
+        group <- NULL
     }
     
     cluster <- attr(attr(mf, "terms"), "specials")$cluster

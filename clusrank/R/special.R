@@ -1,24 +1,3 @@
-#' Identify treatment groups.
-#'
-#' This is a special function used in the context of formula
-#' used for Wilcoxon sum rank test for clustered data.
-#' It identifies the treatment group id of observations, and is used
-#' on the right hand side of a formula.
-#'
-#' @param x A numeric variable of cluster id.
-#'
-#' @details The only action of this function is semantic, to mark
-#' a variable as the group indicator. Must be supplied.
-#' @seealso \code{\link{cluswilcox.test.formula}}
-#'
-#' @examples
-#' data(crd)
-#' cluswilcox.test(z ~ group + cluster(id), data = crd)
-#' @keywords internal
-#' @export
-group <- function(x) {x}
-
-
 #' Identify clusters
 #'
 #' This is a special function used in the context of formula
@@ -34,9 +13,6 @@ group <- function(x) {x}
 #' @return x
 #' @seealso \code{\link{cluswilcox.test.formula}}
 #'
-#' @examples
-#' data(crd)
-#' cluswilcox.test(z ~ group + cluster(id), data = crd)
 #' @keywords internal
 #' @export
 cluster <- function(x) {x}
@@ -55,9 +31,6 @@ cluster <- function(x) {x}
 #' will assume no stratification in the data.
 #' @seealso cluswilcox.test.formula
 #'
-#' @examples
-#' data(crdStr)
-#' cluswilcox.test(z ~ group + cluster(id) + stratum(stratum), data = crdStr)
 #' @keywords internal
 #' @export
 stratum <- function(x) {x}
