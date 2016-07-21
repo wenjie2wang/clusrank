@@ -40,7 +40,6 @@ int crksum(int rks, int I, int J, int sumrks, int minrks) {
 
     return( rks == 0);
   } else {
-    /*Rcpp::Rcout << rks <<  " score_[i + j - 1] = " << score_[i + j - 1] << std::endl;*/
     sumrks = sumrks - score_[i + j - 1];
     
     return(crksum(rks - score_[i+j-1], i-1, j, sumrks, minrks - score_[i - 1]) +
@@ -134,8 +133,6 @@ double pcrksum_str(int k, IntegerMatrix x, IntegerMatrix xc, IntegerVector xn, I
   double p = 0;
   for( int i = 0; i < d; i ++) {
     N *= Rf_choose(n[i], xn[i]);
-    Rcpp::Rcout << N << std::endl;
-
   }
   p = crksum_str(k, x, xc, max);
   p = p / N;
@@ -168,21 +165,15 @@ int csrkg(int srk, IntegerVector Score) {
   w[0] = 0;
 
   w1[Score] = 1;
-  Rcpp::Rcout<<w<<std::endl;
-
   for( j = 2; j < max_s + 1; ++j ) {
-    Rcpp::Rcout << "j = " << j << std::endl;
     compare[0] = j * (j + 1) / 2;
     int i, end = min(compare);
-    Rcpp::Rcout << "end = " << end << std::endl;
     for( i = end; i >= j; --i){
       w[i] += w[i - j];
       if(i == j & w1[j] == 1) w[i] += 1;
-      /*  Rcpp::Rcout << "j = " << j << " i = " << i << " w = " << w[i] << std::endl;*/
     }
   }
   w[0] = 1;
-  Rcpp::Rcout<<w << " srk " <<srk <<std::endl;
   IntegerVector subw(w.begin(), w.begin() + srk + 1);  
   return(sum(subw));
 }
