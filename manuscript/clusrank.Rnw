@@ -6,7 +6,7 @@
 \usepackage{amsmath, bm, amssymb}
 % \usepackage{graphicx}
 \usepackage{natbib}
-\usepackage{booktab}
+\usepackage{booktabs}
 
 % For in-house revision purpose only
 \usepackage{color}
