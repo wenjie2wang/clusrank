@@ -43,11 +43,10 @@
 #' @export
 
 print.ctest <- function (x, digits = getOption("digits"), prefix = "\t", ...) {
-    cat("\n")
     if(!is.null(x$exact)) {
         if(x$exact == TRUE) {
-            x$method <- paste(x$method, "(exact distribution)")
-        }
+             x$method <- paste(x$method, "(exact distribution)")
+         }
     }
     cat(strwrap(x$method, prefix = prefix), sep = "\n")
     cat("\n")
@@ -61,7 +60,6 @@ print.ctest <- function (x, digits = getOption("digits"), prefix = "\t", ...) {
     if (!is.null(x$ERstat)){
         cat( paste(names(x$ERstat), "=", format(signif(x$ERstat,
                                                        max(1L, digits - 2L)))))
-        
         cat("\n")
     }
     
