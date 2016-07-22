@@ -782,22 +782,23 @@ indub[1, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 0.5, 10, 5, "indi
 indub[2, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.9, 0.9), 0.5, 10, 5, "individual")
 @ 
 
-<<rs-tab, echo = FALSE, eval = TRUE>>=
+<<rs-tab, results='asis', echo = FALSE, eval = TRUE>>=
 library(xtable)
 sum.tab <- rbind(clusb, clusub, indb, indub)
-rownames(sum.tab) <- c("clus, bal, $rho = 0.1$", 
-                       "clus, bal, $rho = 0.9$",
-                       "clus, unbal, $rho = 0.1$",
-                       "clus, unbal, $rho = 0.9$",
-                       "ind, bal, $rho = 0.1$", 
-                       "ind, bal, $rho = 0.9$",
-                       "ind, unbal, $rho = 0.1$",
-                       "ind, unbal, $rho = 0.9$")
+rownames(sum.tab) <- c("clus, bal, $\\rho = 0.1$", 
+                       "clus, bal, $\\rho = 0.9$",
+                       "clus, unbal, $\\rho = 0.1$",
+                       "clus, unbal, $\\rho = 0.9$",
+                       "ind, bal, $\\rho = 0.1$", 
+                       "ind, bal, $\\rho = 0.9$",
+                       "ind, unbal, $\\rho = 0.1$",
+                       "ind, unbal, $\\rho = 0.9$")
 addtorow <- list()
-addtorow$pos <- list(0, 0)
+addtorow$pos <- list( 0, 0)
 addtorow$command <-
-    c("\\toprule \\\\\n", " & \\multicolumn{2}{c}{size} & \\multicolumn{2}{c}{power} \\\\\n", " & \\cmidrule(r){2-3} & \\cmidrule(r) {4-5} \\\\\n")
-print(xtable(sum.tab), add.to.row = addtorow)
+    c(" & \\multicolumn{2}{c}{size} & \\multicolumn{2}{c}{power} \\\\\n", "& RGL & DS & RGL & DS \\\\\n")
+print(xtable(sum.tab), add.to.row = addtorow, include.colnames = FALSE,
+      sanitize.rownames.function = function(x){x}, booktabs = TRUE)
                        
 @ 
 
