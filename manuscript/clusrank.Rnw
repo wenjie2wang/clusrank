@@ -579,42 +579,44 @@ args(cluswilcox.test)
 @
 Argument \code{x} can be either a numeric vector or a formula. 
 The default interface is called if \code{x} is a numeric vector, in
-which case, the interface is designed to mimic that of
+which case the interface is designed to mimic that of
 \code{wilcox.test}: 
+
 <<args-cd, echo=TRUE>>=
+args(stats:::wilcox.test.default)
 args(clusrank:::cluswilcox.test.default)
 @
-Depending on whether \code{paired} is set to be \code{TRUE} or
-\code{FALSE}, clustered rank-sum test or the clustered signed-rank
-test is performed, respectively.
 
-{\bf describe the arguments that are inherited from \code{wilcox.test}
-  first and then describe those extra that are specific for clustered version}
-
+As in the default interface of \code{wilcox.test}, \code{x} and
+\code{y} are numeric vectors of data values, though unlike
+\code{wilcox.test}, \code{y} is optional only for the clustered signed 
+rank test where \code{x} and \code{y} may contain observations before
+and after treatment and is spare for the clustered rank sum test for which an
+extra \code{group} variable is required to indicate the treatment
+group assignment of the data values in \code{x}. 
+The hypothesis related arguments \code{alternative}, \code{mu} and
+\code{paired} are identical of those of the \code{wilcox.test}. 
+The optional exact test (\code{exact = TRUE}) is only available for
+clustered rank sum test for RGL method and when the treatment group is
+assigned at cluster level, otherwise \code{exact} should be set as
+\code{FALSE}. Note that due to the computation issue, if exact test is
+applicable, it
+should not be applied to data sets which contain a large number of
+clusters, typically $40$. Other arguments specific for clustered data include
+\code{cluster} which should be a numeric vector contain the cluster
+id. For clustered rank sum test, the argument \code{group} should be a
+numeric vector contain the treatment group id for each observation. In
+addition, for clustered rank sum test using RGL method for data with
+treatment group assigned at clustered level, an extra variable
+\code{stratum} is allowed to take the effect of stratification into
+account and therefore provide a more powerful test.
 For clustered rank-sum test, the data frame \code{data} should
-at least include $3$ variables: the observed score, \code{x},
-the cluster id, \code{cluster} and the treatment group, \code{group}.
-The argument \code{y} is reserved for clustered signed-rank test. 
-{\bf need to match RGL with rgl and DS with ds}
-Both RGL and DS methods are available using asymptotic statistic. 
-Note that for RGL method, an extra varaible \code{stratum} can be
-supplied to account for the effect of stratification in the data.
-In addition, for RGL method, when the treatment group is assigned at cluster
-level, an exact test is available by setting \code{exact ==TRUE}.
-Nevertheless, exact test is not recommended for data with number of
-clusters is greater than $50$ due to computational issue. 
-The other arguments, \code{alternative} and \code{mu}, set the shape of the
-alternative hypothesis and the null value respectively. 
+contain at least $3$ variables: the observed score, \code{x},
+the cluster id, \code{cluster} and the treatment group,
+\code{group}. For both test, two methods, RGL and DS, are available by
+switching \code{method} to \code{``rgl``} or \code{``ds``}.
 
-Clustered signed-rank test is run if \code{paired} is set as
-\code{TRUE}. There are two ways to supply the response variable:
-supply the observed difference as \code{x}, or supply the pair of
-observed scores as \code{x} and \code{y} respectively.  
-Same as
-clustered rank-sum test, exact test is only available for RGL method.
-The other arguments are set in the same way as for the clustered
-rank-sum test.  Note that there is no available method that can
-control the effect of stratification.
+
  
 
 The arguments of the formula interface is as the following:
@@ -798,8 +800,7 @@ addtorow$pos <- list( 0, 0)
 addtorow$command <-
     c(" & \\multicolumn{2}{c}{size} & \\multicolumn{2}{c}{power} \\\\\n", "& RGL & DS & RGL & DS \\\\\n")
 print(xtable(sum.tab), add.to.row = addtorow, include.colnames = FALSE,
-      sanitize.rownames.function = function(x){x}, booktabs = TRUE)
-                       
+      sanitize.rownames.function = function(x){x}, booktabs = TRUE)                       
 @ 
 
 \subsection{Signed rank test}
