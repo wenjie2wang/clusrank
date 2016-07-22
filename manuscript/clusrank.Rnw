@@ -591,22 +591,22 @@ As in the default interface of \code{wilcox.test}, \code{x} and
 \code{y} are numeric vectors of data values, though unlike
 \code{wilcox.test}, \code{y} is optional only for the clustered signed 
 rank test where \code{x} and \code{y} may contain observations before
-and after treatment and is spare for the clustered rank sum test for which an
+and after treatment and is spare for the clustered rank-sum test for which an
 extra \code{group} variable is required to indicate the treatment
 group assignment of the data values in \code{x}. 
 The hypothesis related arguments \code{alternative}, \code{mu} and
 \code{paired} are identical of those of the \code{wilcox.test}. 
 The optional exact test (\code{exact = TRUE}) is only available for
-clustered rank sum test for RGL method and when the treatment group is
+clustered rank-sum test for RGL method and when the treatment group is
 assigned at cluster level, otherwise \code{exact} should be set as
 \code{FALSE}. Note that due to the computation issue, if exact test is
 applicable, it
 should not be applied to data sets which contain a large number of
 clusters, typically $40$. Other arguments specific for clustered data include
 \code{cluster} which should be a numeric vector contain the cluster
-id. For clustered rank sum test, the argument \code{group} should be a
+id. For clustered rank-sum test, the argument \code{group} should be a
 numeric vector contain the treatment group id for each observation. In
-addition, for clustered rank sum test using RGL method for data with
+addition, for clustered rank-sum test using RGL method for data with
 treatment group assigned at clustered level, an extra variable
 \code{stratum} is allowed to take the effect of stratification into
 account and therefore provide a more powerful test.
@@ -617,28 +617,32 @@ the cluster id, \code{cluster} and the treatment group,
 switching \code{method} to \code{``rgl``} or \code{``ds``}.
 
 
- 
-
 The arguments of the formula interface is as the following:
 <<formula, echo=FALSE>>=
 args(clusrank:::cluswilcox.test.formula)
 @
 
+The formula interface differs from the default interface in that a
+formula is used to address the relationship between the input
+variables and it is also different from the formula interface for the
+\code{wilcox.test}. For clustered rank-sumtest, the left hand site is
+the data values and the right hand side should comprise the
+\code{group} id and the \code{cluster} id, additional covariate can
+also be added if corresponding method allows, e.g., \code{stratum}. To
+indicate the role of each variable, special functions have to be used
+for \code{cluster} and \code{stratum} except for \code{group}, e.g.,
+\code{z ~ group + cluster(cid) + stratum(sid)}  (see
+section~\ref{s:illus} for detail). 
 
 
-For rank-sum test, the left hand side of the formula is the observed
-score and the right hand side comprises the required covariates
-including \code{cluster} id and \code{group} id (see section~\ref{s:illus} for detail). 
-Additional covariate for specific method can also be added, e.g., \code{stratum} for
-RGL method.
+For clustered signed-rank test, the left hand side of the formula is
+the observed paired difference and the right hand side comprises the
+cluster id. No group id is needed for signed-rank test. The option
+\code{subset} and \code{na.action} are used the same as the usage of
+them in the \code{model.frame} function to subset the data and
+determine the action to \code{NA} values in the data. The other
+arguments are identical to those in the default interface.
 
-
-{\bf watch line width}
-For signed-rank test, the left hand site of the formula is the 
-observed paired difference and the right hand side comprises the cluster id, note that no group id is needed for signed-rank test.
-The \code{subset} and \code{na.action} have the same effect as they 
-have in the \code{model.frame} function. Other arguments are the
-same as those in the default interface.
 
 
 
@@ -825,7 +829,7 @@ datgen.sr <- function(nclus, maxclsize, delta = 0.,
 The function \code{datgen.sr} generates clustered differences, 
 the arguments \code{nclus}, \code{maxclsize}, \code{delta}, \code{rho}
 and \code{rate} have the same usage as they have in \code{datgen}
-for the rank sum test. Note that unlike rank sum test, no 
+for the rank-sum test. Note that unlike rank-sum test, no 
 grouping is involved in the data for signed rank test.
 
 A size study with strong and weak intra-cluster correlation is as following:
@@ -847,14 +851,14 @@ In both cases, ``ds'' method has a higher power.
 \section{Discussion}
 \label{s:disc}
 
-For rank sum test, ds method cannot be applied to collateral data due to the 
+For rank-sum test, ds method cannot be applied to collateral data due to the 
 violation of the assumption on which the asymptotic null distribution is
 derived. The rgl method works better when the intra-cluster correlation is 
 higher, the ds method works better when the intra-cluster correlation is lower. 
 DS method is more flexible with the cluster size, whereas the construction size
 are more suitable for the case where there are at least several clusters for each 
 cluster size. 
-DS rank sum test is conservative when the number of clusters is small.
+DS rank-sum test is conservative when the number of clusters is small.
 
 
 
