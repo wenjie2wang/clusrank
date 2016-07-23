@@ -638,10 +638,10 @@ section~\ref{s:illus} for detail).
 For clustered signed-rank test, the left hand side of the formula is
 the observed paired difference and the right hand side comprises the
 cluster id. No group id is needed for signed-rank test. The option
-\code{subset} and \code{na.action} are used the same as the usage of
-them in the \code{model.frame} function to subset the data and
-determine the action to \code{NA} values in the data. The other
-arguments are identical to those in the default interface.
+\code{subset} and \code{na.action} have the same usage as they have in
+the \code{model.frame} function to subset the data and 
+determine the action to \code{NA} values in the data. 
+The other arguments are identical to those in the default interface.
 
 
 
@@ -650,11 +650,19 @@ arguments are identical to those in the default interface.
 \label{s:illus}
 
 \subsection{Rank-sum test} 
-{\bf what is the reference of this simulation scheme?}
 
-{\bf watch line width? what editor are you using?}
-
-The following function generates clustered data (balanced or unbalanced) from two treatment groups.
+We use a scheme similar to the simulation study in 
+\citet{Rosn:Glyn:Lee:exte:2006} to generate sample for clustered
+rank-sum test, both balanced data and unbalanced data, though our
+scheme is more straightforward and flexible. 
+The sample is drawn in the fashion of a mixed effect model
+which include a fixed effect of the treatment group, 
+a random effect of the clustering drawn from a Normal  
+distribution, and an individual Normal random error. 
+The random component of the data values is first exponentiated before
+adding the fixed effect.
+The intra-cluster correlation is exchangable and the magnitude of
+it can be further affected by the assigned treatment group. 
 <<datgen, echo=TRUE>>= 
 library(mvtnorm)
 datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.9, -.1), 
@@ -675,7 +683,7 @@ datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.9, -.1),
 }
 @
 
-{\bf watch line width}
+
 
 When \code{grplevel} is set as \code{"cluster"}, the generated data
 frame contains \code{nclus} clusters under each treatment group with
@@ -788,6 +796,24 @@ indub[1, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 0.5, 10, 5, "indi
 indub[2, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.9, 0.9), 0.5, 10, 5, "individual")
 @ 
 
+The following table includes result from $8$ scenarios to compare the
+performance of the two methods. Each scenario represents a combination
+of the level at which the treatment is assigned, whether the data set
+is balanced and $2$ level of intra-cluster correlation: $\rho = 0.1$
+and $\rho = 0.9$ where the treatment does not affect $\rho$. There are
+$1000$ replications under each scenario, 
+and each data set contains $10$ clusters with a maximum cluster size
+$5$.  For balanced data, each cluster size is $5$; for
+unbalanced data, the unbalancedness is introduced by randomly deleting
+a half of the corresponding balance data set. 
+
+
+The empirical size of both methods are around the nominal level in all
+scenarios, though the performance in terms of power differs. RGL
+method has a lower power than DS method when the treatment is assigned
+at cluster level, however, when the treatment is assigned at
+individual level, RGL method has an advantage over DS method
+especially when the intra-cluster correlation is large. 
 <<rs-tab, results='asis', echo = FALSE, eval = TRUE>>=
 library(xtable)
 sum.tab <- rbind(clusb, clusub, indb, indub)
