@@ -746,7 +746,7 @@ simpower <- function(nrep, level, paired, delta, rho, rate,
                      nclus, maxclsize, ...) {
     do1rep <- function() {
         if(paired) {
-            atgen <- datgen.sr
+            datgen <- datgen.sr
             formula <- score ~ cluster(id)
         } else {
             datgen <- datgen.rs
