@@ -569,6 +569,7 @@ library(knitr)
 opts_chunk$set(cache=TRUE, autodep=TRUE)
 @ 
 
+{\bf how about clusWilcox.test?}
 
 Package \pkg{clusrank} provides a unified interface to all the
 methods reviewed in Sections~\ref{s:ranksum} and~\ref{s:signedrank}
@@ -580,12 +581,12 @@ args(cluswilcox.test)
 Argument \code{x} can be either a numeric vector or a formula. 
 The default interface is called if \code{x} is a numeric vector, in
 which case the interface is designed to mimic that of
-\code{wilcox.test}: 
-
+\code{wilcox.test}: {\bf blank line means new paragraph. Be careful.}
 <<args-cd, echo=TRUE>>=
-args(stats:::wilcox.test.default)
+## args(stats:::wilcox.test.default)
 args(clusrank:::cluswilcox.test.default)
 @
+
 
 As in the default interface of \code{wilcox.test}, \code{x} and
 \code{y} are numeric vectors of data values, though unlike
@@ -614,14 +615,14 @@ For clustered rank-sum test, the data frame \code{data} should
 contain at least $3$ variables: the observed score, \code{x},
 the cluster id, \code{cluster} and the treatment group,
 \code{group}. For both test, two methods, RGL and DS, are available by
-switching \code{method} to \code{``rgl``} or \code{``ds``}.
+switching \code{method} to \code{rgl} or \code{ds}.
 
 
-The arguments of the formula interface is as the following:
+The arguments of the formula interface is:
 <<formula, echo=FALSE>>=
 args(clusrank:::cluswilcox.test.formula)
-@
-
+@ 
+{\bf no need for new paragraph}
 The formula interface differs from the default interface in that a
 formula is used to address the relationship between the input
 variables and it is also different from the formula interface for the
@@ -632,7 +633,7 @@ also be added if corresponding method allows, e.g., \code{stratum}. To
 indicate the role of each variable, special functions have to be used
 for \code{cluster} and \code{stratum} except for \code{group}, e.g.,
 \code{z ~ group + cluster(cid) + stratum(sid)}  (see
-section~\ref{s:illus} for detail). 
+Section~\ref{s:illus} for detail). {\bf captilize Section or Equation etc.}
 
 
 For clustered signed-rank test, the left hand side of the formula is
@@ -644,10 +645,14 @@ determine the action to \code{NA} values in the data.
 The other arguments are identical to those in the default interface.
 
 
+{\bf Please summarize 5 things you learned on latex and
+  5 things on writing when we meet on Tuesday.}
 
 
 \section{Illustrations}
 \label{s:illus}
+
+{\bf Use DS and RGL in the text consistently.}
 
 \subsection{Rank-sum test} 
 
@@ -728,6 +733,8 @@ cluswilcox.test(score ~ grp + cluster(id), data = dat0.cls, method = "ds")
 
 
 The next dataset involves individual level grouping.
+{\bf why is the data called dat1.cls? I used cls at the beginning to
+  denote cluster level group. I'd name this dataset d.ind.}
 <<dat-rs-rgl-indi>>=
 dat1.cls <- datgen.rs(10, 5, rho=c(.9, .9), delta = 1, grplevel="individual")
 head(dat1.cls)
@@ -739,6 +746,41 @@ cluswilcox.test(score ~ grp + cluster(id), data = dat1.cls, method = "ds")
 @ 
 
 
+
+
+\subsection{Signed rank test}
+A similar data generation function can be easily realized:
+
+<<datagen_sr, echo = TRUE>>=
+datgen.sr <- function(nclus, maxclsize, delta = 0.,
+                      rho = 0.9, rate = 1) {
+    nn <- nclus * maxclsize
+    Sigma <- diag(1 - rho, nrow = maxclsize) + rho
+    x <- c(t(rmvnorm(nclus, sigma = Sigma)))
+    y <- c(t(rmvnorm(nclus, sigma = Sigma)))
+    score <- exp(x) - exp(y) - delta
+    id <- rep(1:nclus, each = maxclsize)
+    dat <- data.frame(score = score, id = id)
+    keep <- sort(sample(1: nn,
+                 size = rate * nn, FALSE))
+    if (rate == 1) dat else dat[keep,]
+}
+@ 
+
+The function \code{datgen.sr} generates clustered differences, 
+the arguments \code{nclus}, \code{maxclsize}, \code{delta}, \code{rho}
+and \code{rate} have the same usage as they have in \code{datgen}
+for the rank-sum test. Note that unlike rank-sum test, no 
+grouping is involved in the data for signed rank test.
+
+{\bf use a single dataset to illustrate and let the user see what the
+  function returns.}
+
+
+\subsection{A simulation study}
+
+{\bf are we doing the comparison that has not been done in the
+  literature? That is something to highlight.}
 
 A simulation to compare the two methods can be easily done:
 <<simpower>>=
@@ -765,9 +807,8 @@ simpower <- function(nrep, level, paired, delta, rho, rate,
 @
 
 
-
-
-
+{\bf refer to a table by its number. Never use the following table
+  because it may not be following.}
 The following table includes result from $10$ scenarios to compare the
 performance of the two methods. The effect size in the power analysis
 $\delta$ is set as $0.5$. Each of the first $8$ scenarios represents a
@@ -805,30 +846,9 @@ treatment assignment when the treatment is assigned at cluster
 level. In this case, DS method performs better than RGL method as
 shown in the simulation study in \citet{Datt:Satt:rank:2005}.
 
-\subsection{Signed rank test}
-A similar data generation function can be easily realized:
 
-<<datagen_sr, echo = TRUE>>=
-datgen.sr <- function(nclus, maxclsize, delta = 0.,
-                      rho = 0.9, rate = 1) {
-    nn <- nclus * maxclsize
-    Sigma <- diag(1 - rho, nrow = maxclsize) + rho
-    x <- c(t(rmvnorm(nclus, sigma = Sigma)))
-    y <- c(t(rmvnorm(nclus, sigma = Sigma)))
-    score <- exp(x) - exp(y) - delta
-    id <- rep(1:nclus, each = maxclsize)
-    dat <- data.frame(score = score, id = id)
-    keep <- sort(sample(1: nn,
-                 size = rate * nn, FALSE))
-    if (rate == 1) dat else dat[keep,]
-}
-@ 
+{\bf anything interesting to compare for the signed-rank test?}
 
-The function \code{datgen.sr} generates clustered differences, 
-the arguments \code{nclus}, \code{maxclsize}, \code{delta}, \code{rho}
-and \code{rate} have the same usage as they have in \code{datgen}
-for the rank-sum test. Note that unlike rank-sum test, no 
-grouping is involved in the data for signed rank test.
 
 A size study with strong and weak intra-cluster correlation is as following:
 <<size_sr>>=
@@ -844,7 +864,9 @@ A power size under same setting with a shift equals $1$ is as the following:
 simpower(1000, 0.05, TRUE, 1, 0.9, 1, 10, 5)
 simpower(1000, 0.05, TRUE, 1, -0.1, 1, 10, 5)
 @ 
-In both cases, ``ds'' method has a higher power.  
+In both cases, the DS method has a higher power.  
+{\bf we do not want to be misleading. Any comparison that has not been
+done in the literature?}
 
 \section{Discussion}
 \label{s:disc}
@@ -862,9 +884,9 @@ DS rank-sum test is conservative when the number of clusters is small.
 
 What points can be discussed?
 
-Applicability of each method.
+Applicability of each method. {\bf discuss}
 
-
+{\bf Any future directions?}
 
 
 
