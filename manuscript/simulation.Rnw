@@ -1,0 +1,60 @@
+<<clus-b, echo = FALSE, eval = TRUE>>=
+clusb <- matrix(0, 2, 4)
+clusb[1, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), 1, 10, 5, "cluster")
+clusb[2, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.9, 0.9), 1, 10, 5, "cluster")
+clusb[1, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 1, 10, 5, "cluster")
+clusb[2, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.9, 0.9), 1, 10, 5, "cluster")
+@ 
+ 
+<<clus-ub, echo = FALSE, eval = TRUE>>=
+clusub <- matrix(0, 2, 4)
+clusub[1, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), 0.5, 10, 5, "cluster")
+clusub[2, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.9, 0.9), 0.5, 10, 5, "cluster")
+clusub[1, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 0.5, 10, 5, "cluster")
+clusub[2, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.9, 0.9), 0.5, 10, 5, "cluster")
+@ 
+
+<<ind-b, echo = FALSE, eval = TRUE>>=
+indb <- matrix(0, 2, 4)
+indb[1, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), 1, 10, 5, "individual")
+indb[2, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.9, 0.9), 1, 10, 5, "individual")
+indb[1, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 1, 10, 5, "individual")
+indb[2, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.9, 0.9), 1, 10, 5, "individual")
+@ 
+
+<<ind-ub, echo = FALSE, eval = TRUE>>=
+indub <- matrix(0, 2, 4)
+indub[1, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), 0.5, 10, 5, "individual")
+indub[2, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.9, 0.9), 0.5, 10, 5, "individual")
+indub[1, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 0.5, 10, 5, "individual")
+indub[2, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.9, 0.9), 0.5, 10, 5, "individual")
+@ 
+
+<<ind-ub-15, echo = FALSE, eval = TRUE>>=
+indub15 <- matrix(0, 2, 4)
+indub15[1, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), 0.25, 10, 10, "individual")
+indub15[2, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.9, 0.9), 0.25, 10, 10, "individual")
+indub15[1, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 0.25, 10, 10, "individual")
+indub15[2, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.9, 0.9), 0.25, 10, 10, "individual")
+@ 
+
+<<rs-tab, echo = FALSE, eval = TRUE>>=
+library(xtable)
+sum.tab <- rbind(clusb, clusub, indb, indub, indub15)
+rownames(sum.tab) <- c("clus, bal, $\\rho = 0.1$", 
+                       "clus, bal, $\\rho = 0.9$",
+                       "clus, unbal, $\\rho = 0.1$",
+                       "clus, unbal, $\\rho = 0.9$",
+                       "ind, bal, $\\rho = 0.1$", 
+                       "ind, bal, $\\rho = 0.9$",
+                       "ind, unbal, $\\rho = 0.1$",
+                       "ind, unbal, $\\rho = 0.9$",
+                       "ind, unbal, maxsize = 10, $\\rho = 0.1$",
+                       "ind, unbal, maxsize = 10, $\\rho = 0.9$")
+addtorow <- list()
+addtorow$pos <- list( 0, 0)
+addtorow$command <-
+    c(" & \\multicolumn{2}{c}{size} & \\multicolumn{2}{c}{power} \\\\\n", "& RGL & DS & RGL & DS \\\\\n")
+print(xtable(sum.tab, caption = 'Simulation for clustered rank sum test, comparsion between RGL and DS'), caption.placement = 'top',  add.to.row = addtorow, include.colnames = FALSE,
+      sanitize.rownames.function = function(x){x}, booktabs = TRUE)                       
+@ 
