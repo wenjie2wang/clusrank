@@ -9,10 +9,8 @@ all: tex pdf
 tex : $(knitrfile)
 	$(info ************  CONVERTING KNITR TO TEX  ************)
 	Rscript -e "require(knitr); knit('$(knitrfile)')"
-bib : $(bibfile)
-	bibtex $(filestem)
 
-pdf : tex bib
+pdf : tex 
 	$(info ************  COMPILING PDF  ************)
 	pdflatex $(filestem)
 	bibtex $(filestem)
@@ -20,7 +18,7 @@ pdf : tex bib
 	pdflatex $(filestem)
 
 clean:
-	rm *.aux *.bbl *.log *.blg
+	rm *.aux *.bbl *.log *.blg *.out *.pdf *.tex
 # watch:
 #     $(info ************  WATCHING FOR CHANGES  ************)
 #     watchman watch "$(shell pwd)"

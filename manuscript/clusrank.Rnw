@@ -764,63 +764,24 @@ simpower <- function(nrep, level, paired, delta, rho, rate,
 }
 @
 
-<<clus-b, echo = FALSE, eval = TRUE>>=
-clusb <- matrix(0, 2, 4)
-clusb[1, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), 1, 10, 5, "cluster")
-clusb[2, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.9, 0.9), 1, 10, 5, "cluster")
-clusb[1, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 1, 10, 5, "cluster")
-clusb[2, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.9, 0.9), 1, 10, 5, "cluster")
-@ 
- 
-<<clus-ub, echo = FALSE, eval = TRUE>>=
-clusub <- matrix(0, 2, 4)
-clusub[1, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), 0.5, 10, 5, "cluster")
-clusub[2, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.9, 0.9), 0.5, 10, 5, "cluster")
-clusub[1, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 0.5, 10, 5, "cluster")
-clusub[2, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.9, 0.9), 0.5, 10, 5, "cluster")
-@ 
-
-<<ind-b, echo = FALSE, eval = TRUE>>=
-indb <- matrix(0, 2, 4)
-indb[1, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), 1, 10, 5, "individual")
-indb[2, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.9, 0.9), 1, 10, 5, "individual")
-indb[1, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 1, 10, 5, "individual")
-indb[2, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.9, 0.9), 1, 10, 5, "individual")
-@ 
-
-<<ind-ub, echo = FALSE, eval = TRUE>>=
-indub <- matrix(0, 2, 4)
-indub[1, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), 0.5, 10, 5, "individual")
-indub[2, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.9, 0.9), 0.5, 10, 5, "individual")
-indub[1, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 0.5, 10, 5, "individual")
-indub[2, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.9, 0.9), 0.5, 10, 5, "individual")
-@ 
-
-<<ind-ub-15, echo = FALSE, eval = TRUE>>=
-indub15 <- matrix(0, 2, 4)
-indub15[1, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), 0.25, 10, 10, "individual")
-indub15[2, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.9, 0.9), 0.25, 10, 10, "individual")
-indub15[1, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 0.25, 10, 10, "individual")
-indub15[2, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.9, 0.9), 0.25, 10, 10, "individual")
-@ 
 
 
 
 
 The following table includes result from $10$ scenarios to compare the
-performance of the two methods. Each of the first $8$ scenarios
-represents a combination 
-of the level at which the treatment is assigned, whether the data set
-is balanced and $2$ level of intra-cluster correlation: $\rho = 0.1$
-and $\rho = 0.9$ where the treatment does not affect $\rho$. There are
-$1000$ replications under each scenario, 
-and each data set contains $10$ clusters with a maximum cluster size
-$5$.  For balanced data, each cluster size is $5$; for
-unbalanced data, the unbalancedness is introduced by randomly deleting
-a half of the corresponding balance data set. The last two scenarios
-aims at studying the effect of variation in the cluster size by
-increasing the maximum possible cluster size from $5$ to $10$ and
-randomly keep $25\%$ of the original data instead of $50\%$. 
+performance of the two methods. The effect size in the power analysis
+$\delta$ is set as $0.5$. Each of the first $8$ scenarios represents a
+combination of the level at which the treatment is assigned, whether
+the data set is balanced and $2$ level of intra-cluster correlation:
+$\rho = 0.1$ and $\rho = 0.9$ where the treatment does not affect
+$\rho$. There are $1000$ replications under each scenario, and each
+data set contains $10$ clusters with a maximum cluster size $5$.  For
+balanced data, each cluster size is $5$; for unbalanced data, the
+unbalancedness is introduced by randomly deleting a half of the
+corresponding balance data set. The last two scenarios aims at
+studying the effect of variation in the cluster size by increasing the
+maximum possible cluster size from $5$ to $10$ and randomly keep
+$25\%$ of the original data instead of $50\%$.
 
 
 The empirical size of both methods are around the nominal level in all
@@ -843,26 +804,6 @@ consider the possibility when the cluster size is informative for the
 treatment assignment when the treatment is assigned at cluster
 level. In this case, DS method performs better than RGL method as
 shown in the simulation study in \citet{Datt:Satt:rank:2005}.
-<<rs-tab, results='asis', echo = FALSE, eval = TRUE>>=
-library(xtable)
-sum.tab <- rbind(clusb, clusub, indb, indub, indub15)
-rownames(sum.tab) <- c("clus, bal, $\\rho = 0.1$", 
-                       "clus, bal, $\\rho = 0.9$",
-                       "clus, unbal, $\\rho = 0.1$",
-                       "clus, unbal, $\\rho = 0.9$",
-                       "ind, bal, $\\rho = 0.1$", 
-                       "ind, bal, $\\rho = 0.9$",
-                       "ind, unbal, $\\rho = 0.1$",
-                       "ind, unbal, $\\rho = 0.9$",
-                       "ind, unbal, maxsize = 10, $\\rho = 0.1$",
-                       "ind, unbal, maxsize = 10, $\\rho = 0.9$")
-addtorow <- list()
-addtorow$pos <- list( 0, 0)
-addtorow$command <-
-    c(" & \\multicolumn{2}{c}{size} & \\multicolumn{2}{c}{power} \\\\\n", "& RGL & DS & RGL & DS \\\\\n")
-print(xtable(sum.tab, caption = 'Simulation for clustered rank sum test, comparsion between RGL and DS'), caption.placement = 'top',  add.to.row = addtorow, include.colnames = FALSE,
-      sanitize.rownames.function = function(x){x}, booktabs = TRUE)                       
-@ 
 
 \subsection{Signed rank test}
 A similar data generation function can be easily realized:
