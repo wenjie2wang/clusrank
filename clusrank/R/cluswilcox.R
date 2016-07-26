@@ -420,7 +420,7 @@ cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
         x <- x - mu
         METHOD <- "Clustered Wilcoxon signed rank test"
        if((method) == "rgl") {
-           METHOD <- paste(METHOD, "using rgl method", sep = " ")
+           METHOD <- paste(METHOD, "using Rosner-Glynn-Lee method", sep = " ")
            arglist <- setNames(list(x, cluster, alternative, mu, METHOD,
                                     DNAME, exact),
                             c("x", "cluster", "alternative",
@@ -431,7 +431,7 @@ cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
         }
 
         if((method) == "ds") {
-            METHOD <- paste(METHOD, "using ds method", sep = " ")
+            METHOD <- paste(METHOD, "using Datta-Satten method", sep = " ")
              arglist <- setNames(list(x, cluster, alternative, mu, METHOD, DNAME),
                             c("x", "cluster", "alternative",
                               "mu",
