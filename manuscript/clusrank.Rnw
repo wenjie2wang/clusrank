@@ -588,6 +588,9 @@ args(clusrank:::cluswilcox.test.default)
 @
 
 
+{\bf this sentence is too long and confusing. need to break it into
+  smaller ones and rephrase. You can say that y becomes optional
+  because you have a group variable which allows more than 2 groups.}
 As in the default interface of \code{wilcox.test}, \code{x} and
 \code{y} are numeric vectors of data values, though unlike
 \code{wilcox.test}, \code{y} is optional only for the clustered signed 
@@ -597,13 +600,22 @@ extra \code{group} variable is required to indicate the treatment
 group assignment of the data values in \code{x}. 
 The hypothesis related arguments \code{alternative}, \code{mu} and
 \code{paired} are identical of those of the \code{wilcox.test}. 
-The optional exact test (\code{exact = TRUE}) is only available for
-clustered rank-sum test for RGL method and when the treatment group is
-assigned at cluster level, otherwise \code{exact} should be set as
-\code{FALSE}. Note that due to the computation issue, if exact test is
-applicable, it
-should not be applied to data sets which contain a large number of
-clusters, typically $40$. Other arguments specific for clustered data include
+The exact test (\code{exact = TRUE}) is only available for the RGL
+clustered rank-sum test with cluster level grouping; otherwise
+\code{exact} should be set as \code{FALSE}.  
+{\bf DS method cannot have exact? or too hard to implement?}
+Note that an exact test is very computing intensive, so it is
+recommended to be used only with small sample.
+{\bf do we decline or  issue a warning if number of cluster is greater 40?}
+{\bf try to start a new sentence at a new line}
+
+
+The function specifies the cluster by a \code{cluster} variable
+indicating which cluster each observations belongs to.
+Additionally, stratified data is allowed by a code{strata} variable
+indicating which strata each observation belongs to.
+{\bf rephrase...}
+Other arguments specific for clustered data include
 \code{cluster} which should be a numeric vector contain the cluster
 id. For clustered rank-sum test, the argument \code{group} should be a
 numeric vector contain the treatment group id for each observation. In
@@ -618,6 +630,8 @@ the cluster id, \code{cluster} and the treatment group,
 switching \code{method} to \code{rgl} or \code{ds}.
 
 
+{\bf we designed the formula interface to wilcox.test. so
+  present the same aspects first and then describe the additions.}
 The arguments of the formula interface is:
 <<formula, echo=FALSE>>=
 args(clusrank:::cluswilcox.test.formula)
@@ -625,19 +639,22 @@ args(clusrank:::cluswilcox.test.formula)
 The formula interface differs from the default interface in that a
 formula is used to address the relationship between the input
 variables and it is also different from the formula interface for the
-\code{wilcox.test}. For clustered rank-sumtest, the left hand site is
-the data values and the right hand side should comprise the
-\code{group} id and the \code{cluster} id, additional covariate can
-also be added if corresponding method allows, e.g., \code{stratum}. To
-indicate the role of each variable, special functions have to be used
-for \code{cluster} and \code{stratum} except for \code{group}, e.g.,
-\code{z ~ group + cluster(cid) + stratum(sid)}  (see
-Section~\ref{s:illus} for detail). 
+\code{wilcox.test}. 
+Variables indicating clusters and strata are identified in the formula
+by special terms \code{cluster} and \code{stratum}, respectively.
+For example, \code{z ~ group + cluster(cid) + stratum(sid)}, 
+where \code{group} identifies the grouping variable, \code{cid}
+identifies the clusters, and \code{sid} identifies the strata.
+See Section~\ref{s:illus} for detailed illustrations.
 
 
 For clustered signed-rank test, the left hand side of the formula is
 the observed paired difference and the right hand side comprises the
-cluster id. No group id is needed for signed-rank test. The option
+cluster id. No group id is needed for signed-rank test. 
+{\bf need to say that cluster and strata are not applicable}
+
+{\bf these should be stated at the beginning; they are the same as in wilcox.test.}
+The option 
 \code{subset} and \code{na.action} have the same usage as they have in
 the \code{model.frame} function to subset the data and 
 determine the action to \code{NA} values in the data. 
@@ -654,17 +671,21 @@ The other arguments are identical to those in the default interface.
 \subsection{Rank-sum test} 
 
 We use a scheme similar to the simulation study in 
-\citet{Datt:Satt:rank:2005} to generate sample for clustered
-rank-sum test, both balanced data and unbalanced data, though our
-scheme is more straightforward and flexible. 
-The sample is drawn in the fashion of a mixed effect model
-which include a fixed effect of the treatment group, 
-a random effect of the clustering drawn from a Normal  
-distribution, and an individual Normal random error. 
-The random component of the data values is first exponentiated before
-being added to the fixed effect.
-The intra-cluster correlation is exchangable and the magnitude of
-it can be further affected by the assigned treatment group. 
+\citet{Datt:Satt:rank:2005} to generate data for clustered
+rank-sum test, both balanced data and unbalanced data.
+For group $g \in \{0, 1\}$, the observations in a cluster 
+is generated as 
+\[
+X = \exp(Z_g) + \delta g,
+\]
+where $Z_g$ is a standard multivariate normal random vector with mean
+zero and an exchangeable correlation structure with pariwise
+correlation $\rho_g$, and $\delta$ is the group difference. 
+
+
+Here is a simple implementation that allows different levels of
+grouping (cluster-level and individual-level) and unequal cluster
+sizes: 
 <<datgen, echo=TRUE>>= 
 library(mvtnorm)
 datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.9, -.1), 
@@ -674,7 +695,7 @@ datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.9, -.1),
     x <- c(t(rmvnorm(nclus, sigma = Sigma1))) 
     Sigma2 <- diag(1 - rho[2], nrow = maxclsize) + rho[2] 
     y <- c(t(rmvnorm(nclus, sigma = Sigma2)))
-    group <- rep(c(1, 2), each = nn) 
+    group <- rep(c(0, 1), each = nn) 
     if (grplevel == "individual") 
         group  <- sample(group, nn, FALSE) 
     id <- rep(1:(2 * nclus), each = maxclsize)
@@ -684,49 +705,50 @@ datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.9, -.1),
     if (rate ==  1) dat else dat[keep, ]      
 }
 @
+{\bf present the arguments in order.}
+The function have two required inputs:
+\code{nclus} for number of clusters in each group and
+\code{maxclsize} for the maximum cluster size.
+The difference between the groups is specified by \code{delta}.
+The group specific intra-cluster correlation $\rho_g$ is controlled by
+$\rho$, a numeric vector of length 2, one for each group. 
+To allow unequal cluster sizes, \code{rate} specifies the rate at
+which an individual in a cluster is kept at random; when 
+\code{rate = 1}, balanced data with equal cluster size  is generated. 
+The grouping level is controlled by \code{grplevel}: 
+\code{"cluster"} for cluster-level and \code{"individual"} for
+individual level.
+The function returns a data set with three columns: 
+observed measurement \code{score}, 
+grouping id \code{grp}, and cluster id \code{id}.
 
+{\bf always have spell-checker turned on}
 
-
-When \code{grplevel} is set as \code{"cluster"}, the generated data
-frame contains \code{nclus} clusters under each treatment group with
-corresponding intra-cluster correlation; whereas if \code{grplevel}
-set as \code{"individual"}, a data set with individual level grouping
-is obtained by randomly re-assigning the treatment id at indivudual
-level. The maximum cluster size is set as \code{maxclsize}.  Argument
-\code{rate} is used to control the unbalancedness of the data by
-randomly keeping a proportion of \code{rate} of the orignal balanced
-data where each cluster has the size \code{maxclsize}.  Therefore, to
-genearte balanced data the \code{rate} can simply be set to $1$.  The
-intra-cluster correlation of each treatment group is set through
-\code{rho} which also enables a one-to-one correspondence between the
-treatment and the magnitude of intra-cluster correlation.  The shift
-in the location of the two treatment groups is set by \code{delta}.
-The last argument, \code{grplevel}, is a switch of the grouping
-level: if \code{grplevel = TRUE}, the grouping is assigned at cluster
-level, otherwise, it is assigned at individual level. The generated
-data set contains three columns: \code{score}, \code{grp} and
-\code{id} which correspond to the observation, treatment group id and
-cluster id.
-
-
-As an illustration, a balanced data set contains $10$ cluster is
-generated with treatment assigned at cluster level.
+As an illustration, a balanced data set contains $10$ cluster of size
+5 is generated with treatment assigned at the cluster level:
 <<dat-clus>>=
 set.seed(616)
 dat.cls <- datgen.rs(10, 5, rho=c(.9, .9), grplevel="cluster")
 head(dat.cls)
 @ 
-To apply RGL method on this dataset with asymptotic test 
-and exact test:
-<<clus-rs-rgl>>=
+The RGL asymptotic test is performed with:
+<<clus-rs-rgl-asymp>>=
 cluswilcox.test(score ~ grp + cluster(id), data = dat.cls, method = "rgl")
+@ 
+The RGL exact test is performed with:
+<<clus-rs-rgl-exact>>=
 cluswilcox.test(score ~ grp + cluster(id), data = dat.cls, method = "rgl", 
                 exact = TRUE)
 @ 
-To apply DS method on this dataset:
+{\bf comments on the results}
+
+
+The DS test is performed with:
 <<clus-rs-ds>>=
-cluswilcox.test(score ~ grp + cluster(id), data = dat0.cls, method = "ds")
+cluswilcox.test(score ~ grp + cluster(id), data = dat.cls, method = "ds")
 @ 
+{\bf comment on the results, compare with those from RGL.
+  The statistic are of different signs. Any explanation?}
 
 
 The next dataset involves individual level grouping.
@@ -734,14 +756,25 @@ The next dataset involves individual level grouping.
 dat.ind <- datgen.rs(10, 5, rho=c(.9, .9), delta = 1, grplevel="individual")
 head(dat.ind)
 @ 
- 
-Apply the clustered signed-rank test on the dataset using the two available methods:
-<<clus-rs-indi>>=
+The RGL test is performed with:
+<<indi-rs-rgl>>=
 cluswilcox.test(score ~ grp + cluster(id), data = dat.ind, method = "rgl")
+@ 
+The DS test is performed with:
+<<indi-rs-ds>>=
 cluswilcox.test(score ~ grp + cluster(id), data = dat.ind, method = "ds")
 @ 
+{\bf comment on the results. different sign of statistics, why?}
+
+
+{\bf can we illustrate usage of stratum in one paragraph?}
+
+{\bf can we illustrate more than 2 groups?}
 
 \subsection{Signed-rank test}
+
+
+{\bf give a math expression using the notations in section 3}
 The generation of data for illustration for clustered signed-rank test
 mimics that of simulation scenario 1 in \citet{Datt:Satt:sign:2008},
 though for simplicity instead of choosing specific cluster size 
@@ -772,11 +805,13 @@ datgen.sr <- function(nclus, maxclsize, delta = 0.,
 }
 @ 
 
+{\bf why a different default rho from the other function?}
 To illustrate the usage of the test function, a balanced data set with $10$
 clusters is generated. Each cluster contains $5$ members, and
 the intra-cluster correlation is set as $0.1$ and $0.9$ for the first
 and second half of the data respectivly. 
-generated 
+generated
+{\bf what's so special about 616?}
 <<dat-sr>>=
 set.seed(616)
 dat.sr <- datgen.sr(10, 5, rho = c(.1, .9))
@@ -797,13 +832,9 @@ A simulation to compare the two methods can be easily done:
 simpower <- function(nrep, level, paired, delta, rho, rate,
                      nclus, maxclsize, ...) {
     do1rep <- function() {
-        if(paired) {
-            datgen <- datgen.sr
-            formula <- score ~ cluster(id)
-        } else {
-            datgen <- datgen.rs
-            formula <- score ~ cluster(id) + grp
-        }
+        datgen <- if (paired) datgen.sr else datgen.rs
+        formula <- if (paired) score ~ cluster(id) 
+                   else score ~ cluster(id) + grp
         dat <- datgen(nclus, maxclsize, delta, rho, rate, ...)
         p.rgl <- cluswilcox.test(formula, paired = paired, 
                                  data = dat, method = "rgl")$p.value
@@ -815,8 +846,14 @@ simpower <- function(nrep, level, paired, delta, rho, rate,
     apply(sim, 2, function(x) mean(x < level))
 }
 @
+{\bf explain what this function does.}
 
-The table \ref{tab:rs} includes results from $10$ scenarios to compare
+
+For example, {\bf use simpower function to show how comparison in one
+  scenario can be done before presenting the table.}
+
+{\bf Table~\ref{tab:rs}; just like Section~2, Figure~2, or Equation~2}
+Table~\ref{tab:rs} includes results from $10$ scenarios to compare
 the performance of the two methods of clustered rank-sum test. The
 effect size $\delta$ in the power analysis is set as $0.5$. Each of
 the first $8$ scenarios represents a combination of the level at which
@@ -831,6 +868,14 @@ data set. The last two scenarios aims at studying the effect of
 variation in the cluster size by increasing the maximum possible
 cluster size from $5$ to $10$ and randomly keep $25\%$ of the original
 data instead of $50\%$.
+
+{\bf the table left header needs to be prettified}
+
+{\bf what is delta for the power study?}
+
+{\bf never use h in table positioning, always tbp.}
+
+{\bf use cmidrule in tables}
 
 \begin{table}[ht]
 \centering
@@ -855,6 +900,7 @@ clus, bal, $\rho = 0.1$ & 0.04 & 0.05 & 0.62 & 0.65 \\
 \label{tab:rs}
 \end{table}
 
+{\bf where is the comparison that has not been done before?}
 
 The empirical size of both methods are around the nominal level in all
 scenarios, though the performance in terms of power differs. RGL
@@ -878,7 +924,6 @@ level. In this case, DS method performs better than RGL method as
 shown in the simulation study in \citet{Datt:Satt:rank:2005}.
 
 
-
 In the simulation study of clustered signed-rank test, we consider $9$
 scenarios. Each entry is based on $1000$ replications. We consider $3$
 different scenarios regarding the balancedness of the data in
@@ -889,8 +934,13 @@ deleting half of the data set from the corresponding balanced data
 set. The unbalanced data set with a maximum cluster size $10$ is
 obtained by randomly keeping $25\%$ of the original balanced data in
 order to make it comparable with the other case of unbalanced
+{\bf is it half or 25 percent?}
 data. We simulated with $3$ intra-cluster correlation: $\rho = 0.1$;
 $\rho = 0.1$ and $0.9$ for each half of the clusters; $\rho = 0.9$.  
+
+{\bf are these comparison done already in the DS paper?
+  anything not done before?  please address my comments before
+  removing them}
 
 \begin{table}[ht]
 \centering
@@ -945,6 +995,7 @@ cluster size.
 DS rank-sum test is conservative when the number of clusters is small.
 
 
+{\bf more than 2 groups for signed-rank test?}
 
 What points can be discussed?
 
