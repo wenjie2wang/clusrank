@@ -57,6 +57,8 @@ cluswilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
         exact <- FALSE
     }
     if(exact == TRUE) {
+        if(length(table(cluster)) > 40)
+            stop("Number of clusters exceeds 40 for RGL clustered rank exact test") 
         Wc <- sum(dat[dat$grp == 1, "rksum"])
         n.layer <- l.csu * l.stu
         mgv <- ngv <- rep(0, n.layer)

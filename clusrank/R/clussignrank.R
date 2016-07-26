@@ -44,6 +44,8 @@ cluswilcox.test.signedrank.rgl <- function(x, cluster, alternative,
     }
 
     if(exact == TRUE) {
+        if(length(table(cluster)) > 40)
+            stop("Number of clusters exceeds 40 for RGL clustered signed-rank test")
         if(balance == TRUE ) {            
             Tc <- sum(data$signrank)
             srksum <-  stats::aggregate(signrank ~ cluster, FUN = sum)[, 2]

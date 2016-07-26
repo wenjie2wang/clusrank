@@ -588,33 +588,35 @@ args(clusrank:::cluswilcox.test.default)
 @
 
 
-{\bf this sentence is too long and confusing. need to break it into
-  smaller ones and rephrase. You can say that y becomes optional
-  because you have a group variable which allows more than 2 groups.}
+
 As in the default interface of \code{wilcox.test}, \code{x} and
-\code{y} are numeric vectors of data values, though unlike
-\code{wilcox.test}, \code{y} is optional only for the clustered signed 
-rank test where \code{x} and \code{y} may contain observations before
-and after treatment and is spare for the clustered rank-sum test for which an
-extra \code{group} variable is required to indicate the treatment
-group assignment of the data values in \code{x}. 
-The hypothesis related arguments \code{alternative}, \code{mu} and
-\code{paired} are identical of those of the \code{wilcox.test}. 
-The exact test (\code{exact = TRUE}) is only available for the RGL
-clustered rank-sum test with cluster level grouping; otherwise
-\code{exact} should be set as \code{FALSE}.  
-{\bf DS method cannot have exact? or too hard to implement?}
-Note that an exact test is very computing intensive, so it is
-recommended to be used only with small sample.
-{\bf do we decline or  issue a warning if number of cluster is greater 40?}
-{\bf try to start a new sentence at a new line}
+\code{y} are numeric vectors of data values.  Unlike
+\code{wilcox.test}, though, \code{y} is optional only for the
+clustered signed-rank test where \code{x} and \code{y} may contain
+observations before and after treatment, it is not in use for the
+clustered rank-sum test where the treatment group assignment of each
+data value is provided through an extra numeric vector \code{group} as
+the cluster id.  The hypothesis related arguments \code{alternative},
+\code{mu} and \code{paired} are identical of those of the
+\code{wilcox.test}.  The exact test (\code{exact = TRUE}) is only
+available for the RGL clustered rank-sum test with cluster level
+grouping and the RGL clustered signed-rank test; otherwise
+\code{exact} should be set as \code{FALSE}. Since the DS rank-sum
+statistic is based on conditional expectations of cluster rank
+selected with a within-cluster sampling scheme, there is no room for
+an exact test. The exact test is also unavailable for RGL clustered
+rank-sum test when the treatment is assigned individual level due to
+computational complication.  Note that an exact test is very computing
+intensive, so it is recommended to be used only with small sample.
+{\bf do we decline or issue a warning if number of cluster is greater
+  40?}  {\bf try to start a new sentence at a new line}
 
 
 The function specifies the cluster by a \code{cluster} variable
 indicating which cluster each observations belongs to.
-Additionally, stratified data is allowed by a code{strata} variable
-indicating which strata each observation belongs to.
-{\bf rephrase...}
+Additionally, if the data is stratified, a numeric vector
+\code{strata} can be provided to indicate stratum membership of each
+observation. 
 Other arguments specific for clustered data include
 \code{cluster} which should be a numeric vector contain the cluster
 id. For clustered rank-sum test, the argument \code{group} should be a
@@ -634,30 +636,25 @@ switching \code{method} to \code{rgl} or \code{ds}.
   present the same aspects first and then describe the additions.}
 The arguments of the formula interface is:
 <<formula, echo=FALSE>>=
+args(stats:::wilcox.test.formula)
 args(clusrank:::cluswilcox.test.formula)
 @ 
-The formula interface differs from the default interface in that a
-formula is used to address the relationship between the input
-variables and it is also different from the formula interface for the
-\code{wilcox.test}. 
-Variables indicating clusters and strata are identified in the formula
-by special terms \code{cluster} and \code{stratum}, respectively.
-For example, \code{z ~ group + cluster(cid) + stratum(sid)}, 
-where \code{group} identifies the grouping variable, \code{cid}
-identifies the clusters, and \code{sid} identifies the strata.
-See Section~\ref{s:illus} for detailed illustrations.
 
-
+The formula interface mimics that of the \code{wilcox.test} from the
+\code{stats} package for which arguments \code{data}, \code{subset}
+and \code{na.action} have the same usage. As for the \code{formula},
+when a rank-sum test is being performed, 
+the left hand side should be the variable of data values and the right
+hand side should contain the variables indicating the group, cluster
+and stratum membership. Except for the group variable, other variables
+on the left need to be indicated with special terms respectively,
+e.g., \code{z ~ group + cluster(cid) + stratum(sid)}, where
+\code{group} identifies the grouping variable, \code{cid} identifies
+the clusters, and \code{sid} identifies the stratum.  See
+Section~\ref{s:illus} for detailed illustrations.
 For clustered signed-rank test, the left hand side of the formula is
 the observed paired difference and the right hand side comprises the
-cluster id. No group id is needed for signed-rank test. 
-{\bf need to say that cluster and strata are not applicable}
-
-{\bf these should be stated at the beginning; they are the same as in wilcox.test.}
-The option 
-\code{subset} and \code{na.action} have the same usage as they have in
-the \code{model.frame} function to subset the data and 
-determine the action to \code{NA} values in the data. 
+cluster id. Neither \code{group} id or \code{stratum} id is applicable for signed-rank test. 
 The other arguments are identical to those in the default interface.
 
 
