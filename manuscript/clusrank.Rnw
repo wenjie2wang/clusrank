@@ -685,7 +685,7 @@ grouping (cluster-level and individual-level) and unequal cluster
 sizes: 
 <<datgen, echo=TRUE>>= 
 library(mvtnorm)
-datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.9, -.1), 
+datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1), 
                       rate = 1, grplevel = c("cluster", "individual")) { 
     nn <- nclus * maxclsize
     Sigma1 <- diag(1 - rho[1], nrow = maxclsize) + rho[1] 
@@ -724,7 +724,7 @@ grouping id \code{grp}, and cluster id \code{id}.
 As an illustration, a balanced data set contains $10$ cluster of size
 5 is generated with treatment assigned at the cluster level:
 <<dat-clus>>=
-set.seed(616)
+set.seed(1234)
 dat.cls <- datgen.rs(10, 5, rho=c(.9, .9), grplevel="cluster")
 head(dat.cls)
 @ 
@@ -810,7 +810,7 @@ and second half of the data respectivly.
 generated
 {\bf what's so special about 616?}
 <<dat-sr>>=
-set.seed(616)
+set.seed(1234)
 dat.sr <- datgen.sr(10, 5, rho = c(.1, .9))
 head(dat.sr)
 @ 

@@ -402,7 +402,7 @@ cluswilcox.test.ranksum.ds <- function(x, cluster, group,
     
     if(group.uniq == 2) {
 #####calculate quantity 2 (using the pooled estimate of F)
-        group <- recoderFunc(group, order(unique(group)), c(0, 1))
+        group <- recoderFunc(group, order(unique(group)), c(1, 0))
         x[which(group == 0)] <- x[which(group == 0)] - mu
         ni1 <- aggregate(group ~ cluster, FUN = sum)[, 2] # number of obs under trt 2 in each cluster
         if(all(ni1 / ni == 0.5)) {
