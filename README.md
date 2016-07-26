@@ -3,7 +3,7 @@
 ## July 26, 2016, 11:00 am
 + Go through the formulas
 + Every notation needs to be justified.
-+ obs?
++ --obs?--
 + Use bitbucket to see the changes made.
 + See if all cluster size equals 1, what will happen to DS?
 + memory
@@ -34,4 +34,4 @@
 + Uppder bound of SE.
 + Multivariate signed-rank test. Can possibily add it to the package. One paragraph needs to be applied with care. For example, if the RGL method if the data correlation is not exchangeable, but AR1, what will happen.
 + cite mvtnorm, citations of packages.
-+ Make it look like a professional paper. 
++ Make it look like a professional paper.
