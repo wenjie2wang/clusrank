@@ -581,7 +581,7 @@ args(cluswilcox.test)
 Argument \code{x} can be either a numeric vector or a formula. 
 The default interface is called if \code{x} is a numeric vector, in
 which case the interface is designed to mimic that of
-\code{wilcox.test}: {\bf blank line means new paragraph. Be careful.}
+\code{wilcox.test}:
 <<args-cd, echo=TRUE>>=
 ## args(stats:::wilcox.test.default)
 args(clusrank:::cluswilcox.test.default)
@@ -622,7 +622,6 @@ The arguments of the formula interface is:
 <<formula, echo=FALSE>>=
 args(clusrank:::cluswilcox.test.formula)
 @ 
-{\bf no need for new paragraph}
 The formula interface differs from the default interface in that a
 formula is used to address the relationship between the input
 variables and it is also different from the formula interface for the
@@ -633,7 +632,7 @@ also be added if corresponding method allows, e.g., \code{stratum}. To
 indicate the role of each variable, special functions have to be used
 for \code{cluster} and \code{stratum} except for \code{group}, e.g.,
 \code{z ~ group + cluster(cid) + stratum(sid)}  (see
-Section~\ref{s:illus} for detail). {\bf captilize Section or Equation etc.}
+Section~\ref{s:illus} for detail). 
 
 
 For clustered signed-rank test, the left hand side of the formula is
@@ -652,12 +651,10 @@ The other arguments are identical to those in the default interface.
 \section{Illustrations}
 \label{s:illus}
 
-{\bf Use DS and RGL in the text consistently.}
-
 \subsection{Rank-sum test} 
 
 We use a scheme similar to the simulation study in 
-\citet{Rosn:Glyn:Lee:exte:2006} to generate sample for clustered
+\citet{Datt:Satt:rank:2005} to generate sample for clustered
 rank-sum test, both balanced data and unbalanced data, though our
 scheme is more straightforward and flexible. 
 The sample is drawn in the fashion of a mixed effect model
@@ -665,7 +662,7 @@ which include a fixed effect of the treatment group,
 a random effect of the clustering drawn from a Normal  
 distribution, and an individual Normal random error. 
 The random component of the data values is first exponentiated before
-adding the fixed effect.
+being added to the fixed effect.
 The intra-cluster correlation is exchangable and the magnitude of
 it can be further affected by the assigned treatment group. 
 <<datgen, echo=TRUE>>= 
@@ -712,18 +709,18 @@ data set contains three columns: \code{score}, \code{grp} and
 cluster id.
 
 
-The first dataset has 10 clusters in each of the two groups, 
-and the grouping is at the cluster level.
+As an illustration, a balanced data set contains $10$ cluster is
+generated with treatment assigned at cluster level.
 <<dat-clus>>=
 set.seed(616)
-dat0.cls <- datgen.rs(10, 5, rho=c(.9, .9), grplevel="cluster")
-head(dat0.cls)
+dat.cls <- datgen.rs(10, 5, rho=c(.9, .9), grplevel="cluster")
+head(dat.cls)
 @ 
 To apply RGL method on this dataset with asymptotic test 
 and exact test:
 <<clus-rs-rgl>>=
-cluswilcox.test(score ~ grp + cluster(id), data = dat0.cls, method = "rgl")
-cluswilcox.test(score ~ grp + cluster(id), data = dat0.cls, method = "rgl", 
+cluswilcox.test(score ~ grp + cluster(id), data = dat.cls, method = "rgl")
+cluswilcox.test(score ~ grp + cluster(id), data = dat.cls, method = "rgl", 
                 exact = TRUE)
 @ 
 To apply DS method on this dataset:
@@ -733,32 +730,40 @@ cluswilcox.test(score ~ grp + cluster(id), data = dat0.cls, method = "ds")
 
 
 The next dataset involves individual level grouping.
-{\bf why is the data called dat1.cls? I used cls at the beginning to
-  denote cluster level group. I'd name this dataset d.ind.}
-<<dat-rs-rgl-indi>>=
-dat1.cls <- datgen.rs(10, 5, rho=c(.9, .9), delta = 1, grplevel="individual")
-head(dat1.cls)
+<<dat-ind>>=
+dat.ind <- datgen.rs(10, 5, rho=c(.9, .9), delta = 1, grplevel="individual")
+head(dat.ind)
 @ 
+ 
 Apply the clustered signed-rank test on the dataset using the two available methods:
 <<clus-rs-indi>>=
-cluswilcox.test(score ~ grp + cluster(id), data = dat1.cls, method = "rgl")
-cluswilcox.test(score ~ grp + cluster(id), data = dat1.cls, method = "ds")
+cluswilcox.test(score ~ grp + cluster(id), data = dat.ind, method = "rgl")
+cluswilcox.test(score ~ grp + cluster(id), data = dat.ind, method = "ds")
 @ 
 
-
-
-
-\subsection{Signed rank test}
-A similar data generation function can be easily realized:
-
+\subsection{Signed-rank test}
+The generation of data for illustration for clustered signed-rank test
+mimics that of simulation scenario 1 in \citet{Datt:Satt:sign:2008},
+though for simplicity instead of choosing specific cluster size 
+for unbalanced data, we randomly introduce missingness into the data
+to generate unbalanced data, following which our data generation does
+not control the relationship between cluster size and intra-cluster 
+correlation. The following \code{datgen.sr} function generates
+clustered differences, of which the arguments \code{nclus},
+\code{maxclsize}, \code{delta} and \code{rate} are the same as in
+\code{datgen.rs}. The intra-cluster correlation is set through
+\code{rho} with a vector with two elements, each determines the
+magnitude of the correlation of each half of the data respectively.     
 <<datagen_sr, echo = TRUE>>=
 datgen.sr <- function(nclus, maxclsize, delta = 0.,
-                      rho = 0.9, rate = 1) {
+                      rho = c(0.1, 0.1), rate = 1) {
     nn <- nclus * maxclsize
-    Sigma <- diag(1 - rho, nrow = maxclsize) + rho
-    x <- c(t(rmvnorm(nclus, sigma = Sigma)))
-    y <- c(t(rmvnorm(nclus, sigma = Sigma)))
-    score <- exp(x) - exp(y) - delta
+    Sigma1 <- diag(1 - rho[1], nrow = maxclsize) + rho[1]
+    Sigma2 <- diag(1 - rho[2], nrow = maxclsize) + rho[2]
+    x <- c(t(rmvnorm(nclus / 2, sigma = Sigma1)))
+    y <- c(t(rmvnorm(nclus / 2, sigma = Sigma2)))
+    z <- c(x, y) + delta
+    score <- sign(z) * exp(abs(z))
     id <- rep(1:nclus, each = maxclsize)
     dat <- data.frame(score = score, id = id)
     keep <- sort(sample(1: nn,
@@ -767,20 +772,25 @@ datgen.sr <- function(nclus, maxclsize, delta = 0.,
 }
 @ 
 
-The function \code{datgen.sr} generates clustered differences, 
-the arguments \code{nclus}, \code{maxclsize}, \code{delta}, \code{rho}
-and \code{rate} have the same usage as they have in \code{datgen}
-for the rank-sum test. Note that unlike rank-sum test, no 
-grouping is involved in the data for signed rank test.
+To illustrate the usage of the test function, a balanced data set with $10$
+clusters is generated. Each cluster contains $5$ members, and
+the intra-cluster correlation is set as $0.1$ and $0.9$ for the first
+and second half of the data respectivly. 
+generated 
+<<dat-sr>>=
+set.seed(616)
+dat.sr <- datgen.sr(10, 5, rho = c(.1, .9))
+head(dat.sr)
+@ 
 
-{\bf use a single dataset to illustrate and let the user see what the
-  function returns.}
-
+To apply both methods to this data set:
+<<sr>>=
+cluswilcox.test(score ~ cluster(id), dat.sr, paired=TRUE, method="rgl")
+cluswilcox.test(score ~ cluster(id), dat.sr, paired = TRUE, method = "ds")
+@ 
 
 \subsection{A simulation study}
-
-{\bf are we doing the comparison that has not been done in the
-  literature? That is something to highlight.}
+\label{s:simu}
 
 A simulation to compare the two methods can be easily done:
 <<simpower>>=
@@ -806,23 +816,44 @@ simpower <- function(nrep, level, paired, delta, rho, rate,
 }
 @
 
+The table \ref{tab:rs} includes results from $10$ scenarios to compare
+the performance of the two methods of clustered rank-sum test. The
+effect size $\delta$ in the power analysis is set as $0.5$. Each of
+the first $8$ scenarios represents a combination of the level at which
+the treatment is assigned, whether the data set is balanced and $2$
+level of intra-cluster correlation: $\rho = 0.1$ and $\rho = 0.9$
+where the treatment does not affect $\rho$. There are $1000$
+replications under each scenario, and each data set contains $10$
+clusters with a maximum cluster size $5$.  For balanced data, each
+cluster size is $5$; for unbalanced data, the unbalancedness is
+introduced by randomly deleting a half of the corresponding balance
+data set. The last two scenarios aims at studying the effect of
+variation in the cluster size by increasing the maximum possible
+cluster size from $5$ to $10$ and randomly keep $25\%$ of the original
+data instead of $50\%$.
 
-{\bf refer to a table by its number. Never use the following table
-  because it may not be following.}
-The following table includes result from $10$ scenarios to compare the
-performance of the two methods. The effect size in the power analysis
-$\delta$ is set as $0.5$. Each of the first $8$ scenarios represents a
-combination of the level at which the treatment is assigned, whether
-the data set is balanced and $2$ level of intra-cluster correlation:
-$\rho = 0.1$ and $\rho = 0.9$ where the treatment does not affect
-$\rho$. There are $1000$ replications under each scenario, and each
-data set contains $10$ clusters with a maximum cluster size $5$.  For
-balanced data, each cluster size is $5$; for unbalanced data, the
-unbalancedness is introduced by randomly deleting a half of the
-corresponding balance data set. The last two scenarios aims at
-studying the effect of variation in the cluster size by increasing the
-maximum possible cluster size from $5$ to $10$ and randomly keep
-$25\%$ of the original data instead of $50\%$.
+\begin{table}[ht]
+\centering
+\caption{Simulation for clustered rank sum test, comparsion between RGL and DS} 
+\begin{tabular}{rrrrr}
+  \toprule
+   & \multicolumn{2}{c}{size} & \multicolumn{2}{c}{power} \\
+ & RGL & DS & RGL & DS \\
+ \midrule
+clus, bal, $\rho = 0.1$ & 0.04 & 0.05 & 0.62 & 0.65 \\ 
+  clus, bal, $\rho = 0.9$ & 0.06 & 0.07 & 0.26 & 0.28 \\ 
+  clus, unbal, $\rho = 0.1$ & 0.04 & 0.04 & 0.32 & 0.39 \\ 
+  clus, unbal, $\rho = 0.9$ & 0.05 & 0.06 & 0.20 & 0.25 \\ 
+  ind, bal, $\rho = 0.1$ & 0.05 & 0.05 & 0.81 & 0.76 \\ 
+  ind, bal, $\rho = 0.9$ & 0.05 & 0.05 & 0.84 & 0.73 \\ 
+  ind, unbal, $\rho = 0.1$ & 0.06 & 0.04 & 0.44 & 0.41 \\ 
+  ind, unbal, $\rho = 0.9$ & 0.05 & 0.05 & 0.55 & 0.38 \\ 
+  ind, unbal, maxsize = 10, $\rho = 0.1$ & 0.05 & 0.05 & 0.44 & 0.39 \\ 
+  ind, unbal, maxsize = 10, $\rho = 0.9$ & 0.04 & 0.05 & 0.57 & 0.39 \\ 
+   \bottomrule
+\end{tabular}
+\label{tab:rs}
+\end{table}
 
 
 The empirical size of both methods are around the nominal level in all
@@ -847,26 +878,59 @@ level. In this case, DS method performs better than RGL method as
 shown in the simulation study in \citet{Datt:Satt:rank:2005}.
 
 
-{\bf anything interesting to compare for the signed-rank test?}
+
+In the simulation study of clustered signed-rank test, we consider $9$
+scenarios. Each entry is based on $1000$ replications. We consider $3$
+different scenarios regarding the balancedness of the data in
+combination with $3$ cases of intra-cluster correlation. Each data set
+in the study contain $10$ clusters with a maximum cluster size $5$ if
+not not stated otherwise. The unbalanced data is generated by randomly
+deleting half of the data set from the corresponding balanced data
+set. The unbalanced data set with a maximum cluster size $10$ is
+obtained by randomly keeping $25\%$ of the original balanced data in
+order to make it comparable with the other case of unbalanced
+data. We simulated with $3$ intra-cluster correlation: $\rho = 0.1$;
+$\rho = 0.1$ and $0.9$ for each half of the clusters; $\rho = 0.9$.  
+
+\begin{table}[ht]
+\centering
+\caption{Simulation for clustered signed-rank test, comparsion between RGL and DS} 
+\begin{tabular}{rrrrr}
+  \toprule
+   & \multicolumn{2}{c}{size} & \multicolumn{2}{c}{power} \\
+ & RGL & DS & RGL & DS \\
+ \midrule
+bal, $\rho = 0.1$ & 0.048 & 0.051 & 0.725 & 0.733 \\ 
+  bal, $\rho = 0.1, 0.9$ & 0.035 & 0.042 & 0.419 & 0.430 \\ 
+  bal, $\rho = 0.9$ & 0.037 & 0.050 & 0.270 & 0.287 \\ 
+  unbal, $\rho = 0.1$ & 0.032 & 0.032 & 0.464 & 0.468 \\ 
+  unbal, $\rho = 0.1, 0.9$ & 0.043 & 0.042 & 0.360 & 0.370 \\ 
+  unbal, $\rho = 0.9$ & 0.049 & 0.055 & 0.293 & 0.310 \\ 
+  unbal, maxsize = 10, $\rho = 0.1$ & 0.053 & 0.053 & 0.450 & 0.448 \\ 
+  unbal, maxsize = 10, $\rho = 0.1, 0.9$ & 0.056 & 0.061 & 0.350 & 0.353 \\ 
+  unbal, maxsize = 10, $\rho = 0.9$ & 0.048 & 0.058 & 0.286 & 0.302 \\ 
+   \bottomrule
+\end{tabular}
+\label{tab:sr}
+\end{table}
 
 
-A size study with strong and weak intra-cluster correlation is as following:
-<<size_sr>>=
-simpower(1000, 0.05, TRUE, 0, 0.9, 1, 10, 5)
-simpower(1000, 0.05, TRUE, 0, -0.1, 1, 10, 5)
-@ 
-The ``rgl'' method has an empirical size closer to the true size $0.05$ when the 
-intra-cluster correlation is large. Both methods have a smaller empirical size
-when intra-cluster correlation is slightly negative.
+The standard error of the empirical power can be estimated as $0.5 /
+\sqrt{1000} = 0.032$, therefore we state that there is a significant
+difference between the empirical power of the two methods at a
+significance level $0.05$ if the absolute difference is more than
+$0.008 * 1.96 * \sqrt{2} = 0.022.$ In all of the cases listed in the
+above table, these two methods are comparable. For the empirical size,
+the standard error can be estimated as $\sqrt{0.05 * 0.95} /
+\sqrt{1000} = 0.012$, therefore we state that there is a significant
+deviation from the norminal level $0.05$ if the deviation of the
+empirical size from $0.05$ is more than $0.012 * 1.96 = 0.028$,
+according to which the RGL method underestimate the size in all of the
+cases where the intra-cluster correlation is low on average, though
+the DS method also tends to have a lower empirical size when
+intra-cluster correlation is low, it does maintain an empirical size
+close to the nominal level in almost all of the cases. 
 
-A power size under same setting with a shift equals $1$ is as the following:
-<<power_sr>>=
-simpower(1000, 0.05, TRUE, 1, 0.9, 1, 10, 5)
-simpower(1000, 0.05, TRUE, 1, -0.1, 1, 10, 5)
-@ 
-In both cases, the DS method has a higher power.  
-{\bf we do not want to be misleading. Any comparison that has not been
-done in the literature?}
 
 \section{Discussion}
 \label{s:disc}
