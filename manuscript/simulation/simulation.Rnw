@@ -1,0 +1,213 @@
+\documentclass[nojss]{jss}
+
+\usepackage{amsmath, bm, amssymb}
+% \usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{booktabs}
+
+% For in-house revision purpose only
+\usepackage{color}
+\newcommand{\blue}[1]{\textcolor{blue}{(#1)}}
+\newcommand{\red}[1]{\textcolor{red}{(#1)}}
+\begin{document}
+<<knitr, echo=FALSE>>=
+library(knitr)
+opts_chunk$set(cache=TRUE, autodep=TRUE)
+@ 
+
+<<datgen, echo=TRUE>>= 
+library(mvtnorm)
+datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.9, -.1), 
+                      rate = 1, grplevel = c("cluster", "individual")) { 
+    nn <- nclus * maxclsize
+    Sigma1 <- diag(1 - rho[1], nrow = maxclsize) + rho[1] 
+    x <- c(t(rmvnorm(nclus, sigma = Sigma1))) 
+    Sigma2 <- diag(1 - rho[2], nrow = maxclsize) + rho[2] 
+    y <- c(t(rmvnorm(nclus, sigma = Sigma2)))
+    group <- rep(c(1, 2), each = nn) 
+    if (grplevel == "individual") 
+        group  <- sample(group, nn, FALSE) 
+    id <- rep(1:(2 * nclus), each = maxclsize)
+    score <- exp(c(x, y)) + delta * group 
+    dat <- data.frame(score = score, grp = group, id = id) 
+    keep <-  sort(sample(1:(2 * nn), size = rate * (2 * nn), FALSE))
+    if (rate ==  1) dat else dat[keep, ]      
+}
+@
+
+
+<<simpower>>=
+library(clusrank)
+simpower <- function(nrep, level, paired, delta, rho, rate,
+                     nclus, maxclsize, ...) {
+    do1rep <- function() {
+        if(paired) {
+            datgen <- datgen.sr
+            formula <- score ~ cluster(id)
+        } else {
+            datgen <- datgen.rs
+            formula <- score ~ cluster(id) + grp
+        }
+        dat <- datgen(nclus, maxclsize, delta, rho, rate, ...)
+        p.rgl <- cluswilcox.test(formula, paired = paired, 
+                                 data = dat, method = "rgl")$p.value
+        p.ds <- cluswilcox.test(formula, paired = paired, 
+                                data = dat, method = "ds")$p.value
+        c(rgl = p.rgl, ds = p.ds)
+    }
+    sim <- t(replicate(nrep, do1rep()))
+    apply(sim, 2, function(x) mean(x < level))
+}
+@
+
+<<clus-b, echo = FALSE, eval = TRUE>>=
+clusb <- matrix(0, 2, 4)
+clusb[1, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), 1, 10, 5, "cluster")
+clusb[2, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.9, 0.9), 1, 10, 5, "cluster")
+clusb[1, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 1, 10, 5, "cluster")
+clusb[2, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.9, 0.9), 1, 10, 5, "cluster")
+@ 
+ 
+<<clus-ub, echo = FALSE, eval = TRUE>>=
+clusub <- matrix(0, 2, 4)
+clusub[1, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), 0.5, 10, 5, "cluster")
+clusub[2, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.9, 0.9), 0.5, 10, 5, "cluster")
+clusub[1, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 0.5, 10, 5, "cluster")
+clusub[2, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.9, 0.9), 0.5, 10, 5, "cluster")
+@ 
+
+<<ind-b, echo = FALSE, eval = TRUE>>=
+indb <- matrix(0, 2, 4)
+indb[1, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), 1, 10, 5, "individual")
+indb[2, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.9, 0.9), 1, 10, 5, "individual")
+indb[1, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 1, 10, 5, "individual")
+indb[2, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.9, 0.9), 1, 10, 5, "individual")
+@ 
+
+<<ind-ub, echo = FALSE, eval = TRUE>>=
+indub <- matrix(0, 2, 4)
+indub[1, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), 0.5, 10, 5, "individual")
+indub[2, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.9, 0.9), 0.5, 10, 5, "individual")
+indub[1, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 0.5, 10, 5, "individual")
+indub[2, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.9, 0.9), 0.5, 10, 5, "individual")
+@ 
+
+<<ind-ub-15, echo = FALSE, eval = TRUE>>=
+indub15 <- matrix(0, 2, 4)
+indub15[1, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), 0.25, 10, 10, "individual")
+indub15[2, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.9, 0.9), 0.25, 10, 10, "individual")
+indub15[1, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 0.25, 10, 10, "individual")
+indub15[2, 3:4] <- simpower(1000, 0.05, FALSE, 0.5, c(0.9, 0.9), 0.25, 10, 10, "individual")
+@ 
+
+<<rs-tab, echo = FALSE, eval = TRUE, results = 'asis'>>=
+library(xtable)
+sum.tab <- rbind(clusb, clusub, indb, indub, indub15)
+rownames(sum.tab) <- c("clus, bal, $\\rho = 0.1$", 
+                       "clus, bal, $\\rho = 0.9$",
+                       "clus, unbal, $\\rho = 0.1$",
+                       "clus, unbal, $\\rho = 0.9$",
+                       "ind, bal, $\\rho = 0.1$", 
+                       "ind, bal, $\\rho = 0.9$",
+                       "ind, unbal, $\\rho = 0.1$",
+                       "ind, unbal, $\\rho = 0.9$",
+                       "ind, unbal, maxsize = 10, $\\rho = 0.1$",
+                       "ind, unbal, maxsize = 10, $\\rho = 0.9$")
+addtorow <- list()
+addtorow$pos <- list( 0, 0)
+addtorow$command <-
+    c(" & \\multicolumn{2}{c}{size} & \\multicolumn{2}{c}{power} \\\\\n", "& RGL & DS & RGL & DS \\\\\n")
+print(xtable(sum.tab, caption = 'Simulation for clustered rank sum test, comparsion between RGL and DS'), caption.placement = 'top',  add.to.row = addtorow, include.colnames = FALSE,
+      sanitize.rownames.function = function(x){x}, booktabs = TRUE)                       
+@ 
+
+<<datagen_sr, echo = TRUE>>=
+datgen.sr <- function(nclus, maxclsize, delta = 0.,
+                      rho = c(0.1, 0.1), rate = 1) {
+    nn <- nclus * maxclsize
+    Sigma1 <- diag(1 - rho[1], nrow = maxclsize) + rho[1]
+    Sigma2 <- diag(1 - rho[2], nrow = maxclsize) + rho[2]
+    x <- c(t(rmvnorm(nclus / 2, sigma = Sigma1)))
+    y <- c(t(rmvnorm(nclus / 2, sigma = Sigma2)))
+    z <- c(x, y) + delta
+    score <- sign(z) * exp(abs(z))
+    id <- rep(1:nclus, each = maxclsize)
+    dat <- data.frame(score = score, id = id)
+    keep <- sort(sample(1: nn,
+                 size = rate * nn, FALSE))
+    if (rate == 1) dat else dat[keep,]
+}
+@ 
+
+
+<<sr-b, echo = FALSE, eval = TRUE>>=
+srb <- matrix(0, 3, 4) 
+srb[1, 1:2] <- simpower(1000, 0.05, TRUE, 0, c(0.1, 0.1), 1, 10, 5)
+srb[2, 1:2] <- simpower(1000, 0.05, TRUE, 0, c(0.1, 0.9), 1, 10, 5)
+srb[3, 1:2] <- simpower(1000, 0.05, TRUE, 0, c(0.9, 0.9), 1, 10, 5)
+srb[1, 3:4] <- simpower(1000, 0.05, TRUE, 0.5, c(0.1, 0.1), 1, 10, 5)
+srb[2, 3:4] <- simpower(1000, 0.05, TRUE, 0.5, c(0.1, 0.9), 1, 10, 5)
+srb[3, 3:4] <- simpower(1000, 0.05, TRUE, 0.5, c(0.9, 0.9), 1, 10, 5)
+@ 
+
+<<sr-ub, echo = FALSE, eval = TRUE>>=
+srub <- matrix(0, 3, 4) 
+srub[1, 1:2] <- simpower(1000, 0.05, TRUE, 0, c(0.1, 0.1), 0.5, 10, 5)
+srub[2, 1:2] <- simpower(1000, 0.05, TRUE, 0, c(0.1, 0.9), 0.5, 10, 5)
+srub[3, 1:2] <- simpower(1000, 0.05, TRUE, 0, c(0.9, 0.9), 0.5, 10, 5)
+srub[1, 3:4] <- simpower(1000, 0.05, TRUE, 0.5, c(0.1, 0.1), 0.5, 10, 5)
+srub[2, 3:4] <- simpower(1000, 0.05, TRUE, 0.5, c(0.1, 0.9), 0.5, 10, 5)
+srub[3, 3:4] <- simpower(1000, 0.05, TRUE, 0.5, c(0.9, 0.9), 0.5, 10, 5)
+@ 
+
+<<sr-ub-10, echo = FALSE, eval = TRUE>>=
+srub10 <- matrix(0, 3, 4) 
+srub10[1, 1:2] <- simpower(1000, 0.05, TRUE, 0, c(0.1, 0.1), 0.25, 10, 10)
+srub10[2, 1:2] <- simpower(1000, 0.05, TRUE, 0, c(0.1, 0.9), 0.25, 10, 10)
+srub10[3, 1:2] <- simpower(1000, 0.05, TRUE, 0, c(0.9, 0.9), 0.25, 10, 10)   
+srub10[1, 3:4] <- simpower(1000, 0.05, TRUE, 0.5, c(0.1, 0.1), 0.25, 10, 10)
+srub10[2, 3:4] <- simpower(1000, 0.05, TRUE, 0.5, c(0.1, 0.9), 0.25, 10, 10)
+srub10[3, 3:4] <- simpower(1000, 0.05, TRUE, 0.5, c(0.9, 0.9), 0.25, 10, 10)
+@ 
+
+<<sr-tab, results = 'asis', echo = FALSE, eval = TRUE>>=
+library(xtable)
+sum.tab <- rbind(srb, srub, srub10)
+rownames(sum.tab) <- c("bal, $\\rho = 0.1$", 
+                       "bal, $\\rho = 0.1, 0.9$",
+                       "bal, $\\rho = 0.9$",
+                       "unbal, $\\rho = 0.1$",
+                       "unbal, $\\rho = 0.1, 0.9$",
+                       "unbal, $\\rho = 0.9$" ,
+                       "unbal, maxsize = 10, $\\rho = 0.1$",
+                       "unbal, maxsize = 10, $\\rho = 0.1, 0.9$",
+                       "unbal, maxsize = 10, $\\rho = 0.9$")
+addtorow <- list()
+addtorow$pos <- list( 0, 0)
+addtorow$command <-
+    c(" & \\multicolumn{2}{c}{size} & \\multicolumn{2}{c}{power} \\\\\n", "& RGL & DS & RGL & DS \\\\\n")
+print(xtable(sum.tab, 
+             caption = 'Simulation for clustered signed rank test, comparsion between RGL and DS', digits = 3), 
+      caption.placement = 'top',  add.to.row = addtorow,
+      include.colnames = FALSE,
+      sanitize.rownames.function = function(x){x}, 
+      booktabs = TRUE)                       
+@ 
+
+The standard error of the empirical power can be estimated as $0.5 /
+\sqrt{1000} = 0.032$, therefore we state that there is a significant
+difference between the empirical power of the two methods at a
+significance level $0.05$ if the absolute difference is more than
+$0.008 * 1.96 * \sqrt{2} = 0.022.$ In all of the cases listed in the
+above table, these two methods are comparable. For the empirical size,
+the standard error can be estimated as $\sqrt{0.05 * 0.95} /
+\sqrt{1000} = 0.012$, therefore we state that there is a significant
+deviation from the norminal level $0.05$ if the deviation of the
+empirical size from $0.05$ is more than $0.003 * 1.96 = 0.028$,
+according to which the RGL method underestimate the size in all of the
+cases where the intra-cluster correlation is low on average, though
+the DS method also tends to have a lower empirical size when
+intra-cluster correlation is low, it does maintain an empirical size
+close to the nominal level in almost all of the cases. 
+
+\end{document}
