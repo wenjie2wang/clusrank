@@ -3,7 +3,7 @@
 ## July 26, 2016, 11:00 am
 + Go through the formulas
 + Every notation needs to be justified.
-+ --obs?--
++ ~~obs?~~
 + Use bitbucket to see the changes made.
 + See if all cluster size equals 1, what will happen to DS?
 + memory
