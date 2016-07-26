@@ -6,7 +6,6 @@
 + ~~obs?~~
 + Use bitbucket to see the changes made.
 + ~~See if all cluster size equals 1, what will happen to DS?~~
-+ memory
 + ~~name of the function~~.
 + For the exact method, when cluster size equals 1.
 + Exact method, the trick, summary of algorithm. Put it in appendix.
