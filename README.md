@@ -10,7 +10,7 @@
 + For the exact method, when cluster size equals 1.
 + Exact method, the trick, summary of algorithm. Put it in appendix.
 + Have an order to present thing.
-+ Reduce the number of things in the printout.
++ ~~Reduce the number of things in the printout.~~
 + 10 clusters each with size 5, the group correlation parameter.
 + People using RGL and DS method with different signs, inorder to get the same sign just change the group based on which the statistic is calculated.
 + Combine two data sets to test m-group rank sum test.
