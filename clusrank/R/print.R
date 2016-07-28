@@ -41,7 +41,7 @@
 print.ctest <- function (x, digits = getOption("digits"), prefix = "\t", ...) {
     if(!is.null(x$exact)) {
         if(x$exact == TRUE) {
-             x$method <- paste(x$method, "(exact distribution)")
+             x$method <- paste(x$method, "(permutation)")
          }
     }
     cat(strwrap(x$method, prefix = prefix), sep = "\n")
@@ -49,9 +49,11 @@ print.ctest <- function (x, digits = getOption("digits"), prefix = "\t", ...) {
     cat("data: ", x$data.name, "\n", sep = "")
     
     out <- character()
-    if (!is.null(x$Rstat) && x$exact == TRUE){
-        out <- c(out, paste(names(x$Rstat), "=",
-                            format(signif(x$Rstat, max(1L, digits - 2L)))))
+    if (!is.null(x$Rstat) && !is.null(x$exact)) {
+        if (x$exact == TRUE) {
+            out <- c(out, paste(names(x$Rstat), "=",
+                                format(signif(x$Rstat, max(1L, digits - 2L)))))
+        }
     }
     if (!is.null(x$statistic))
         out <- c(out, paste(names(x$statistic), "=", format(signif(x$statistic,

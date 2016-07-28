@@ -357,7 +357,7 @@ clusWilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
         names(Zc) <- "Test statistic"
         
         names(mu) <- "difference in locations"
-        result <- list( statistic = Zc, p.value = pval,
+        result <- list(statistic = Zc, p.value = pval,
                        alternative = alternative, null.value = mu,
                        data.name = DNAME, method = METHOD,
                        balance = bal)

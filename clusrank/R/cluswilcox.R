@@ -231,7 +231,7 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
     cluster.name <- gsub("[\\(\\)]", "",
                          regmatches(ctemp$vars,
                                     gregexpr("\\(.*?\\)", ctemp$vars))[[1]])
-    DNAME <- paste0(DNAME, " cluster: ", cluster.name, ",")
+    DNAME <- paste0(DNAME, " cluster: ", cluster.name)
 
 
     if(length(ctemp$vars) == 1) {
@@ -258,8 +258,16 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
     
     stratum <- attr(attr(mf, "terms"), "specials")$stratum
     if(!is.null(stratum)) {
+        stemp <- untangle.specials(Terms, "stratum", 1)
+        strata.name <- gsub("[\\(\\)]", "",
+                             regmatches(stemp$vars,
+                                        gregexpr("\\(.*?\\)", stemp$vars))[[1]])
         stratum <- mf[[stratum]]
+        
+        DNAME <- paste0(DNAME, ", strata: ", strata.name, ".")
+        
     } else {
+        DNAME <- paste0(DNAME, ".")
         stratum <- rep(1, n.obs)
     }
     
