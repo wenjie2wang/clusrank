@@ -7,8 +7,7 @@ int crksum(int rks, int I, int J, int sumrks, int minrks) {
   int i, j, c;
   Rcpp::IntegerVector score_sub, idx, idx_sum, score_sum;
   if( I < 0 | J < 0) return(0);    
-  c = (int) (sumrks / 2);
-  if(rks > c) {
+  if(I > J) {
     rks = sumrks - rks;
     i = J;
     j = I;
@@ -29,7 +28,6 @@ int crksum(int rks, int I, int J, int sumrks, int minrks) {
     return( rks == 0);
   }
   
-  
   if(rks < j) {
     idx_sum = seq_len(i + rks) - 1;
     score_sum = score_[idx_sum];
@@ -38,7 +36,7 @@ int crksum(int rks, int I, int J, int sumrks, int minrks) {
   }
   if( j == 0) {
 
-    return( rks == 0);
+    return( rks == sumrks);
   } else {
     sumrks = sumrks - score_[i + j - 1];
     
@@ -58,11 +56,10 @@ double pcrksum(int rks, int I, IntegerVector Score) {
   J = n - I;
   N = Rf_choose(I + J, I);
   sumrks = sum(Score);
-  
   idx = seq_len(I) - 1;
   score_sub = score_[idx];
   minrks = sum(score_sub); /* Smallest possible rank sum*/
-  for( int k = 1; k <= rks; k++) {  
+  for( int k = 1; k <= rks; k++) {
     nrksum += crksum(k, I, J, sumrks, minrks);
   }
   return(nrksum);
@@ -106,7 +103,7 @@ int crksum_str(int k, IntegerMatrix x, IntegerMatrix xc, IntegerVector max) {
          }
          temp += x(slots[i], i);
        }
-       if(zero == 0 & temp < k) {
+       if(zero == 0 & temp <= k) {
          for( int i = 0; i < d; i ++ ) {
            ctp *= xc(slots[i], i);
          }
