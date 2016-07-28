@@ -23,7 +23,7 @@ int crksum(int rks, int I, int J, int sumrks, int minrks) {
     j = J;
   }
   
-  if(rks < minrks |  (rks > (sumrks))) return(0);
+  if((rks < minrks) |  (rks > (sumrks))) return(0);
   if( i == 0) {
     return( rks == 0);
   }
@@ -47,10 +47,10 @@ int crksum(int rks, int I, int J, int sumrks, int minrks) {
 
 //[[Rcpp::export]]
 double pcrksum(int rks, int I, IntegerVector Score) {
-  int sumrks, minrks, i, n, J;
+  int sumrks, minrks, n, J;
   IntegerVector idx, score_sub;
   int N;
-  double p, nrksum = 0;
+  double  nrksum = 0;
   score_ = Score;
   n = Score.size();
   J = n - I;
@@ -91,7 +91,7 @@ IntegerMatrix cumcrksum(int rks, int I, IntegerVector Score) {
 //[[Rcpp::export]]
 int crksum_str(int k, IntegerMatrix x, IntegerMatrix xc, IntegerVector max) {
   /* x: matrix of non zero rank sum, xc: matrix of count of non zero rank sum */
-  int d = x.ncol(), m = x.nrow(), temp = 0, tempc = 0, ct = 0, ctp = 1;
+  int d = x.ncol(), temp = 0,  ct = 0, ctp = 1;
   IntegerVector slots(d), y(d);
   int id = 0, zero = 0, counter = 0;
   while(true) {
@@ -146,8 +146,7 @@ int csrkg(int srk, IntegerVector Score) {
   /* Count the no of combination with a sum rank less than srk */
   /* The sum rank is sum(rank[ rank > 0]) in the programme*/
   /* The input sum rank is sum(sign(rank) * rank) */
-  int N, max_s, sum_s,u, c, j
-    ;
+  int N, max_s, sum_s, u, j;
   IntegerVector compare(2), w1;
   N = Score.size();
   max_s = max(Score);
