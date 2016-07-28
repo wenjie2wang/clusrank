@@ -569,22 +569,20 @@ library(knitr)
 opts_chunk$set(cache=TRUE, autodep=TRUE)
 @ 
 
-{\bf how about clusWilcox.test?}
 
 Package \pkg{clusrank} provides a unified interface to all the
 methods reviewed in Sections~\ref{s:ranksum} and~\ref{s:signedrank}
-through function \code{cluswilcox.test}:
+through function \code{clusWilcox.test}:
 <<args-c, echo=TRUE>>=
 library(clusrank)
-args(cluswilcox.test)
+args(clusWilcox.test)
 @
 Argument \code{x} can be either a numeric vector or a formula. 
 The default interface is called if \code{x} is a numeric vector, in
 which case the interface is designed to mimic that of
 \code{wilcox.test}:
 <<args-cd, echo=TRUE>>=
-## args(stats:::wilcox.test.default)
-args(clusrank:::cluswilcox.test.default)
+args(clusrank:::clusWilcox.test.default)
 @
 
 
@@ -608,8 +606,7 @@ an exact test. The exact test is also unavailable for RGL clustered
 rank-sum test when the treatment is assigned individual level due to
 computational complication.  Note that an exact test is very computing
 intensive, so it is recommended to be used only with small sample.
-{\bf do we decline or issue a warning if number of cluster is greater
-  40?}  {\bf try to start a new sentence at a new line}
+
 
 
 The function specifies the cluster by a \code{cluster} variable
@@ -632,13 +629,10 @@ the cluster id, \code{cluster} and the treatment group,
 switching \code{method} to \code{rgl} or \code{ds}.
 
 
-{\bf we designed the formula interface to wilcox.test. so
-  present the same aspects first and then describe the additions.}
-The arguments of the formula interface is:
 <<formula, echo=FALSE>>=
-args(stats:::wilcox.test.formula)
-args(clusrank:::cluswilcox.test.formula)
+args(clusrank:::clusWilcox.test.formula)
 @ 
+
 
 The formula interface mimics that of the \code{wilcox.test} from the
 \code{stats} package for which arguments \code{data}, \code{subset}
@@ -656,10 +650,6 @@ For clustered signed-rank test, the left hand side of the formula is
 the observed paired difference and the right hand side comprises the
 cluster id. Neither \code{group} id or \code{stratum} id is applicable for signed-rank test. 
 The other arguments are identical to those in the default interface.
-
-
-{\bf Please summarize 5 things you learned on latex and
-  5 things on writing when we meet on Tuesday.}
 
 
 \section{Illustrations}
@@ -682,22 +672,29 @@ correlation $\rho_g$, and $\delta$ is the group difference.
 
 Here is a simple implementation that allows different levels of
 grouping (cluster-level and individual-level) and unequal cluster
-sizes: 
+sizes, \pkg{mvtnorm} is applied to generate the needed multivariate
+normal random variable.  
 <<datgen, echo=TRUE>>= 
 library(mvtnorm)
 datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1), 
-                      rate = 1, grplevel = c("cluster", "individual")) { 
+                      rate = 1, grplevel = c("cluster", "individual"), stratum = FALSE) { 
     nn <- nclus * maxclsize
     Sigma1 <- diag(1 - rho[1], nrow = maxclsize) + rho[1] 
     x <- c(t(rmvnorm(nclus, sigma = Sigma1))) 
     Sigma2 <- diag(1 - rho[2], nrow = maxclsize) + rho[2] 
     y <- c(t(rmvnorm(nclus, sigma = Sigma2)))
-    group <- rep(c(0, 1), each = nn) 
-    if (grplevel == "individual") group  <- sample(group, nn, FALSE)
+    if (grplevel == "individual") {
+        group  <- sample(rep(c(0, 1), each = nn), nn, FALSE)
+    } else {
+        group <- sample(rep(c(0, 1), each = nclus), nclus, FALSE)
+        group <- rep(group, each = maxclsize)
+    }
     cid <- rep(1:(2 * nclus), each = maxclsize)
     score <- exp(c(x, y)) + delta * group 
     dat <- data.frame(score = score, grp = group, cid = cid) 
     keep <-  sort(sample(1:(2 * nn), size = rate * (2 * nn), FALSE))
+    if (stratum == TRUE) 
+        dat <- cbind(dat, strat = rep(c(1, 2), each = nn))
     if (rate ==  1) dat else dat[keep, ]      
 }
 @
@@ -712,13 +709,17 @@ which an individual in a cluster is kept at random; when
 \code{rate = 1}, balanced data with equal cluster size  is generated. 
 The grouping level is controlled by \code{grplevel}: 
 \code{"cluster"} for cluster-level and \code{"individual"} for
-individual level.
-The function returns a data set with three columns: 
+individual level. 
+The function returns a data set with three columns if \code{stratum}
+is \code{FALSE}: 
 observed measurement \code{score}, 
 grouping id \code{grp}, and cluster id \code{cid}.
+A stratum variable is added to the data set if \code{stratum} is
+\code{TRUE} and \code{grplevel} equals \code{"cluster"}.
 
-For the replicability of the following demonstration, a random seed is
-fixed. 
+
+For the replicability of the following demonstration,
+a random seed is fixed. 
 <<seed>>=
 set.seed(1234)
 @ 
@@ -729,28 +730,35 @@ correlation level is set by letting $\rho_g = 0.9$. The treatment is
 assigned at cluster level.
 
 <<dat-clus>>=
-dat.cls <- datgen.rs(10, 5, rho=c(.9, .9), grplevel="cluster")
+dat.cls <- datgen.rs(10, 5, 0, c(.9, .9), 1, "cluster", TRUE)
 head(dat.cls)
 @ 
 
 The RGL asymptotic test is performed with:
 <<clus-rs-rgl-asymp>>=
-cluswilcox.test(score ~ grp + cluster(cid), data = dat.cls, method = "rgl")
+clusWilcox.test(score ~ grp + cluster(cid), dat.cls, method = "rgl")
 @ 
 The RGL exact test is performed with:
 <<clus-rs-rgl-exact>>=
-cluswilcox.test(score ~ grp + cluster(cid)), data = dat.cls, method = "rgl", 
-                exact = TRUE)
+clusWilcox.test(score ~ grp + cluster(cid), dat.cls, method = "rgl", exact = TRUE)
 @ 
-{\bf comments on the results}
-
+The p-value of the asymptotic test is close to that of the permutation
+test even when number of cluster is low as $10$. 
 
 The DS test is performed with:
 <<clus-rs-ds>>=
-cluswilcox.test(score ~ grp + cluster(cid)), data = dat.cls, method = "ds")
+clusWilcox.test(score ~ grp + cluster(cid), dat.cls, method = "ds")
 @ 
-{\bf comment on the results, compare with those from RGL.
-  The statistic are of different signs. Any explanation?}
+The test staistics of RGL and DS method are very close to each
+other. Note that, when using the code provided online by the authors
+of \citet{Rosn:Glyn:Lee:inco:2003} and \citet{Datt:Satt:rank:2005},
+statistics with different signs using both methods may occur, this is
+due to they use different group of observation to calculate the test
+statistic, in order to get the same sign, users only need to change
+the group based on which the statistic is calculated. 
+
+The RGL method is also able to handle an extra stratum variable for
+data with cluster grouping, 
 
 
 The next dataset involves individual level grouping.
@@ -760,13 +768,13 @@ head(dat.ind)
 @ 
 The RGL test is performed with:
 <<indi-rs-rgl>>=
-cluswilcox.test(score ~ grp + cluster(cid)), data = dat.ind, method = "rgl")
+clusWilcox.test(score ~ grp + cluster(cid)), data = dat.ind, method = "rgl")
 @ 
 The DS test is performed with:
 <<indi-rs-ds>>=
-cluswilcox.test(score ~ grp + cluster(cid)), data = dat.ind, method = "ds")
+clusWilcox.test(score ~ grp + cluster(cid)), data = dat.ind, method = "ds")
 @ 
-{\bf comment on the results. different sign of statistics, why?}
+
 
 
 {\bf can we illustrate usage of stratum in one paragraph?}
@@ -801,8 +809,7 @@ datgen.sr <- function(nclus, maxclsize, delta = 0.,
     score <- sign(z) * exp(abs(z))
     cid <- rep(1:nclus, each = maxclsize)
     dat <- data.frame(score = score, cid = cid)
-    keep <- sort(sample(1: nn,
-                 size = rate * nn, FALSE))
+    keep <- sort(sample(1: nn, size = rate * nn, FALSE))
     if (rate == 1) dat else dat[keep,]
 }
 @ 
@@ -819,7 +826,8 @@ head(dat.sr)
 
 To apply both methods to this data set:
 <<sr>>=
-cluswilcox.test(score ~ cluster(cid).test(score ~ cluster(id), dat.sr, paired = TRUE, method = "ds")
+clusWilcox.test(score ~ cluster(cid),  dat.sr, paired = TRUE, method = "rgl")
+clusWilcox.test(score ~ cluster(cid),  dat.sr, paired = TRUE, method = "ds")
 @ 
 
 \subsection{A simulation study}
@@ -834,9 +842,9 @@ simpower <- function(nrep, level, paired, delta, rho, rate,
         formula <- if (paired) score ~ cluster(id) 
                    else score ~ cluster(id) + grp
         dat <- datgen(nclus, maxclsize, delta, rho, rate, ...)
-        p.rgl <- cluswilcox.test(formula, paired = paired, 
+        p.rgl <- clusWilcox.test(formula, paired = paired, 
                                  data = dat, method = "rgl")$p.value
-         p.ds <- cluswilcox.test(formula, paired = paired, 
+         p.ds <- clusWilcox.test(formula, paired = paired, 
                                  data = dat, method = "ds" )$p.value
         c(rgl = p.rgl, ds = p.ds)
     }
