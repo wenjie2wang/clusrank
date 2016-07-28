@@ -11,7 +11,7 @@
 #' a variable as the cluster indicator. If not supplied,
 #' will assume no cluster in the data.
 #' @return x
-#' @seealso \code{\link{cluswilcox.test.formula}}
+#' @seealso \code{\link{clusWilcox.test.formula}}
 #'
 #' @keywords internal
 #' @export
@@ -29,7 +29,7 @@ cluster <- function(x) {x}
 #' @details THe function's only action is semantic, to mark
 #' a variable as the stratum indicator. If not supplied,
 #' will assume no stratification in the data.
-#' @seealso cluswilcox.test.formula
+#' @seealso clusWilcox.test.formula
 #'
 #' @keywords internal
 #' @export

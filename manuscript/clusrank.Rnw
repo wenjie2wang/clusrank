@@ -470,39 +470,39 @@ was adapted to the signed rank test in \citet{Rosn:Glyn:Lee:wilc:2006}.
 For balanced data where $n_i = g$ for all $i$,
 the clustered WIlcoxon signed rank statistic is
 \[
-T^{(obs)} = \sum_{i=1}^N S_{i+} = \sum_{i=1}^N  \sum_{j=1}^g R_{ij} V_{ij},
+T = \sum_{i=1}^N S_{i+} = \sum_{i=1}^N  \sum_{j=1}^g R_{ij} V_{ij},
 \]
 where $S_{i+} = \sum^g_{j=1}S_{ij}$ and only nonzero $X_{ij}$ is
 considered in the computation of signed ranks.
-The null sampling distribution of $T_g$ can be obtained from a
+The null sampling distribution of $T$ can be obtained from a
 randomization at the cluster level conditional on $S_{i+}$'s.
 Let $\delta_i$, $i = 1, \ldots, N$, be independent and identically
 distributed random variables with equal probability being 1 and $-1$;
 this distribution has variance 1.
-The conditional distribution of $T^{(obs)}$ given $S_{i+}$'s is the
-same as that of $T = \sum_{i=1}^N \delta_i S_{i+}$.
-For small $N$, it is possible to assess the significance of $T_g$ by
+The conditional distribution of $T$ given $S_{i+}$'s is the
+same as that of $T_p = \sum_{i=1}^N \delta_i S_{i+}$.
+For small $N$, it is possible to assess the significance of $T$ by
 enumerating all $2^N$ possibilities and computing the tail probability.
 A large sample test can be constructed with
-$\E(T_g) = 0$ and $\VAR(T_g) = \sum_{i=1}^n S_{i+}^2$.
-As $N \to \infty$, $T_g / \VAR^{1/2}(T_g)$ converges to a standard
+$\E(T) = 0$ and $\VAR(T) = \sum_{i=1}^n S_{i+}^2$.
+As $N \to \infty$, $T / \VAR^{1/2}(T)$ converges to a standard
 normal distribution provided $g < \infty$.
 
 
 For unbalanced data, \citet{Rosn:Glyn:Lee:wilc:2006} considered a
 stratified statistic
 \[
-T^{(obs)} = \sum_{i=1}^N w_i\bar{S}_i,
+T = \sum_{i=1}^N w_i\bar{S}_i,
 \]
 where $\bar{S}_i = S_{i+} / n_i$ and $w_i = 1/\VAR(\bar{S}_i)$ under $H_0$.
 The variance estimator $\widehat\VAR(\bar S_i)$ is obtained
 assuming a shared intracluster correlation coefficient.
-The randomization distribution of $T^{(obs)}$ given $\bar{S}_i$'s is
+The randomization distribution of $T$ given $\bar{S}_i$'s is
 that of
-$T = \sum_{i=1}^N \delta_i w_i \bar{S}_i$,
+$T_p = \sum_{i=1}^N \delta_i w_i \bar{S}_i$,
 which facilitates a random permutation test for small $N$.
 The large sample test statistic is
-$T^{(obs)} / (\sum_{i=1}^N \hat w_i^2 \bar S_i^2)^{1/2}$,
+$T / (\sum_{i=1}^N \hat w_i^2 \bar S_i^2)^{1/2}$,
 where $\hat w_i = 1 / \widehat\VAR(\bar S_i)$.
 It converges to a standard normal distribution as $N\to \infty$
 provided that $G < \infty$ and $\lim_{N\to\infty} N_g / N \to \xi_g$
@@ -592,11 +592,11 @@ args(clusrank:::cluswilcox.test.default)
 As in the default interface of \code{wilcox.test}, \code{x} and
 \code{y} are numeric vectors of data values.  Unlike
 \code{wilcox.test}, though, \code{y} is optional only for the
-clustered signed-rank test where \code{x} and \code{y} may contain
-observations before and after treatment, it is not in use for the
-clustered rank-sum test where the treatment group assignment of each
-data value is provided through an extra numeric vector \code{group} as
-the cluster id.  The hypothesis related arguments \code{alternative},
+clustered signed-rank test where \code{x} and \code{y} are pre- and
+post-treatment observations, it is not in use for the clustered
+rank-sum test where the treatment group assignment of each data value
+is provided through an extra numeric vector \code{group} as the
+cluster id.  The hypothesis related arguments \code{alternative},
 \code{mu} and \code{paired} are identical of those of the
 \code{wilcox.test}.  The exact test (\code{exact = TRUE}) is only
 available for the RGL clustered rank-sum test with cluster level
@@ -693,21 +693,19 @@ datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1),
     Sigma2 <- diag(1 - rho[2], nrow = maxclsize) + rho[2] 
     y <- c(t(rmvnorm(nclus, sigma = Sigma2)))
     group <- rep(c(0, 1), each = nn) 
-    if (grplevel == "individual") 
-        group  <- sample(group, nn, FALSE) 
-    id <- rep(1:(2 * nclus), each = maxclsize)
+    if (grplevel == "individual") group  <- sample(group, nn, FALSE)
+    cid <- rep(1:(2 * nclus), each = maxclsize)
     score <- exp(c(x, y)) + delta * group 
-    dat <- data.frame(score = score, grp = group, id = id) 
+    dat <- data.frame(score = score, grp = group, cid = cid) 
     keep <-  sort(sample(1:(2 * nn), size = rate * (2 * nn), FALSE))
     if (rate ==  1) dat else dat[keep, ]      
 }
 @
-{\bf present the arguments in order.}
 The function have two required inputs:
 \code{nclus} for number of clusters in each group and
 \code{maxclsize} for the maximum cluster size.
 The difference between the groups is specified by \code{delta}.
-The group specific intra-cluster correlation $\rho_g$ is controlled by
+The group specific intra-cluster correlation parameter $\rho_g$ is controlled by
 $\rho$, a numeric vector of length 2, one for each group. 
 To allow unequal cluster sizes, \code{rate} specifies the rate at
 which an individual in a cluster is kept at random; when 
@@ -717,12 +715,9 @@ The grouping level is controlled by \code{grplevel}:
 individual level.
 The function returns a data set with three columns: 
 observed measurement \code{score}, 
-grouping id \code{grp}, and cluster id \code{id}.
+grouping id \code{grp}, and cluster id \code{cid}.
 
-{\bf always have spell-checker turned on}
-
-As an illustration, a balanced data set contains $10$ cluster of size
-5 is generated with treatment assigned at the cluster level:
+As an illustration, a balanced data set with $10$ clusters of size 5 with cluster level grouping is generated, the  :
 <<dat-clus>>=
 set.seed(1234)
 dat.cls <- datgen.rs(10, 5, rho=c(.9, .9), grplevel="cluster")
@@ -730,11 +725,11 @@ head(dat.cls)
 @ 
 The RGL asymptotic test is performed with:
 <<clus-rs-rgl-asymp>>=
-cluswilcox.test(score ~ grp + cluster(id), data = dat.cls, method = "rgl")
+cluswilcox.test(score ~ grp + cluster(cid), data = dat.cls, method = "rgl")
 @ 
 The RGL exact test is performed with:
 <<clus-rs-rgl-exact>>=
-cluswilcox.test(score ~ grp + cluster(id), data = dat.cls, method = "rgl", 
+cluswilcox.test(score ~ grp + cluster(cid)), data = dat.cls, method = "rgl", 
                 exact = TRUE)
 @ 
 {\bf comments on the results}
@@ -742,7 +737,7 @@ cluswilcox.test(score ~ grp + cluster(id), data = dat.cls, method = "rgl",
 
 The DS test is performed with:
 <<clus-rs-ds>>=
-cluswilcox.test(score ~ grp + cluster(id), data = dat.cls, method = "ds")
+cluswilcox.test(score ~ grp + cluster(cid)), data = dat.cls, method = "ds")
 @ 
 {\bf comment on the results, compare with those from RGL.
   The statistic are of different signs. Any explanation?}
@@ -755,11 +750,11 @@ head(dat.ind)
 @ 
 The RGL test is performed with:
 <<indi-rs-rgl>>=
-cluswilcox.test(score ~ grp + cluster(id), data = dat.ind, method = "rgl")
+cluswilcox.test(score ~ grp + cluster(cid)), data = dat.ind, method = "rgl")
 @ 
 The DS test is performed with:
 <<indi-rs-ds>>=
-cluswilcox.test(score ~ grp + cluster(id), data = dat.ind, method = "ds")
+cluswilcox.test(score ~ grp + cluster(cid)), data = dat.ind, method = "ds")
 @ 
 {\bf comment on the results. different sign of statistics, why?}
 
@@ -794,31 +789,27 @@ datgen.sr <- function(nclus, maxclsize, delta = 0.,
     y <- c(t(rmvnorm(nclus / 2, sigma = Sigma2)))
     z <- c(x, y) + delta
     score <- sign(z) * exp(abs(z))
-    id <- rep(1:nclus, each = maxclsize)
-    dat <- data.frame(score = score, id = id)
+    cid <- rep(1:nclus, each = maxclsize)
+    dat <- data.frame(score = score, cid = cid)
     keep <- sort(sample(1: nn,
                  size = rate * nn, FALSE))
     if (rate == 1) dat else dat[keep,]
 }
 @ 
 
-{\bf why a different default rho from the other function?}
 To illustrate the usage of the test function, a balanced data set with $10$
 clusters is generated. Each cluster contains $5$ members, and
 the intra-cluster correlation is set as $0.1$ and $0.9$ for the first
 and second half of the data respectivly. 
 generated
-{\bf what's so special about 616?}
 <<dat-sr>>=
-set.seed(1234)
 dat.sr <- datgen.sr(10, 5, rho = c(.1, .9))
 head(dat.sr)
 @ 
 
 To apply both methods to this data set:
 <<sr>>=
-cluswilcox.test(score ~ cluster(id), dat.sr, paired=TRUE, method="rgl")
-cluswilcox.test(score ~ cluster(id), dat.sr, paired = TRUE, method = "ds")
+cluswilcox.test(score ~ cluster(cid).test(score ~ cluster(id), dat.sr, paired = TRUE, method = "ds")
 @ 
 
 \subsection{A simulation study}
@@ -835,8 +826,8 @@ simpower <- function(nrep, level, paired, delta, rho, rate,
         dat <- datgen(nclus, maxclsize, delta, rho, rate, ...)
         p.rgl <- cluswilcox.test(formula, paired = paired, 
                                  data = dat, method = "rgl")$p.value
-        p.ds <- cluswilcox.test(formula, paired = paired, 
-                                data = dat, method = "ds")$p.value
+         p.ds <- cluswilcox.test(formula, paired = paired, 
+                                 data = dat, method = "ds" )$p.value
         c(rgl = p.rgl, ds = p.ds)
     }
     sim <- t(replicate(nrep, do1rep()))
@@ -874,7 +865,7 @@ data instead of $50\%$.
 
 {\bf use cmidrule in tables}
 
-\begin{table}[ht]
+\begin{table}[tbp]
 \centering
 \caption{Simulation for clustered rank sum test, comparsion between RGL and DS} 
 \begin{tabular}{rrrrr}

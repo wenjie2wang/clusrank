@@ -98,16 +98,16 @@
 #' @examples
 #' ## Clustered signed rank test using RGL method.
 #' data(crsd)
-#' cluswilcox.test(z, cluster = id, data = crsd, paired = TRUE)
+#' clusWilcox.test(z, cluster = id, data = crsd, paired = TRUE)
 #' ## or
-#' cluswilcox.test(z ~ cluster(id), data = crsd, paired = TRUE)
-#' \dontrun{cluswilcox.test(z, cluster = id, data = crsd)
+#' clusWilcox.test(z ~ cluster(id), data = crsd, paired = TRUE)
+#' \dontrun{clusWilcox.test(z, cluster = id, data = crsd)
 #' ## Default is rank sum test. The group variable is required.}
 #' ## Clustered rank sum test using RGL method.
 #' data(crd)
-#' cluswilcox.test(z ~ group + cluster(id), data = crd)
+#' clusWilcox.test(z ~ group + cluster(id), data = crd)
 #' ## or
-#' cluswilcox.test(z, cluster = id, group = group, data = crd)
+#' clusWilcox.test(z, cluster = id, group = group, data = crd)
 #' @author Yujing Jiang
 #' @references
 #' Bernard Rosner, Robert J. Glynn, Mei-Ling T. Lee (2006)
@@ -136,7 +136,7 @@
 #' @useDynLib clusrank 
 #' @export
 
-cluswilcox.test <- function(x, ...) {
+clusWilcox.test <- function(x, ...) {
     pars <- as.list(match.call()[-1])
     if(!is.null(pars$data)) {
         data.temp <- eval(pars$data, parent.frame())
@@ -152,16 +152,16 @@ cluswilcox.test <- function(x, ...) {
             x <- data.temp[, as.character(pars$x)]
         }
     }
-    UseMethod("cluswilcox.test", x)
+    UseMethod("clusWilcox.test", x)
 }
 
 
-#' @method cluswilcox.test formula
-#' @describeIn cluswilcox.test \code{S3} method for class 'formula'
+#' @method clusWilcox.test formula
+#' @describeIn clusWilcox.test \code{S3} method for class 'formula'
 #' @export
 
 
-cluswilcox.test.formula <- function(formula, data = parent.frame(), subset = NULL,
+clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NULL,
                                     na.action = na.omit,
                                     alternative = c("two.sided", "less", "greater"),
                                     mu = 0, paired = FALSE, exact = FALSE,
@@ -263,7 +263,7 @@ cluswilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
         stratum <- rep(1, n.obs)
     }
     
-    y <- do.call("cluswilcox.test.default",
+    y <- do.call("clusWilcox.test.default",
                  c( list(x = x, cluster = cluster,
                          group = group, stratum = stratum,
                          DNAME = DNAME, paired = paired,
@@ -274,11 +274,11 @@ cluswilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
 }
 
 
-#' @method cluswilcox.test default
-#' @describeIn cluswilcox.test Default \code{S3} method.
+#' @method clusWilcox.test default
+#' @describeIn clusWilcox.test Default \code{S3} method.
 #' @export
 
-cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
+clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
             group = NULL, stratum = NULL, data = parent.frame(),
             alternative = c("two.sided", "less", "greater"),
             mu = 0, paired = FALSE, exact = FALSE,
@@ -426,7 +426,7 @@ cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
                             c("x", "cluster", "alternative",
                               "mu",
                               "METHOD", "DNAME",  "exact"))
-            result <- do.call("cluswilcox.test.signedrank.rgl", c(arglist))
+            result <- do.call("clusWilcox.test.signedrank.rgl", c(arglist))
             return(result)
         }
 
@@ -436,7 +436,7 @@ cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
                             c("x", "cluster", "alternative",
                               "mu",
                               "METHOD", "DNAME"))
-           result <-  do.call("cluswilcox.test.signedrank.ds",
+           result <-  do.call("clusWilcox.test.signedrank.ds",
                               c(arglist))
            return(result)
         } else {
@@ -452,7 +452,7 @@ cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
                             c("x", "cluster", "group", "stratum",
                               "alternative", "mu", "DNAME", "METHOD",
                               "exact"))
-            result <- do.call("cluswilcox.test.ranksum.rgl", c(arglist))
+            result <- do.call("clusWilcox.test.ranksum.rgl", c(arglist))
             return(result)
         }
 
@@ -470,7 +470,7 @@ cluswilcox.test.default <- function(x, y = NULL, cluster = NULL,
             if(length(table(stratum)) > 1L) {
                 warning("'stratum' will be ignored for the clustered rank sum test, 'ds' method")
             }
-            result <- do.call("cluswilcox.test.ranksum.ds", c(arglist))
+            result <- do.call("clusWilcox.test.ranksum.ds", c(arglist))
             return(result)
         }
         

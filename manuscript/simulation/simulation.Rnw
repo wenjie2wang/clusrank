@@ -60,7 +60,53 @@ simpower <- function(nrep, level, paired, delta, rho, rate,
 }
 @
 
+
+
+
+<<rs-1>>=
+simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), 1, 20, 1, "cluster")
+simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 1, 20, 1, "cluster")
+@ 
+
+When cluster size equals 1, DS method works almost the same as RGL
+(which is equal to wilcox.test), keeps the nominal size and similar
+empirical power.
+
+<<simpower-exact-1>>=
+library(clusrank)
+simpower.exact <- function(nrep, level, delta, nclus, ...) {
+    do1rep.rgl <- function() {
+        formula <- score ~ cluster(id) + grp
+        dat <- datgen.rs(nclus, 1, delta, c(0, 0), 
+                         1, grplevel = "c")
+        p.rgl <- cluswilcox.test(formula, paired = FALSE,
+                                 exact = TRUE,
+                                 data = dat, method = "rgl")$p.value
+        c(rgl = p.rgl)
+    }
+    do1rep.w <- function() {
+        dat <- datgen.rs(nclus, 1, delta, c(0, 0), 1,
+                         grplevel = "c")
+        p.w <- wilcox.test(dat[1 : nclus, 1], exact = TRUE,
+                           y = dat[(nclus + 1) : (2 * nclus), 1])$p.value
+        c(wilcox = p.w)
+    }
+    set.seed(1234)
+    rgl.time <- system.time(sim.rgl <- replicate(nrep, do1rep.rgl()))[1]
+    set.seed(1234)
+    w.time <- system.time(sim.w <- replicate(nrep, do1rep.w()))[1]
+    sim <- cbind(sim.rgl, sim.w)
+    rbind(c(rgl.time, w.time), apply(sim, 2, function(x) mean(x < level)))
+}
+@
+
+<<rgl-exact-wil>>=
+simpower.exact(100, 0.05, 0, 10)
+simpower.exact(100, 0.05, 0.5, 10)
+@ 
+
 <<clus-b, echo = FALSE, eval = TRUE>>=
+
 clusb <- matrix(0, 2, 4)
 clusb[1, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), 1, 10, 5, "cluster")
 clusb[2, 1:2] <- simpower(1000, 0.05, FALSE, 0, c(0.9, 0.9), 1, 10, 5, "cluster")

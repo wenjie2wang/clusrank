@@ -19,7 +19,7 @@
 ##   along with the R package clusrank. If not, see <http://www.gnu.org/licenses/>.
 ##
 ################################################################################
-cluswilcox.test.signedrank.rgl <- function(x, cluster, alternative,
+clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
                                            mu, exact, DNAME, METHOD) {
   ## Drop the ties
   x <- x - mu
@@ -45,7 +45,7 @@ cluswilcox.test.signedrank.rgl <- function(x, cluster, alternative,
 
     if(exact == TRUE) {
         if(length(table(cluster)) > 40)
-            stop("Number of clusters exceeds 40 for RGL clustered signed-rank test")
+            print("Number of clusters exceeds 40 for RGL clustered signed-rank test")
         if(balance == TRUE ) {            
             Tc <- sum(data$signrank)
             srksum <-  stats::aggregate(signrank ~ cluster, FUN = sum)[, 2]
@@ -200,7 +200,7 @@ cluswilcox.test.signedrank.rgl <- function(x, cluster, alternative,
     }
 }
 
-cluswilcox.test.signedrank.ds <- function(x, cluster, alternative,
+clusWilcox.test.signedrank.ds <- function(x, cluster, alternative,
                                           mu, DNAME, METHOD) {
     x <- x - mu
     order.c <- order(cluster)

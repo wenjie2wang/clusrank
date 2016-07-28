@@ -1,4 +1,5 @@
-cluswilcox.test.ranksum.rgl <- function(x, cluster, group, stratum,
+
+clusWilcox.test.ranksum.rgl <- function(x, cluster, group, stratum,
                                          alternative, exact, mu,
                                         DNAME = NULL, METHOD = NULL) {
     clus.grp <- lapply(split(cluster, group), unique)
@@ -19,15 +20,15 @@ cluswilcox.test.ranksum.rgl <- function(x, cluster, group, stratum,
                           "alternative", "mu", "DNAME", "METHOD",
                           "exact"))
     if(l.clus != l.clus.grp) {
-        result <- do.call("cluswilcox.test.ranksum.rgl.sub", c(arglist))
+        result <- do.call("clusWilcox.test.ranksum.rgl.sub", c(arglist))
         return(result)
     } else {
-        result <- do.call("cluswilcox.test.ranksum.rgl.clus", c(arglist))
+        result <- do.call("clusWilcox.test.ranksum.rgl.clus", c(arglist))
         return(result)
     }
 }
 
-cluswilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
+clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
                                              stratum, alternative, exact,
                                              mu, DNAME = NULL, METHOD = NULL) {
 ## The input data should be already in the increasing order with cluster.
@@ -58,7 +59,7 @@ cluswilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
     }
     if(exact == TRUE) {
         if(length(table(cluster)) > 40)
-            stop("Number of clusters exceeds 40 for RGL clustered rank exact test") 
+            print("Number of clusters exceeds 40 for RGL clustered rank exact test") 
         Wc <- sum(dat[dat$grp == 1, "rksum"])
         n.layer <- l.csu * l.stu
         mgv <- ngv <- rep(0, n.layer)
@@ -169,7 +170,7 @@ cluswilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
 
 
 
-cluswilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
+clusWilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
                                        exact, mu, DNAME = NULL, METHOD = NULL, stratum) {
     ## The input data should be already arranged
     ## check balance of data.
@@ -367,7 +368,7 @@ cluswilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
 
 #' @importFrom MASS ginv
 
-cluswilcox.test.ranksum.ds <- function(x, cluster, group,
+clusWilcox.test.ranksum.ds <- function(x, cluster, group,
                                        alternative,
                                        mu,
                                        DNAME, METHOD) {
