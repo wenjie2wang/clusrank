@@ -36,10 +36,6 @@
 #'
 #' @return the argument \code{x}, invisibly, as for all \link{print}
 #' methods.
-#' @examples
-#' data(crd)
-#' clt <- cluswilcox.test(z ~ group + cluster(id), data = crd)
-#' print(clt, digits = 2)
 #' @export
 
 print.ctest <- function (x, digits = getOption("digits"), prefix = "\t", ...) {
@@ -51,36 +47,21 @@ print.ctest <- function (x, digits = getOption("digits"), prefix = "\t", ...) {
     cat(strwrap(x$method, prefix = prefix), sep = "\n")
     cat("\n")
     cat("data: ", x$data.name, "\n", sep = "")
-    out <- character()
-    if (!is.null(x$Rstat)){
-        cat(paste(names(x$Rstat), "=", format(signif(x$Rstat,
-                                                     max(1L, digits - 2L)))))
-        cat("\n")
-    }
-    if (!is.null(x$ERstat)){
-        cat( paste(names(x$ERstat), "=", format(signif(x$ERstat,
-                                                       max(1L, digits - 2L)))))
-        cat("\n")
-    }
-    
-    if (!is.null(x$VRstat)){
-        cat(paste(names(x$VRstat), "=", format(signif(x$VRstat,
-                                                      max(1L, digits - 2L)))))
-        cat("\n")
-    }
     
     out <- character()
+    if (!is.null(x$Rstat) && x$exact == TRUE){
+        out <- c(out, paste(names(x$Rstat), "=",
+                            format(signif(x$Rstat, max(1L, digits - 2L)))))
+    }
     if (!is.null(x$statistic))
         out <- c(out, paste(names(x$statistic), "=", format(signif(x$statistic,
                                                                    max(1L, digits - 2L)))))
-    ## if (!is.null(x$parameter))
-    ##  out <- c(out, paste(names(x$parameter), "=", format(signif(x$parameter,
-    ##                                                            max(1L, digits - 2L)))))
+   
     if (!is.null(x$p.value)) {
         fp <- format.pval(x$p.value, digits = max(1L, digits -
                                                       3L))
-        out <- c(out, paste("p-value", if (substr(fp, 1L, 1L) ==
-                                           "<") fp else paste("=", fp)))
+        out <- c(out, paste("p-value",
+                            if (substr(fp, 1L, 1L) == "<") fp else paste("=", fp)))
     }
     cat(strwrap(paste(out, collapse = ", ")), sep = "\n")
     out <- character()
@@ -105,18 +86,7 @@ print.ctest <- function (x, digits = getOption("digits"), prefix = "\t", ...) {
     if(!is.null(x$adjusted) && x$adjusted == TRUE) {
         cat("The signed rank test statistics is adjusted since the data is unbalanced.")
         cat("\n")
-    }
-    
-    
-    if(!is.null(x$balance)) {
-        if(x$balance == FALSE) {
-            cat("The data is unbalanced")
-            cat("\n")
-        } else {
-            cat("The data is balanced")
-            cat("\n")
-        }
-    }         
+    }    
     
     if (!is.null(x$alternative)) {
         cat("alternative hypothesis: ")
