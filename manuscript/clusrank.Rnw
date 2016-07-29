@@ -768,11 +768,11 @@ head(dat.ind)
 @ 
 The RGL test is performed with:
 <<indi-rs-rgl>>=
-clusWilcox.test(score ~ grp + cluster(cid)), data = dat.ind, method = "rgl")
+clusWilcox.test(score ~ grp + cluster(cid), data = dat.ind, method = "rgl")
 @ 
 The DS test is performed with:
 <<indi-rs-ds>>=
-clusWilcox.test(score ~ grp + cluster(cid)), data = dat.ind, method = "ds")
+clusWilcox.test(score ~ grp + cluster(cid), data = dat.ind, method = "ds")
 @ 
 
 
@@ -910,7 +910,7 @@ data instead of $50\%$.
   \toprule
    & \multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.5$} \\
  & RGL & DS & RGL & DS \\
- \cmidrule
+ \midrule
   ind, bal, $\rho = 0.1$ & 0.05 & 0.05 & 0.81 & 0.76 \\ 
   ind, bal, $\rho = 0.9$ & 0.05 & 0.05 & 0.84 & 0.73 \\ 
   ind, unbal, $\rho = 0.1$ & 0.06 & 0.04 & 0.44 & 0.41 \\ 
