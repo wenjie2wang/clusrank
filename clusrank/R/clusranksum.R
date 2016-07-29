@@ -58,6 +58,7 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
         exact <- FALSE
     }
     if(exact == TRUE) {
+        METHOD <- paste0(METHOD, " (exact)")
         if(length(table(cluster)) > 40)
             print("Number of clusters exceeds 40 for RGL clustered rank exact test") 
         Wc <- sum(dat[dat$grp == 1, "rksum"])
@@ -93,13 +94,13 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
                       two.sided = 2 * min(p.val.l, 1 - p.val.l))
         names(mu) <- "location"
 
-        names(Wc) <- "rank sum statistic"
+        names(Wc) <- "Wc"
 
-        result <- list(Rstat = Wc, p.value = pval,
+        result <- list(statistic = Wc, p.value = pval,
                        null.value = mu, alternative = alternative,
                        data.name = DNAME, method = METHOD,
                        balance = bal, exact = exact)
-        class(result) <- "ctest"
+        class(result) <- "htest"
         return(result)
 
 
@@ -149,10 +150,10 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
                        two.sided = 2 * min(pnorm(abs(Zc)),
                                            pnorm(abs(Zc), lower.tail = FALSE)))
 
-        names(Wc) <- "rank sum statistic"
-        names(EWc) <- "expected value of rank sum statistic"
-        names(VarWc) <- "variance of rank sum statistic"
-        names(Zc) <- "test statistic"
+        names(Wc) <- "Wc"
+        names(EWc) <- "Expected value of Wc"
+        names(VarWc) <- "Variance of Wc"
+        names(Zc) <- "Zc"
         names(mu) <- "difference in locations"
         result <- list(Rstat = Wc, ERstat = EWc,
                  VRstat = VarWc,
@@ -162,7 +163,7 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
                  data.name = DNAME,
                  method = METHOD,
                  balance = bal, exact = exact)
-        class(result) <- "ctest"
+        class(result) <- "htest"
         return(result)
     }
     
@@ -216,10 +217,10 @@ clusWilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
                        greater = pnorm(abs(Zc), lower.tail = FALSE),
                        two.sided = 2 * min(pnorm(abs(Zc)),
                                            pnorm(abs(Zc), lower.tail = FALSE)))
-        names(Wc) <- "rank sum statistic"
-        names(EWc) <- "expected value of rank sum statistic"
-        names(VarWc) <- "variance of rank sum statistic"
-        names(Zc) <- "test statistic"
+        names(Wc) <- "Wc"
+        names(EWc) <- "expected value of Wc"
+        names(VarWc) <- "variance of Wc"
+        names(Zc) <- "Zc"
         names(mu) <- "difference in locations"
         result <- list(Rstat = Wc, ERstat = EWc,
                  VRstat = VarWc,
@@ -229,7 +230,7 @@ clusWilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
                  data.name = DNAME,
                  method = METHOD,
                  balance = bal)
-        class(result) <- "ctest"
+        class(result) <- "htest"
         return(result)
 
     } else {
@@ -354,14 +355,14 @@ clusWilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
                        two.sided = 2 * min(pnorm(abs(Zc)),
                                            pnorm(abs(Zc), lower.tail = FALSE)))
 
-        names(Zc) <- "Test statistic"
+        names(Zc) <- "Zc"
         
         names(mu) <- "difference in locations"
         result <- list(statistic = Zc, p.value = pval,
                        alternative = alternative, null.value = mu,
                        data.name = DNAME, method = METHOD,
                        balance = bal)
-        class(result) <- "ctest"
+        class(result) <- "htest"
         return(result)
     }
 }
@@ -441,14 +442,14 @@ clusWilcox.test.ranksum.ds <- function(x, cluster, group,
                        greater = pnorm(abs(Z), lower.tail = FALSE),
                        two.sided = 2 * min(pnorm(abs(Z)),
                                            pnorm(abs(Z), lower.tail = FALSE)))
-        names(Z) <- "test statistic"
+        names(Z) <- "Zc"
         names(mu) <- "difference in locations"
 
         result <- list(statistic = Z, p.value = pval,
                        alternative = alternative, null.value = mu,
                        data.name = DNAME, method = METHOD)
 
-        class(result) <- "ctest"
+        class(result) <- "htest"
         result
         
         
@@ -509,9 +510,8 @@ clusWilcox.test.ranksum.ds <- function(x, cluster, group,
         METHOD <- paste(METHOD, "using Chi-square test")
                                         #calculate the test statistic
         result <- list(statistic = T, p.value = pval, n.group = ngrp,
-                       df = df,
-                       data.name = DNAME, method = METHOD)
-        class(result) <- "ctest"
+                       df = df, data.name = DNAME, method = METHOD)
+        class(result) <- "htest"
         result
     }
 }
