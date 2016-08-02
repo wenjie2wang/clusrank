@@ -7,7 +7,7 @@ int meanrks;
 int crksum(int rks, int I, int J, int sumrks, int minrks, int maxrks) {
   int i, j, csize_cum, res;
   Rcpp::IntegerVector score_sub, idx,  score_sum, csize_ord, csize_sub;
-  Rcpp::Rcout <<rks <<" " <<  I << " " << J  << " " << sumrks << " " << minrks << " " << maxrks << std::endl; 
+  /*  Rcpp::Rcout <<rks <<" " <<  I << " " << J  << " " << sumrks << " " << minrks << " " << maxrks << std::endl;  */
   if (I < 0 | J < 0) return(0);    
   if (I > J) {
     rks = sumrks - rks;
@@ -46,14 +46,14 @@ int crksum(int rks, int I, int J, int sumrks, int minrks, int maxrks) {
       count++;
     }
     j = count;
-      Rcpp::Rcout << " j = ? " << j << std::endl; 
+     // Rcpp::Rcout << " j = ? " << j << std::endl; 
     if ( j < 0 ) return(0);
     if ( j == 0 ) {
       idx = seq_len(i) - 1;
       score_sub = score_[idx];
       int temp;
       temp = sum(score_sub);
-      Rcpp::Rcout << "j == 0" << std::endl;
+      // Rcpp::Rcout << "j == 0" << std::endl;
       return(rks == temp);
     }
     idx = seq_len(i + j) - 1;
@@ -81,7 +81,7 @@ int crksum(int rks, int I, int J, int sumrks, int minrks, int maxrks) {
     return(rks == sumrks);
   } else {
     sumrks = sumrks - score_[i + j - 1];
-    Rcpp::Rcout << "maxrks = " << maxrks << std::endl;
+    // Rcpp::Rcout << "maxrks = " << maxrks << std::endl;
     res = crksum(rks - score_[i+j-1], i-1, j, sumrks, minrks - score_[i - 1], maxrks - score_[i + j - 1]) + crksum(rks, i, j-1, sumrks, minrks, maxrks - score_[i + j - 1] + score_[j - 1]);
     return(res);
   }
