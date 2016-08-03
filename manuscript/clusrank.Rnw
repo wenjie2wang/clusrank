@@ -668,18 +668,25 @@ X = \exp(Z_g) + \delta g,
 where $Z_g$ is a standard multivariate normal random vector with mean
 zero and an exchangeable or a AR1 correlation structure with
 correlation parameter $\rho_g$, and $\delta$ is the group difference.
+<<corstr>>=
+xch <- function(dim, rho) {
+    diag(1 - rho, dim) + matrix(rho, dim, dim) 
+}
+ar1 <- function(dim, rho) {
+    rho ^ outer(1:dim, 1:dim, function(x, y) abs(x - y))
+}
+@ 
 
 
+{\bf you have two subjects in one sentence}
 Here is a simple implementation that allows different levels of
 grouping (cluster-level and individual-level) and unequal cluster
 sizes, \pkg{mvtnorm} \citep{Genz:etal:mvtn:2016, Genz:Bret:comp:2009}
 is applied to generate the needed multivariate
-normal random variable, and \pkg{binarySimCLF}
-\citep{By:Qaqi:bina:2009} is used to generate exchangeble and AR1
-correlation structure.  
+normal random variable.
+{\bf we don't want to use something that's been removed from cran.}
 <<datgen, echo=TRUE>>= 
 library(mvtnorm)
-library(binarySimCLF)
 datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1), cor = c(xch, ar1),
                       rate = 1, grplevel = c("cluster", "individual")) { 
     nn <- nclus * maxclsize
