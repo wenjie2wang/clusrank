@@ -77,7 +77,7 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
                 temp.grp <- temp[, "grp"]
                 mgv[counter] <- length(temp.grp[temp.grp == 1])
                 ngv[counter] <- length(temp.grp)
-                temp.x <- cumcrksum(Wc, mgv[counter], sort(temp.rksum))
+                temp.x <- cumcrksum(Wc, mgv[counter], sort(temp.rksum), csize.uniq)
                 rkx[, counter] <- temp.x[, 1]
                 rkxc[, counter] <- temp.x[, 2]
                 counter <- counter + 1

@@ -678,21 +678,18 @@ ar1 <- function(dim, rho) {
 @ 
 
 
-{\bf you have two subjects in one sentence}
 Here is a simple implementation that allows different levels of
 grouping (cluster-level and individual-level) and unequal cluster
-sizes, \pkg{mvtnorm} \citep{Genz:etal:mvtn:2016, Genz:Bret:comp:2009}
-is applied to generate the needed multivariate
-normal random variable.
-{\bf we don't want to use something that's been removed from cran.}
+sizes. The needed multivariate normal random variable is generated
+with \pkg{mvtnorm} \citep{Genz:etal:mvtn:2016, Genz:Bret:comp:2009}.
 <<datgen, echo=TRUE>>= 
 library(mvtnorm)
 datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1), cor = c(xch, ar1),
                       rate = 1, grplevel = c("cluster", "individual")) { 
     nn <- nclus * maxclsize
-    Sigma1 <- cor(maxclsize, rho[1]) 
+    Sigma1 <- cor(maxclsize, rho[1])
+    Sigma2 <- cor(maxclsize, rho[2])
     x <- c(t(rmvnorm(nclus, sigma = Sigma1))) 
-    Sigma2 <- cor(maxclsize, rho[2]) 
     y <- c(t(rmvnorm(nclus, sigma = Sigma2)))
     group <- rep(c(0, 1), each = nn)
     if (grplevel == "individual") group  <- sample(group, nn, FALSE)
@@ -703,24 +700,21 @@ datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1), cor = c(x
     if (rate ==  1) dat else dat[keep, ]      
 }
 @
-The function have two required inputs:
-\code{nclus} for number of clusters in each group and
-\code{maxclsize} for the maximum cluster size.
-The difference between the groups is specified by \code{delta}.
-The group specific intra-cluster correlation parameter $\rho_g$ is controlled by
-$\rho$, a numeric vector of length 2, one for each group. 
-There are two correlation structures to choose from by setting
+The function have two required inputs: \code{nclus} for number of
+clusters in each group and \code{maxclsize} for the maximum cluster
+size.  The difference between the groups is specified by \code{delta}.
+The group specific intra-cluster correlation parameter $\rho_g$ is
+controlled by $\rho$, a numeric vector of length 2, one for each
+group.  There are two correlation structures to choose from by setting
 \code{cor}: \code{xch} for exchangeable correlation and \code{ar1} for
-AR1 correlation.  
-To allow unequal cluster sizes, \code{rate} specifies the rate at
-which an individual in a cluster is kept at random; when 
-\code{rate = 1}, balanced data with equal cluster size  is generated.  
-The grouping level is controlled by \code{grplevel}: 
+AR1 correlation.  To allow unequal cluster sizes, \code{rate}
+specifies the rate at which an individual in a cluster is kept at
+random; when \code{rate = 1}, balanced data with equal cluster size is
+generated.  The grouping level is controlled by \code{grplevel}:
 \code{"cluster"} for cluster-level and \code{"individual"} for
-individual level. 
-The function returns a data set with three columns: 
-observed measurement \code{score}, 
-grouping id \code{grp}, and cluster id \code{cid}.
+individual level.  The function returns a data set with three columns:
+observed measurement \code{score}, grouping id \code{grp}, and cluster
+id \code{cid}.
 
 
 For the replicability of the following demonstration,
@@ -768,24 +762,27 @@ stratum variable to add information to the test. The data set
 \code{dat.str} generated below contains a strata variable besides the
 required variables. It is obtained by combining two data sets:
 \code{dat.cls}, and \code{dat.cls1} which is generated similarly as
-\code{dat.cls} but with a non-zero effect equals $0.5$. Each data set is treated as from a separate stratum, and a \code{strat} variable is added to the combined data set to identify the strata.
+\code{dat.cls} but with a non-zero effect equals $0.5$. Each data set
+is treated as from a separate stratum, and a \code{strat} variable is
+added to the combined data set to identify the strata.
 
 
 <<clus-rs-rgl-str>>=
-dat.cls1 <- datgen.rs(10, 3, 0.5, c(.9, .9), xch,  1, "cluster")
-dat.str <- cbind(rbind(dat.cls1), strat = rep(c(1, 2), each = 30))
+dat.cls1 <- datgen.rs(10, 3, 0, c(.9, .9), xch,  1, "cluster")
+dat.cls1$cid <- rep(21:40, each = 3)
+dat.str <- cbind(rbind(dat.cls, dat.cls1), strat = rep(c(1, 2), each = 60))
 head(dat.str)
-clusWilcox.test(score ~ grp + cluster(cid) + stratum(strat), 
-                dat = dat.str,  method = "rgl")
+clusWilcox.test(score ~ grp + cluster(cid) + stratum(strat), dat = dat.str,  method = "rgl")
 @ 
 
 
 A benefit of the DS method is that it can compare more than two
 groups. We construct a data set with $4$ groups by combining
-\code{dat.cls} and \code{dat.cls1} but assign a different set of group id to \code{dat.cls1} than that of \code{dat.cls}. 
+\code{dat.cls} and \code{dat.cls1} but assign a different set of group
+id to \code{dat.cls1} than that of \code{dat.cls}.
 
 <<clus-rs-ds-mgrp>>=
-dat.cls1$grp <- rep(c(3, 4), each = 15)
+dat.cls1$grp <- rep(c(3, 4), each = 30)
 dat.m <- rbind(dat.cls, dat.cls1)
 clusWilcox.test(score ~ grp + cluster(cid), dat = dat.m, method = "ds")
 @ 
@@ -795,14 +792,18 @@ clusWilcox.test(score ~ grp + cluster(cid), dat = dat.m, method = "ds")
 \subsection{Signed-rank test}
 
 
-{\bf give a math expression using the notations in section 3}
 Note: the DS paper hasn't done unbalanced, non-exchangeable simulation.
 
-We generate the data for clustered signed-rank test similarly as in simulation scenario $1$ in \citet{Datt:Satt:sign:2008}, both balanced data and unbalanced data. The observations in a cluster is generated as 
+We generate the data for clustered signed-rank test similarly as in
+simulation scenario $1$ in \citet{Datt:Satt:sign:2008}, both balanced
+data and unbalanced data. The observations in a cluster is generated
+as
 \[
   X = sign(Z_d)\exp(|Z_d|),
 \]
-where $Z_d$ is a multivariate normal random vector with mean $\delta$ and an exchangeable or AR1 conrrelation structure with correlation parameter $\rho$, and $\delta$ is the pair difference.
+where $Z_d$ is a multivariate normal random vector with mean $\delta$
+and an exchangeable or AR1 conrrelation structure with correlation
+parameter $\rho$, and $\delta$ is the pair difference.
 
 
 <<datagen_sr, echo = TRUE>>=
@@ -819,13 +820,13 @@ datgen.sr <- function(nclus, maxclsize, delta = 0.,
 }
 @ 
 
-To illustrate the usage of the test function, a balanced data set with $10$
-clusters is generated. Each cluster contains $5$ members, and
-the intra-cluster correlation is set as $0.1$ and $0.9$ for the first
-and second half of the data respectivly. 
-generated
+We illustrate the clustered signed rank test with a data set that
+contains $10$ clusters. Each cluster contains $3$ pair differences.
+An exchangeble correlation with parameter \code{rho} equals $0.9$
+is used as the intra-cluster correlation. 
+
 <<dat-sr>>=
-dat.sr <- datgen.sr(10, 5, rho = c(.1, .9))
+dat.sr <- datgen.sr(10, 3, cor = xch, rho = 0.9)
 head(dat.sr)
 @ 
 
@@ -840,13 +841,13 @@ clusWilcox.test(score ~ cluster(cid),  dat.sr, paired = TRUE, method = "ds")
 
 Using the two data generation functions, we provide a convenient function, \code{simpower}, to enable the comparison of empirical size and power of RGL and DS method for each test under a range of scenarios.  
 <<simpower>>=
-simpower <- function(nrep, level, paired, delta, rho, rate,
-                     nclus, maxclsize, ...) {
+simpower <- function(nrep, level, paired, delta, rho, cor,
+                     rate, nclus, maxclsize, ...) {
     do1rep <- function() {
         datgen <- if (paired) datgen.sr else datgen.rs
-        formula <- if (paired) score ~ cluster(id) 
-                   else score ~ cluster(id) + grp
-        dat <- datgen(nclus, maxclsize, delta, rho, rate, ...)
+        formula <- if (paired) score ~ cluster(cid) 
+                   else score ~ cluster(cid) + grp
+        dat <- datgen(nclus, maxclsize, delta, rho, cor, rate, ...)
         p.rgl <- clusWilcox.test(formula, paired = paired, 
                                  data = dat, method = "rgl")$p.value
          p.ds <- clusWilcox.test(formula, paired = paired, 
@@ -861,24 +862,22 @@ simpower <- function(nrep, level, paired, delta, rho, rate,
 The first two arguments, \code{nrep} and \code{level} specify the
 number of replications and the significance level that the user
 desires. As in the test function, \code{paired} is a logical to switch
-between signed-rank test and rank-sum test. The value of \code{delta}
-controls the the effect size.  Other arguments are inherited from the
-data generation functions and different configuration of them. The
-function will return a vector of the empirical power of RGL and DS
-method. 
+between the clustered signed-rank test and rank-sum test. The value of
+\code{delta} determines the group difference. The rest arguments are
+inherited from \code{datgen.rs} or \code{datgen.sr} depending on the
+value of \code{paired}.
 
 
 To illustrate the usage of the function, we compare the empirical
 power of the two methods for clustered rank-sum test through $1000$
-replications. The level is set as $0.05$. The ture difference in the
-data is $0$ and $0.5$ respectively. The data set generated is
-balanced with $10$ clusters, each with size $5$. The intra-cluster
-correlation parameter \code{rho} is 0.1. 
-The grouping is at cluster level.
+replications. The level is set as $0.05$. The true group difference is
+$0$ and $0.5$, respectively. The data set contains $10$ clusters, each
+with size $3$. The intra-cluster correlation parameter \code{rho} is
+0.1. The unit of randomization is cluster.
 
 <<sim-clus-rs>>=
-simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), 1, 10, 5, "cluster")
-simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), 1, 10, 5, "cluster")
+simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), xch, 1, 10, 5, "cluster")
+simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), xch, 1, 10, 5, "cluster")
 @ 
 It is shown in the output that the empirical size of both methods are
 close to the nominal level, and the empirical power is comparable. 
