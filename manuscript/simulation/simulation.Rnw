@@ -15,51 +15,70 @@ library(knitr)
 opts_chunk$set(cache=TRUE, autodep=TRUE)
 @ 
 
+
+<<corstr>>=
+xch <- function(dim, rho) {
+    diag(1 - rho, dim) + matrix(rho, dim, dim) 
+}
+ar1 <- function(dim, rho) {
+    rho ^ outer(1:dim, 1:dim, function(x, y) abs(x - y))
+}
+@
+
+
 <<datgen, echo=TRUE>>= 
 library(mvtnorm)
-datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.9, -.1), 
+datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1), cor = c(xch, ar1),
                       rate = 1, grplevel = c("cluster", "individual")) { 
     nn <- nclus * maxclsize
-    Sigma1 <- diag(1 - rho[1], nrow = maxclsize) + rho[1] 
+    Sigma1 <- cor(maxclsize, rho[1])
+    Sigma2 <- cor(maxclsize, rho[2])
     x <- c(t(rmvnorm(nclus, sigma = Sigma1))) 
-    Sigma2 <- diag(1 - rho[2], nrow = maxclsize) + rho[2] 
     y <- c(t(rmvnorm(nclus, sigma = Sigma2)))
-    group <- rep(c(1, 2), each = nn) 
-    if (grplevel == "individual") 
-        group  <- sample(group, nn, FALSE) 
-    id <- rep(1:(2 * nclus), each = maxclsize)
+    group <- rep(c(0, 1), each = nn)
+    if (grplevel == "individual") group  <- sample(group, nn, FALSE)
+    cid <- rep(1:(2 * nclus), each = maxclsize)
     score <- exp(c(x, y)) + delta * group 
-    dat <- data.frame(score = score, grp = group, id = id) 
+    dat <- data.frame(score = score, grp = group, cid = cid) 
     keep <-  sort(sample(1:(2 * nn), size = rate * (2 * nn), FALSE))
     if (rate ==  1) dat else dat[keep, ]      
 }
 @
 
+<<datagen_sr, echo = TRUE>>=
+datgen.sr <- function(nclus, maxclsize, delta = 0.,
+                      rho = 0.1, cor = c(xch, ar1), rate = 1) {
+    nn <- nclus * maxclsize
+    Sigma <- cor(maxclsize, rho)
+    z <- c(t(rmvnorm(nclus, sigma = Sigma))) + delta
+    score <- sign(z) * exp(abs(z))
+    cid <- rep(1:nclus, each = maxclsize)
+    dat <- data.frame(score = score, cid = cid)
+    keep <- sort(sample(1: nn, size = rate * nn, FALSE))
+    if (rate == 1) dat else dat[keep,]
+}
+@ 
+
 
 <<simpower>>=
 library(clusrank)
-simpower <- function(nrep, level, paired, delta, rho, rate,
-                     nclus, maxclsize, ...) {
+simpower <- function(nrep, level, paired, nclus, maxclsize, 
+                     delta, rho, cor, rate, ...) {
     do1rep <- function() {
-        if(paired) {
-            datgen <- datgen.sr
-            formula <- score ~ cluster(id)
-        } else {
-            datgen <- datgen.rs
-            formula <- score ~ cluster(id) + grp
-        }
-        dat <- datgen(nclus, maxclsize, delta, rho, rate, ...)
-        p.rgl <- cluswilcox.test(formula, paired = paired, 
+        datgen <- if (paired) datgen.sr else datgen.rs
+        formula <- if (paired) score ~ cluster(cid) 
+                   else score ~ cluster(cid) + grp
+        dat <- datgen(nclus, maxclsize, delta, rho, cor, rate, ...)
+        p.rgl <- clusWilcox.test(formula, paired = paired, 
                                  data = dat, method = "rgl")$p.value
-        p.ds <- cluswilcox.test(formula, paired = paired, 
-                                data = dat, method = "ds")$p.value
+         p.ds <- clusWilcox.test(formula, paired = paired, 
+                                 data = dat, method = "ds" )$p.value
         c(rgl = p.rgl, ds = p.ds)
     }
     sim <- t(replicate(nrep, do1rep()))
     apply(sim, 2, function(x) mean(x < level))
 }
 @
-
 
 
 

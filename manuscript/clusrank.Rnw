@@ -839,10 +839,14 @@ clusWilcox.test(score ~ cluster(cid),  dat.sr, paired = TRUE, method = "ds")
 \subsection{A simulation study}
 \label{s:simu}
 
-Using the two data generation functions, we provide a convenient function, \code{simpower}, to enable the comparison of empirical size and power of RGL and DS method for each test under a range of scenarios.  
+Using the two data generation functions, we provide a convenient
+function, \code{simpower}, to facilitate the comparison of empirical
+size and power of RGL and DS method for each test under a range of
+scenarios.
+
 <<simpower>>=
-simpower <- function(nrep, level, paired, delta, rho, cor,
-                     rate, nclus, maxclsize, ...) {
+simpower <- function(nrep, level, paired, nclus, maxclsize, 
+                     delta, rho, cor, rate, ...) {
     do1rep <- function() {
         datgen <- if (paired) datgen.sr else datgen.rs
         formula <- if (paired) score ~ cluster(cid) 
@@ -868,24 +872,25 @@ inherited from \code{datgen.rs} or \code{datgen.sr} depending on the
 value of \code{paired}.
 
 
-To illustrate the usage of the function, we compare the empirical
-power of the two methods for clustered rank-sum test through $1000$
-replications. The level is set as $0.05$. The true group difference is
-$0$ and $0.5$, respectively. The data set contains $10$ clusters, each
-with size $3$. The intra-cluster correlation parameter \code{rho} is
-0.1. The unit of randomization is cluster.
+To illustrate the usage of the function, we compare the empirical size
+and power of the two clustered rank-sum tests through $1000$
+replications. The significance level is set as $0.05$. The true group
+differences are $0$ and $0.5$, respectively. Each data set contains
+$10$ clusters with size $3$. The intra-cluster correlation structure
+is exchangeable with parameter \code{rho} equals 0.1. The unit of
+randomization is cluster.
 
 <<sim-clus-rs>>=
-simpower(1000, 0.05, FALSE, 0, c(0.1, 0.1), xch, 1, 10, 5, "cluster")
-simpower(1000, 0.05, FALSE, 0.5, c(0.1, 0.1), xch, 1, 10, 5, "cluster")
+simpower(1000, 0.05, FALSE, 10, 5, 0, c(0.1, 0.1), xch, 1, "cluster")
+simpower(1000, 0.05, FALSE, 10, 5, 0.5, c(0.1, 0.1), xch, 1, "cluster")
 @ 
 It is shown in the output that the empirical size of both methods are
 close to the nominal level, and the empirical power is comparable. 
 
-A relatively comprehensive comparison of the two methods of clustered rank-sum test has been
-done by \citet{Datt:Satt:rank:2005} when grouping is at cluster level,
-comparison when grouping is at individual level, however, has not been
-done yet in the literature. 
+A relatively comprehensive comparison of the two clustered rank-sum
+tests has been done by \citet{Datt:Satt:rank:2005} when treatment is
+assigned to clusters. No comparison has been done when the treatment
+is assigned at individual level yet. 
 
 Table~\ref{tab:rs} includes results from $6$ scenarios using this
 function for different configuration that compares
