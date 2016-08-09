@@ -669,7 +669,7 @@ where $Z_g$ is a standard multivariate normal random vector with mean
 zero and an exchangeable or a AR1 correlation structure with
 correlation parameter $\rho_g$, and $\delta$ is the group difference.
 <<corstr>>=
-xch <- function(dim, rho) {
+ex  <- function(dim, rho) {
     diag(1 - rho, dim) + matrix(rho, dim, dim) 
 }
 ar1 <- function(dim, rho) {
@@ -684,18 +684,18 @@ sizes. The needed multivariate normal random variable is generated
 with \pkg{mvtnorm} \citep{Genz:etal:mvtn:2016, Genz:Bret:comp:2009}.
 <<datgen, echo=TRUE>>= 
 library(mvtnorm)
-datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1), cor = c(xch, ar1),
-                      rate = 1, grplevel = c("cluster", "individual")) { 
+datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1), 
+                      cor = c(ex, ar1), rate = 1, clusgrp = TRUE) {
     nn <- nclus * maxclsize
     Sigma1 <- cor(maxclsize, rho[1])
     Sigma2 <- cor(maxclsize, rho[2])
     x <- c(t(rmvnorm(nclus, sigma = Sigma1))) 
     y <- c(t(rmvnorm(nclus, sigma = Sigma2)))
     group <- rep(c(0, 1), each = nn)
-    if (grplevel == "individual") group  <- sample(group, nn, FALSE)
+    if (!clusgrp) group  <- sample(group, nn, FALSE)
     cid <- rep(1:(2 * nclus), each = maxclsize)
-    score <- exp(c(x, y)) + delta * group 
-    dat <- data.frame(score = score, grp = group, cid = cid) 
+    x <- exp(c(x, y)) + delta * group 
+    dat <- data.frame(x = x, grp = group, cid = cid) 
     keep <-  sort(sample(1:(2 * nn), size = rate * (2 * nn), FALSE))
     if (rate ==  1) dat else dat[keep, ]      
 }
@@ -713,7 +713,7 @@ random; when \code{rate = 1}, balanced data with equal cluster size is
 generated.  The grouping level is controlled by \code{grplevel}:
 \code{"cluster"} for cluster-level and \code{"individual"} for
 individual level.  The function returns a data set with three columns:
-observed measurement \code{score}, grouping id \code{grp}, and cluster
+observed measurement \code{x}, grouping id \code{grp}, and cluster
 id \code{cid}.
 
 
@@ -736,18 +736,18 @@ head(dat.cls)
 We first apply the formula interface and the RGL asymptotic test to the
 data set: 
 <<clus-rs-rgl-asymp>>=
-clusWilcox.test(score ~ grp + cluster(cid), dat.cls, method = "rgl")
+clusWilcox.test(x ~ grp + cluster(cid), dat.cls, method = "rgl")
 @ 
 The permutation test of RGL method is also available for data with a
 small number of clusters when treatment is assigned at cluster level:  
 <<clus-rs-rgl-exact>>=
-clusWilcox.test(score ~ grp + cluster(cid), dat.cls, method = "rgl", exact = TRUE)
+clusWilcox.test(x ~ grp + cluster(cid), dat.cls, method = "rgl", exact = TRUE)
 @ 
 
 
 We illustrate the use of numerical interface with DS method in the following:
 <<clus-rs-ds>>=
-clusWilcox.test(score, group =  grp, cluster = cid, data = dat.cls, method = "ds")
+clusWilcox.test(x, group =  grp, cluster = cid, data = dat.cls, method = "ds")
 @ 
 The test staistics of RGL and DS method are very close to each
 other. Note that, when using the code provided online by the authors
@@ -772,7 +772,8 @@ dat.cls1 <- datgen.rs(10, 3, 0, c(.9, .9), xch,  1, "cluster")
 dat.cls1$cid <- rep(21:40, each = 3)
 dat.str <- cbind(rbind(dat.cls, dat.cls1), strat = rep(c(1, 2), each = 60))
 head(dat.str)
-clusWilcox.test(score ~ grp + cluster(cid) + stratum(strat), dat = dat.str,  method = "rgl")
+clusWilcox.test(x ~ grp + cluster(cid) + stratum(strat), dat = dat.str, 
+                method = "rgl")
 @ 
 
 
@@ -784,7 +785,7 @@ id to \code{dat.cls1} than that of \code{dat.cls}.
 <<clus-rs-ds-mgrp>>=
 dat.cls1$grp <- rep(c(3, 4), each = 30)
 dat.m <- rbind(dat.cls, dat.cls1)
-clusWilcox.test(score ~ grp + cluster(cid), dat = dat.m, method = "ds")
+clusWilcox.test(x ~ grp + cluster(cid), dat = dat.m, method = "ds")
 @ 
 
 
@@ -799,7 +800,7 @@ simulation scenario $1$ in \citet{Datt:Satt:sign:2008}, both balanced
 data and unbalanced data. The observations in a cluster is generated
 as
 \[
-  X = sign(Z_d)\exp(|Z_d|),
+  X = \mathrm{sign}(Z_d)\exp(|Z_d|),
 \]
 where $Z_d$ is a multivariate normal random vector with mean $\delta$
 and an exchangeable or AR1 conrrelation structure with correlation
@@ -812,9 +813,9 @@ datgen.sr <- function(nclus, maxclsize, delta = 0.,
     nn <- nclus * maxclsize
     Sigma <- cor(maxclsize, rho)
     z <- c(t(rmvnorm(nclus, sigma = Sigma))) + delta
-    score <- sign(z) * exp(abs(z))
+    x <- sign(z) * exp(abs(z))
     cid <- rep(1:nclus, each = maxclsize)
-    dat <- data.frame(score = score, cid = cid)
+    dat <- data.frame(x = x, cid = cid)
     keep <- sort(sample(1: nn, size = rate * nn, FALSE))
     if (rate == 1) dat else dat[keep,]
 }
@@ -832,29 +833,27 @@ head(dat.sr)
 
 To apply both methods to this data set:
 <<sr>>=
-clusWilcox.test(score ~ cluster(cid),  dat.sr, paired = TRUE, method = "rgl")
-clusWilcox.test(score ~ cluster(cid),  dat.sr, paired = TRUE, method = "ds")
+clusWilcox.test(x ~ cluster(cid),  dat.sr, paired = TRUE, method = "rgl")
+clusWilcox.test(x ~ cluster(cid),  dat.sr, paired = TRUE, method = "ds")
 @ 
 
 \subsection{A simulation study}
 \label{s:simu}
 
-Using the two data generation functions, we provide a convenient
-function, \code{simpower}, to facilitate the comparison of empirical
-size and power of RGL and DS method for each test under a range of
-scenarios.
-
+Using the two data generation functions defined above, we provide a 
+convenient function \code{simpower} to facilitate the power comparison 
+of RGL and DS method for each test under a range of scenarios.
 <<simpower>>=
 simpower <- function(nrep, level, paired, nclus, maxclsize, 
                      delta, rho, cor, rate, ...) {
     do1rep <- function() {
         datgen <- if (paired) datgen.sr else datgen.rs
-        formula <- if (paired) score ~ cluster(cid) 
-                   else score ~ cluster(cid) + grp
+        formula <- if (paired) x ~ cluster(cid) 
+                   else x ~ cluster(cid) + grp
         dat <- datgen(nclus, maxclsize, delta, rho, cor, rate, ...)
         p.rgl <- clusWilcox.test(formula, paired = paired, 
                                  data = dat, method = "rgl")$p.value
-         p.ds <- clusWilcox.test(formula, paired = paired, 
+        p.ds  <- clusWilcox.test(formula, paired = paired, 
                                  data = dat, method = "ds" )$p.value
         c(rgl = p.rgl, ds = p.ds)
     }
@@ -862,6 +861,7 @@ simpower <- function(nrep, level, paired, nclus, maxclsize,
     apply(sim, 2, function(x) mean(x < level))
 }
 @
+
 
 The first two arguments, \code{nrep} and \code{level} specify the
 number of replications and the significance level that the user
@@ -879,13 +879,13 @@ differences are $0$ and $0.5$, respectively. Each data set contains
 $10$ clusters with size $3$. The intra-cluster correlation structure
 is exchangeable with parameter \code{rho} equals 0.1. The unit of
 randomization is cluster.
-
 <<sim-clus-rs>>=
-simpower(1000, 0.05, FALSE, 10, 5, 0, c(0.1, 0.1), xch, 1, "cluster")
+simpower(1000, 0.05, FALSE, 10, 5, 0.0, c(0.1, 0.1), xch, 1, "cluster")
 simpower(1000, 0.05, FALSE, 10, 5, 0.5, c(0.1, 0.1), xch, 1, "cluster")
 @ 
 It is shown in the output that the empirical size of both methods are
 close to the nominal level, and the empirical power is comparable. 
+
 
 A relatively comprehensive comparison of the two clustered rank-sum
 tests has been done by \citet{Datt:Satt:rank:2005} when treatment is
@@ -896,8 +896,9 @@ the two clustered rank-sum tests under different conditions when each
 individual is the unit of randomization. Each data set contains $40$
 clusters. Two intra-cluster correlation
 structures, exchangeable and AR1 (non-exchangeable), are used, each
-with $\rho = 0.1$ and $0.9$. The maximum cluster size $M$ has two
-levels $5$ and $10$. When maximum cluster size is $5$, we compare the
+with $\rho = 0.1$ and $0.9$. 
+The maximum cluster size $M = \max_i n_i$ has two levels $5$ and $10$. 
+When maximum cluster size is $5$, we compare the
 performance of the two tests when data is balanced and unbalanced, by
 setting \code{rate} of observations which are randomly kept to be $1$
 and $0.5$. In order to introduce more variation in the cluster size of
@@ -915,10 +916,10 @@ Each cell represents $1000$ replications.
   \toprule
 &&&&& \multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.3$} & \multicolumn{2}{c}{$\delta = 0.6$} \\
   \cmidrule{6-7} \cmidrule{8-9} \cmidrule{10-11}
-  Design & Correlation structure & $\rho$ & M & rate & RGL & DS & RGL & DS & RGL & DS \\
+  Design & Corr. str. & $\rho$ & M & rate & RGL & DS & RGL & DS & RGL & DS \\
 
   \midrule
-1 & Exchangeable & 0.1 & 5 & 1 &  0.05 & 0.05 & 0.43 & 0.38 & 0.89 & 0.86 \\ 
+1 & ex & 0.1 & 5 & 1 &  0.05 & 0.05 & 0.43 & 0.38 & 0.89 & 0.86 \\ 
 
   2 & & & 5 & 0.5 & 0.05 & 0.04 & 0.21 & 0.19 & 0.55 & 0.50 \\ 
   3 & & & 10 & 0.25 & 0.05 & 0.05 & 0.20 & 0.19 & 0.50 & 0.48 \\ 
@@ -926,7 +927,7 @@ Each cell represents $1000$ replications.
   5 & & & 5 & 0.5 & 0.04 & 0.05 & 0.29 & 0.18 & 0.62 & 0.47 \\ 
   
   6 & & & 10 & 0.25 & 0.04 & 0.04 & 0.30 & 0.19 & 0.65 & 0.44 \\ 
-  7 & AR1 & 0.1 & 5 & 1 &  0.05 & 0.05 & 0.44 & 0.41 & 0.89 & 0.87 \\
+  7 & ar1 & 0.1 & 5 & 1 &  0.05 & 0.05 & 0.44 & 0.41 & 0.89 & 0.87 \\
   8 & & & 5 & 0.5 &  0.04 & 0.05 & 0.20 & 0.20 & 0.56 & 0.51 \\ 
   9 & & & 10 & 0.25 &  0.05 & 0.06 & 0.20 & 0.20 & 0.53 & 0.51 \\ 
   10 & & 0.9 & 5 & 1 & 0.05 & 0.04 & 0.50 & 0.37 & 0.89 & 0.80 \\ 

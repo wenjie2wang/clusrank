@@ -485,8 +485,3 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
         }
     }
 }
-
-
-
-
-
