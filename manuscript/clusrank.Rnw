@@ -913,25 +913,35 @@ data instead of $50\%$.
 
 \begin{table}[tbp]
 \centering
-\caption{Empirical rejection rate of the two clustered rank-sum test
-  under different scenarios.} 
-\begin{tabular}{rrrrr}
+\caption{Empirical rejection rate comparisons for RGL and DS clustered rank-sum test, nominal level $5\%$, $N = 40$ clusters, $M$ is the maximum cluster size, $1000$ simulations for each combination.}
+\begin{tabular}{rrrrrrrrrrr}
   \toprule
-   & \multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.5$} \\
- & RGL & DS & RGL & DS \\
- \midrule
-  ind, bal, $\rho = 0.1$ & 0.05 & 0.05 & 0.81 & 0.76 \\ 
-  ind, bal, $\rho = 0.9$ & 0.05 & 0.05 & 0.84 & 0.73 \\ 
-  ind, unbal, $\rho = 0.1$ & 0.06 & 0.04 & 0.44 & 0.41 \\ 
-  ind, unbal, $\rho = 0.9$ & 0.05 & 0.05 & 0.55 & 0.38 \\ 
-  ind, unbal, maxsize = 10, $\rho = 0.1$ & 0.05 & 0.05 & 0.44 & 0.39 \\ 
-  ind, unbal, maxsize = 10, $\rho = 0.9$ & 0.04 & 0.05 & 0.57 & 0.39 \\ 
-   \bottomrule
+&&&&& \multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.3$} & \multicolumn{2}{c}{$\delta = 0.6$} \\
+  \cmidrule{6-7} \cmidrule{8-9} \cmidrule{10-11}
+  Design & Correlation structure & $\rho$ & M & rate & RGL & DS & RGL & DS & RGL & DS \\
+
+  \midrule
+1 & Exchangeable & 0.1 & 5 & 1 &  0.05 & 0.05 & 0.43 & 0.38 & 0.89 & 0.86 \\ 
+
+  2 & & & 5 & 0.5 & 0.05 & 0.04 & 0.21 & 0.19 & 0.55 & 0.50 \\ 
+  3 & & & 10 & 0.25 & 0.05 & 0.05 & 0.20 & 0.19 & 0.50 & 0.48 \\ 
+  4 & & 0.9 & 5 & 1 & 0.05 & 0.06 & 0.51 & 0.42 & 0.91 & 0.82 \\ 
+  5 & & & 5 & 0.5 & 0.04 & 0.05 & 0.29 & 0.18 & 0.62 & 0.47 \\ 
+  
+  6 & & & 10 & 0.25 & 0.04 & 0.04 & 0.30 & 0.19 & 0.65 & 0.44 \\ 
+  7 & AR1 & 0.1 & 5 & 1 &  0.05 & 0.05 & 0.44 & 0.41 & 0.89 & 0.87 \\
+  8 & & & 5 & 0.5 &  0.04 & 0.05 & 0.20 & 0.20 & 0.56 & 0.51 \\ 
+  9 & & & 10 & 0.25 &  0.05 & 0.06 & 0.20 & 0.20 & 0.53 & 0.51 \\ 
+  10 & & 0.9 & 5 & 1 & 0.05 & 0.04 & 0.50 & 0.37 & 0.89 & 0.80 \\ 
+ 
+  11 & & & 5 & 0.5 & 0.04 & 0.05 & 0.26 & 0.18 & 0.64 & 0.48 \\ 
+
+  12 & & & 10 & 0.25 &  0.05 & 0.05 & 0.28 & 0.18 & 0.59 & 0.49 \\ 
+ \bottomrule
 \end{tabular}
 \label{tab:rs}
 \end{table}
 
-{\bf where is the comparison that has not been done before?}
 
 The empirical size of both methods are around the nominal level in all
 scenarios, though the performance in terms of power differs. RGL
@@ -973,30 +983,31 @@ $\rho = 0.1$ and $0.9$ for each half of the clusters; $\rho = 0.9$.
   anything not done before?  please address my comments before
   removing them}
 
-\begin{table}[ht]
+\begin{table}[tbp]
 \centering
-\caption{Simulation for clustered signed-rank test, comparsion between RGL and DS} 
-\begin{tabular}{rrrrr}
+\caption{Empirical rejection rate comparisons for RGL and DS clustered signed-rank test, nominal level $5\%$, $N = 40$ clusters, maximum cluster size $M = 5$, $1000$ simulations for each combination.}
+\begin{tabular}{rrrrrrrrrr}
   \toprule
-   & \multicolumn{2}{c}{size} & \multicolumn{2}{c}{power} \\
- & RGL & DS & RGL & DS \\
- \midrule
-bal, $\rho = 0.1$ & 0.048 & 0.051 & 0.725 & 0.733 \\ 
-  bal, $\rho = 0.1, 0.9$ & 0.035 & 0.042 & 0.419 & 0.430 \\ 
-  bal, $\rho = 0.9$ & 0.037 & 0.050 & 0.270 & 0.287 \\ 
-  unbal, $\rho = 0.1$ & 0.032 & 0.032 & 0.464 & 0.468 \\ 
-  unbal, $\rho = 0.1, 0.9$ & 0.043 & 0.042 & 0.360 & 0.370 \\ 
-  unbal, $\rho = 0.9$ & 0.049 & 0.055 & 0.293 & 0.310 \\ 
-  unbal, maxsize = 10, $\rho = 0.1$ & 0.053 & 0.053 & 0.450 & 0.448 \\ 
-  unbal, maxsize = 10, $\rho = 0.1, 0.9$ & 0.056 & 0.061 & 0.350 & 0.353 \\ 
-  unbal, maxsize = 10, $\rho = 0.9$ & 0.048 & 0.058 & 0.286 & 0.302 \\ 
-   \bottomrule
+  &&&& \multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.3$} & \multicolumn{2}{c}{$\delta = 0.6$} \\
+  \cmidrule{5-6}\cmidrule{7-8}\cmidrule{9-10}
+Design & Correlation structure & $\rho$ & Balance rate & RGL & DS & RGL & DS & RGL & DS \\
+  \hline
+  1 & Exchangeable & 0.1 & 1 & 0.05 & 0.05 & 0.94 & 0.94 & 1.00 & 1.00 \\ 
+  2 & & & 0.5 & 0.05 & 0.06 & 0.71 & 0.66 & 1.00 & 1.00 \\ 
+  3 & & 0.9 & 1 & 0.05 & 0.06 & 0.50 & 0.50 & 0.97 & 0.97 \\ 
+  4 & & & 0.5 & 0.03 & 0.03 & 0.46 & 0.47 & 0.96 & 0.96 \\ 
+  5 & AR1 & 0.1 & 1 & 0.05 & 0.05 & 0.96 & 0.96 & 1.00 & 1.00 \\
+  6 & & & 0.5 & 0.04 & 0.05 & 0.78 & 0.74 & 1.00 & 1.00 \\ 
+  7 & & 0.9 & 1 & 0.05 & 0.05 & 0.50 & 0.51 & 0.98 & 0.98 \\ 
+  8 & & & 0.5 & 0.05 & 0.05 & 0.52 & 0.51 & 0.96 & 0.96 \\ 
+   \hline
 \end{tabular}
+
 \label{tab:sr}
 \end{table}
 
 
-The standard error of the empirical power can be estimated as $0.5 /
+The upper bound standard error of the empirical power can be estimated as $0.5 /
 \sqrt{1000} = 0.032$, therefore we state that there is a significant
 difference between the empirical power of the two methods at a
 significance level $0.05$ if the absolute difference is more than
