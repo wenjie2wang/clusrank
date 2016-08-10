@@ -189,7 +189,7 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
     Terms <- terms(mf)
 
     x.name <- rownames(attr(m$formula, "factors"))[1]
-    DNAME <- paste0(x.name, ",")
+    DNAME <- paste0(x.name, ";")
     response <- attr(terms(mf), "response")
     x <- mf[[response]]
     n.obs <- length(x)
@@ -202,7 +202,7 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
     cluster.name <- gsub("[\\(\\)]", "",
                          regmatches(ctemp$vars,
                                     gregexpr("\\(.*?\\)", ctemp$vars))[[1]])
-    DNAME <- paste0(DNAME, " cluster: ", cluster.name)
+    DNAME <- paste0(DNAME, " cluster: ", cluster.name, ";")
 
 
     if(length(ctemp$vars) == 1) {
@@ -230,7 +230,7 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
     group <- Term.labels[!grepl("[\\(\\)]", Term.labels)]
     if(length(group)) {
         group.name <- group
-        DNAME <- paste0(DNAME, " group: ", group.name)
+        DNAME <- paste0(DNAME, " group: ", group.name, ";")
         if(length(group.name) == 1) {
             group.keep <- mf[[group.name]]
         } else {
@@ -260,13 +260,13 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
                                         gregexpr("\\(.*?\\)", stemp$vars))[[1]])
         stratum <- mf[[stratum]]
         
-        DNAME <- paste0(DNAME, " strata: ", strata.name)
+        DNAME <- paste0(DNAME, " strata: ", strata.name, ";")
         
     } else {
         stratum <- rep(1, n.obs)
     }
      if(!missing(data)) {
-        DNAME <- paste(DNAME, "from", m$data)
+        DNAME <- paste(DNAME, "(from", paste0(m$data, ")"))
     }
     
     y <- do.call("clusWilcox.test.default",
@@ -308,23 +308,23 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
             }
             if(!is.null(pars$cluster)) {
                 cluster <- data[, as.character(pars$cluster)]
-                DNAME <- paste0(DNAME, ", cluster: ", pars$cluster)
+                DNAME <- paste0(DNAME, ", cluster: ", pars$cluster, ";")
             } else {
                 cluster <- NULL
             }
             if(!is.null(pars$group)) {
                 group <- data[, as.character(pars$group)]
-                DNAME <- paste0(DNAME, " group: ", pars$group)
+                DNAME <- paste0(DNAME, " group: ", pars$group, ";")
             } else {
                 group <- NULL
             }
             if(!is.null(pars$stratum)) {
               stratum <- data[, as.character(pars$stratum)]
-              DNAME <- paste0(DNAME, " stratum: ", pars$stratum)
+              DNAME <- paste0(DNAME, " stratum: ", pars$stratum, ";")
             } else {
               stratum <- NULL
             }
-            DNAME <- paste0(DNAME, " from ", pars$data)
+            DNAME <- paste0(DNAME, " (from ", paste0(pars$data, ")"))
           } else {
               DNAME <- (pars$x)
               if(!is.null(y)) {

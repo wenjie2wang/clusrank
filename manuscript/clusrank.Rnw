@@ -685,7 +685,7 @@ with \pkg{mvtnorm} \citep{Genz:etal:mvtn:2016, Genz:Bret:comp:2009}.
 <<datgen, echo=TRUE>>= 
 library(mvtnorm)
 datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1), 
-                      cor = c(ex, ar1), rate = 1, clusgrp = TRUE) {
+                      cor = c(ex, ar1), rate = 0., clusgrp = TRUE) {
     nn <- nclus * maxclsize
     Sigma1 <- cor(maxclsize, rho[1])
     Sigma2 <- cor(maxclsize, rho[2])
@@ -696,58 +696,61 @@ datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1),
     cid <- rep(1:(2 * nclus), each = maxclsize)
     x <- exp(c(x, y)) + delta * group 
     dat <- data.frame(x = x, grp = group, cid = cid) 
-    keep <-  sort(sample(1:(2 * nn), size = rate * (2 * nn), FALSE))
-    if (rate ==  1) dat else dat[keep, ]      
+    miss <-  sort(sample(1:(2 * nn), size = rate * (2 * nn), FALSE))
+    if (rate == 0.) dat else dat[-miss, ]      
 }
-@
+@ 
 The function have two required inputs: \code{nclus} for number of
 clusters in each group and \code{maxclsize} for the maximum cluster
-size.  The difference between the groups is specified by \code{delta}.
+size. 
+The difference between the groups is specified by \code{delta}.
 The group specific intra-cluster correlation parameter $\rho_g$ is
 controlled by $\rho$, a numeric vector of length 2, one for each
 group.  There are two correlation structures to choose from by setting
-\code{cor}: \code{xch} for exchangeable correlation and \code{ar1} for
-AR1 correlation.  To allow unequal cluster sizes, \code{rate}
-specifies the rate at which an individual in a cluster is kept at
-random; when \code{rate = 1}, balanced data with equal cluster size is
-generated.  The grouping level is controlled by \code{grplevel}:
-\code{"cluster"} for cluster-level and \code{"individual"} for
-individual level.  The function returns a data set with three columns:
-observed measurement \code{x}, grouping id \code{grp}, and cluster
-id \code{cid}.
+\code{cor}: \code{ex} for exchangeable correlation and \code{ar1} for
+AR1 correlation.  
+To allow unequal cluster sizes, \code{rate} specifies the missing rate
+at which an individual in a cluster to be excluded at random; when
+\code{rate = 1}, balanced data with equal cluster size is generated.  
+The grouping level is controlled by the logical \code{clusgrp}:
+\code{TRUE} for cluster-level and \code{FALSE} for individual level.
+The function returns a data set with three columns: observed
+measurement \code{x}, grouping id \code{grp}, and cluster id
+\code{cid}. 
 
 
 For the replicability of the following demonstration,
-a random seed is fixed. 
+a random seed is first fixed. 
 <<seed>>=
 set.seed(1234)
 @ 
 
 To illustrate the clustered rank sum test, a data set with $10$
-clusters is generated with treatment effect null. 
-Each cluster has $3$ members and an exchangeable correlation with
-$\rho_g = 0.9$. The basic unit of the treatment assignment is cluster.
+clusters is generated with null treatment effect. 
+Each cluster contains $3$ members and the intra-cluster correlation
+is exchangeable with $\rho_g = 0.9$. 
+The basic unit of the treatment assignment is cluster.
 
 <<dat-clus>>=
-dat.cls <- datgen.rs(10, 3, 0, c(.9, .9), xch,  1, "cluster")
-head(dat.cls)
+dat.cl <- datgen.rs(10, 3, 0, c(.9, .9), ex, 0, TRUE)
+head(dat.cl)
 @ 
 
 We first apply the formula interface and the RGL asymptotic test to the
 data set: 
 <<clus-rs-rgl-asymp>>=
-clusWilcox.test(x ~ grp + cluster(cid), dat.cls, method = "rgl")
+clusWilcox.test(x ~ grp + cluster(cid), dat.cl, method = "rgl")
 @ 
 The permutation test of RGL method is also available for data with a
 small number of clusters when treatment is assigned at cluster level:  
 <<clus-rs-rgl-exact>>=
-clusWilcox.test(x ~ grp + cluster(cid), dat.cls, method = "rgl", exact = TRUE)
+clusWilcox.test(x ~ grp + cluster(cid), dat.cl, method = "rgl", exact = TRUE)
 @ 
 
 
 We illustrate the use of numerical interface with DS method in the following:
 <<clus-rs-ds>>=
-clusWilcox.test(x, group =  grp, cluster = cid, data = dat.cls, method = "ds")
+clusWilcox.test(x, group =  grp, cluster = cid, data = dat.cl, method = "ds")
 @ 
 The test staistics of RGL and DS method are very close to each
 other. Note that, when using the code provided online by the authors
@@ -761,16 +764,16 @@ For cluster-level grouping data, the RGL method allows an extra
 stratum variable to add information to the test. The data set
 \code{dat.str} generated below contains a strata variable besides the
 required variables. It is obtained by combining two data sets:
-\code{dat.cls}, and \code{dat.cls1} which is generated similarly as
-\code{dat.cls} but with a non-zero effect equals $0.5$. Each data set
+\code{dat.cl}, and \code{dat.cl1} which is generated similarly as
+\code{dat.cl} but with a non-zero effect equals $0.5$. Each data set
 is treated as from a separate stratum, and a \code{strat} variable is
 added to the combined data set to identify the strata.
 
 
 <<clus-rs-rgl-str>>=
-dat.cls1 <- datgen.rs(10, 3, 0, c(.9, .9), xch,  1, "cluster")
-dat.cls1$cid <- rep(21:40, each = 3)
-dat.str <- cbind(rbind(dat.cls, dat.cls1), strat = rep(c(1, 2), each = 60))
+dat.cl1 <- datgen.rs(10, 3, 0, c(.9, .9), ex, 0, TRUE)
+dat.cl1$cid <- rep(21 : 40, each = 3)
+dat.str <- cbind(rbind(dat.cl, dat.cl1), strat = rep(c(1, 2), each = 60))
 head(dat.str)
 clusWilcox.test(x ~ grp + cluster(cid) + stratum(strat), dat = dat.str, 
                 method = "rgl")
@@ -779,12 +782,12 @@ clusWilcox.test(x ~ grp + cluster(cid) + stratum(strat), dat = dat.str,
 
 A benefit of the DS method is that it can compare more than two
 groups. We construct a data set with $4$ groups by combining
-\code{dat.cls} and \code{dat.cls1} but assign a different set of group
-id to \code{dat.cls1} than that of \code{dat.cls}.
+\code{dat.cl} and \code{dat.cl1} but assign a different set of group
+id to \code{dat.cl1} than that of \code{dat.cl}.
 
 <<clus-rs-ds-mgrp>>=
-dat.cls1$grp <- rep(c(3, 4), each = 30)
-dat.m <- rbind(dat.cls, dat.cls1)
+dat.cl1$grp <- rep(c(3, 4), each = 30)
+dat.m <- rbind(dat.cl, dat.cl1)
 clusWilcox.test(x ~ grp + cluster(cid), dat = dat.m, method = "ds")
 @ 
 
@@ -807,17 +810,17 @@ and an exchangeable or AR1 conrrelation structure with correlation
 parameter $\rho$, and $\delta$ is the pair difference.
 
 
-<<datagen_sr, echo = TRUE>>=
+<<datagen-sr, echo = TRUE>>=
 datgen.sr <- function(nclus, maxclsize, delta = 0.,
-                      rho = 0.1, cor = c(xch, ar1), rate = 1) {
+                      rho = 0.1, cor = c(ex, ar1), rate = 0.) {
     nn <- nclus * maxclsize
     Sigma <- cor(maxclsize, rho)
     z <- c(t(rmvnorm(nclus, sigma = Sigma))) + delta
     x <- sign(z) * exp(abs(z))
-    cid <- rep(1:nclus, each = maxclsize)
+    cid <- rep(1 : nclus, each = maxclsize)
     dat <- data.frame(x = x, cid = cid)
-    keep <- sort(sample(1: nn, size = rate * nn, FALSE))
-    if (rate == 1) dat else dat[keep,]
+    miss <- sort(sample(1: nn, size = rate * nn, FALSE))
+    if (rate == 0.) dat else dat[-miss, ]
 }
 @ 
 
@@ -827,7 +830,7 @@ An exchangeble correlation with parameter \code{rho} equals $0.9$
 is used as the intra-cluster correlation. 
 
 <<dat-sr>>=
-dat.sr <- datgen.sr(10, 3, cor = xch, rho = 0.9)
+dat.sr <- datgen.sr(10, 3, cor = ex, rho = 0.9)
 head(dat.sr)
 @ 
 
@@ -880,8 +883,10 @@ $10$ clusters with size $3$. The intra-cluster correlation structure
 is exchangeable with parameter \code{rho} equals 0.1. The unit of
 randomization is cluster.
 <<sim-clus-rs>>=
-simpower(1000, 0.05, FALSE, 10, 5, 0.0, c(0.1, 0.1), xch, 1, "cluster")
-simpower(1000, 0.05, FALSE, 10, 5, 0.5, c(0.1, 0.1), xch, 1, "cluster")
+simpower(1000, 0.05, FALSE, 10, 5, 0.0, c(0.1, 0.1), ex, 0, TRUE)
+@ 
+<<sim-sr>>=
+simpower(1000, 0.05, TRUE, 10, 5, 0.5, 0.1, ex, 0)
 @ 
 It is shown in the output that the empirical size of both methods are
 close to the nominal level, and the empirical power is comparable. 
@@ -915,8 +920,8 @@ Each cell represents $1000$ replications.
 \begin{tabular}{rrrrrrrrrrr}
   \toprule
 &&&&& \multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.3$} & \multicolumn{2}{c}{$\delta = 0.6$} \\
-  \cmidrule{6-7} \cmidrule{8-9} \cmidrule{10-11}
-  Design & Corr. str. & $\rho$ & M & rate & RGL & DS & RGL & DS & RGL & DS \\
+  \cmidrule(lr){6-7} \cmidrule(lr){8-9} \cmidrule(lr){10-11}
+  Design & Corr. str. & $\rho$ & M & Missing rate & RGL & DS & RGL & DS & RGL & DS \\
 
   \midrule
 1 & ex & 0.1 & 5 & 1 &  0.05 & 0.05 & 0.43 & 0.38 & 0.89 & 0.86 \\ 
@@ -968,10 +973,10 @@ for each design.
 \begin{tabular}{rrrrrrrrrr}
   \toprule
   &&&& \multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.3$} & \multicolumn{2}{c}{$\delta = 0.6$} \\
-  \cmidrule{5-6}\cmidrule{7-8}\cmidrule{9-10}
-Design & Correlation structure & $\rho$ & Balance rate & RGL & DS & RGL & DS & RGL & DS \\
+  \cmidrule(lr){5-6}\cmidrule(lr){7-8}\cmidrule(lr){9-10}
+Design & Correlation structure & $\rho$ & Missing rate & RGL & DS & RGL & DS & RGL & DS \\
   \hline
-  1 & Exchangeable & 0.1 & 1 & 0.05 & 0.05 & 0.94 & 0.94 & 1.00 & 1.00 \\ 
+  1 & ex & 0.1 & 1 & 0.05 & 0.05 & 0.94 & 0.94 & 1.00 & 1.00 \\ 
   2 & & & 0.5 & 0.05 & 0.06 & 0.71 & 0.66 & 1.00 & 1.00 \\ 
   3 & & 0.9 & 1 & 0.05 & 0.06 & 0.50 & 0.50 & 0.97 & 0.97 \\ 
   4 & & & 0.5 & 0.03 & 0.03 & 0.46 & 0.47 & 0.96 & 0.96 \\ 

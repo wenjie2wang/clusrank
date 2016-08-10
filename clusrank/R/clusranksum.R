@@ -61,11 +61,11 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
         METHOD <- paste0(METHOD, " (exact)")
         if(length(table(cluster)) > 40)
             print("Number of clusters exceeds 40 for RGL clustered rank exact test") 
-        Wc <- sum(dat[dat$grp == 1, "rksum"])
+        W <- sum(dat[dat$grp == 1, "rksum"])
         n.layer <- l.csu * l.stu
         mgv <- ngv <- rep(0, n.layer)
         ct <- 1
-        rkx <- rkxc <- as.matrix(matrix(0, Wc + 1, n.layer))
+        rkx <- rkxc <- as.matrix(matrix(0, W + 1, n.layer))
         ## Small sample permutation test
         counter <- 1
         for( i in csize.uniq) {
@@ -77,7 +77,7 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
                 temp.grp <- temp[, "grp"]
                 mgv[counter] <- length(temp.grp[temp.grp == 1])
                 ngv[counter] <- length(temp.grp)
-                temp.x <- cumcrksum(Wc, mgv[counter], sort(temp.rksum), csize.uniq)
+                temp.x <- cumcrksum(W, mgv[counter], sort(temp.rksum), csize.uniq)
                 rkx[, counter] <- temp.x[, 1]
                 rkxc[, counter] <- temp.x[, 2]
                 counter <- counter + 1
@@ -86,7 +86,7 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
         rkxi <- apply(rkxc, 1, function(x) all(x > 0))
         rkx <- as.matrix(rkx[rkxi, ])
         rkxc <- as.matrix(rkxc[rkxi, ])
-        p.val.l <- pcrksum_str(Wc, rkx, rkxc, mgv, ngv, rep(nrow(rkx), n.layer))
+        p.val.l <- pcrksum_str(W, rkx, rkxc, mgv, ngv, rep(nrow(rkx), n.layer))
         
         pval<- switch(alternative,
                       less = p.val.l,
@@ -94,9 +94,9 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
                       two.sided = 2 * min(p.val.l, 1 - p.val.l))
         names(mu) <- "location"
 
-        names(Wc) <- "Wc"
+        names(W) <- "W"
 
-        result <- list(statistic = Wc, p.value = pval,
+        result <- list(statistic = W, p.value = pval,
                        null.value = mu, alternative = alternative,
                        data.name = DNAME, method = METHOD,
                        balance = bal, exact = exact)
@@ -134,30 +134,30 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
         }
     }
         summary.mat[, "ngv"] <- summary.mat[, "Ngv"] - summary.mat[, "mgv"]
-        ## Wc is the ranksum stat
-        Wc <- sum(dat[dat$grp == 1, "rksum"])
+        ## W is the ranksum stat
+        W <- sum(dat[dat$grp == 1, "rksum"])
         Ngv <- summary.mat[, "Ngv"]
         mgv <- summary.mat[, "mgv"]
         ngv <- summary.mat[, "ngv"]
         VRgv <- summary.mat[, "VRgv"]
         Rsumgv <- summary.mat[, "Rsumgv"]
-        EWc <- sum(mgv * Rsumgv / Ngv)
-        VarWc <- sum((mgv * ngv / (Ngv * (Ngv - 1)) * VRgv)[VRgv > 0])
-        Zc <- (Wc - EWc) / sqrt(VarWc)
+        EW <- sum(mgv * Rsumgv / Ngv)
+        VarW <- sum((mgv * ngv / (Ngv * (Ngv - 1)) * VRgv)[VRgv > 0])
+        Z <- (W - EW) / sqrt(VarW)
 
-        pval <- switch(alternative, less = pnorm(abs(Zc)),
-                       greater = pnorm(abs(Zc), lower.tail = FALSE),
-                       two.sided = 2 * min(pnorm(abs(Zc)),
-                                           pnorm(abs(Zc), lower.tail = FALSE)))
+        pval <- switch(alternative, less = pnorm(abs(Z)),
+                       greater = pnorm(abs(Z), lower.tail = FALSE),
+                       two.sided = 2 * min(pnorm(abs(Z)),
+                                           pnorm(abs(Z), lower.tail = FALSE)))
 
-        names(Wc) <- "Wc"
-        names(EWc) <- "Expected value of Wc"
-        names(VarWc) <- "Variance of Wc"
-        names(Zc) <- "Zc"
+        names(W) <- "W"
+        names(EW) <- "Expected value of W"
+        names(VarW) <- "Variance of W"
+        names(Z) <- "Z"
         names(mu) <- "difference in locations"
-        result <- list(Rstat = Wc, ERstat = EWc,
-                 VRstat = VarWc,
-                 statistic = Zc, p.value = pval,
+        result <- list(Rstat = W, ERstat = EW,
+                 VRstat = VarW,
+                 statistic = Z, p.value = pval,
                  alternative = alternative,
                  null.value = mu,
                  data.name = DNAME,
@@ -206,25 +206,25 @@ clusWilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
         varQ <- (sum(q.uniq^2 * nq) - (sum(q.uniq * nq)) ^ 2 / n.clus) / n.clus
         sb.2 <- sum((rksum - csize * (csize * n.clus + 1) / 2) ^ 2) / n.clus
         sw.2 <- sum(vrk) / n.clus
-        Wc <- sum(as.numeric(group == 1) * xrank)
-        EWc <- (n.clus * unique(csize) + 1) / 2 * sum(q.uniq * nq)
+        W <- sum(as.numeric(group == 1) * xrank)
+        EW <- (n.clus * unique(csize) + 1) / 2 * sum(q.uniq * nq)
         G <- unique(csize)
         varb <- sum(nq * (G - q.uniq) * q.uniq * sw.2) / G
-        VarWc <- n.clus * (n.clus / (n.clus - 1) * varQ * sb.2 / unique(csize) ^ 2 + varb / n.clus)
-        Zc <- (Wc - EWc) / sqrt(VarWc)
+        VarW <- n.clus * (n.clus / (n.clus - 1) * varQ * sb.2 / unique(csize) ^ 2 + varb / n.clus)
+        Z <- (W - EW) / sqrt(VarW)
         pval <- switch(alternative,
-                       less = pnorm(abs(Zc)),
-                       greater = pnorm(abs(Zc), lower.tail = FALSE),
-                       two.sided = 2 * min(pnorm(abs(Zc)),
-                                           pnorm(abs(Zc), lower.tail = FALSE)))
-        names(Wc) <- "Wc"
-        names(EWc) <- "expected value of Wc"
-        names(VarWc) <- "variance of Wc"
-        names(Zc) <- "Zc"
+                       less = pnorm(abs(Z)),
+                       greater = pnorm(abs(Z), lower.tail = FALSE),
+                       two.sided = 2 * min(pnorm(abs(Z)),
+                                           pnorm(abs(Z), lower.tail = FALSE)))
+        names(W) <- "W"
+        names(EW) <- "expected value of W"
+        names(VarW) <- "variance of W"
+        names(Z) <- "Z"
         names(mu) <- "difference in locations"
-        result <- list(Rstat = Wc, ERstat = EWc,
-                 VRstat = VarWc,
-                 statistic = Zc, p.value = pval,
+        result <- list(Rstat = W, ERstat = EW,
+                 VRstat = VarW,
+                 statistic = Z, p.value = pval,
                  alternative = alternative,
                  null.value = mu,
                  data.name = DNAME,
@@ -241,12 +241,12 @@ clusWilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
         colnames(csize)[2] <- "csize"
         dat <- merge(dat, csize, by = "cluster")
         dat.l <- split(dat, dat$csize)
-        getWc <- function(dat) {
+        getW <- function(dat) {
             xrank <- rank(dat[, "x"])
             sum(xrank * as.numeric(dat[, "group"] == 1))
         }
-        Wc.l <- lapply(dat.l, getWc)
-        Wc <- unlist(Wc.l)
+        W.l <- lapply(dat.l, getW)
+        W <- unlist(W.l)
         csize.grp <- as.numeric(names(dat.l))
         CountQplus <- function(dat) {
             sum(length(which(dat[, "group"] == 1 )))
@@ -280,7 +280,7 @@ clusWilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
         theta <- deno <- numeric(n.csize)
         trans.rk <- vector("list", n.csize)
         for( i in 1 : n.csize) {
-            theta[i] <-( Wc[i] - Qplus[i] * (Qplus[i] + 1) / 2 ) / (Qplus[i] * (csize.grp[i] * N.clus[i] - Qplus[i]))
+            theta[i] <-( W[i] - Qplus[i] * (Qplus[i] + 1) / 2 ) / (Qplus[i] * (csize.grp[i] * N.clus[i] - Qplus[i]))
             deno[i] <- csize.grp[i] * N.clus[i] + 1
             trans.rk[[i]] <- qnorm(rank.l[[i]] / deno[i])
         }
@@ -349,16 +349,16 @@ clusWilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
 
         theta <- sumtheta / sumwt
         sdtheta <- sqrt(1 / sumwt)
-        Zc <- (theta - 1/2) / sdtheta
-        pval <- switch(alternative, less = pnorm(abs(Zc)),
-                       greater = pnorm(abs(Zc), lower.tail = FALSE),
-                       two.sided = 2 * min(pnorm(abs(Zc)),
-                                           pnorm(abs(Zc), lower.tail = FALSE)))
+        Z <- (theta - 1/2) / sdtheta
+        pval <- switch(alternative, less = pnorm(abs(Z)),
+                       greater = pnorm(abs(Z), lower.tail = FALSE),
+                       two.sided = 2 * min(pnorm(abs(Z)),
+                                           pnorm(abs(Z), lower.tail = FALSE)))
 
-        names(Zc) <- "Zc"
+        names(Z) <- "Z"
         
         names(mu) <- "difference in locations"
-        result <- list(statistic = Zc, p.value = pval,
+        result <- list(statistic = Z, p.value = pval,
                        alternative = alternative, null.value = mu,
                        data.name = DNAME, method = METHOD,
                        balance = bal)
@@ -442,7 +442,7 @@ clusWilcox.test.ranksum.ds <- function(x, cluster, group,
                        greater = pnorm(abs(Z), lower.tail = FALSE),
                        two.sided = 2 * min(pnorm(abs(Z)),
                                            pnorm(abs(Z), lower.tail = FALSE)))
-        names(Z) <- "Zc"
+        names(Z) <- "Z"
         names(mu) <- "difference in locations"
 
         result <- list(statistic = Z, p.value = pval,

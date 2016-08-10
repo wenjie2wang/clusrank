@@ -2,7 +2,6 @@
 using namespace Rcpp;
 Rcpp::IntegerVector score_, w;
 int meanrks, csize;
-//[[Rcpp::export]]
 
 int crksum(int rks, int I, int J, int sumrks, int minrks, int maxrks) {
   int i, j, res;
@@ -26,7 +25,7 @@ int crksum(int rks, int I, int J, int sumrks, int minrks, int maxrks) {
     j = J;
   }
   /*  Rcpp::Rcout << rks << " " << i << " " << j << " " << sumrks << " " << minrks << " " << maxrks << " " << std::endl; */
-  if ((rks < minrks) |(rks > maxrks)) return(0);
+  if ((rks < minrks) | (rks > maxrks)) return(0);
   if ((rks == minrks) | (rks == maxrks)) return(1);
   if (i == 0) {
     return(rks == 0);
@@ -54,7 +53,6 @@ int crksum(int rks, int I, int J, int sumrks, int minrks, int maxrks) {
     
 }
 
-//[[Rcpp::export]]
 double pcrksum(int rks, int I, IntegerVector Score, int Csize) {
   int sumrks, minrks, maxrks, n, J;
   IntegerVector idx, score_sub;
@@ -100,7 +98,7 @@ IntegerMatrix cumcrksum(int rks, int I, IntegerVector Score, int Csize) {
   score_sub = score_[idx];
   maxrks = sum(score_sub); /* Largest possible rank sum */
   
-  for (int i = meanrks; i <= rks; i ++) {
+  for (int i = meanrks; i <= rks; i++) {
     res(i, 1) = crksum(i, I, J, sumrks, minrks, maxrks);
     res(i, 0) = i;
   }
@@ -149,7 +147,7 @@ int crksum_str(int k, IntegerMatrix x, IntegerMatrix xc, IntegerVector max) {
 double pcrksum_str(int k, IntegerMatrix x, IntegerMatrix xc, IntegerVector xn, IntegerVector n, IntegerVector max) {
   int d = x.ncol(), N = 1;
   double p = 0;
-  for (int i = 0; i < d; i ++) {
+  for (int i = 0; i < d; i++) {
     N *= Rf_choose(n[i], xn[i]);
   }
   p = crksum_str(k, x, xc, max);
@@ -161,7 +159,6 @@ double pcrksum_str(int k, IntegerMatrix x, IntegerMatrix xc, IntegerVector xn, I
 
 
 
-//[[Rcpp::export]]
 
 int csrkg(int srk, IntegerVector Score) {
   /* Count the no of combination with a sum rank less than srk */
@@ -173,7 +170,7 @@ int csrkg(int srk, IntegerVector Score) {
   max_s = max(Score);
   sum_s = sum(Score);
   u = max_s * (max_s + 1) / 2;
-  if( srk < 0 || srk > u)
+  if(srk < 0 | srk > u)
     return 0; 
   compare[1] = u;
   w = IntegerVector(u + 1);
