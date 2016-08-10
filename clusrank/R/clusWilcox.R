@@ -387,7 +387,7 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
         stop("'cluster' is required")
     }
 
-    i f(is.null(group) && paired == FALSE) {
+    if (is.null(group) && paired == FALSE) {
         stop("'group' is required for the clustered rank sum test")
     }
     
