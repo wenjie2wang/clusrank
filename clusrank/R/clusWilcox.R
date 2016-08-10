@@ -128,7 +128,7 @@
 #' Somath Datta, Glen A. Satten (2008) \emph{A Signed-Rank test for Clustered Data}.
 #' Biometric, \bold{64}, 501-507.
 #'
-#'@note Exact tests are not recommended in the current version of package.
+#' @note Exact tests are not recommended in the current version of package.
 #' @importFrom  stats complete.cases na.omit terms complete.cases model.extract aggregate
 #' @importFrom stats lm ecdf pnorm qnorm var  pchisq setNames lag
 #' @importFrom MASS ginv
@@ -138,17 +138,17 @@
 
 clusWilcox.test <- function(x, ...) {
     pars <- as.list(match.call()[-1])
-    if(!is.null(pars$data)) {
+    if (!is.null(pars$data)) {
         data.temp <- eval(pars$data, parent.frame())
     } else {
         data.temp <- NULL
-        }
-    if(!is.null(data.temp) & length(pars$x) == 1) {
-        if(is.data.frame(data.temp) & any(as.character(pars$x)
-            %in% names(data.temp))) {
+    }
+    if (!is.null(data.temp) && length(pars$x) == 1) {
+        if (is.data.frame(data.temp) &&
+           any(as.character(pars$x) %in% names(data.temp))) {
             x <- data.temp[, as.character(pars$x)]
-        } else if(is.matrix(data.temp) & any(as.character(pars$x)
-            %in% colnames(data.temp))) {
+        } else if(is.matrix(data.temp) &&
+                  any(as.character(pars$x) %in% colnames(data.temp))) {
             x <- data.temp[, as.character(pars$x)]
         }
     }
@@ -165,10 +165,8 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
                                     na.action = na.omit,
                                     alternative = c("two.sided", "less", "greater"),
                                     mu = 0, paired = FALSE, exact = FALSE,
-                                    method = c("rgl", "ds"),  ...)
-{
-    if(missing(formula) ||
-       (length(formula) != 3L)) {
+                                    method = c("rgl", "ds"),  ...) {
+    if (missing(formula) || (length(formula) != 3L)) {
         stop("'formula' missing or incorrect")
     }
     m <- match.call(expand.dots = FALSE)
@@ -193,34 +191,32 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
     response <- attr(terms(mf), "response")
     x <- mf[[response]]
     n.obs <- length(x)
-
-   
-    
+ 
     cluster <- attr(attr(mf, "terms"), "specials")$cluster
-    if(length(cluster)) {
-    ctemp <- untangle.specials(Terms, "cluster", 1)
-    cluster.name <- gsub("[\\(\\)]", "",
-                         regmatches(ctemp$vars,
-                                    gregexpr("\\(.*?\\)", ctemp$vars))[[1]])
-    DNAME <- paste0(DNAME, " cluster: ", cluster.name, ";")
-
-
-    if(length(ctemp$vars) == 1) {
-        cluster.keep <- mf[[ctemp$vars]]
-    } else {
-        stop("more than one variable are set as the cluster id")
-    }
-    cluster.uniq <- unique(cluster.keep)
-    cluster.uniq.l <- length(cluster.uniq)
-    
-    if(is.character(cluster.uniq)) {
-        cluster <- recoderFunc(cluster.keep, cluster.uniq, c(1 : cluster.uniq.l))
-    } else {
-        if(!is.numeric(cluster.uniq)) {
-            stop("cluster id should be numeric or character")
+    if (length(cluster)) {
+        ctemp <- untangle.specials(Terms, "cluster", 1)
+        cluster.name <- gsub("[\\(\\)]", "",
+                             regmatches(ctemp$vars,
+                                        gregexpr("\\(.*?\\)", ctemp$vars))[[1]])
+        DNAME <- paste0(DNAME, " cluster: ", cluster.name, ";")
+        
+        
+        if (length(ctemp$vars) == 1) {
+            cluster.keep <- mf[[ctemp$vars]]
+        } else {
+            stop("more than one variable are set as the cluster id")
         }
-        cluster <- cluster.keep
-    }
+        cluster.uniq <- unique(cluster.keep)
+        cluster.uniq.l <- length(cluster.uniq)
+        
+        if (is.character(cluster.uniq)) {
+            cluster <- recoderFunc(cluster.keep, cluster.uniq, c(1 : cluster.uniq.l))
+        } else {
+            if (!is.numeric(cluster.uniq)) {
+                stop("cluster id should be numeric or character")
+            }
+            cluster <- cluster.keep
+        }
     } else {
         cluster <- c(1 : n.obs)
     }
@@ -228,10 +224,10 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
     ## group <- attr(Terms, "specials")$group
     Term.labels <- attr(Terms, "term.labels")
     group <- Term.labels[!grepl("[\\(\\)]", Term.labels)]
-    if(length(group)) {
+    if (length(group)) { ## this is a big chunk of repeated code similar to the if (length(cluster)) block; tidy it
         group.name <- group
         DNAME <- paste0(DNAME, " group: ", group.name, ";")
-        if(length(group.name) == 1) {
+        if (length(group.name) == 1) {
             group.keep <- mf[[group.name]]
         } else {
             stop("more than one variable are set as the group id")
@@ -239,10 +235,10 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
         group.uniq <- unique(group.keep)
         group.uniq.l <- length(group.uniq)
         
-        if(!is.character(group.uniq) && !is.numeric(group.uniq)) {
+        if (!is.character(group.uniq) && !is.numeric(group.uniq)) {
             stop("group id has to be numeric or character")
         }
-        if(group.uniq.l == 1) {
+        if (group.uniq.l == 1) {
             stop("group id has to contain at least two levels")
         }
         group <- recoderFunc(group.keep, group.uniq, c(1 : group.uniq.l))
@@ -265,7 +261,8 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
     } else {
         stratum <- rep(1, n.obs)
     }
-     if(!missing(data)) {
+    ## please use tab key to keep the indentation correct
+    if (!missing(data)) {
         DNAME <- paste(DNAME, "(from", paste0(m$data, ")"))
     }
     
@@ -296,29 +293,29 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
     if (!missing(mu) && ((length(mu) > 1L) || !is.finite(mu)))
         stop("'mu' must be a single number")
     DNAME <- list(...)$"DNAME"
-    if(is.null(DNAME))  {
-        if(!is.null(pars$data)) {
+    if (is.null(DNAME))  {
+        if (!is.null(pars$data)) {
             x <- data[, as.character(pars$x)]
             DNAME <- pars$x
-            if(!is.null(pars$y)) {
+            if (!is.null(pars$y)) {
                   y <- data[, as.character(pars$y)]
                   DNAME <- paste(DNAME, "and", pars$y)
-            } else {
+            } else { ## is this necessary?
                 y <- NULL
             }
-            if(!is.null(pars$cluster)) {
+            if (!is.null(pars$cluster)) {
                 cluster <- data[, as.character(pars$cluster)]
                 DNAME <- paste0(DNAME, ", cluster: ", pars$cluster, ";")
             } else {
                 cluster <- NULL
             }
-            if(!is.null(pars$group)) {
+            if (!is.null(pars$group)) {
                 group <- data[, as.character(pars$group)]
                 DNAME <- paste0(DNAME, " group: ", pars$group, ";")
             } else {
                 group <- NULL
             }
-            if(!is.null(pars$stratum)) {
+            if (!is.null(pars$stratum)) {
               stratum <- data[, as.character(pars$stratum)]
               DNAME <- paste0(DNAME, " stratum: ", pars$stratum, ";")
             } else {
@@ -327,56 +324,55 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
             DNAME <- paste0(DNAME, " (from ", paste0(pars$data, ")"))
           } else {
               DNAME <- (pars$x)
-              if(!is.null(y)) {
+              if (!is.null(y)) {
                   DNAME <- paste(DNAME, "and", (pars$y))
-                }
-
-               if(!is.null(cluster)) {
-                    DNAME <- paste0(DNAME, " cluster: ", pars$cluster)
-               }
-              if(!is.null(pars$group)) {
-                DNAME <- paste0(DNAME, " group: ", pars$group)
               }
-              if(!is.null(pars$stratum)) {
-                DNAME <- paste0(DNAME, " stratum: ", pars$stratum)
+              
+              if (!is.null(cluster)) {
+                  DNAME <- paste0(DNAME, " cluster: ", pars$cluster)
               }
-            }
-    }
-    
-      if(!is.null(pars$data)) {
-            x <- data[, as.character(pars$x)]
-              if(!is.null(pars$y)) {
-                  y <- data[, as.character(pars$y)]
-
-                } else {
-                    y <- NULL
-                  }
-            if(!is.null(pars$cluster)) {
-                cluster <- data[, as.character(pars$cluster)]
-
-              } else {
-                  cluster <- NULL
+              if (!is.null(pars$group)) {
+                  DNAME <- paste0(DNAME, " group: ", pars$group)
               }
-            if(!is.null(pars$group)) {
-              group <- data[, as.character(pars$group)]
-            } else {
-              group <- NULL
-            }
-            if(!is.null(pars$stratum)) {
-              stratum <- data[, as.character(pars$stratum)]
-
-            } else {
-              stratum <- NULL
-            }
-
+              if (!is.null(pars$stratum)) {
+                  DNAME <- paste0(DNAME, " stratum: ", pars$stratum)
+              }
           }
-    if(!is.numeric(x)){
-        stop("'x' must be numeric")
+    } ## please use tab key for correct indentation; do you have ess installed?
+    
+    if (!is.null(pars$data)) { ## again, a lot of repetition; can it be tidied up?
+        x <- data[, as.character(pars$x)]
+        if (!is.null(pars$y)) {
+            y <- data[, as.character(pars$y)]
+            
+        } else {
+            y <- NULL
+        }
+        if (!is.null(pars$cluster)) {
+            cluster <- data[, as.character(pars$cluster)]
+        } else {
+            cluster <- NULL
+        }
+        if (!is.null(pars$group)) {
+            group <- data[, as.character(pars$group)]
+        } else {
+            group <- NULL
+        }
+        if (!is.null(pars$stratum)) {
+            stratum <- data[, as.character(pars$stratum)]
+            
+        } else {
+            stratum <- NULL
+        }
+        
     }
+    ## if (!is.numeric(x)){
+    ##     stop("'x' must be numeric")
+    ## }
 
 
 
-    if(!is.null(y)) {
+    if (!is.null(y)) {
         if(!is.numeric(y)) {
             stop("'y' must be numeric")
         }
@@ -387,22 +383,22 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
         x <- x - y
     }
 
-    if(is.null(cluster)) {
+    if (is.null(cluster)) {
         stop("'cluster' is required")
     }
 
-    if(is.null(group) & paired == FALSE) {
+    i f(is.null(group) && paired == FALSE) {
         stop("'group' is required for the clustered rank sum test")
     }
-
-    if(!is.null(group) & paired == TRUE) {
+    
+    if (!is.null(group) & paired == TRUE) {
         warning("'group' will be ignored for the clustered signed rank test")
     }
 
-    if(is.null(stratum)) {
+    if (is.null(stratum)) {
         stratum <- rep(1, length(x))
     }
-    if(is.null(DNAME)) {
+    if (is.null(DNAME)) {
         if(is.null(y)) {
             DNAME  <-  deparse(substitute(x))
         } else {
@@ -414,66 +410,65 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
     cluster <- cluster[OK]
     group <- group[OK]
     stratum <- stratum[OK]
-
-    if(length(x) < 1L) {
+    
+    if (length(x) < 1L) {
         stop("not enough (finite) 'x' observation")
     }
-
-    if(paired == TRUE) {
-        if(length(table(stratum)) > 1L) {
+    
+    if (paired == TRUE) {
+        if (length(table(stratum)) > 1L) {
             warning("'stratum' will be ignored for the clustered signed rank test")
         }
         x <- x - mu
         METHOD <- "Clustered Wilcoxon signed rank test"
-       if((method) == "rgl") {
-           METHOD <- paste(METHOD, "using Rosner-Glynn-Lee method", sep = " ")
-           arglist <- setNames(list(x, cluster, alternative, mu, METHOD,
-                                    DNAME, exact),
-                            c("x", "cluster", "alternative",
-                              "mu",
-                              "METHOD", "DNAME",  "exact"))
+        if (method == "rgl") {
+            METHOD <- paste(METHOD, "using Rosner-Glynn-Lee method", sep = " ")
+            arglist <- setNames(list(x, cluster, alternative, mu, METHOD,
+                                     DNAME, exact),
+                                c("x", "cluster", "alternative",
+                                  "mu",
+                                  "METHOD", "DNAME",  "exact"))
             result <- do.call("clusWilcox.test.signedrank.rgl", c(arglist))
             return(result)
         }
-
-        if((method) == "ds") {
+        
+        if (method == "ds") {
             METHOD <- paste(METHOD, "using Datta-Satten method", sep = " ")
-             arglist <- setNames(list(x, cluster, alternative, mu, METHOD, DNAME),
-                            c("x", "cluster", "alternative",
-                              "mu",
-                              "METHOD", "DNAME"))
-           result <-  do.call("clusWilcox.test.signedrank.ds",
-                              c(arglist))
-           return(result)
+            arglist <- setNames(list(x, cluster, alternative, mu, METHOD, DNAME),
+                                c("x", "cluster", "alternative",
+                                  "mu", "METHOD", "DNAME"))
+            result <-  do.call("clusWilcox.test.signedrank.ds",
+                               c(arglist))
+            return(result)
         } else {
             stop("Method should be one of 'rgl' and 'ds'")
         }
         
     } else {
         METHOD <- "Clustered Wilcoxon rank sum test"
-        if((method) == "rgl") {
+        if ((method) == "rgl") {
             METHOD <- paste( METHOD, "using Rosner-Glynn-Lee method", sep = " ")
-             arglist <- setNames(list(x, cluster, group, stratum, alternative,
-                                 mu, DNAME, METHOD, exact),
-                            c("x", "cluster", "group", "stratum",
-                              "alternative", "mu", "DNAME", "METHOD",
-                              "exact"))
+            arglist <- setNames(list(x, cluster, group, stratum, alternative,
+                                     mu, DNAME, METHOD, exact),
+                                c("x", "cluster", "group", "stratum",
+                                  "alternative", "mu", "DNAME", "METHOD",
+                                  "exact"))
             result <- do.call("clusWilcox.test.ranksum.rgl", c(arglist))
             return(result)
         }
-
-        if((method) == "ds") {
+        
+        if ((method) == "ds") {
             METHOD <- paste(METHOD, "using Datta-Satten method", sep = " ")
             ## FIXME: The length of the list and the name do not match!
             arglist <- setNames(list(x, cluster, group, mu, alternative,
                                      DNAME, METHOD),
                                 c("x", "cluster", "group", "mu",
                                   "alternative", "DNAME", "METHOD"))
-            if(exact == TRUE) {
+            if (exact == TRUE) {
                 warning(" No exact test is provided for 'ds' method")
             }
-
-            if(length(table(stratum)) > 1L) {
+            
+            if (length(table(stratum)) > 1L) {
                 warning("'stratum' will be ignored for the clustered rank sum test, 'ds' method")
             }
             result <- do.call("clusWilcox.test.ranksum.ds", c(arglist))
