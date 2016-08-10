@@ -840,12 +840,17 @@ clusWilcox.test(x ~ cluster(cid),  dat.sr, paired = TRUE, method = "rgl")
 clusWilcox.test(x ~ cluster(cid),  dat.sr, paired = TRUE, method = "ds")
 @ 
 
-\subsection{A simulation study}
+\section{A Simulation Study}
 \label{s:simu}
 
-Using the two data generation functions defined above, we provide a 
-convenient function \code{simpower} to facilitate the power comparison 
-of RGL and DS method for each test under a range of scenarios.
+Despite the recent literature, comparisons of the RGL method and the
+DS method under certain senarios have not been studied.
+Such comparison can be easily done with package \pkg{clusrank}. 
+Using the two data generation functions defined above, we report a
+simulation study comparing their sizes and powers under a variety of
+scenarios. The following function generates replicates of data for a
+given scenario and returns the empirical power for a given
+significance level.
 <<simpower>>=
 simpower <- function(nrep, level, paired, nclus, maxclsize, 
                      delta, rho, cor, rate, ...) {
@@ -864,8 +869,6 @@ simpower <- function(nrep, level, paired, nclus, maxclsize,
     apply(sim, 2, function(x) mean(x < level))
 }
 @
-
-
 The first two arguments, \code{nrep} and \code{level} specify the
 number of replications and the significance level that the user
 desires. As in the test function, \code{paired} is a logical to switch
@@ -882,9 +885,12 @@ differences are $0$ and $0.5$, respectively. Each data set contains
 $10$ clusters with size $3$. The intra-cluster correlation structure
 is exchangeable with parameter \code{rho} equals 0.1. The unit of
 randomization is cluster.
+{\bf what is the last argument? it should be named}
 <<sim-clus-rs>>=
 simpower(1000, 0.05, FALSE, 10, 5, 0.0, c(0.1, 0.1), ex, 0, TRUE)
 @ 
+
+{\bf say something here. why rho is length 1 here?}
 <<sim-sr>>=
 simpower(1000, 0.05, TRUE, 10, 5, 0.5, 0.1, ex, 0)
 @ 
@@ -892,16 +898,17 @@ It is shown in the output that the empirical size of both methods are
 close to the nominal level, and the empirical power is comparable. 
 
 
+\subsection{Rank-sum tests}
 A relatively comprehensive comparison of the two clustered rank-sum
 tests has been done by \citet{Datt:Satt:rank:2005} when treatment is
 assigned to clusters. No comparison has been done when the treatment
 is assigned at individual level yet.  Table~\ref{tab:rs} shows the
 results from $12$ designs using function \code{simpower} to compare
 the two clustered rank-sum tests under different conditions when each
-individual is the unit of randomization. Each data set contains $40$
-clusters. Two intra-cluster correlation
-structures, exchangeable and AR1 (non-exchangeable), are used, each
-with $\rho = 0.1$ and $0.9$. 
+individual is the unit of randomization. 
+Each data set contains $40$ clusters. Two intra-cluster correlation
+structures, exchangeable and autocorrelated with order~1 (ar1), are used, 
+each with correlation coefficient $\rho = 0.1$ and $0.9$. 
 The maximum cluster size $M = \max_i n_i$ has two levels $5$ and $10$. 
 When maximum cluster size is $5$, we compare the
 performance of the two tests when data is balanced and unbalanced, by
@@ -909,10 +916,8 @@ setting \code{rate} of observations which are randomly kept to be $1$
 and $0.5$. In order to introduce more variation in the cluster size of
 the unbalanced data while maintaining the same sample size, we
 increase $M$ tp $10$ and decrease \code{rate} to $0.25$. 
-The group difference $\delta$ takes $0$, $0.3$ and $0.6$
-respectively. 
+The group difference $\delta$ takes $0$, $0.3$ and $0.6$ respectively. 
 Each cell represents $1000$ replications.
-
 
 \begin{table}[tbp]
 \centering
@@ -952,6 +957,7 @@ intra-cluster correlation is high, the RGL method is more competent
 than DS method regardless of other configurations, while their
 performance is comparable when the correlation is low. 
 
+
 The data generation scheme used in our simulation study did not
 consider the possibility when the cluster size is informative for the
 treatment assignment when the treatment is assigned at cluster
@@ -959,6 +965,7 @@ level. In this case, DS method performs better than RGL method as
 shown in the simulation study in \citet{Datt:Satt:rank:2005}.
 
 
+\subsection{Signed-rank tests}
 For clustered signed-rank tests, we compare the RGL and DS methods
 under $8$ designs. Each generated data set contains $40$ clusters with
 a maximum cluster size $M = 5$. Two correlation structures,
@@ -986,7 +993,6 @@ Design & Correlation structure & $\rho$ & Missing rate & RGL & DS & RGL & DS & R
   8 & & & 0.5 & 0.05 & 0.05 & 0.52 & 0.51 & 0.96 & 0.96 \\ 
    \hline
 \end{tabular}
-
 \label{tab:sr}
 \end{table}
 
