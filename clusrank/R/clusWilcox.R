@@ -143,11 +143,11 @@ clusWilcox.test <- function(x, ...) {
     } else {
         data.temp <- NULL
     }
-    if (!is.null(data.temp) && length(pars$x) == 1) {
-        if (is.data.frame(data.temp) &&
+    if (!is.null(data.temp) & length(pars$x) == 1) {
+        if (is.data.frame(data.temp) &
            any(as.character(pars$x) %in% names(data.temp))) {
             x <- data.temp[, as.character(pars$x)]
-        } else if(is.matrix(data.temp) &&
+        } else if(is.matrix(data.temp) &
                   any(as.character(pars$x) %in% colnames(data.temp))) {
             x <- data.temp[, as.character(pars$x)]
         }
@@ -166,13 +166,13 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
                                     alternative = c("two.sided", "less", "greater"),
                                     mu = 0, paired = FALSE, exact = FALSE,
                                     method = c("rgl", "ds"),  ...) {
-    if (missing(formula) || (length(formula) != 3L)) {
+    if (missing(formula) | (length(formula) != 3L)) {
         stop("'formula' missing or incorrect")
     }
     m <- match.call(expand.dots = FALSE)
    
 
-    if(is.matrix(eval(m$data, parent.frame()))) {
+    if (is.matrix(eval(m$data, parent.frame()))) {
         m$data <- as.data.frame(data)
     }
     special <- c("stratum", "cluster")
@@ -181,86 +181,30 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
     m$formula <- if(missing(data)) terms(formula, special)
                  else terms(formula, special, data = data)
 
-    m <- if(missing(data)) m <- m[1 : 2]
+    m <- if (missing(data)) m <- m[1 : 2]
          else m <- m[1 : 3]
     mf <- eval(m, parent.frame())
-    Terms <- terms(mf)
+    Terms <- terms(mf) ## Delete 
 
     x.name <- rownames(attr(m$formula, "factors"))[1]
     DNAME <- paste0(x.name, ";")
     response <- attr(terms(mf), "response")
     x <- mf[[response]]
     n.obs <- length(x)
- 
-    cluster <- attr(attr(mf, "terms"), "specials")$cluster
-    if (length(cluster)) {
-        ctemp <- untangle.specials(Terms, "cluster", 1)
-        cluster.name <- gsub("[\\(\\)]", "",
-                             regmatches(ctemp$vars,
-                                        gregexpr("\\(.*?\\)", ctemp$vars))[[1]])
-        DNAME <- paste0(DNAME, " cluster: ", cluster.name, ";")
-        
-        
-        if (length(ctemp$vars) == 1) {
-            cluster.keep <- mf[[ctemp$vars]]
-        } else {
-            stop("more than one variable are set as the cluster id")
-        }
-        cluster.uniq <- unique(cluster.keep)
-        cluster.uniq.l <- length(cluster.uniq)
-        
-        if (is.character(cluster.uniq)) {
-            cluster <- recoderFunc(cluster.keep, cluster.uniq, c(1 : cluster.uniq.l))
-        } else {
-            if (!is.numeric(cluster.uniq)) {
-                stop("cluster id should be numeric or character")
-            }
-            cluster <- cluster.keep
-        }
-    } else {
-        cluster <- c(1 : n.obs)
-    }
+     
+    group <- extractTerm("group", mf, n.obs, paired)
+    DNAME <- paste0(DNAME, group[["name"]])
+    group <- group[["var"]]
 
-    ## group <- attr(Terms, "specials")$group
-    Term.labels <- attr(Terms, "term.labels")
-    group <- Term.labels[!grepl("[\\(\\)]", Term.labels)]
-    if (length(group)) { ## this is a big chunk of repeated code similar to the if (length(cluster)) block; tidy it
-        group.name <- group
-        DNAME <- paste0(DNAME, " group: ", group.name, ";")
-        if (length(group.name) == 1) {
-            group.keep <- mf[[group.name]]
-        } else {
-            stop("more than one variable are set as the group id")
-        }
-        group.uniq <- unique(group.keep)
-        group.uniq.l <- length(group.uniq)
-        
-        if (!is.character(group.uniq) && !is.numeric(group.uniq)) {
-            stop("group id has to be numeric or character")
-        }
-        if (group.uniq.l == 1) {
-            stop("group id has to contain at least two levels")
-        }
-        group <- recoderFunc(group.keep, group.uniq, c(1 : group.uniq.l))
-    } else if (!paired){
-        stop("group variable is missing")
-    } else {
-        group <- NULL
-    }
+    cluster <- extractTerm("cluster", mf, n.obs, paired)
+    DNAME <- paste0(DNAME, cluster[["name"]])
+    cluster <- cluster[["var"]]
+
+    stratum <- extractTerm("stratum", mf, n.obs, paired)
+    DNAME <- paste0(DNAME, stratum[["name"]])
+    stratum <- stratum[["var"]]
     
-    stratum <- attr(attr(mf, "terms"), "specials")$stratum
-    if(!is.null(stratum)) {
-        stemp <- untangle.specials(Terms, "stratum", 1)
-        strata.name <- gsub("[\\(\\)]", "",
-                             regmatches(stemp$vars,
-                                        gregexpr("\\(.*?\\)", stemp$vars))[[1]])
-        stratum <- mf[[stratum]]
-        
-        DNAME <- paste0(DNAME, " strata: ", strata.name, ";")
-        
-    } else {
-        stratum <- rep(1, n.obs)
-    }
+    
     ## please use tab key to keep the indentation correct
     if (!missing(data)) {
         DNAME <- paste(DNAME, "(from", paste0(m$data, ")"))
@@ -282,7 +226,7 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
 #' @export
 
 clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
-            group = NULL, stratum = NULL, data = parent.frame(),
+            group = NULL, stratum = NULL, data = NULL,
             alternative = c("two.sided", "less", "greater"),
             mu = 0, paired = FALSE, exact = FALSE,
             method = c("rgl", "ds"), ...) {
@@ -290,86 +234,35 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
     method <- match.arg(method)
     pars <- as.list(match.call()[-1])
     
-    if (!missing(mu) && ((length(mu) > 1L) || !is.finite(mu)))
+    if (!missing(mu) & ((length(mu) > 1L) | !is.finite(mu)))
         stop("'mu' must be a single number")
     DNAME <- list(...)$"DNAME"
     if (is.null(DNAME))  {
         if (!is.null(pars$data)) {
-            x <- data[, as.character(pars$x)]
-            DNAME <- pars$x
-            if (!is.null(pars$y)) {
-                  y <- data[, as.character(pars$y)]
-                  DNAME <- paste(DNAME, "and", pars$y)
-            } else { ## is this necessary?
-                y <- NULL
-            }
-            if (!is.null(pars$cluster)) {
-                cluster <- data[, as.character(pars$cluster)]
-                DNAME <- paste0(DNAME, ", cluster: ", pars$cluster, ";")
-            } else {
-                cluster <- NULL
-            }
-            if (!is.null(pars$group)) {
-                group <- data[, as.character(pars$group)]
-                DNAME <- paste0(DNAME, " group: ", pars$group, ";")
-            } else {
-                group <- NULL
-            }
-            if (!is.null(pars$stratum)) {
-              stratum <- data[, as.character(pars$stratum)]
-              DNAME <- paste0(DNAME, " stratum: ", pars$stratum, ";")
-            } else {
-              stratum <- NULL
-            }
-            DNAME <- paste0(DNAME, " (from ", paste0(pars$data, ")"))
-          } else {
-              DNAME <- (pars$x)
-              if (!is.null(y)) {
-                  DNAME <- paste(DNAME, "and", (pars$y))
-              }
-              
-              if (!is.null(cluster)) {
-                  DNAME <- paste0(DNAME, " cluster: ", pars$cluster)
-              }
-              if (!is.null(pars$group)) {
-                  DNAME <- paste0(DNAME, " group: ", pars$group)
-              }
-              if (!is.null(pars$stratum)) {
-                  DNAME <- paste0(DNAME, " stratum: ", pars$stratum)
-              }
-          }
-    } ## please use tab key for correct indentation; do you have ess installed?
-    
-    if (!is.null(pars$data)) { ## again, a lot of repetition; can it be tidied up?
-        x <- data[, as.character(pars$x)]
-        if (!is.null(pars$y)) {
-            y <- data[, as.character(pars$y)]
-            
-        } else {
-            y <- NULL
-        }
-        if (!is.null(pars$cluster)) {
-            cluster <- data[, as.character(pars$cluster)]
-        } else {
-            cluster <- NULL
-        }
-        if (!is.null(pars$group)) {
-            group <- data[, as.character(pars$group)]
-        } else {
-            group <- NULL
-        }
-        if (!is.null(pars$stratum)) {
-            stratum <- data[, as.character(pars$stratum)]
-            
-        } else {
-            stratum <- NULL
-        }
-        
-    }
-    ## if (!is.numeric(x)){
-    ##     stop("'x' must be numeric")
-    ## }
+            x <- extractVar("x", pars, data)
+            DNAME <- extractName("x", pars)
 
+            y <- extractVar("y", pars, data)
+            DNAME <- paste0(DNAME, extractName("y", pars))
+
+            group <- extractVar("group", pars, data)
+            DNAME <- paste0(DNAME, extractName("group", pars))
+
+            cluster <- extractVar("cluster", pars, data)
+            DNAME <- paste0(DNAME, extractName("cluster", pars))
+
+            stratum <- extractVar("stratum", pars, data)
+            DNAME <- paste0(DNAME, extractName("stratum", pars))
+
+            DNAME <- paste0(DNAME, " (from ", paste0(pars$data, ")"))
+        } else {
+            DNAME <- (pars$x)
+            DNAME <- paste0(DNAME, extractName("y", pars))
+            DNAME <- paste0(DNAME, extractName("group", pars))
+            DNAME <- paste0(DNAME, extractName("cluster", pars))
+            DNAME <- paste0(DNAME, extractName("stratum", pars))    
+        }
+    } 
 
 
     if (!is.null(y)) {
@@ -387,7 +280,7 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
         stop("'cluster' is required")
     }
 
-    if (is.null(group) && paired == FALSE) {
+    if (is.null(group) & paired == FALSE) {
         stop("'group' is required for the clustered rank sum test")
     }
     
@@ -448,8 +341,9 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
         METHOD <- "Clustered Wilcoxon rank sum test"
         if ((method) == "rgl") {
             METHOD <- paste( METHOD, "using Rosner-Glynn-Lee method", sep = " ")
-            arglist <- setNames(list(x, cluster, group, stratum, alternative,
-                                     mu, DNAME, METHOD, exact),
+            arglist <- setNames(list(x, cluster, group, stratum,
+                                     alternative, mu, DNAME,
+                                     METHOD, exact),
                                 c("x", "cluster", "group", "stratum",
                                   "alternative", "mu", "DNAME", "METHOD",
                                   "exact"))
