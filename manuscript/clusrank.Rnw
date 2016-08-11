@@ -875,24 +875,36 @@ desires. As in the test function, \code{paired} is a logical to switch
 between the clustered signed-rank test and rank-sum test. The value of
 \code{delta} determines the group difference. The rest arguments are
 inherited from \code{datgen.rs} or \code{datgen.sr} depending on the
-value of \code{paired}.
+value of \code{paired}. When \code{paired} is \code{FALSE}, i.e.,
+clustered rank-sum test is under study, the last argument, \code{...},
+is the \code{clusgrp} argument in \code{datgen.rs} to determine the
+unit of randomization. 
 
 
 To illustrate the usage of the function, we compare the empirical size
-and power of the two clustered rank-sum tests through $1000$
-replications. The significance level is set as $0.05$. The true group
-differences are $0$ and $0.5$, respectively. Each data set contains
+of the two clustered rank-sum tests and the two clustered signed-rank
+tests through $1000$ replications on balanced data set. The significance level is set as
+$0.05$. The true group differences is $0.$. Each data set contains
 $10$ clusters with size $3$. The intra-cluster correlation structure
-is exchangeable with parameter \code{rho} equals 0.1. The unit of
-randomization is cluster.
-{\bf what is the last argument? it should be named}
+is exchangeable with parameter. For clustered rank-sum test, the
+correlation parameter \code{rho} is set as $0.1$ for both groups.
+The missing rate is set as $0$ to obtain balanced data.
+The unit of randomization is cluster. 
+{\bf what is the last argument?  it should be named}
 <<sim-clus-rs>>=
-simpower(1000, 0.05, FALSE, 10, 5, 0.0, c(0.1, 0.1), ex, 0, TRUE)
+simpower(1000, 0.05, FALSE, 10, 5, 0.0, c(0.1, 0.1), ex, 0, clusgrp = TRUE)
 @ 
 
-{\bf say something here. why rho is length 1 here?}
+
+For the clustered signed-rank tests, there is no explicit treatment
+group, therefore we assign a universal correlation parameter to all
+paired differences through a single numeric. Here we let \code{rho} be
+$0.1$. Other arguments are set the same as the above simulation for
+clustered rank-sum test, except that no \code{clusgrp} is needed since
+there is no explicit treatment assignment for signed-rank test data. 
+
 <<sim-sr>>=
-simpower(1000, 0.05, TRUE, 10, 5, 0.5, 0.1, ex, 0)
+simpower(1000, 0.05, TRUE, 10, 5, 0., 0.1, ex, 0)
 @ 
 It is shown in the output that the empirical size of both methods are
 close to the nominal level, and the empirical power is comparable. 
