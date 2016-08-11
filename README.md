@@ -50,9 +50,3 @@
 + ~~Missing rate. <- keep rate.~~
 + Citation Laroque. one book chapter and one biometrica.
 + ~~semicolumn after score. Fix printout.~~
-+ Increase sigma in jointfp.
-+ Increase sample size to 20.
-+ Decrease to 50 years.
-+ Increase number of sites. IL first. then CSE.
-+ Put functions in a package.
-+ Data cleaning. two stage. joint modeling. 
