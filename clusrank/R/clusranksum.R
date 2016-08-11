@@ -455,7 +455,7 @@ clusWilcox.test.ranksum.ds <- function(x, cluster, group,
         
     } else {
 #####calculate quantity 2 (using the pooled estimate of F)
-        if(!is.null(mu) & mu != 0) {
+        if(!is.null(mu) && mu != 0) {
             warning("comparison between m (m > 2) groups cannot set location shift parameter")
         }
         mu <- 0

@@ -143,11 +143,11 @@ clusWilcox.test <- function(x, ...) {
     } else {
         data.temp <- NULL
     }
-    if (!is.null(data.temp) & length(pars$x) == 1) {
-        if (is.data.frame(data.temp) &
+    if (!is.null(data.temp) && length(pars$x) == 1) {
+        if (is.data.frame(data.temp) &&
            any(as.character(pars$x) %in% names(data.temp))) {
             x <- data.temp[, as.character(pars$x)]
-        } else if(is.matrix(data.temp) &
+        } else if(is.matrix(data.temp) &&
                   any(as.character(pars$x) %in% colnames(data.temp))) {
             x <- data.temp[, as.character(pars$x)]
         }
@@ -166,7 +166,7 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
                                     alternative = c("two.sided", "less", "greater"),
                                     mu = 0, paired = FALSE, exact = FALSE,
                                     method = c("rgl", "ds"),  ...) {
-    if (missing(formula) | (length(formula) != 3L)) {
+    if (missing(formula) || (length(formula) != 3L)) {
         stop("'formula' missing or incorrect")
     }
     m <- match.call(expand.dots = FALSE)
@@ -234,7 +234,7 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
     method <- match.arg(method)
     pars <- as.list(match.call()[-1])
     
-    if (!missing(mu) & ((length(mu) > 1L) | !is.finite(mu)))
+    if (!missing(mu) && ((length(mu) > 1L) || !is.finite(mu)))
         stop("'mu' must be a single number")
     DNAME <- list(...)$"DNAME"
     if (is.null(DNAME))  {
@@ -280,11 +280,11 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
         stop("'cluster' is required")
     }
 
-    if (is.null(group) & paired == FALSE) {
+    if (is.null(group) && paired == FALSE) {
         stop("'group' is required for the clustered rank sum test")
     }
     
-    if (!is.null(group) & paired == TRUE) {
+    if (!is.null(group) && paired == TRUE) {
         warning("'group' will be ignored for the clustered signed rank test")
     }
 
