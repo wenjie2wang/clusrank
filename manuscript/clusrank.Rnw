@@ -696,8 +696,8 @@ datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1),
     cid <- rep(1:(2 * nclus), each = maxclsize)
     x <- exp(c(x, y)) + delta * group 
     dat <- data.frame(x = x, grp = group, cid = cid) 
-    miss <-  sort(sample(1:(2 * nn), size = rate * (2 * nn), FALSE))
-    if (rate == 0.) dat else dat[-miss, ]      
+    drop <-  sort(sample(1:(2 * nn), size = rate * (2 * nn), FALSE))
+    if (rate == 0.) dat else dat[-drop, ]      
 }
 @ 
 The function have two required inputs: \code{nclus} for number of
@@ -812,15 +812,18 @@ parameter $\rho$, and $\delta$ is the pair difference.
 
 <<datagen-sr, echo = TRUE>>=
 datgen.sr <- function(nclus, maxclsize, delta = 0.,
-                      rho = 0.1, cor = c(ex, ar1), rate = 0.) {
+                      rho = 0.1, cor = c(xch, ar1), rate = 0) {
     nn <- nclus * maxclsize
-    Sigma <- cor(maxclsize, rho)
-    z <- c(t(rmvnorm(nclus, sigma = Sigma))) + delta
-    x <- sign(z) * exp(abs(z))
-    cid <- rep(1 : nclus, each = maxclsize)
-    dat <- data.frame(x = x, cid = cid)
-    miss <- sort(sample(1: nn, size = rate * nn, FALSE))
-    if (rate == 0.) dat else dat[-miss, ]
+    Sigma1 <- cor(maxclsize, rho[1])
+    Sigma2 <- cor(maxclsize, rho[2])
+    x <- t(rmvnorm(nclus, sigma = Sigma1))
+    y <- t(rmvnorm(nclus, sigma = Sigma2))
+    z <- c(x, y) + delta  
+    score <- sign(z) * exp(abs(z))
+    cid <- rep(1:(2*nclus), each = maxclsize)
+    dat <- data.frame(score = score, cid = cid)
+    drop <- sort(sample(1: (2 * nn), size = (1 - rate) * (2 * nn), FALSE))
+    if (rate == 0) dat else dat[-drop,]
 }
 @ 
 

@@ -11,9 +11,7 @@ clusWilcox.test.ranksum.rgl <- function(x, cluster, group, stratum,
     check <- lapply(temp, function(x) length(unique(x)))
     ## check with each stratum in which clusters have the same cluster size 
     ## to see if they only are only assigned a single treatment.
-    if(all(unlist(check) == 1))  warning("For each of the stratum of the data when data are
-                      stratified by the cluster size,
-                      there should be at least one stratum with both treatments ")
+    if(all(unlist(check) == 1))  warning("The two groups should contain clusters with the same size for at leaset one cluster size")
     arglist <- setNames(list(x, cluster, group, stratum, alternative,
                              mu, DNAME, METHOD, exact),
                         c("x", "cluster", "group", "stratum",
@@ -156,13 +154,13 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
         names(Z) <- "Z"
         names(mu) <- "difference in locations"
         result <- list(Rstat = W, ERstat = EW,
-                 VRstat = VarW,
-                 statistic = Z, p.value = pval,
-                 alternative = alternative,
-                 null.value = mu,
-                 data.name = DNAME,
-                 method = METHOD,
-                 balance = bal, exact = exact)
+                       VRstat = VarW,
+                       statistic = Z, p.value = pval,
+                       alternative = alternative,
+                       null.value = mu,
+                       data.name = DNAME,
+                       method = METHOD,
+                       balance = bal, exact = exact)
         class(result) <- "htest"
         return(result)
     }
@@ -445,7 +443,8 @@ clusWilcox.test.ranksum.ds <- function(x, cluster, group,
         names(Z) <- "Z"
         names(mu) <- "difference in locations"
 
-        result <- list(statistic = Z, p.value = pval,
+        result <- list(statistic = Z, p.value = pval, S = S,
+                       ES = ES, varS = varS,
                        alternative = alternative, null.value = mu,
                        data.name = DNAME, method = METHOD)
 

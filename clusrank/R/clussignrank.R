@@ -48,10 +48,10 @@ clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
         if(length(table(cluster)) > 40)
             print("Number of clusters exceeds 40 for RGL clustered signed-rank test")
         if(balance == TRUE ) {            
-            Tc <- sum(data$signrank)
+            T <- sum(data$signrank)
             srksum <-  stats::aggregate(signrank ~ cluster, FUN = sum)[, 2]
-            Tc.pos <- sum(srksum[srksum > 0])
-            p.val.l <- psrkg(Tc.pos, sort(abs(srksum)))
+            T.pos <- sum(srksum[srksum > 0])
+            p.val.l <- psrkg(T.pos, sort(abs(srksum)))
             pval <- switch(alternative,
                           less = p.val.l,
                           greater = 1 - p.val.l,
@@ -90,25 +90,25 @@ clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
             }
             wi <- cluster.size / (vars * (1 + (cluster.size - 1) * roscor))
             
-            Tc <- sum(meansumrank * wi)
+            T <- sum(meansumrank * wi)
             msr.pos <- msr.w <-  meansumrank * wi
             msr.pos <- msr.pos[msr.pos > 0]
-            Tc.pos <- sum(msr.pos)
+            T.pos <- sum(msr.pos)
 
             msr.dif <- min(lag(sort(abs(msr.w))))
             msr.pos.int <- as.integer(sort(abs(msr.w) / msr.dif))
-            Tc.pos.int <- as.integer(Tc.pos / msr.dif)
-            p.val.l <- psrkg(Tc.pos.int, msr.pos.int)
+            T.pos.int <- as.integer(T.pos / msr.dif)
+            p.val.l <- psrkg(T.pos.int, msr.pos.int)
             pval <- switch(alternative,
                           less = p.val.l,
                           greater = 1 - p.val.l,
                           two.sided = 2 * min(p.val.l, 1 - p.val.l))
         }
-        names(Tc) <- "Tc"
+        names(T) <- "T"
         names(n) <- "total number of observations"
         names(m) <- "total number of clusters"
         names(mu) <- "shift in location"
-        result <- list(statistic = Tc,
+        result <- list(statistic = T,
                        p.value = pval, n = n, cn = m, null.value = mu,
                        alternative = alternative,
                        data.name = DNAME, method = METHOD)
@@ -117,21 +117,21 @@ clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
         
     } else {
         if(balance == TRUE){
-            Tc <- sum(data$signrank)
+            T <- sum(data$signrank)
             sumrank <- c(by(data$signrank, data$cluster, sum))
             sumsq <- sum(sumrank ^ 2)
             VarT <- sumsq
-            Zc <- Tc / sqrt(VarT)
+            Zc <- T / sqrt(VarT)
             pval <- 2 * (1 - pnorm(abs(Zc)))       
             ADJUST <- FALSE
-            names(Tc) <- "Tc"
+            names(T) <- "T"
             names(Zc) <- "Zc"
-            names(VarT) <- "variance of Tc"       
+            names(VarT) <- "variance of T"       
             names(n) <- "total number of observations"
             names(m) <- "total number of clusters"
-            names(VarT) <- paste("variance of ", names(Tc))
+            names(VarT) <- paste("variance of ", names(T))
             names(mu) <- "shift in location"
-            result <- list(Rstat = Tc, VRstat = VarT, statistic = Zc,
+            result <- list(Rstat = T, VRstat = VarT, statistic = Zc,
                            p.value = pval, n = n, cn = m, null.value = mu,
                            alternative = alternative,
                            data.name = DNAME, method = METHOD,
@@ -169,25 +169,25 @@ clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
                 roscor = 1
             }
             wi <- cluster.size / (vars * (1 + (cluster.size - 1) * roscor))
-            Tc <- sum(meansumrank * wi)
+            T <- sum(meansumrank * wi)
             sqweightsum <- sum(wi ^ 2 * meansumrank ^ 2)
             VarT <- sqweightsum
-            Zc <-  Tc / (sqrt(VarT))
+            Zc <-  T / (sqrt(VarT))
             pval <- switch(alternative,
                             less = pnorm(abs(Zc)),
                             greater = pnorm(abs(Zc), lower.tail = FALSE),
                             two.sided = 2 * min(pnorm(abs(Zc)),
                                                 pnorm(abs(Zc), lower.tail = FALSE)))
             
-            names(Tc) <- "Tc"
+            names(T) <- "T"
             names(Zc) <- "Zc"
   
             ADJUST <- TRUE
             names(mu) <- "shift in location"
             names(n) <- "total number of observations"
             names(m) <- "total number of clusters"
-            names(VarT) <- paste("variance of ", names(Tc))
-            result <- list(Rstat = Tc, VRstat = VarT, statistic = Zc,
+            names(VarT) <- paste("variance of ", names(T))
+            result <- list(Rstat = T, VRstat = VarT, statistic = Zc,
                            p.value = pval, n = n, cn = m,
                            alternative = alternative,
                            null.value = mu,
@@ -232,21 +232,23 @@ clusWilcox.test.signedrank.ds <- function(x, cluster, alternative,
 
     temp <- aggregate(temp ~ cluster, FUN = sum)[, 2]
     VTS <- sum(((niplus - niminus) / ni + (m - 1) / ni * temp) ^ 2 )
-    Zc <- T / sqrt(VTS)
-    pval <- switch(alternative, less = pnorm(abs(Zc)),
-                    greater = pnorm(abs(Zc), lower.tail = FALSE),
-                    two.sided = 2 * min(pnorm(abs(Zc)),
-                                        pnorm(abs(Zc), lower.tail = FALSE)))
+    Z <- T / sqrt(VTS)
+    pval <- switch(alternative, less = pnorm(abs(Z)),
+                    greater = pnorm(abs(Z), lower.tail = FALSE),
+                    two.sided = 2 * min(pnorm(abs(Z)),
+                                        pnorm(abs(Z), lower.tail = FALSE)))
     
     names(n) <- "total number of observations"
     names(m) <- "total number of clusters"
-    names(Zc) <- "Zc"
+    names(Z) <- "Z"
     names(mu) <- "shift in location"
-    result <- list(statistic = Zc,
+    result <- list(statistic = Z,
+                   srstat = T,
+                   vsrstat = VTS,
                    p.value = pval, n = n, cn = m,
                    alternative = alternative,
                    null.value = mu,
-                 data.name = DNAME, method = METHOD)
+                   data.name = DNAME, method = METHOD)
     class(result) <- "htest"
     return(result)
 }
