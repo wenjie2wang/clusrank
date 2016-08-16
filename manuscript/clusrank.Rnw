@@ -52,8 +52,9 @@ the popular two-sample and paired $t$-test.
 For independent data, they are available in
 the built-in \pkg{stats} package of \proglang{R}.
 For clustered data, several rank-based tests that accounts for
-intracluster dependence have been recently developed, but no existing
-package provides all of them with ease of access at one place.
+intracluster dependence have been recently developed, 
+but few existing R package provides easy access to them at one place
+\citep{Dutt:Datt:clus:2016}.  
 In package \pkg{clusrank}, the latest developments are implemented
 and wrapped under a unified high-level user-friendly function.
 Different methods are dispatched based on an input formula,
@@ -64,7 +65,10 @@ permutation for small samples are available.
 We present some details and usages of the implemented methods,
 with illustrations via simulated and real data.
 Some comparison of selected methods that have not been studied before
-are easily performed with the package and the results are discussed.
+are easily performed with the package and the results are
+discussed. We acknowledge the \proglang{SAS} and \proglang{R} code provided
+by the authors of the methods implemented in this package
+\citep{SAS:inco:2016, SAS:sub:2016, SAS:sign:2016, R:clus:2016}.
 }
 
 
@@ -194,16 +198,18 @@ sampling within cluster that accounts for informative cluster sizes.
 
 Despite the popularity of clustered data arising from a wide range of
 applications such as biomedical studies and social science research,
-the extensions of Wilcoxon rank-sum and signed-rank tests reviewed
-above have not been implemented in any existing \proglang{R} package.
-This motivated our development of package \pkg{clusrank}.
-Under a unified interface similar to \code{wilcox.test}, the package
-provides these recently available rank-sum tests
-\citep{Rosn:Glyn:Lee:inco:2003, Datt:Satt:rank:2005,
-  Deni:etal:two:2010} and signed-rank tests
-\citep{Rosn:Glyn:Lee:wilc:2006, Datt:Satt:sign:2008} for clustered data.
-The package makes it very easy to compare the performances of the
-different approaches under various settings.
+only the DS method of the extensions of Wilcoxon rank-sum and
+signed-rank tests reviewed above and another recent developed
+clustered rank-sum test \citep{Dutt:Datt:clus:2016} has only been implemented in a
+\proglang{R} package \pkg{ClusterRankTest} by the athors
+\citep{Datt:Satt:rank:2005, Datt:Satt:sign:2008, Dutt:Datt:clus:2016}.  This motivated our development of
+package \pkg{clusrank}.  Under a unified interface similar to
+\code{wilcox.test}, the package provides these recently available
+rank-sum tests \citep{Rosn:Glyn:Lee:inco:2003,
+  Rosn:Glyn:Lee:exte:2006, Datt:Satt:rank:2005} and signed-rank tests
+\citep{Rosn:Glyn:Lee:wilc:2006, Datt:Satt:sign:2008} for clustered
+data.  The package makes it very easy to compare the performances of
+the different approaches under various settings.
 
 
 The rest of the article is organized as follows.
@@ -818,10 +824,10 @@ datgen.sr <- function(nclus, maxclsize, delta = 0.,
     Sigma2 <- cor(maxclsize, rho[2])
     x <- t(rmvnorm(nclus, sigma = Sigma1))
     y <- t(rmvnorm(nclus, sigma = Sigma2))
-    z <- c(x, y) + delta  
-    score <- sign(z) * exp(abs(z))
+    x <- c(x, y) + delta  
+    x <- sign(x) * exp(abs(x))
     cid <- rep(1:(2*nclus), each = maxclsize)
-    dat <- data.frame(score = score, cid = cid)
+    dat <- data.frame(x = x, cid = cid)
     drop <- sort(sample(1: (2 * nn), size = (1 - rate) * (2 * nn), FALSE))
     if (rate == 0) dat else dat[-drop,]
 }
