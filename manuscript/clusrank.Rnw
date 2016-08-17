@@ -691,7 +691,7 @@ with \pkg{mvtnorm} \citep{Genz:etal:mvtn:2016, Genz:Bret:comp:2009}.
 <<datgen, echo=TRUE>>= 
 library(mvtnorm)
 datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1), 
-                      cor = c(ex, ar1), rate = 0., clusgrp = TRUE) {
+                      cor = ex, rate = 0., clusgrp = TRUE) {
     nn <- nclus * maxclsize
     Sigma1 <- cor(maxclsize, rho[1])
     Sigma2 <- cor(maxclsize, rho[2])
@@ -711,7 +711,7 @@ clusters in each group and \code{maxclsize} for the maximum cluster
 size. 
 The difference between the groups is specified by \code{delta}.
 The group specific intra-cluster correlation parameter $\rho_g$ is
-controlled by $\rho$, a numeric vector of length 2, one for each
+controlled by \code{rho}, a numeric vector of length 2, one for each
 group.  There are two correlation structures to choose from by setting
 \code{cor}: \code{ex} for exchangeable correlation and \code{ar1} for
 AR1 correlation.  
@@ -812,13 +812,11 @@ as
   X = \mathrm{sign}(Z_d)\exp(|Z_d|),
 \]
 where $Z_d$ is a multivariate normal random vector with mean $\delta$
-and an exchangeable or AR1 conrrelation structure with correlation
-parameter $\rho$, and $\delta$ is the pair difference.
-
+and an exchangeable or AR1 conrrelation structure with parameter $\rho$. 
 
 <<datagen-sr, echo = TRUE>>=
 datgen.sr <- function(nclus, maxclsize, delta = 0.,
-                      rho = 0.1, cor = c(xch, ar1), rate = 0) {
+                      rho = c(0.1, 0.1), cor = xch, rate = 0) {
     nn <- nclus * maxclsize
     Sigma1 <- cor(maxclsize, rho[1])
     Sigma2 <- cor(maxclsize, rho[2])
@@ -832,6 +830,16 @@ datgen.sr <- function(nclus, maxclsize, delta = 0.,
     if (rate == 0) dat else dat[-drop,]
 }
 @ 
+
+For the ease of the simulation study in the following section, all of
+the arguments of \code{datgen.sr} are inherited from \code{datgen.rs}
+as necessary. No grouping is involved in the data generation for the
+signed rank test, therefore there is no \code{clusgrp} argument.
+In addition, to allow variation in the intra-cluster correlation, 
+correlation parameter \code{rho} is a vector of two, each controls
+\code{nclus} clusters. 
+
+
 
 We illustrate the clustered signed rank test with a data set that
 contains $10$ clusters. Each cluster contains $3$ pair differences.
@@ -892,31 +900,35 @@ unit of randomization.
 
 To illustrate the usage of the function, we compare the empirical size
 of the two clustered rank-sum tests and the two clustered signed-rank
-tests through $1000$ replications on balanced data set. The significance level is set as
-$0.05$. The true group differences is $0.$. Each data set contains
-$10$ clusters with size $3$. The intra-cluster correlation structure
-is exchangeable with parameter. For clustered rank-sum test, the
+tests through $1000$ replications on balanced data set. 
+The significance level is set as $0.05$. 
+The true group differences is $0.$. For clustered rank-sum test each
+data set contains $20$ clusters with size $3$ for each group.  
+The intra-cluster correlation structure is exchangeable. The
 correlation parameter \code{rho} is set as $0.1$ for both groups.
 The missing rate is set as $0$ to obtain balanced data.
 The unit of randomization is cluster. 
-{\bf what is the last argument?  it should be named}
+
 <<sim-clus-rs>>=
-simpower(1000, 0.05, FALSE, 10, 5, 0.0, c(0.1, 0.1), ex, 0, clusgrp = TRUE)
+simpower(1000, 0.05, FALSE, 20, 3, 0.0, c(0.5, 0.5), ex, 0, clusgrp = TRUE)
 @ 
 
+The empirical sizes of both methods are close to the nominal level $0.05$. 
 
-For the clustered signed-rank tests, there is no explicit treatment
-group, therefore we assign a universal correlation parameter to all
-paired differences through a single numeric. Here we let \code{rho} be
-$0.1$. Other arguments are set the same as the above simulation for
-clustered rank-sum test, except that no \code{clusgrp} is needed since
-there is no explicit treatment assignment for signed-rank test data. 
 
+For the clustered signed-rank tests, we use the same setting as in the
+above simulation for clustered rank-sum test, except that the
+correlation structure is now AR1 which is not exchangeable and no
+\code{clusgrp} is needed since there is no explicit treatment 
+assignment for signed-rank test data.  
 <<sim-sr>>=
-simpower(1000, 0.05, TRUE, 10, 5, 0., c(0.1, 0.1), ex, 0)
+simpower(1000, 0.05, TRUE, 20, 3, 0., c(0.5, 0.5), ar1, 0)
 @ 
-It is shown in the output that the empirical size of both methods are
-close to the nominal level, and the empirical power is comparable. 
+Both methods have a empirical size that is close to the nominal level
+which shows that even though the RGL method requires the exchangeability in
+the derivation of the asymptotic distribution of the test statistic,
+it is quite robust to this assumption when the correlation structure
+is AR1. 
 
 
 \subsection{Rank-sum tests}
@@ -951,7 +963,7 @@ Each cell represents $1000$ replications.
 
   \midrule
   
-  ex  & 1 & 2 & 0.1, 0.1 & 4.3 & 4.7 & 17.5 & 17.9 & 64.3 & 65.3 \\ 
+  ex  & 0 & 2 & 0.1, 0.1 & 4.3 & 4.7 & 17.5 & 17.9 & 64.3 & 65.3 \\ 
   &&&           0.5, 0.5 & 3.5 & 3.7 & 14.2 & 14.8 & 53.2 & 54.5 \\ 
   &&&          -0.1, 0.9 & 3.4 & 3.6 & 14.1 & 14.8 & 59.5 & 60.5 \\ 
   &&       10 & 0.1, 0.1 & 4.2 & 4.4 & 41.4 & 42.5 & 97.4 & 97.6 \\ 
@@ -963,7 +975,7 @@ Each cell represents $1000$ replications.
   &&       10 & 0.1, 0.1 & 5.9 & 6.1 & 26.0 & 30.3 & 85.4 & 89.1 \\ 
   &&&           0.5, 0.5 & 5.1 & 5.7 & 13.6 & 16.7 & 49.6 & 62.8 \\ 
   &&&          -0.1, 0.9 & 4.9 & 4.8 & 14.4 & 17.1 & 69.2 & 79.3 \\ 
-  ar1 & 1 & 2 & 0.1, 0.1 & 4.0 & 4.2 & 18.4 & 19.0 & 65.4 & 66.4 \\ 
+  ar1 & 0 & 2 & 0.1, 0.1 & 4.0 & 4.2 & 18.4 & 19.0 & 65.4 & 66.4 \\ 
   &&&           0.5, 0.5 & 5.2 & 5.4 & 15.4 & 16.6 & 51.9 & 53.3 \\ 
   &&&          -0.1, 0.9 & 5.1 & 5.3 & 15.9 & 16.7 & 59.6 & 60.5 \\ 
   &&       10 & 0.1, 0.1 & 4.1 & 4.4 & 61.0 & 62.4 & 99.8 & 99.8 \\ 
@@ -991,7 +1003,7 @@ Each cell represents $1000$ replications.
   Corr. str. & Missing rate & M &   $\rho$ & RGL & DS & RGL & DS & RGL & DS \\
 
   \midrule
- ex  & 1 & 2 & 0.1, 0.1 & 4.0 & 4.3 & 17.5 & 16.7 & 69.2 & 67.8 \\ 
+ ex  & 0 & 2 & 0.1, 0.1 & 4.0 & 4.3 & 17.5 & 16.7 & 69.2 & 67.8 \\ 
  &&&           0.5, 0.5 & 4.6 & 5.0 & 19.8 & 19.6 & 69.1 & 68.0 \\ 
  &&&          -0.1, 0.9 & 4.9 & 5.0 & 18.0 & 16.9 & 69.2 & 68.6 \\ 
  &&       10 & 0.1, 0.1 & 5.3 & 4.5 & 65.1 & 63.2 & 100.0 & 100.0 \\ 
@@ -1003,7 +1015,7 @@ Each cell represents $1000$ replications.
  &&       10 & 0.1, 0.1 & 5.5 & 4.9 & 40.4 & 38.9 & 97.2 & 94.9 \\ 
  &&&           0.5, 0.5 & 4.6 & 4.4 & 42.3 & 35.7 & 97.2 & 93.7 \\ 
  &&&          -0.1, 0.9 & 4.5 & 4.1 & 48.5 & 37.5 & 97.8 & 93.3 \\ 
- ar1 & 1 & 2 & 0.1, 0.1 & 4.7 & 5.3 & 16.8 & 17.8 & 69.1 & 69.0 \\ 
+ ar1 & 0 & 2 & 0.1, 0.1 & 4.7 & 5.3 & 16.8 & 17.8 & 69.1 & 69.0 \\ 
  &&&           0.5, 0.5 & 4.3 & 4.3 & 18.7 & 18.4 & 68.0 & 66.9 \\ 
  &&&          -0.1, 0.9 & 3.9 & 4.4 & 19.9 & 20.9 & 69.1 & 67.8 \\ 
  &&       10 & 0.1, 0.1 & 5.1 & 5.3 & 68.3 & 64.7 & 100.0 & 100.0 \\ 
@@ -1038,12 +1050,13 @@ shown in the simulation study in \citet{Datt:Satt:rank:2005}.
 
 
 \subsection{Signed-rank tests}
-For clustered signed-rank tests, we compare the RGL and DS methods
-under $8$ designs. Each generated data set contains $40$ clusters with
-a maximum cluster size $M = 5$. Two correlation structures,
-exchangeable and AR1, are used, each with $\rho = 0.1$ and $0.9$. We
-also compare the two tests with balanced and unbalanced data by
-setting \code{rate} as $1$ and $0.5$. There are $1000$ replications
+For clustered signed-rank tests, we compare the RGL and DS methods for
+data with cluster level and individual grouping respectively.
+Each generated data set contains $40$ clusters with
+a maximum cluster size $M = 2$ and $10$. Two correlation structures,
+exchangeable and AR1, are used.
+We also compared the two tests with balanced and unbalanced data by
+setting missing rate as $0$ and $0.5$. There are $1000$ replications
 for each design.
 
 \begin{table}[tbp]
@@ -1055,7 +1068,7 @@ for each design.
   \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9}
   Missing rate & M &   $\rho$ & RGL & DS & RGL & DS & RGL & DS \\
   \midrule
-  1   & 2 &  0.1, 0.1 & 5.2 & 5.4 & 37.7 & 38.3 & 98.0 & 98.0 \\ 
+  0   & 2 &  0.1, 0.1 & 5.2 & 5.4 & 37.7 & 38.3 & 98.0 & 98.0 \\ 
   &   &      0.5, 0.5 & 5.0 & 5.2 & 29.1 & 29.4 & 93.3 & 93.5 \\ 
   &   &      0.9, 0.9 & 5.4 & 5.5 & 23.5 & 23.7 & 86.6 & 87.0 \\ 
   &   &     -0.1, 0.9 & 3.7 & 3.9 & 30.1 & 30.6 & 95.9 & 96.0 \\ 
@@ -1086,7 +1099,7 @@ for each design.
   \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9}
   Missing rate & M &   $\rho$ & RGL & DS & RGL & DS & RGL & DS \\
   \midrule
-  1   & 2 &  0.1, 0.1  & 5.0 & 5.1 & 35.2 & 35.9 & 97.7 & 97.7 \\ 
+  0   & 2 &  0.1, 0.1  & 5.0 & 5.1 & 35.2 & 35.9 & 97.7 & 97.7 \\ 
   &   &      0.5, 0.5  & 5.8 & 5.8 & 31.6 & 32.0 & 93.8 & 93.9 \\ 
   &   &      0.9, 0.9  & 5.4 & 5.7 & 21.6 & 21.9 & 86.8 & 86.9 \\ 
   &   &     -0.1, 0.9  & 4.3 & 4.5 & 30.0 & 30.1 & 94.0 & 94.1 \\ 
