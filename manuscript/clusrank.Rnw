@@ -69,6 +69,9 @@ are easily performed with the package and the results are
 discussed. We acknowledge the \proglang{SAS} and \proglang{R} code provided
 by the authors of the methods implemented in this package
 \citep{SAS:inco:2016, SAS:sub:2016, SAS:sign:2016, R:clus:2016}.
+\red{No citations in the abstract please. Reviews should be put in the
+  introduction at the right places.}
+
 }
 
 
@@ -952,6 +955,8 @@ increase $M$ tp $10$ and decrease \code{rate} to $0.25$.
 The group difference $\delta$ takes $0$, $0.3$ and $0.6$ respectively. 
 Each cell represents $1000$ replications.
 
+\red{Read the log files and fix the warnings.}
+
 \begin{table}[tbp]
   \centering
   \caption{Empirical rejection percentage  comparisons for RGL and DS clustered rank-sum test with cluster level grouping, nominal level $5\%$, $N = 40$ clusters, $M$ is the maximum cluster size, $1000$ simulations for each combination.}
@@ -991,6 +996,9 @@ Each cell represents $1000$ replications.
 \end{tabular}
 \label{tab:rsclus}
 \end{table}
+
+\red{If you don't separate them by blank lines, they will be treated as
+  one paragraph!}
 % latex table generated in R 3.3.1 by xtable 1.8-2 package
 % Tue Aug 16 21:57:22 2016
 \begin{table}[tbp]
@@ -1027,12 +1035,13 @@ Each cell represents $1000$ replications.
  &&       10 & 0.1, 0.1 & 5.1 & 5.3 & 37.5 & 34.4 & 96.1 & 94.1 \\ 
  &&&           0.5, 0.5 & 4.2 & 4.5 & 39.1 & 35.6 & 96.7 & 93.1 \\ 
  &&&          -0.1, 0.9 & 5.1 & 4.8 & 43.0 & 35.0 & 97.5 & 94.0 \\ 
-   \hline
+ \bottomrule
 \end{tabular}
 \label{tab:rsind}
 \end{table}
 
-
+\red{highlight your discussion on the comparison that has not been done.
+  what do these results suggest? are they as expected?}
 
 
 The empirical size of both methods are around the nominal level in all
@@ -1059,6 +1068,7 @@ We also compared the two tests with balanced and unbalanced data by
 setting missing rate as $0$ and $0.5$. There are $1000$ replications
 for each design.
 
+\red{these two tables can be combined into one}
 \begin{table}[tbp]
   \centering
    \caption{Empirical rejection percentage comparisons for RGL and DS clustered signed-rank test with exchangeable intra-cluster correlation, nominal level $5\%$, $N = 40$ clusters, $1000$ simulations for each combination.}
@@ -1084,7 +1094,7 @@ for each design.
   &   &      0.5, 0.5 & 5.2 & 4.7 & 35.5 & 35.4 & 96.9 & 97.2 \\ 
   &   &      0.9, 0.9 & 5.5 & 5.6 & 25.3 & 25.7 & 86.8 & 87.1 \\ 
   &   &     -0.1, 0.9 & 4.5 & 4.6 & 40.3 & 40.0 & 98.4 & 98.4 \\ 
-   \hline
+\bottomrule
 \end{tabular}
 \label{tab:srxch}
 \end{table}
@@ -1115,7 +1125,7 @@ for each design.
   &   &      0.5, 0.5  & 5.4 & 5.6 & 52.1 & 50.5 & 99.9 & 99.9 \\ 
   &   &      0.9, 0.9  & 5.1 & 5.7 & 26.7 & 27.2 & 93.8 & 94.2 \\ 
   &   &     -0.1, 0.9  & 4.4 & 4.2 & 45.8 & 44.0 & 98.9 & 98.9 \\ 
-   \hline
+\bottomrule
 \end{tabular}
 \label{tab:srar1}
 \end{table}
@@ -1150,7 +1160,8 @@ Applicability of each method. {\bf discuss}
 {\bf Any future directions?}
 
 
-
+\red{discuss those methods and references that may be implemented 
+  in the future.}
 
 \bibliography{clusrank}
 
