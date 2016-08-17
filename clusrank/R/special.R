@@ -38,14 +38,14 @@ stratum <- function(x) {x}
 
 untangle.specials <- function (tt, special, order = 1) 
 {
-  spc <- attr(tt, "specials")[[special]]
-  if (length(spc) == 0) 
-    return(list(vars = character(0), terms = numeric(0)))
-  facs <- attr(tt, "factors")
-  fname <- dimnames(facs)
-  ff <- apply(facs[spc, , drop = FALSE], 2, sum)
-  list(vars = (fname[[1]])[spc],
-       terms = seq(ff)[ff & match(attr(tt, "order"), order, nomatch = 0)])
+    spc <- attr(tt, "specials")[[special]]
+    if (length(spc) == 0) 
+        return(list(vars = character(0), terms = numeric(0)))
+    facs <- attr(tt, "factors")
+    fname <- dimnames(facs)
+    ff <- apply(facs[spc, , drop = FALSE], 2, sum)
+    list(vars = (fname[[1]])[spc],
+         terms = seq(ff)[ff & match(attr(tt, "order"), order, nomatch = 0)])
 }
 
 
@@ -56,7 +56,7 @@ extractTerm <- function(term, mf, nobs, paired) {
     } else {
         term.mf <- attr(attr(mf, "terms"), "specials")[[term]]
     }
-       
+    
     if (length(term.mf) == 0) {
         if (term == "cluster") var <- c(1 : nobs)
         if (term == "stratum") var <- rep(1, nobs)
@@ -74,8 +74,8 @@ extractTerm <- function(term, mf, nobs, paired) {
         } else {
             temp <- untangle.specials(terms(mf), term, 1)
             name <- gsub("[\\(\\)]", "",
-                     regmatches(temp$vars,
-                                gregexpr("\\(.*?\\)", temp$vars))[[1]])
+                         regmatches(temp$vars,
+                                    gregexpr("\\(.*?\\)", temp$vars))[[1]])
             temp <- temp$vars
         }
         name <- paste0(" ", term, ": ", name, ";")

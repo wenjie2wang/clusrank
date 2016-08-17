@@ -145,7 +145,7 @@ clusWilcox.test <- function(x, ...) {
     }
     if (!is.null(data.temp) && length(pars$x) == 1) {
         if (is.data.frame(data.temp) &&
-           any(as.character(pars$x) %in% names(data.temp))) {
+            any(as.character(pars$x) %in% names(data.temp))) {
             x <- data.temp[, as.character(pars$x)]
         } else if(is.matrix(data.temp) &&
                   any(as.character(pars$x) %in% colnames(data.temp))) {
@@ -170,7 +170,7 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
         stop("'formula' missing or incorrect")
     }
     m <- match.call(expand.dots = FALSE)
-   
+    
 
     if (is.matrix(eval(m$data, parent.frame()))) {
         m$data <- as.data.frame(data)
@@ -191,7 +191,7 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
     response <- attr(terms(mf), "response")
     x <- mf[[response]]
     n.obs <- length(x)
-     
+    
     group <- extractTerm("group", mf, n.obs, paired)
     DNAME <- paste0(DNAME, group[["name"]])
     group <- group[["var"]]
@@ -226,10 +226,10 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
 #' @export
 
 clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
-            group = NULL, stratum = NULL, data = NULL,
-            alternative = c("two.sided", "less", "greater"),
-            mu = 0, paired = FALSE, exact = FALSE,
-            method = c("rgl", "ds"), ...) {
+                                    group = NULL, stratum = NULL, data = NULL,
+                                    alternative = c("two.sided", "less", "greater"),
+                                    mu = 0, paired = FALSE, exact = FALSE,
+                                    method = c("rgl", "ds"), ...) {
     alternative <- match.arg(alternative)
     method <- match.arg(method)
     pars <- as.list(match.call()[-1])

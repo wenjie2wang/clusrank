@@ -21,48 +21,48 @@
 ################################################################################
 clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
                                            mu, exact, DNAME, METHOD) {
-  ## Drop the ties
-  x <- x - mu
-  data <- data.frame(x, cluster)
-  data <- data[x != 0, ]
-  cluster.size <- table(data$cluster)
-  m <- length(cluster.size)
-  n <- nrow(data)
-  if (length(table(cluster.size)) != 1) {
-    balance = FALSE
-  } else {
-    balance = TRUE
-  }
-
-  xrank <- rank(abs(data$x))
-  data <- cbind(data, xrank)
-  signrank <- ifelse(data$x > 0, 1, -1) * data$xrank
-  data <- cbind(data, signrank)
-  colnames(data)[4] <- "signrank"
-    if(is.null(exact)) {
+    ### Ties are dropped
+    x <- x - mu
+    data <- data.frame(x, cluster)
+    data <- data[x != 0, ]
+    cluster.size <- table(data$cluster)
+    m <- length(cluster.size)
+    n <- nrow(data)
+    if (length(table(cluster.size)) != 1) {
+        balance = FALSE
+    } else {
+        balance = TRUE
+    }
+    
+    xrank <- rank(abs(data$x))
+    data <- cbind(data, xrank)
+    signrank <- ifelse(data$x > 0, 1, -1) * data$xrank
+    data <- cbind(data, signrank)
+    colnames(data)[4] <- "signrank"
+    if (is.null(exact)) {
         exact <- FALSE
     }
 
-    if(exact == TRUE) {
+    if (exact == TRUE) {
         METHOD <- paste0(METHOD, " (exact)")
-        if(length(table(cluster)) > 40)
+        if (length(table(cluster)) > 40)
             print("Number of clusters exceeds 40 for RGL clustered signed-rank test")
-        if(balance == TRUE ) {            
+        if (balance == TRUE ) {            
             T <- sum(data$signrank)
             srksum <-  stats::aggregate(signrank ~ cluster, FUN = sum)[, 2]
             T.pos <- sum(srksum[srksum > 0])
             p.val.l <- psrkg(T.pos, sort(abs(srksum)))
             pval <- switch(alternative,
-                          less = p.val.l,
-                          greater = 1 - p.val.l,
-                          two.sided = 2 * min(p.val.l, 1 - p.val.l))
+                           less = p.val.l,
+                           greater = 1 - p.val.l,
+                           two.sided = 2 * min(p.val.l, 1 - p.val.l))
         } else {
             sumclusterrank <- c(by(data$signrank, data$cluster, sum))
             sumsq <- sum(sumclusterrank ^ 2)
             meansumrank <- sumclusterrank / cluster.size
             sumsqi <- sum(cluster.size ^ 2)
             
-                                        # calculate intraclass correlation between signed ranks within the same cluster
+            ## calculate intraclass correlation between signed ranks within the same cluster
             data$cluster.f <- as.factor(data$cluster)
             mod <- lm(signrank ~ cluster.f, data, y = TRUE)
             errordf <- mod$df.residual
@@ -100,9 +100,9 @@ clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
             T.pos.int <- as.integer(T.pos / msr.dif)
             p.val.l <- psrkg(T.pos.int, msr.pos.int)
             pval <- switch(alternative,
-                          less = p.val.l,
-                          greater = 1 - p.val.l,
-                          two.sided = 2 * min(p.val.l, 1 - p.val.l))
+                           less = p.val.l,
+                           greater = 1 - p.val.l,
+                           two.sided = 2 * min(p.val.l, 1 - p.val.l))
         }
         names(T) <- "T"
         names(n) <- "total number of observations"
@@ -116,7 +116,7 @@ clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
         return(result)
         
     } else {
-        if(balance == TRUE){
+        if (balance == TRUE){
             T <- sum(data$signrank)
             sumrank <- c(by(data$signrank, data$cluster, sum))
             sumsq <- sum(sumrank ^ 2)
@@ -143,7 +143,7 @@ clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
             sumsq <- sum(sumclusterrank ^ 2)
             meansumrank <- sumclusterrank / cluster.size
             sumsqi <- sum(cluster.size ^ 2)
-                                        # calculate intraclass correlation between signed ranks within the same cluster
+            ## calculate intraclass correlation between signed ranks within the same cluster
             data$cluster.f <- as.factor(data$cluster)
             mod <- lm(signrank ~ cluster.f, data, y = TRUE)
             errordf <- mod$df.residual
@@ -174,14 +174,14 @@ clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
             VarT <- sqweightsum
             Zc <-  T / (sqrt(VarT))
             pval <- switch(alternative,
-                            less = pnorm(abs(Zc)),
-                            greater = pnorm(abs(Zc), lower.tail = FALSE),
-                            two.sided = 2 * min(pnorm(abs(Zc)),
-                                                pnorm(abs(Zc), lower.tail = FALSE)))
+                           less = pnorm(abs(Zc)),
+                           greater = pnorm(abs(Zc), lower.tail = FALSE),
+                           two.sided = 2 * min(pnorm(abs(Zc)),
+                                               pnorm(abs(Zc), lower.tail = FALSE)))
             
             names(T) <- "T"
             names(Zc) <- "Zc"
-  
+            
             ADJUST <- TRUE
             names(mu) <- "shift in location"
             names(n) <- "total number of observations"
@@ -192,7 +192,7 @@ clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
                            alternative = alternative,
                            null.value = mu,
                            data.name = DNAME, method = METHOD,
-                               adjusted = ADJUST)
+                           adjusted = ADJUST)
             class(result) <- "htest"
             return(result)
             
@@ -234,9 +234,9 @@ clusWilcox.test.signedrank.ds <- function(x, cluster, alternative,
     VTS <- sum(((niplus - niminus) / ni + (m - 1) / ni * temp) ^ 2 )
     Z <- T / sqrt(VTS)
     pval <- switch(alternative, less = pnorm(abs(Z)),
-                    greater = pnorm(abs(Z), lower.tail = FALSE),
-                    two.sided = 2 * min(pnorm(abs(Z)),
-                                        pnorm(abs(Z), lower.tail = FALSE)))
+                   greater = pnorm(abs(Z), lower.tail = FALSE),
+                   two.sided = 2 * min(pnorm(abs(Z)),
+                                       pnorm(abs(Z), lower.tail = FALSE)))
     
     names(n) <- "total number of observations"
     names(m) <- "total number of clusters"

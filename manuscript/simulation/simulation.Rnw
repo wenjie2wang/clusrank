@@ -45,12 +45,12 @@ datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1),
     nn <- nclus * maxclsize
     Sigma1 <- cor(maxclsize, rho[1])
     Sigma2 <- cor(maxclsize, rho[2])
-    x <- c(t(rmvnorm(nclus, sigma = Sigma1))) 
-    y <- c(t(rmvnorm(nclus, sigma = Sigma2)))
+    y1 <- c(t(rmvnorm(nclus, sigma = Sigma1))) 
+    y2 <- c(t(rmvnorm(nclus, sigma = Sigma2)))
     group <- rep(c(0, 1), each = nn)
     if (!clusgrp) group  <- sample(group, nn, FALSE)
     cid <- rep(1:(2 * nclus), each = maxclsize)
-    x <- exp(c(x, y)) + delta * group 
+    x <- exp(c(y1, y2)) + delta * group 
     dat <- data.frame(x = x, grp = group, cid = cid) 
     miss <-  sort(sample(1:(2 * nn), size = rate * (2 * nn), FALSE))
     if (rate == 0.) dat else dat[-miss, ]      
@@ -63,9 +63,9 @@ datgen.sr <- function(nclus, maxclsize, delta = 0.,
     nn <- nclus * maxclsize
     Sigma1 <- cor(maxclsize, rho[1])
     Sigma2 <- cor(maxclsize, rho[2])
-    x <- t(rmvnorm(nclus, sigma = Sigma1))
-    y <- t(rmvnorm(nclus, sigma = Sigma2))
-    x <- c(x, y) + delta  
+    y1 <- t(rmvnorm(nclus, sigma = Sigma1))
+    y2 <- t(rmvnorm(nclus, sigma = Sigma2))
+    x <- c(y1, y2) + delta  
     x <- sign(x) * exp(abs(x))
     cid <- rep(1:(2*nclus), each = maxclsize)
     dat <- data.frame(x = x, cid = cid)
@@ -128,28 +128,28 @@ simpower.exact <- function(nrep, level, delta, nclus, ...) {
 ## simpower.exact(100, 0.05, 0, 10)
 ## simpower.exact(100, 0.05, 0.5, 10)
 @ 
-#################################################
+
 
 <<rs-b-xch-rho11-csize2-clus, echo = FALSE, eval = TRUE>>=
 rs.b.x.11.2.clus<- rep(0, 6) 
-rs.b.x.11.2.clus[1:2] <- simpower(10000, 0.05, FALSE, 20, 2, 0, c(0.1, 0.1), xch, 0, TRUE)
-rs.b.x.11.2.clus[3:4] <- simpower(10000, 0.05, FALSE, 20, 2, 0.2, c(0.1, 0.1), xch, 0, TRUE)
-rs.b.x.11.2.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(0.1, 0.1), xch, 0, TRUE)
+rs.b.x.11.2.clus[1:2] <- simpower(1000, 0.05, FALSE, 20, 2, 0, c(0.1, 0.1), xch, 0, TRUE)
+rs.b.x.11.2.clus[3:4] <- simpower(1000, 0.05, FALSE, 20, 2, 0.2, c(0.1, 0.1), xch, 0, TRUE)
+rs.b.x.11.2.clus[5:6] <- simpower(1000, 0.05, FALSE, 20, 2, 0.5, c(0.1, 0.1), xch, 0, TRUE)
 @ 
 
 <<rs-b-xch-rho55-csize2-clus, echo = FALSE, eval = TRUE>>=
 rs.b.x.55.2.clus<- rep(0, 6) 
-rs.b.x.55.2.clus[1:2] <- simpower(10000, 0.05, FALSE, 20, 2, 0, c(0.5, 0.5), xch, 0, TRUE)
-rs.b.x.55.2.clus[3:4] <- simpower(10000, 0.05, FALSE, 20, 2, 0.2, c(0.5, 0.5), xch, 0, TRUE)
-rs.b.x.55.2.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(0.5, 0.5), xch, 0, TRUE)
+rs.b.x.55.2.clus[1:2] <- simpower(1000, 0.05, FALSE, 20, 2, 0, c(0.5, 0.5), xch, 0, TRUE)
+rs.b.x.55.2.clus[3:4] <- simpower(1000, 0.05, FALSE, 20, 2, 0.2, c(0.5, 0.5), xch, 0, TRUE)
+rs.b.x.55.2.clus[5:6] <- simpower(1000, 0.05, FALSE, 20, 2, 0.5, c(0.5, 0.5), xch, 0, TRUE)
 @ 
 
 
 <<rs-b-xch-rho19-csize2-clus, echo = FALSE, eval = TRUE>>=
 rs.b.x.19.2.clus<- rep(0, 6) 
-rs.b.x.19.2.clus[1:2] <- simpower(10000, 0.05, FALSE, 20, 2, 0, c(-0.1, 0.9), xch, 0, TRUE)
-rs.b.x.19.2.clus[3:4] <- simpower(10000, 0.05, FALSE, 20, 2, 0.2, c(-0.1, 0.9), xch, 0, TRUE)
-rs.b.x.19.2.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(-0.1, 0.9), xch, 0, TRUE)
+rs.b.x.19.2.clus[1:2] <- simpower(1000, 0.05, FALSE, 20, 2, 0, c(-0.1, 0.9), xch, 0, TRUE)
+rs.b.x.19.2.clus[3:4] <- simpower(1000, 0.05, FALSE, 20, 2, 0.2, c(-0.1, 0.9), xch, 0, TRUE)
+rs.b.x.19.2.clus[5:6] <- simpower(1000, 0.05, FALSE, 20, 2, 0.5, c(-0.1, 0.9), xch, 0, TRUE)
 @ 
 
 
@@ -157,24 +157,24 @@ rs.b.x.19.2.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(-0.1, 0.9), 
 
 <<rs-b-xch-rho11-csize10-clus, echo = FALSE, eval = TRUE>>=
 rs.b.x.11.10.clus <- rep(0, 6) 
-rs.b.x.11.10.clus[1:2] <- simpower(10000, 0.05, FALSE, 20, 10, 0, c(0.1, 0.1), xch, 0, TRUE)
-rs.b.x.11.10.clus[3:4] <- simpower(10000, 0.05, FALSE, 20, 10, 0.2, c(0.1, 0.1), xch, 0, TRUE)
-rs.b.x.11.10.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(0.1, 0.1), xch, 0, TRUE)
+rs.b.x.11.10.clus[1:2] <- simpower(1000, 0.05, FALSE, 20, 10, 0, c(0.1, 0.1), xch, 0, TRUE)
+rs.b.x.11.10.clus[3:4] <- simpower(1000, 0.05, FALSE, 20, 10, 0.2, c(0.1, 0.1), xch, 0, TRUE)
+rs.b.x.11.10.clus[5:6] <- simpower(1000, 0.05, FALSE, 20, 10, 0.5, c(0.1, 0.1), xch, 0, TRUE)
 @ 
 
 <<rs-b-xch-rho55-csize10-clus, echo = FALSE, eval = TRUE>>=
 rs.b.x.55.10.clus <- rep(0, 6) 
-rs.b.x.55.10.clus[1:2] <- simpower(10000, 0.05, FALSE, 20, 10, 0, c(0.5, 0.5), xch, 0, TRUE)
-rs.b.x.55.10.clus[3:4] <- simpower(10000, 0.05, FALSE, 20, 10, 0.2, c(0.5, 0.5), xch, 0, TRUE)
-rs.b.x.55.10.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(0.5, 0.5), xch, 0, TRUE)
+rs.b.x.55.10.clus[1:2] <- simpower(1000, 0.05, FALSE, 20, 10, 0, c(0.5, 0.5), xch, 0, TRUE)
+rs.b.x.55.10.clus[3:4] <- simpower(1000, 0.05, FALSE, 20, 10, 0.2, c(0.5, 0.5), xch, 0, TRUE)
+rs.b.x.55.10.clus[5:6] <- simpower(1000, 0.05, FALSE, 20, 10, 0.5, c(0.5, 0.5), xch, 0, TRUE)
 @ 
 
 
 <<rs-b-xch-rho19-csize10-clus, echo = FALSE, eval = TRUE>>=
 rs.b.x.19.10.clus <- rep(0, 6) 
-rs.b.x.19.10.clus[1:2] <- simpower(10000, 0.05, FALSE, 20, 10, 0, c(-0.1, 0.9), xch, 0, TRUE)
-rs.b.x.19.10.clus[3:4] <- simpower(10000, 0.05, FALSE, 20, 10, 0.2, c(-0.1, 0.9), xch, 0, TRUE)
-rs.b.x.19.10.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(-0.1, 0.9), xch, 0, TRUE)
+rs.b.x.19.10.clus[1:2] <- simpower(1000, 0.05, FALSE, 20, 10, 0, c(-0.1, 0.9), xch, 0, TRUE)
+rs.b.x.19.10.clus[3:4] <- simpower(1000, 0.05, FALSE, 20, 10, 0.2, c(-0.1, 0.9), xch, 0, TRUE)
+rs.b.x.19.10.clus[5:6] <- simpower(1000, 0.05, FALSE, 20, 10, 0.5, c(-0.1, 0.9), xch, 0, TRUE)
 @ 
 
 
@@ -182,24 +182,24 @@ rs.b.x.19.10.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(-0.1, 0.9)
 
 <<rs-ub-xch-rho11-csize2-clus, echo = FALSE, eval = TRUE>>=
 rs.ub.x.11.2.clus<- rep(0, 6) 
-rs.ub.x.11.2.clus[1:2] <- simpower(10000, 0.05, FALSE, 20, 2, 0, c(0.1, 0.1), xch, 0.8, TRUE)
-rs.ub.x.11.2.clus[3:4] <- simpower(10000, 0.05, FALSE, 20, 2, 0.2, c(0.1, 0.1), xch, 0.8, TRUE)
-rs.ub.x.11.2.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(0.1, 0.1), xch, 0.8, TRUE)
+rs.ub.x.11.2.clus[1:2] <- simpower(1000, 0.05, FALSE, 20, 2, 0, c(0.1, 0.1), xch, 0.5, TRUE)
+rs.ub.x.11.2.clus[3:4] <- simpower(1000, 0.05, FALSE, 20, 2, 0.2, c(0.1, 0.1), xch, 0.5, TRUE)
+rs.ub.x.11.2.clus[5:6] <- simpower(1000, 0.05, FALSE, 20, 2, 0.5, c(0.1, 0.1), xch, 0.5, TRUE)
 @ 
 
 <<rs-ub-xch-rho55-csize2-clus, echo = FALSE, eval = TRUE>>=
 rs.ub.x.55.2.clus<- rep(0, 6) 
-rs.ub.x.55.2.clus[1:2] <- simpower(10000, 0.05, FALSE, 20, 2, 0, c(0.5, 0.5), xch, 0.8, TRUE)
-rs.ub.x.55.2.clus[3:4] <- simpower(10000, 0.05, FALSE, 20, 2, 0.2, c(0.5, 0.5), xch, 0.8, TRUE)
-rs.ub.x.55.2.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(0.5, 0.5), xch, 0.8, TRUE)
+rs.ub.x.55.2.clus[1:2] <- simpower(1000, 0.05, FALSE, 20, 2, 0, c(0.5, 0.5), xch, 0.5, TRUE)
+rs.ub.x.55.2.clus[3:4] <- simpower(1000, 0.05, FALSE, 20, 2, 0.2, c(0.5, 0.5), xch, 0.5, TRUE)
+rs.ub.x.55.2.clus[5:6] <- simpower(1000, 0.05, FALSE, 20, 2, 0.5, c(0.5, 0.5), xch, 0.5, TRUE)
 @ 
 
 
 <<rs-ub-xch-rho19-csize2-clus, echo = FALSE, eval = TRUE>>=
 rs.ub.x.19.2.clus<- rep(0, 6) 
-rs.ub.x.19.2.clus[1:2] <- simpower(10000, 0.05, FALSE, 20, 2, 0, c(-0.1, 0.9), xch, 0.8, TRUE)
-rs.ub.x.19.2.clus[3:4] <- simpower(10000, 0.05, FALSE, 20, 2, 0.2, c(-0.1, 0.9), xch, 0.8, TRUE)
-rs.ub.x.19.2.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(-0.1, 0.9), xch, 0.8, TRUE)
+rs.ub.x.19.2.clus[1:2] <- simpower(1000, 0.05, FALSE, 20, 2, 0, c(-0.1, 0.9), xch, 0.5, TRUE)
+rs.ub.x.19.2.clus[3:4] <- simpower(1000, 0.05, FALSE, 20, 2, 0.2, c(-0.1, 0.9), xch, 0.5, TRUE)
+rs.ub.x.19.2.clus[5:6] <- simpower(1000, 0.05, FALSE, 20, 2, 0.5, c(-0.1, 0.9), xch, 0.5, TRUE)
 @ 
 
 
@@ -207,152 +207,151 @@ rs.ub.x.19.2.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(-0.1, 0.9),
 
 <<rs-ub-xch-rho11-csize10-clus, echo = FALSE, eval = TRUE>>=
 rs.ub.x.11.10.clus <- rep(0, 6) 
-rs.ub.x.11.10.clus[1:2] <- simpower(10000, 0.05, FALSE, 20, 10, 0, c(0.1, 0.1), xch, 0.8, TRUE)
-rs.ub.x.11.10.clus[3:4] <- simpower(10000, 0.05, FALSE, 20, 10, 0.2, c(0.1, 0.1), xch, 0.8, TRUE)
-rs.ub.x.11.10.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(0.1, 0.1), xch, 0.8, TRUE)
+rs.ub.x.11.10.clus[1:2] <- simpower(1000, 0.05, FALSE, 20, 10, 0, c(0.1, 0.1), xch, 0.5, TRUE)
+rs.ub.x.11.10.clus[3:4] <- simpower(1000, 0.05, FALSE, 20, 10, 0.2, c(0.1, 0.1), xch, 0.5, TRUE)
+rs.ub.x.11.10.clus[5:6] <- simpower(1000, 0.05, FALSE, 20, 10, 0.5, c(0.1, 0.1), xch, 0.5, TRUE)
 @ 
 
 <<rs-ub-xch-rho55-csize10-clus, echo = FALSE, eval = TRUE>>=
 rs.ub.x.55.10.clus <- rep(0, 6) 
-rs.ub.x.55.10.clus[1:2] <- simpower(10000, 0.05, FALSE, 20, 10, 0, c(0.5, 0.5), xch, 0.8, TRUE)
-rs.ub.x.55.10.clus[3:4] <- simpower(10000, 0.05, FALSE, 20, 10, 0.2, c(0.5, 0.5), xch, 0.8, TRUE)
-rs.ub.x.55.10.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(0.5, 0.5), xch, 0.8, TRUE)
+rs.ub.x.55.10.clus[1:2] <- simpower(1000, 0.05, FALSE, 20, 10, 0, c(0.5, 0.5), xch, 0.5, TRUE)
+rs.ub.x.55.10.clus[3:4] <- simpower(1000, 0.05, FALSE, 20, 10, 0.2, c(0.5, 0.5), xch, 0.5, TRUE)
+rs.ub.x.55.10.clus[5:6] <- simpower(1000, 0.05, FALSE, 20, 10, 0.5, c(0.5, 0.5), xch, 0.5, TRUE)
 @ 
 
 
 
 <<rs-ub-xch-rho19-csize10-clus, echo = FALSE, eval = TRUE>>=
 rs.ub.x.19.10.clus <- rep(0, 6) 
-rs.ub.x.19.10.clus[1:2] <- simpower(10000, 0.05, FALSE, 20, 10, 0, c(-0.1, 0.9), xch, 0.8, TRUE)
-rs.ub.x.19.10.clus[3:4] <- simpower(10000, 0.05, FALSE, 20, 10, 0.2, c(-0.1, 0.9), xch, 0.8, TRUE)
-rs.ub.x.19.10.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(-0.1, 0.9), xch, 0.8, TRUE)
+rs.ub.x.19.10.clus[1:2] <- simpower(1000, 0.05, FALSE, 20, 10, 0, c(-0.1, 0.9), xch, 0.5, TRUE)
+rs.ub.x.19.10.clus[3:4] <- simpower(1000, 0.05, FALSE, 20, 10, 0.2, c(-0.1, 0.9), xch, 0.5, TRUE)
+rs.ub.x.19.10.clus[5:6] <- simpower(1000, 0.05, FALSE, 20, 10, 0.5, c(-0.1, 0.9), xch, 0.5, TRUE)
 @ 
 
 
-#############################################
+
 
 <<rs-b-ar1-rho11-csize2-clus, echo = FALSE, eval = TRUE>>=
-rs.b.x.11.2.clus<- rep(0, 6) 
-rs.b.x.11.2.clus[1:2] <- simpower(10000, 0.05, FALSE, 20, 2, 0, c(0.1, 0.1), ar1, 0, TRUE)
-rs.b.x.11.2.clus[3:4] <- simpower(10000, 0.05, FALSE, 20, 2, 0.2, c(0.1, 0.1), ar1, 0, TRUE)
-rs.b.x.11.2.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(0.1, 0.1), ar1, 0, TRUE)
+rs.b.a.11.2.clus<- rep(0, 6) 
+rs.b.a.11.2.clus[1:2] <- simpower(1000, 0.05, FALSE, 20, 2, 0, c(0.1, 0.1), ar1, 0, TRUE)
+rs.b.a.11.2.clus[3:4] <- simpower(1000, 0.05, FALSE, 20, 2, 0.2, c(0.1, 0.1), ar1, 0, TRUE)
+rs.b.a.11.2.clus[5:6] <- simpower(1000, 0.05, FALSE, 20, 2, 0.5, c(0.1, 0.1), ar1, 0, TRUE)
 @ 
 
 <<rs-b-ar1-rho55-csize2-clus, echo = FALSE, eval = TRUE>>=
-rs.b.x.55.2.clus<- rep(0, 6) 
-rs.b.x.55.2.clus[1:2] <- simpower(10000, 0.05, FALSE, 20, 2, 0, c(0.5, 0.5), ar1, 0, TRUE)
-rs.b.x.55.2.clus[3:4] <- simpower(10000, 0.05, FALSE, 20, 2, 0.2, c(0.5, 0.5), ar1, 0, TRUE)
-rs.b.x.55.2.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(0.5, 0.5), ar1, 0, TRUE)
+rs.b.a.55.2.clus<- rep(0, 6) 
+rs.b.a.55.2.clus[1:2] <- simpower(1000, 0.05, FALSE, 20, 2, 0, c(0.5, 0.5), ar1, 0, TRUE)
+rs.b.a.55.2.clus[3:4] <- simpower(1000, 0.05, FALSE, 20, 2, 0.2, c(0.5, 0.5), ar1, 0, TRUE)
+rs.b.a.55.2.clus[5:6] <- simpower(1000, 0.05, FALSE, 20, 2, 0.5, c(0.5, 0.5), ar1, 0, TRUE)
 @ 
 
 
 
 <<rs-b-ar1-rho19-csize2-clus, echo = FALSE, eval = TRUE>>=
-rs.b.x.19.2.clus<- rep(0, 6) 
-rs.b.x.19.2.clus[1:2] <- simpower(10000, 0.05, FALSE, 20, 2, 0, c(-0.1, 0.9), ar1, 0, TRUE)
-rs.b.x.19.2.clus[3:4] <- simpower(10000, 0.05, FALSE, 20, 2, 0.2, c(-0.1, 0.9), ar1, 0, TRUE)
-rs.b.x.19.2.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(-0.1, 0.9), ar1, 0, TRUE)
+rs.b.a.19.2.clus<- rep(0, 6) 
+rs.b.a.19.2.clus[1:2] <- simpower(1000, 0.05, FALSE, 20, 2, 0, c(-0.1, 0.9), ar1, 0, TRUE)
+rs.b.a.19.2.clus[3:4] <- simpower(1000, 0.05, FALSE, 20, 2, 0.2, c(-0.1, 0.9), ar1, 0, TRUE)
+rs.b.a.19.2.clus[5:6] <- simpower(1000, 0.05, FALSE, 20, 2, 0.5, c(-0.1, 0.9), ar1, 0, TRUE)
 @ 
 
 
 
 
 <<rs-b-ar1-rho11-csize10-clus, echo = FALSE, eval = TRUE>>=
-rs.b.x.11.10.clus <- rep(0, 6) 
-rs.b.x.11.10.clus[1:2] <- simpower(10000, 0.05, FALSE, 20, 10, 0, c(0.1, 0.1), ar1, 0, TRUE)
-rs.b.x.11.10.clus[3:4] <- simpower(10000, 0.05, FALSE, 20, 10, 0.2, c(0.1, 0.1), ar1, 0, TRUE)
-rs.b.x.11.10.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(0.1, 0.1), ar1, 0, TRUE)
+rs.b.a.11.10.clus <- rep(0, 6) 
+rs.b.a.11.10.clus[1:2] <- simpower(1000, 0.05, FALSE, 20, 10, 0, c(0.1, 0.1), ar1, 0, TRUE)
+rs.b.a.11.10.clus[3:4] <- simpower(1000, 0.05, FALSE, 20, 10, 0.2, c(0.1, 0.1), ar1, 0, TRUE)
+rs.b.a.11.10.clus[5:6] <- simpower(1000, 0.05, FALSE, 20, 10, 0.5, c(0.1, 0.1), ar1, 0, TRUE)
 @ 
 
 <<rs-b-ar1-rho55-csize10-clus, echo = FALSE, eval = TRUE>>=
-rs.b.x.55.10.clus <- rep(0, 6) 
-rs.b.x.55.10.clus[1:2] <- simpower(10000, 0.05, FALSE, 20, 10, 0, c(0.5, 0.5), ar1, 0, TRUE)
-rs.b.x.55.10.clus[3:4] <- simpower(10000, 0.05, FALSE, 20, 10, 0.2, c(0.5, 0.5), ar1, 0, TRUE)
-rs.b.x.55.10.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(0.5, 0.5), ar1, 0, TRUE)
+rs.b.a.55.10.clus <- rep(0, 6) 
+rs.b.a.55.10.clus[1:2] <- simpower(1000, 0.05, FALSE, 20, 10, 0, c(0.5, 0.5), ar1, 0, TRUE)
+rs.b.a.55.10.clus[3:4] <- simpower(1000, 0.05, FALSE, 20, 10, 0.2, c(0.5, 0.5), ar1, 0, TRUE)
+rs.b.a.55.10.clus[5:6] <- simpower(1000, 0.05, FALSE, 20, 10, 0.5, c(0.5, 0.5), ar1, 0, TRUE)
 @ 
 
 
 
 <<rs-b-ar1-rho19-csize10-clus, echo = FALSE, eval = TRUE>>=
-rs.b.x.19.10.clus <- rep(0, 6) 
-rs.b.x.19.10.clus[1:2] <- simpower(10000, 0.05, FALSE, 20, 10, 0, c(-0.1, 0.9), ar1, 0, TRUE)
-rs.b.x.19.10.clus[3:4] <- simpower(10000, 0.05, FALSE, 20, 10, 0.2, c(-0.1, 0.9), ar1, 0, TRUE)
-rs.b.x.19.10.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(-0.1, 0.9), ar1, 0, TRUE)
+rs.b.a.19.10.clus <- rep(0, 6) 
+rs.b.a.19.10.clus[1:2] <- simpower(1000, 0.05, FALSE, 20, 10, 0, c(-0.1, 0.9), ar1, 0, TRUE)
+rs.b.a.19.10.clus[3:4] <- simpower(1000, 0.05, FALSE, 20, 10, 0.2, c(-0.1, 0.9), ar1, 0, TRUE)
+rs.b.a.19.10.clus[5:6] <- simpower(1000, 0.05, FALSE, 20, 10, 0.5, c(-0.1, 0.9), ar1, 0, TRUE)
 @ 
 
 
 
 
 <<rs-ub-ar1-rho11-csize2-clus, echo = FALSE, eval = TRUE>>=
-rs.ub.x.11.2.clus<- rep(0, 6) 
-rs.ub.x.11.2.clus[1:2] <- simpower(10000, 0.05, FALSE, 20, 2, 0, c(0.1, 0.1), ar1, 0.8, TRUE)
-rs.ub.x.11.2.clus[3:4] <- simpower(10000, 0.05, FALSE, 20, 2, 0.2, c(0.1, 0.1), ar1, 0.8, TRUE)
-rs.ub.x.11.2.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(0.1, 0.1), ar1, 0.8, TRUE)
+rs.ub.a.11.2.clus<- rep(0, 6) 
+rs.ub.a.11.2.clus[1:2] <- simpower(1000, 0.05, FALSE, 20, 2, 0, c(0.1, 0.1), ar1, 0.5, TRUE)
+rs.ub.a.11.2.clus[3:4] <- simpower(1000, 0.05, FALSE, 20, 2, 0.2, c(0.1, 0.1), ar1, 0.5, TRUE)
+rs.ub.a.11.2.clus[5:6] <- simpower(1000, 0.05, FALSE, 20, 2, 0.5, c(0.1, 0.1), ar1, 0.5, TRUE)
 @ 
 
 <<rs-ub-ar1-rho55-csize2-clus, echo = FALSE, eval = TRUE>>=
-rs.ub.x.55.2.clus<- rep(0, 6) 
-rs.ub.x.55.2.clus[1:2] <- simpower(10000, 0.05, FALSE, 20, 2, 0, c(0.5, 0.5), ar1, 0.8, TRUE)
-rs.ub.x.55.2.clus[3:4] <- simpower(10000, 0.05, FALSE, 20, 2, 0.2, c(0.5, 0.5), ar1, 0.8, TRUE)
-rs.ub.x.55.2.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(0.5, 0.5), ar1, 0.8, TRUE)
+rs.ub.a.55.2.clus<- rep(0, 6) 
+rs.ub.a.55.2.clus[1:2] <- simpower(1000, 0.05, FALSE, 20, 2, 0, c(0.5, 0.5), ar1, 0.5, TRUE)
+rs.ub.a.55.2.clus[3:4] <- simpower(1000, 0.05, FALSE, 20, 2, 0.2, c(0.5, 0.5), ar1, 0.5, TRUE)
+rs.ub.a.55.2.clus[5:6] <- simpower(1000, 0.05, FALSE, 20, 2, 0.5, c(0.5, 0.5), ar1, 0.5, TRUE)
 @ 
 
 
 
 <<rs-ub-ar1-rho19-csize2-clus, echo = FALSE, eval = TRUE>>=
-rs.ub.x.19.2.clus<- rep(0, 6) 
-rs.ub.x.19.2.clus[1:2] <- simpower(10000, 0.05, FALSE, 20, 2, 0, c(-0.1, 0.9), ar1, 0.8, TRUE)
-rs.ub.x.19.2.clus[3:4] <- simpower(10000, 0.05, FALSE, 20, 2, 0.2, c(-0.1, 0.9), ar1, 0.8, TRUE)
-rs.ub.x.19.2.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(-0.1, 0.9), ar1, 0.8, TRUE)
+rs.ub.a.19.2.clus<- rep(0, 6) 
+rs.ub.a.19.2.clus[1:2] <- simpower(1000, 0.05, FALSE, 20, 2, 0, c(-0.1, 0.9), ar1, 0.5, TRUE)
+rs.ub.a.19.2.clus[3:4] <- simpower(1000, 0.05, FALSE, 20, 2, 0.2, c(-0.1, 0.9), ar1, 0.5, TRUE)
+rs.ub.a.19.2.clus[5:6] <- simpower(1000, 0.05, FALSE, 20, 2, 0.5, c(-0.1, 0.9), ar1, 0.5, TRUE)
 @ 
 
 
 
 
 <<rs-ub-ar1-rho11-csize10-clus, echo = FALSE, eval = TRUE>>=
-rs.ub.x.11.10.clus <- rep(0, 6) 
-rs.ub.x.11.10.clus[1:2] <- simpower(10000, 0.05, FALSE, 20, 10, 0, c(0.1, 0.1), ar1, 0.8, TRUE)
-rs.ub.x.11.10.clus[3:4] <- simpower(10000, 0.05, FALSE, 20, 10, 0.2, c(0.1, 0.1), ar1, 0.8, TRUE)
-rs.ub.x.11.10.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(0.1, 0.1), ar1, 0.8, TRUE)
+rs.ub.a.11.10.clus <- rep(0, 6) 
+rs.ub.a.11.10.clus[1:2] <- simpower(1000, 0.05, FALSE, 20, 10, 0, c(0.1, 0.1), ar1, 0.5, TRUE)
+rs.ub.a.11.10.clus[3:4] <- simpower(1000, 0.05, FALSE, 20, 10, 0.2, c(0.1, 0.1), ar1, 0.5, TRUE)
+rs.ub.a.11.10.clus[5:6] <- simpower(1000, 0.05, FALSE, 20, 10, 0.5, c(0.1, 0.1), ar1, 0.5, TRUE)
 @ 
 
 <<rs-ub-ar1-rho55-csize10-clus, echo = FALSE, eval = TRUE>>=
-rs.ub.x.55.10.clus <- rep(0, 6) 
-rs.ub.x.55.10.clus[1:2] <- simpower(10000, 0.05, FALSE, 20, 10, 0, c(0.5, 0.5), ar1, 0.8, TRUE)
-rs.ub.x.55.10.clus[3:4] <- simpower(10000, 0.05, FALSE, 20, 10, 0.2, c(0.5, 0.5), ar1, 0.8, TRUE)
-rs.ub.x.55.10.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(0.5, 0.5), ar1, 0.8, TRUE)
+rs.ub.a.55.10.clus <- rep(0, 6) 
+rs.ub.a.55.10.clus[1:2] <- simpower(1000, 0.05, FALSE, 20, 10, 0, c(0.5, 0.5), ar1, 0.5, TRUE)
+rs.ub.a.55.10.clus[3:4] <- simpower(1000, 0.05, FALSE, 20, 10, 0.2, c(0.5, 0.5), ar1, 0.5, TRUE)
+rs.ub.a.55.10.clus[5:6] <- simpower(1000, 0.05, FALSE, 20, 10, 0.5, c(0.5, 0.5), ar1, 0.5, TRUE)
 @ 
 
 
 
 <<rs-ub-ar1-rho19-csize10-clus, echo = FALSE, eval = TRUE>>=
-rs.ub.x.19.10.clus <- rep(0, 6) 
-rs.ub.x.19.10.clus[1:2] <- simpower(10000, 0.05, FALSE, 20, 10, 0, c(-0.1, 0.9), ar1, 0.8, TRUE)
-rs.ub.x.19.10.clus[3:4] <- simpower(10000, 0.05, FALSE, 20, 10, 0.2, c(-0.1, 0.9), ar1, 0.8, TRUE)
-rs.ub.x.19.10.clus[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(-0.1, 0.9), ar1, 0.8, TRUE)
+rs.ub.a.19.10.clus <- rep(0, 6) 
+rs.ub.a.19.10.clus[1:2] <- simpower(1000, 0.05, FALSE, 20, 10, 0, c(-0.1, 0.9), ar1, 0.5, TRUE)
+rs.ub.a.19.10.clus[3:4] <- simpower(1000, 0.05, FALSE, 20, 10, 0.2, c(-0.1, 0.9), ar1, 0.5, TRUE)
+rs.ub.a.19.10.clus[5:6] <- simpower(1000, 0.05, FALSE, 20, 10, 0.5, c(-0.1, 0.9), ar1, 0.5, TRUE)
 @
 
-##################################################################
 <<rs-b-xch-rho11-csize2-ind, echo = FALSE, eval = TRUE>>=
 rs.b.x.11.2.ind<- rep(0, 6) 
-rs.b.x.11.2.ind[1:2] <- simpower(10000, 0.05, FALSE, 20, 2, 0, c(0.1, 0.1), xch, 0, FALSE)
-rs.b.x.11.2.ind[3:4] <- simpower(10000, 0.05, FALSE, 20, 2, 0.2, c(0.1, 0.1), xch, 0, FALSE)
-rs.b.x.11.2.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(0.1, 0.1), xch, 0, FALSE)
+rs.b.x.11.2.ind[1:2] <- simpower(1000, 0.05, FALSE, 20, 2, 0, c(0.1, 0.1), xch, 0, FALSE)
+rs.b.x.11.2.ind[3:4] <- simpower(1000, 0.05, FALSE, 20, 2, 0.2, c(0.1, 0.1), xch, 0, FALSE)
+rs.b.x.11.2.ind[5:6] <- simpower(1000, 0.05, FALSE, 20, 2, 0.5, c(0.1, 0.1), xch, 0, FALSE)
 @ 
 
 <<rs-b-xch-rho55-csize2-ind, echo = FALSE, eval = TRUE>>=
 rs.b.x.55.2.ind<- rep(0, 6) 
-rs.b.x.55.2.ind[1:2] <- simpower(10000, 0.05, FALSE, 20, 2, 0, c(0.5, 0.5), xch, 0, FALSE)
-rs.b.x.55.2.ind[3:4] <- simpower(10000, 0.05, FALSE, 20, 2, 0.2, c(0.5, 0.5), xch, 0, FALSE)
-rs.b.x.55.2.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(0.5, 0.5), xch, 0, FALSE)
+rs.b.x.55.2.ind[1:2] <- simpower(1000, 0.05, FALSE, 20, 2, 0, c(0.5, 0.5), xch, 0, FALSE)
+rs.b.x.55.2.ind[3:4] <- simpower(1000, 0.05, FALSE, 20, 2, 0.2, c(0.5, 0.5), xch, 0, FALSE)
+rs.b.x.55.2.ind[5:6] <- simpower(1000, 0.05, FALSE, 20, 2, 0.5, c(0.5, 0.5), xch, 0, FALSE)
 @ 
 
 
 <<rs-b-xch-rho19-csize2-ind, echo = FALSE, eval = TRUE>>=
 rs.b.x.19.2.ind<- rep(0, 6) 
-rs.b.x.19.2.ind[1:2] <- simpower(10000, 0.05, FALSE, 20, 2, 0, c(-0.1, 0.9), xch, 0, FALSE)
-rs.b.x.19.2.ind[3:4] <- simpower(10000, 0.05, FALSE, 20, 2, 0.2, c(-0.1, 0.9), xch, 0, FALSE)
-rs.b.x.19.2.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(-0.1, 0.9), xch, 0, FALSE)
+rs.b.x.19.2.ind[1:2] <- simpower(1000, 0.05, FALSE, 20, 2, 0, c(-0.1, 0.9), xch, 0, FALSE)
+rs.b.x.19.2.ind[3:4] <- simpower(1000, 0.05, FALSE, 20, 2, 0.2, c(-0.1, 0.9), xch, 0, FALSE)
+rs.b.x.19.2.ind[5:6] <- simpower(1000, 0.05, FALSE, 20, 2, 0.5, c(-0.1, 0.9), xch, 0, FALSE)
 @ 
 
 
@@ -360,24 +359,24 @@ rs.b.x.19.2.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(-0.1, 0.9), x
 
 <<rs-b-xch-rho11-csize10-ind, echo = FALSE, eval = TRUE>>=
 rs.b.x.11.10.ind <- rep(0, 6) 
-rs.b.x.11.10.ind[1:2] <- simpower(10000, 0.05, FALSE, 20, 10, 0, c(0.1, 0.1), xch, 0, FALSE)
-rs.b.x.11.10.ind[3:4] <- simpower(10000, 0.05, FALSE, 20, 10, 0.2, c(0.1, 0.1), xch, 0, FALSE)
-rs.b.x.11.10.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(0.1, 0.1), xch, 0, FALSE)
+rs.b.x.11.10.ind[1:2] <- simpower(1000, 0.05, FALSE, 20, 10, 0, c(0.1, 0.1), xch, 0, FALSE)
+rs.b.x.11.10.ind[3:4] <- simpower(1000, 0.05, FALSE, 20, 10, 0.2, c(0.1, 0.1), xch, 0, FALSE)
+rs.b.x.11.10.ind[5:6] <- simpower(1000, 0.05, FALSE, 20, 10, 0.5, c(0.1, 0.1), xch, 0, FALSE)
 @ 
 
 <<rs-b-xch-rho55-csize10-ind, echo = FALSE, eval = TRUE>>=
 rs.b.x.55.10.ind <- rep(0, 6) 
-rs.b.x.55.10.ind[1:2] <- simpower(10000, 0.05, FALSE, 20, 10, 0, c(0.5, 0.5), xch, 0, FALSE)
-rs.b.x.55.10.ind[3:4] <- simpower(10000, 0.05, FALSE, 20, 10, 0.2, c(0.5, 0.5), xch, 0, FALSE)
-rs.b.x.55.10.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(0.5, 0.5), xch, 0, FALSE)
+rs.b.x.55.10.ind[1:2] <- simpower(1000, 0.05, FALSE, 20, 10, 0, c(0.5, 0.5), xch, 0, FALSE)
+rs.b.x.55.10.ind[3:4] <- simpower(1000, 0.05, FALSE, 20, 10, 0.2, c(0.5, 0.5), xch, 0, FALSE)
+rs.b.x.55.10.ind[5:6] <- simpower(1000, 0.05, FALSE, 20, 10, 0.5, c(0.5, 0.5), xch, 0, FALSE)
 @ 
 
 
 <<rs-b-xch-rho19-csize10-ind, echo = FALSE, eval = TRUE>>=
 rs.b.x.19.10.ind <- rep(0, 6) 
-rs.b.x.19.10.ind[1:2] <- simpower(10000, 0.05, FALSE, 20, 10, 0, c(-0.1, 0.9), xch, 0, FALSE)
-rs.b.x.19.10.ind[3:4] <- simpower(10000, 0.05, FALSE, 20, 10, 0.2, c(-0.1, 0.9), xch, 0, FALSE)
-rs.b.x.19.10.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(-0.1, 0.9), xch, 0, FALSE)
+rs.b.x.19.10.ind[1:2] <- simpower(1000, 0.05, FALSE, 20, 10, 0, c(-0.1, 0.9), xch, 0, FALSE)
+rs.b.x.19.10.ind[3:4] <- simpower(1000, 0.05, FALSE, 20, 10, 0.2, c(-0.1, 0.9), xch, 0, FALSE)
+rs.b.x.19.10.ind[5:6] <- simpower(1000, 0.05, FALSE, 20, 10, 0.5, c(-0.1, 0.9), xch, 0, FALSE)
 @ 
 
 
@@ -385,24 +384,24 @@ rs.b.x.19.10.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(-0.1, 0.9),
 
 <<rs-ub-xch-rho11-csize2-ind, echo = FALSE, eval = TRUE>>=
 rs.ub.x.11.2.ind<- rep(0, 6) 
-rs.ub.x.11.2.ind[1:2] <- simpower(10000, 0.05, FALSE, 20, 2, 0, c(0.1, 0.1), xch, 0.8, FALSE)
-rs.ub.x.11.2.ind[3:4] <- simpower(10000, 0.05, FALSE, 20, 2, 0.2, c(0.1, 0.1), xch, 0.8, FALSE)
-rs.ub.x.11.2.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(0.1, 0.1), xch, 0.8, FALSE)
+rs.ub.x.11.2.ind[1:2] <- simpower(1000, 0.05, FALSE, 20, 2, 0, c(0.1, 0.1), xch, 0.5, FALSE)
+rs.ub.x.11.2.ind[3:4] <- simpower(1000, 0.05, FALSE, 20, 2, 0.2, c(0.1, 0.1), xch, 0.5, FALSE)
+rs.ub.x.11.2.ind[5:6] <- simpower(1000, 0.05, FALSE, 20, 2, 0.5, c(0.1, 0.1), xch, 0.5, FALSE)
 @ 
 
 <<rs-ub-xch-rho55-csize2-ind, echo = FALSE, eval = TRUE>>=
 rs.ub.x.55.2.ind<- rep(0, 6) 
-rs.ub.x.55.2.ind[1:2] <- simpower(10000, 0.05, FALSE, 20, 2, 0, c(0.5, 0.5), xch, 0.8, FALSE)
-rs.ub.x.55.2.ind[3:4] <- simpower(10000, 0.05, FALSE, 20, 2, 0.2, c(0.5, 0.5), xch, 0.8, FALSE)
-rs.ub.x.55.2.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(0.5, 0.5), xch, 0.8, FALSE)
+rs.ub.x.55.2.ind[1:2] <- simpower(1000, 0.05, FALSE, 20, 2, 0, c(0.5, 0.5), xch, 0.5, FALSE)
+rs.ub.x.55.2.ind[3:4] <- simpower(1000, 0.05, FALSE, 20, 2, 0.2, c(0.5, 0.5), xch, 0.5, FALSE)
+rs.ub.x.55.2.ind[5:6] <- simpower(1000, 0.05, FALSE, 20, 2, 0.5, c(0.5, 0.5), xch, 0.5, FALSE)
 @ 
 
 
 <<rs-ub-xch-rho19-csize2-ind, echo = FALSE, eval = TRUE>>=
 rs.ub.x.19.2.ind<- rep(0, 6) 
-rs.ub.x.19.2.ind[1:2] <- simpower(10000, 0.05, FALSE, 20, 2, 0, c(-0.1, 0.9), xch, 0.8, FALSE)
-rs.ub.x.19.2.ind[3:4] <- simpower(10000, 0.05, FALSE, 20, 2, 0.2, c(-0.1, 0.9), xch, 0.8, FALSE)
-rs.ub.x.19.2.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(-0.1, 0.9), xch, 0.8, FALSE)
+rs.ub.x.19.2.ind[1:2] <- simpower(1000, 0.05, FALSE, 20, 2, 0, c(-0.1, 0.9), xch, 0.5, FALSE)
+rs.ub.x.19.2.ind[3:4] <- simpower(1000, 0.05, FALSE, 20, 2, 0.2, c(-0.1, 0.9), xch, 0.5, FALSE)
+rs.ub.x.19.2.ind[5:6] <- simpower(1000, 0.05, FALSE, 20, 2, 0.5, c(-0.1, 0.9), xch, 0.5, FALSE)
 @ 
 
 
@@ -410,140 +409,161 @@ rs.ub.x.19.2.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(-0.1, 0.9), 
 
 <<rs-ub-xch-rho11-csize10-ind, echo = FALSE, eval = TRUE>>=
 rs.ub.x.11.10.ind <- rep(0, 6) 
-rs.ub.x.11.10.ind[1:2] <- simpower(10000, 0.05, FALSE, 20, 10, 0, c(0.1, 0.1), xch, 0.8, FALSE)
-rs.ub.x.11.10.ind[3:4] <- simpower(10000, 0.05, FALSE, 20, 10, 0.2, c(0.1, 0.1), xch, 0.8, FALSE)
-rs.ub.x.11.10.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(0.1, 0.1), xch, 0.8, FALSE)
+rs.ub.x.11.10.ind[1:2] <- simpower(1000, 0.05, FALSE, 20, 10, 0, c(0.1, 0.1), xch, 0.5, FALSE)
+rs.ub.x.11.10.ind[3:4] <- simpower(1000, 0.05, FALSE, 20, 10, 0.2, c(0.1, 0.1), xch, 0.5, FALSE)
+rs.ub.x.11.10.ind[5:6] <- simpower(1000, 0.05, FALSE, 20, 10, 0.5, c(0.1, 0.1), xch, 0.5, FALSE)
 @ 
 
 <<rs-ub-xch-rho55-csize10-ind, echo = FALSE, eval = TRUE>>=
 rs.ub.x.55.10.ind <- rep(0, 6) 
-rs.ub.x.55.10.ind[1:2] <- simpower(10000, 0.05, FALSE, 20, 10, 0, c(0.5, 0.5), xch, 0.8, FALSE)
-rs.ub.x.55.10.ind[3:4] <- simpower(10000, 0.05, FALSE, 20, 10, 0.2, c(0.5, 0.5), xch, 0.8, FALSE)
-rs.ub.x.55.10.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(0.5, 0.5), xch, 0.8, FALSE)
+rs.ub.x.55.10.ind[1:2] <- simpower(1000, 0.05, FALSE, 20, 10, 0, c(0.5, 0.5), xch, 0.5, FALSE)
+rs.ub.x.55.10.ind[3:4] <- simpower(1000, 0.05, FALSE, 20, 10, 0.2, c(0.5, 0.5), xch, 0.5, FALSE)
+rs.ub.x.55.10.ind[5:6] <- simpower(1000, 0.05, FALSE, 20, 10, 0.5, c(0.5, 0.5), xch, 0.5, FALSE)
 @ 
 
 
 
 <<rs-ub-xch-rho19-csize10-ind, echo = FALSE, eval = TRUE>>=
 rs.ub.x.19.10.ind <- rep(0, 6) 
-rs.ub.x.19.10.ind[1:2] <- simpower(10000, 0.05, FALSE, 20, 10, 0, c(-0.1, 0.9), xch, 0.8, FALSE)
-rs.ub.x.19.10.ind[3:4] <- simpower(10000, 0.05, FALSE, 20, 10, 0.2, c(-0.1, 0.9), xch, 0.8, FALSE)
-rs.ub.x.19.10.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(-0.1, 0.9), xch, 0.8, FALSE)
+rs.ub.x.19.10.ind[1:2] <- simpower(1000, 0.05, FALSE, 20, 10, 0, c(-0.1, 0.9), xch, 0.5, FALSE)
+rs.ub.x.19.10.ind[3:4] <- simpower(1000, 0.05, FALSE, 20, 10, 0.2, c(-0.1, 0.9), xch, 0.5, FALSE)
+rs.ub.x.19.10.ind[5:6] <- simpower(1000, 0.05, FALSE, 20, 10, 0.5, c(-0.1, 0.9), xch, 0.5, FALSE)
 @ 
 
 
-#############################################
 
 <<rs-b-ar1-rho11-csize2-ind, echo = FALSE, eval = TRUE>>=
-rs.b.x.11.2.ind<- rep(0, 6) 
-rs.b.x.11.2.ind[1:2] <- simpower(10000, 0.05, FALSE, 20, 2, 0, c(0.1, 0.1), ar1, 0, FALSE)
-rs.b.x.11.2.ind[3:4] <- simpower(10000, 0.05, FALSE, 20, 2, 0.2, c(0.1, 0.1), ar1, 0, FALSE)
-rs.b.x.11.2.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(0.1, 0.1), ar1, 0, FALSE)
+rs.b.a.11.2.ind<- rep(0, 6) 
+rs.b.a.11.2.ind[1:2] <- simpower(1000, 0.05, FALSE, 20, 2, 0, c(0.1, 0.1), ar1, 0, FALSE)
+rs.b.a.11.2.ind[3:4] <- simpower(1000, 0.05, FALSE, 20, 2, 0.2, c(0.1, 0.1), ar1, 0, FALSE)
+rs.b.a.11.2.ind[5:6] <- simpower(1000, 0.05, FALSE, 20, 2, 0.5, c(0.1, 0.1), ar1, 0, FALSE)
 @ 
 
 <<rs-b-ar1-rho55-csize2-ind, echo = FALSE, eval = TRUE>>=
-rs.b.x.55.2.ind<- rep(0, 6) 
-rs.b.x.55.2.ind[1:2] <- simpower(10000, 0.05, FALSE, 20, 2, 0, c(0.5, 0.5), ar1, 0, FALSE)
-rs.b.x.55.2.ind[3:4] <- simpower(10000, 0.05, FALSE, 20, 2, 0.2, c(0.5, 0.5), ar1, 0, FALSE)
-rs.b.x.55.2.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(0.5, 0.5), ar1, 0, FALSE)
+rs.b.a.55.2.ind<- rep(0, 6) 
+rs.b.a.55.2.ind[1:2] <- simpower(1000, 0.05, FALSE, 20, 2, 0, c(0.5, 0.5), ar1, 0, FALSE)
+rs.b.a.55.2.ind[3:4] <- simpower(1000, 0.05, FALSE, 20, 2, 0.2, c(0.5, 0.5), ar1, 0, FALSE)
+rs.b.a.55.2.ind[5:6] <- simpower(1000, 0.05, FALSE, 20, 2, 0.5, c(0.5, 0.5), ar1, 0, FALSE)
 @ 
 
 
 
 <<rs-b-ar1-rho19-csize2-ind, echo = FALSE, eval = TRUE>>=
-rs.b.x.19.2.ind<- rep(0, 6) 
-rs.b.x.19.2.ind[1:2] <- simpower(10000, 0.05, FALSE, 20, 2, 0, c(-0.1, 0.9), ar1, 0, FALSE)
-rs.b.x.19.2.ind[3:4] <- simpower(10000, 0.05, FALSE, 20, 2, 0.2, c(-0.1, 0.9), ar1, 0, FALSE)
-rs.b.x.19.2.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(-0.1, 0.9), ar1, 0, FALSE)
+rs.b.a.19.2.ind<- rep(0, 6) 
+rs.b.a.19.2.ind[1:2] <- simpower(1000, 0.05, FALSE, 20, 2, 0, c(-0.1, 0.9), ar1, 0, FALSE)
+rs.b.a.19.2.ind[3:4] <- simpower(1000, 0.05, FALSE, 20, 2, 0.2, c(-0.1, 0.9), ar1, 0, FALSE)
+rs.b.a.19.2.ind[5:6] <- simpower(1000, 0.05, FALSE, 20, 2, 0.5, c(-0.1, 0.9), ar1, 0, FALSE)
 @ 
 
 
 
 
 <<rs-b-ar1-rho11-csize10-ind, echo = FALSE, eval = TRUE>>=
-rs.b.x.11.10.ind <- rep(0, 6) 
-rs.b.x.11.10.ind[1:2] <- simpower(10000, 0.05, FALSE, 20, 10, 0, c(0.1, 0.1), ar1, 0, FALSE)
-rs.b.x.11.10.ind[3:4] <- simpower(10000, 0.05, FALSE, 20, 10, 0.2, c(0.1, 0.1), ar1, 0, FALSE)
-rs.b.x.11.10.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(0.1, 0.1), ar1, 0, FALSE)
+rs.b.a.11.10.ind <- rep(0, 6) 
+rs.b.a.11.10.ind[1:2] <- simpower(1000, 0.05, FALSE, 20, 10, 0, c(0.1, 0.1), ar1, 0, FALSE)
+rs.b.a.11.10.ind[3:4] <- simpower(1000, 0.05, FALSE, 20, 10, 0.2, c(0.1, 0.1), ar1, 0, FALSE)
+rs.b.a.11.10.ind[5:6] <- simpower(1000, 0.05, FALSE, 20, 10, 0.5, c(0.1, 0.1), ar1, 0, FALSE)
 @ 
 
 <<rs-b-ar1-rho55-csize10-ind, echo = FALSE, eval = TRUE>>=
-rs.b.x.55.10.ind <- rep(0, 6) 
-rs.b.x.55.10.ind[1:2] <- simpower(10000, 0.05, FALSE, 20, 10, 0, c(0.5, 0.5), ar1, 0, FALSE)
-rs.b.x.55.10.ind[3:4] <- simpower(10000, 0.05, FALSE, 20, 10, 0.2, c(0.5, 0.5), ar1, 0, FALSE)
-rs.b.x.55.10.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(0.5, 0.5), ar1, 0, FALSE)
+rs.b.a.55.10.ind <- rep(0, 6) 
+rs.b.a.55.10.ind[1:2] <- simpower(1000, 0.05, FALSE, 20, 10, 0, c(0.5, 0.5), ar1, 0, FALSE)
+rs.b.a.55.10.ind[3:4] <- simpower(1000, 0.05, FALSE, 20, 10, 0.2, c(0.5, 0.5), ar1, 0, FALSE)
+rs.b.a.55.10.ind[5:6] <- simpower(1000, 0.05, FALSE, 20, 10, 0.5, c(0.5, 0.5), ar1, 0, FALSE)
 @ 
 
 
 
 <<rs-b-ar1-rho19-csize10-ind, echo = FALSE, eval = TRUE>>=
-rs.b.x.19.10.ind <- rep(0, 6) 
-rs.b.x.19.10.ind[1:2] <- simpower(10000, 0.05, FALSE, 20, 10, 0, c(-0.1, 0.9), ar1, 0, FALSE)
-rs.b.x.19.10.ind[3:4] <- simpower(10000, 0.05, FALSE, 20, 10, 0.2, c(-0.1, 0.9), ar1, 0, FALSE)
-rs.b.x.19.10.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(-0.1, 0.9), ar1, 0, FALSE)
+rs.b.a.19.10.ind <- rep(0, 6) 
+rs.b.a.19.10.ind[1:2] <- simpower(1000, 0.05, FALSE, 20, 10, 0, c(-0.1, 0.9), ar1, 0, FALSE)
+rs.b.a.19.10.ind[3:4] <- simpower(1000, 0.05, FALSE, 20, 10, 0.2, c(-0.1, 0.9), ar1, 0, FALSE)
+rs.b.a.19.10.ind[5:6] <- simpower(1000, 0.05, FALSE, 20, 10, 0.5, c(-0.1, 0.9), ar1, 0, FALSE)
 @ 
 
 
 
 
 <<rs-ub-ar1-rho11-csize2-ind, echo = FALSE, eval = TRUE>>=
-rs.ub.x.11.2.ind<- rep(0, 6) 
-rs.ub.x.11.2.ind[1:2] <- simpower(10000, 0.05, FALSE, 20, 2, 0, c(0.1, 0.1), ar1, 0.8, FALSE)
-rs.ub.x.11.2.ind[3:4] <- simpower(10000, 0.05, FALSE, 20, 2, 0.2, c(0.1, 0.1), ar1, 0.8, FALSE)
-rs.ub.x.11.2.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(0.1, 0.1), ar1, 0.8, FALSE)
+rs.ub.a.11.2.ind<- rep(0, 6) 
+rs.ub.a.11.2.ind[1:2] <- simpower(1000, 0.05, FALSE, 20, 2, 0, c(0.1, 0.1), ar1, 0.5, FALSE)
+rs.ub.a.11.2.ind[3:4] <- simpower(1000, 0.05, FALSE, 20, 2, 0.2, c(0.1, 0.1), ar1, 0.5, FALSE)
+rs.ub.a.11.2.ind[5:6] <- simpower(1000, 0.05, FALSE, 20, 2, 0.5, c(0.1, 0.1), ar1, 0.5, FALSE)
 @ 
 
 <<rs-ub-ar1-rho55-csize2-ind, echo = FALSE, eval = TRUE>>=
-rs.ub.x.55.2.ind<- rep(0, 6) 
-rs.ub.x.55.2.ind[1:2] <- simpower(10000, 0.05, FALSE, 20, 2, 0, c(0.5, 0.5), ar1, 0.8, FALSE)
-rs.ub.x.55.2.ind[3:4] <- simpower(10000, 0.05, FALSE, 20, 2, 0.2, c(0.5, 0.5), ar1, 0.8, FALSE)
-rs.ub.x.55.2.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(0.5, 0.5), ar1, 0.8, FALSE)
+rs.ub.a.55.2.ind<- rep(0, 6) 
+rs.ub.a.55.2.ind[1:2] <- simpower(1000, 0.05, FALSE, 20, 2, 0, c(0.5, 0.5), ar1, 0.5, FALSE)
+rs.ub.a.55.2.ind[3:4] <- simpower(1000, 0.05, FALSE, 20, 2, 0.2, c(0.5, 0.5), ar1, 0.5, FALSE)
+rs.ub.a.55.2.ind[5:6] <- simpower(1000, 0.05, FALSE, 20, 2, 0.5, c(0.5, 0.5), ar1, 0.5, FALSE)
 @ 
 
 
 
 <<rs-ub-ar1-rho19-csize2-ind, echo = FALSE, eval = TRUE>>=
-rs.ub.x.19.2.ind<- rep(0, 6) 
-rs.ub.x.19.2.ind[1:2] <- simpower(10000, 0.05, FALSE, 20, 2, 0, c(-0.1, 0.9), ar1, 0.8, FALSE)
-rs.ub.x.19.2.ind[3:4] <- simpower(10000, 0.05, FALSE, 20, 2, 0.2, c(-0.1, 0.9), ar1, 0.8, FALSE)
-rs.ub.x.19.2.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 2, 0.5, c(-0.1, 0.9), ar1, 0.8, FALSE)
+rs.ub.a.19.2.ind<- rep(0, 6) 
+rs.ub.a.19.2.ind[1:2] <- simpower(1000, 0.05, FALSE, 20, 2, 0, c(-0.1, 0.9), ar1, 0.5, FALSE)
+rs.ub.a.19.2.ind[3:4] <- simpower(1000, 0.05, FALSE, 20, 2, 0.2, c(-0.1, 0.9), ar1, 0.5, FALSE)
+rs.ub.a.19.2.ind[5:6] <- simpower(1000, 0.05, FALSE, 20, 2, 0.5, c(-0.1, 0.9), ar1, 0.5, FALSE)
 @ 
 
 
 
 
 <<rs-ub-ar1-rho11-csize10-ind, echo = FALSE, eval = TRUE>>=
-rs.ub.x.11.10.ind <- rep(0, 6) 
-rs.ub.x.11.10.ind[1:2] <- simpower(10000, 0.05, FALSE, 20, 10, 0, c(0.1, 0.1), ar1, 0.8, FALSE)
-rs.ub.x.11.10.ind[3:4] <- simpower(10000, 0.05, FALSE, 20, 10, 0.2, c(0.1, 0.1), ar1, 0.8, FALSE)
-rs.ub.x.11.10.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(0.1, 0.1), ar1, 0.8, FALSE)
+rs.ub.a.11.10.ind <- rep(0, 6) 
+rs.ub.a.11.10.ind[1:2] <- simpower(1000, 0.05, FALSE, 20, 10, 0, c(0.1, 0.1), ar1, 0.5, FALSE)
+rs.ub.a.11.10.ind[3:4] <- simpower(1000, 0.05, FALSE, 20, 10, 0.2, c(0.1, 0.1), ar1, 0.5, FALSE)
+rs.ub.a.11.10.ind[5:6] <- simpower(1000, 0.05, FALSE, 20, 10, 0.5, c(0.1, 0.1), ar1, 0.5, FALSE)
 @ 
 
 <<rs-ub-ar1-rho55-csize10-ind, echo = FALSE, eval = TRUE>>=
-rs.ub.x.55.10.ind <- rep(0, 6) 
-rs.ub.x.55.10.ind[1:2] <- simpower(10000, 0.05, FALSE, 20, 10, 0, c(0.5, 0.5), ar1, 0.8, FALSE)
-rs.ub.x.55.10.ind[3:4] <- simpower(10000, 0.05, FALSE, 20, 10, 0.2, c(0.5, 0.5), ar1, 0.8, FALSE)
-rs.ub.x.55.10.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(0.5, 0.5), ar1, 0.8, FALSE)
+rs.ub.a.55.10.ind <- rep(0, 6) 
+rs.ub.a.55.10.ind[1:2] <- simpower(1000, 0.05, FALSE, 20, 10, 0, c(0.5, 0.5), ar1, 0.5, FALSE)
+rs.ub.a.55.10.ind[3:4] <- simpower(1000, 0.05, FALSE, 20, 10, 0.2, c(0.5, 0.5), ar1, 0.5, FALSE)
+rs.ub.a.55.10.ind[5:6] <- simpower(1000, 0.05, FALSE, 20, 10, 0.5, c(0.5, 0.5), ar1, 0.5, FALSE)
 @ 
 
 
 
 <<rs-ub-ar1-rho19-csize10-ind, echo = FALSE, eval = TRUE>>=
-rs.ub.x.19.10.ind <- rep(0, 6) 
-rs.ub.x.19.10.ind[1:2] <- simpower(10000, 0.05, FALSE, 20, 10, 0, c(-0.1, 0.9), ar1, 0.8, FALSE)
-rs.ub.x.19.10.ind[3:4] <- simpower(10000, 0.05, FALSE, 20, 10, 0.2, c(-0.1, 0.9), ar1, 0.8, FALSE)
-rs.ub.x.19.10.ind[5:6] <- simpower(10000, 0.05, FALSE, 20, 10, 0.5, c(-0.1, 0.9), ar1, 0.8, FALSE)
+rs.ub.a.19.10.ind <- rep(0, 6) 
+rs.ub.a.19.10.ind[1:2] <- simpower(1000, 0.05, FALSE, 20, 10, 0, c(-0.1, 0.9), ar1, 0.5, FALSE)
+rs.ub.a.19.10.ind[3:4] <- simpower(1000, 0.05, FALSE, 20, 10, 0.2, c(-0.1, 0.9), ar1, 0.5, FALSE)
+rs.ub.a.19.10.ind[5:6] <- simpower(1000, 0.05, FALSE, 20, 10, 0.5, c(-0.1, 0.9), ar1, 0.5, FALSE)
 @ 
 
 
 
 
 
-#########################
+
 <<rs-tab, echo = FALSE, eval = TRUE, results = 'asis'>>=
-sum.tab <- rbind(indb.x, indub.x, indb.a, indub.a, indub15.x, indub15.a)
+sum.tab.clus <- rbind(rs.b.x.11.2.clus, rs.b.x.55.2.clus, rs.b.x.19.2.clus,
+      rs.b.x.11.10.clus, rs.b.x.55.10.clus, rs.b.x.19.10.clus,
+      rs.ub.x.11.2.clus, rs.ub.x.55.2.clus, rs.ub.x.19.2.clus,
+      rs.ub.x.11.10.clus, rs.ub.x.55.10.clus, rs.ub.x.19.10.clus,
+      rs.b.a.11.2.clus, rs.b.a.55.2.clus, rs.b.a.19.2.clus,
+      rs.b.a.11.10.clus, rs.b.a.55.10.clus, rs.b.a.19.10.clus,
+      rs.ub.a.11.2.clus, rs.ub.a.55.2.clus, rs.ub.a.19.2.clus,
+      rs.ub.a.11.10.clus, rs.ub.a.55.10.clus, rs.ub.a.19.10.clus)
+sum.tab.ind <- rbind(rs.b.x.11.2.ind, rs.b.x.55.2.ind, rs.b.x.19.2.ind,
+      rs.b.x.11.10.ind, rs.b.x.55.10.ind, rs.b.x.19.10.ind,
+      rs.ub.x.11.2.ind, rs.ub.x.55.2.ind, rs.ub.x.19.2.ind,
+      rs.ub.x.11.10.ind, rs.ub.x.55.10.ind, rs.ub.x.19.10.ind,
+      rs.b.a.11.2.ind, rs.b.a.55.2.ind, rs.b.a.19.2.ind,
+      rs.b.a.11.10.ind, rs.b.a.55.10.ind, rs.b.a.19.10.ind,
+      rs.ub.a.11.2.ind, rs.ub.a.55.2.ind, rs.ub.a.19.2.ind,
+      rs.ub.a.11.10.ind, rs.ub.a.55.10.ind, rs.ub.a.19.10.ind)
+
+sum.tab.clus <- sum.tab.clus * 100
+sum.tab.ind <- sum.tab.ind * 100
+
 library(xtable)
-xtable(sum.tab)
+sum.tab.clus <- xtable(sum.tab.clus, digits = 1)
+sum.tab.ind <- xtable(sum.tab.ind, digits = 1)
+print(sum.tab.clus)
+print(sum.tab.ind)
 ## library(xtable)
 ## sum.tab <- rbind(clusb, clusub, indb, indub, indub15)
 ## rownames(sum.tab) <- c("clus, bal, $\\rho = 0.1$", 
@@ -567,98 +587,98 @@ xtable(sum.tab)
 
 
 
-<<rs-b-xch->>=
+<<rs-b-xch, echo = TRUE, eval = TRUE>>=
 @ 
 
-###############################################
+
 <<sr-b-xch-rho11-csize2, echo = FALSE, eval = TRUE>>=
 sr.b.x.11.2 <- rep(0, 6) 
-sr.b.x.11.2[1:2] <- simpower(10000, 0.05, TRUE, 20, 2, 0, c(0.1, 0.1), xch, 0)
-sr.b.x.11.2[3:4] <- simpower(10000, 0.05, TRUE, 20, 2, 0.2, c(0.1, 0.1), xch, 0)
-sr.b.x.11.2[5:6] <- simpower(10000, 0.05, TRUE, 20, 2, 0.5, c(0.1, 0.1), xch, 0)
+sr.b.x.11.2[1:2] <- simpower(1000, 0.05, TRUE, 20, 2, 0, c(0.1, 0.1), xch, 0)
+sr.b.x.11.2[3:4] <- simpower(1000, 0.05, TRUE, 20, 2, 0.2, c(0.1, 0.1), xch, 0)
+sr.b.x.11.2[5:6] <- simpower(1000, 0.05, TRUE, 20, 2, 0.5, c(0.1, 0.1), xch, 0)
 @ 
 
 <<sr-b-xch-rho55-csize2, echo = FALSE, eval = TRUE>>=
 sr.b.x.55.2 <- rep(0, 6) 
-sr.b.x.55.2[1:2] <- simpower(10000, 0.05, TRUE, 20, 2, 0, c(0.5, 0.5), xch, 0)
-sr.b.x.55.2[3:4] <- simpower(10000, 0.05, TRUE, 20, 2, 0.2, c(0.5, 0.5), xch, 0)
-sr.b.x.55.2[5:6] <- simpower(10000, 0.05, TRUE, 20, 2, 0.5, c(0.5, 0.5), xch, 0)
+sr.b.x.55.2[1:2] <- simpower(1000, 0.05, TRUE, 20, 2, 0, c(0.5, 0.5), xch, 0)
+sr.b.x.55.2[3:4] <- simpower(1000, 0.05, TRUE, 20, 2, 0.2, c(0.5, 0.5), xch, 0)
+sr.b.x.55.2[5:6] <- simpower(1000, 0.05, TRUE, 20, 2, 0.5, c(0.5, 0.5), xch, 0)
 @ 
 
 <<sr-b-xch-rho99-csize2, echo = FALSE, eval = TRUE>>=
 sr.b.x.99.2 <- rep(0, 6) 
-sr.b.x.99.2[1:2] <- simpower(10000, 0.05, TRUE, 20, 2, 0, c(0.9, 0.9), xch, 0)
-sr.b.x.99.2[3:4] <- simpower(10000, 0.05, TRUE, 20, 2, 0.2, c(0.9, 0.9), xch, 0)
-sr.b.x.99.2[5:6] <- simpower(10000, 0.05, TRUE, 20, 2, 0.5, c(0.9, 0.9), xch, 0)
+sr.b.x.99.2[1:2] <- simpower(1000, 0.05, TRUE, 20, 2, 0, c(0.9, 0.9), xch, 0)
+sr.b.x.99.2[3:4] <- simpower(1000, 0.05, TRUE, 20, 2, 0.2, c(0.9, 0.9), xch, 0)
+sr.b.x.99.2[5:6] <- simpower(1000, 0.05, TRUE, 20, 2, 0.5, c(0.9, 0.9), xch, 0)
 @ 
 
 <<sr-b-xch-rho19-csize2, echo = FALSE, eval = TRUE>>=
 sr.b.x.19.2 <- rep(0, 6) 
-sr.b.x.19.2[1:2] <- simpower(10000, 0.05, TRUE, 20, 2, 0, c(-0.1, 0.9), xch, 0)
-sr.b.x.19.2[3:4] <- simpower(10000, 0.05, TRUE, 20, 2, 0.2, c(-0.1, 0.9), xch, 0)
-sr.b.x.19.2[5:6] <- simpower(10000, 0.05, TRUE, 20, 2, 0.5, c(-0.1, 0.9), xch, 0)
+sr.b.x.19.2[1:2] <- simpower(1000, 0.05, TRUE, 20, 2, 0, c(-0.1, 0.9), xch, 0)
+sr.b.x.19.2[3:4] <- simpower(1000, 0.05, TRUE, 20, 2, 0.2, c(-0.1, 0.9), xch, 0)
+sr.b.x.19.2[5:6] <- simpower(1000, 0.05, TRUE, 20, 2, 0.5, c(-0.1, 0.9), xch, 0)
 @ 
 
 
 
 
 <<sr-b-xch-rho11-csize10, echo = FALSE, eval = TRUE>>=
-sr.b.x.11.2 <- rep(0, 6) 
-sr.b.x.11.2[1:2] <- simpower(10000, 0.05, TRUE, 20, 10, 0, c(0.1, 0.1), xch, 0)
-sr.b.x.11.2[3:4] <- simpower(10000, 0.05, TRUE, 20, 10, 0.2, c(0.1, 0.1), xch, 0)
-sr.b.x.11.2[5:6] <- simpower(10000, 0.05, TRUE, 20, 10, 0.5, c(0.1, 0.1), xch, 0)
+sr.b.x.11.10 <- rep(0, 6) 
+sr.b.x.11.10[1:2] <- simpower(1000, 0.05, TRUE, 20, 10, 0, c(0.1, 0.1), xch, 0)
+sr.b.x.11.10[3:4] <- simpower(1000, 0.05, TRUE, 20, 10, 0.2, c(0.1, 0.1), xch, 0)
+sr.b.x.11.10[5:6] <- simpower(1000, 0.05, TRUE, 20, 10, 0.5, c(0.1, 0.1), xch, 0)
 @ 
 
 <<sr-b-xch-rho55-csize10, echo = FALSE, eval = TRUE>>=
-sr.b.x.55.2 <- rep(0, 6) 
-sr.b.x.55.2[1:2] <- simpower(10000, 0.05, TRUE, 20, 10, 0, c(0.5, 0.5), xch, 0)
-sr.b.x.55.2[3:4] <- simpower(10000, 0.05, TRUE, 20, 10, 0.2, c(0.5, 0.5), xch, 0)
-sr.b.x.55.2[5:6] <- simpower(10000, 0.05, TRUE, 20, 10, 0.5, c(0.5, 0.5), xch, 0)
+sr.b.x.55.10 <- rep(0, 6) 
+sr.b.x.55.10[1:2] <- simpower(1000, 0.05, TRUE, 20, 10, 0, c(0.5, 0.5), xch, 0)
+sr.b.x.55.10[3:4] <- simpower(1000, 0.05, TRUE, 20, 10, 0.2, c(0.5, 0.5), xch, 0)
+sr.b.x.55.10[5:6] <- simpower(1000, 0.05, TRUE, 20, 10, 0.5, c(0.5, 0.5), xch, 0)
 @ 
 
 <<sr-b-xch-rho99-csize10, echo = FALSE, eval = TRUE>>=
-sr.b.x.99.2 <- rep(0, 6) 
-sr.b.x.99.2[1:2] <- simpower(10000, 0.05, TRUE, 20, 10, 0, c(0.9, 0.9), xch, 0)
-sr.b.x.99.2[3:4] <- simpower(10000, 0.05, TRUE, 20, 10, 0.2, c(0.9, 0.9), xch, 0)
-sr.b.x.99.2[5:6] <- simpower(10000, 0.05, TRUE, 20, 10, 0.5, c(0.9, 0.9), xch, 0)
+sr.b.x.99.10 <- rep(0, 6) 
+sr.b.x.99.10[1:2] <- simpower(1000, 0.05, TRUE, 20, 10, 0, c(0.9, 0.9), xch, 0)
+sr.b.x.99.10[3:4] <- simpower(1000, 0.05, TRUE, 20, 10, 0.2, c(0.9, 0.9), xch, 0)
+sr.b.x.99.10[5:6] <- simpower(1000, 0.05, TRUE, 20, 10, 0.5, c(0.9, 0.9), xch, 0)
 @ 
 
 <<sr-b-xch-rho19-csize10, echo = FALSE, eval = TRUE>>=
-sr.b.x.19.2 <- rep(0, 6) 
-sr.b.x.19.2[1:2] <- simpower(10000, 0.05, TRUE, 20, 10, 0, c(-0.1, 0.9), xch, 0)
-sr.b.x.19.2[3:4] <- simpower(10000, 0.05, TRUE, 20, 10, 0.2, c(-0.1, 0.9), xch, 0)
-sr.b.x.19.2[5:6] <- simpower(10000, 0.05, TRUE, 20, 10, 0.5, c(-0.1, 0.9), xch, 0)
+sr.b.x.19.10 <- rep(0, 6) 
+sr.b.x.19.10[1:2] <- simpower(1000, 0.05, TRUE, 20, 10, 0, c(-0.1, 0.9), xch, 0)
+sr.b.x.19.10[3:4] <- simpower(1000, 0.05, TRUE, 20, 10, 0.2, c(-0.1, 0.9), xch, 0)
+sr.b.x.19.10[5:6] <- simpower(1000, 0.05, TRUE, 20, 10, 0.5, c(-0.1, 0.9), xch, 0)
 @ 
 
 
 
-
+`
 <<sr-ub-xch-rho11-csize2, echo = FALSE, eval = TRUE>>=
 sr.ub.x.11.2 <- rep(0, 6) 
-sr.ub.x.11.2[1:2] <- simpower(10000, 0.05, TRUE, 20, 2, 0, c(0.1, 0.1), xch, 0.8)
-sr.ub.x.11.2[3:4] <- simpower(10000, 0.05, TRUE, 20, 2, 0.2, c(0.1, 0.1), xch, 0.8)
-sr.ub.x.11.2[5:6] <- simpower(10000, 0.05, TRUE, 20, 2, 0.5, c(0.1, 0.1), xch, 0.8)
+sr.ub.x.11.2[1:2] <- simpower(1000, 0.05, TRUE, 20, 2, 0, c(0.1, 0.1), xch, 0.5)
+sr.ub.x.11.2[3:4] <- simpower(1000, 0.05, TRUE, 20, 2, 0.2, c(0.1, 0.1), xch, 0.5)
+sr.ub.x.11.2[5:6] <- simpower(1000, 0.05, TRUE, 20, 2, 0.5, c(0.1, 0.1), xch, 0.5)
 @ 
 
 <<sr-ub-xch-rho55-csize2, echo = FALSE, eval = TRUE>>=
 sr.ub.x.55.2 <- rep(0, 6) 
-sr.ub.x.55.2[1:2] <- simpower(10000, 0.05, TRUE, 20, 2, 0, c(0.5, 0.5), xch, 0.8)
-sr.ub.x.55.2[3:4] <- simpower(10000, 0.05, TRUE, 20, 2, 0.2, c(0.5, 0.5), xch, 0.8)
-sr.ub.x.55.2[5:6] <- simpower(10000, 0.05, TRUE, 20, 2, 0.5, c(0.5, 0.5), xch, 0.8)
+sr.ub.x.55.2[1:2] <- simpower(1000, 0.05, TRUE, 20, 2, 0, c(0.5, 0.5), xch, 0.5)
+sr.ub.x.55.2[3:4] <- simpower(1000, 0.05, TRUE, 20, 2, 0.2, c(0.5, 0.5), xch, 0.5)
+sr.ub.x.55.2[5:6] <- simpower(1000, 0.05, TRUE, 20, 2, 0.5, c(0.5, 0.5), xch, 0.5)
 @ 
 
 <<sr-ub-xch-rho99-csize2, echo = FALSE, eval = TRUE>>=
 sr.ub.x.99.2 <- rep(0, 6) 
-sr.ub.x.99.2[1:2] <- simpower(10000, 0.05, TRUE, 20, 2, 0, c(0.9, 0.9), xch, 0.8)
-sr.ub.x.99.2[3:4] <- simpower(10000, 0.05, TRUE, 20, 2, 0.2, c(0.9, 0.9), xch, 0.8)
-sr.ub.x.99.2[5:6] <- simpower(10000, 0.05, TRUE, 20, 2, 0.5, c(0.9, 0.9), xch, 0.8)
+sr.ub.x.99.2[1:2] <- simpower(1000, 0.05, TRUE, 20, 2, 0, c(0.9, 0.9), xch, 0.5)
+sr.ub.x.99.2[3:4] <- simpower(1000, 0.05, TRUE, 20, 2, 0.2, c(0.9, 0.9), xch, 0.5)
+sr.ub.x.99.2[5:6] <- simpower(1000, 0.05, TRUE, 20, 2, 0.5, c(0.9, 0.9), xch, 0.5)
 @ 
 
 <<sr-ub-xch-rho19-csize2, echo = FALSE, eval = TRUE>>=
 sr.ub.x.19.2 <- rep(0, 6) 
-sr.ub.x.19.2[1:2] <- simpower(10000, 0.05, TRUE, 20, 2, 0, c(-0.1, 0.9), xch, 0.8)
-sr.ub.x.19.2[3:4] <- simpower(10000, 0.05, TRUE, 20, 2, 0.2, c(-0.1, 0.9), xch, 0.8)
-sr.ub.x.19.2[5:6] <- simpower(10000, 0.05, TRUE, 20, 2, 0.5, c(-0.1, 0.9), xch, 0.8)
+sr.ub.x.19.2[1:2] <- simpower(1000, 0.05, TRUE, 20, 2, 0, c(-0.1, 0.9), xch, 0.5)
+sr.ub.x.19.2[3:4] <- simpower(1000, 0.05, TRUE, 20, 2, 0.2, c(-0.1, 0.9), xch, 0.5)
+sr.ub.x.19.2[5:6] <- simpower(1000, 0.05, TRUE, 20, 2, 0.5, c(-0.1, 0.9), xch, 0.5)
 @ 
 
 
@@ -666,154 +686,154 @@ sr.ub.x.19.2[5:6] <- simpower(10000, 0.05, TRUE, 20, 2, 0.5, c(-0.1, 0.9), xch, 
 
 <<sr-ub-xch-rho11-csize10, echo = FALSE, eval = TRUE>>=
 sr.ub.x.11.10 <- rep(0, 6) 
-sr.ub.x.11.10[1:2] <- simpower(10000, 0.05, TRUE, 20, 10, 0, c(0.1, 0.1), xch, 0.8)
-sr.ub.x.11.10[3:4] <- simpower(10000, 0.05, TRUE, 20, 10, 0.2, c(0.1, 0.1), xch, 0.8)
-sr.ub.x.11.10[5:6] <- simpower(10000, 0.05, TRUE, 20, 10, 0.5, c(0.1, 0.1), xch, 0.8)
+sr.ub.x.11.10[1:2] <- simpower(1000, 0.05, TRUE, 20, 10, 0, c(0.1, 0.1), xch, 0.5)
+sr.ub.x.11.10[3:4] <- simpower(1000, 0.05, TRUE, 20, 10, 0.2, c(0.1, 0.1), xch, 0.5)
+sr.ub.x.11.10[5:6] <- simpower(1000, 0.05, TRUE, 20, 10, 0.5, c(0.1, 0.1), xch, 0.5)
 @ 
 
 <<sr-ub-xch-rho55-csize10, echo = FALSE, eval = TRUE>>=
 sr.ub.x.55.10 <- rep(0, 6) 
-sr.ub.x.55.10[1:2] <- simpower(10000, 0.05, TRUE, 20, 10, 0, c(0.5, 0.5), xch, 0.8)
-sr.ub.x.55.10[3:4] <- simpower(10000, 0.05, TRUE, 20, 10, 0.2, c(0.5, 0.5), xch, 0.8)
-sr.ub.x.55.10[5:6] <- simpower(10000, 0.05, TRUE, 20, 10, 0.5, c(0.5, 0.5), xch, 0.8)
+sr.ub.x.55.10[1:2] <- simpower(1000, 0.05, TRUE, 20, 10, 0, c(0.5, 0.5), xch, 0.5)
+sr.ub.x.55.10[3:4] <- simpower(1000, 0.05, TRUE, 20, 10, 0.2, c(0.5, 0.5), xch, 0.5)
+sr.ub.x.55.10[5:6] <- simpower(1000, 0.05, TRUE, 20, 10, 0.5, c(0.5, 0.5), xch, 0.5)
 @ 
 
 <<sr-ub-xch-rho99-csize10, echo = FALSE, eval = TRUE>>=
 sr.ub.x.99.10 <- rep(0, 6) 
-sr.ub.x.99.10[1:2] <- simpower(10000, 0.05, TRUE, 20, 10, 0, c(0.9, 0.9), xch, 0.8)
-sr.ub.x.99.10[3:4] <- simpower(10000, 0.05, TRUE, 20, 10, 0.2, c(0.9, 0.9), xch, 0.8)
-sr.ub.x.99.10[5:6] <- simpower(10000, 0.05, TRUE, 20, 10, 0.5, c(0.9, 0.9), xch, 0.8)
+sr.ub.x.99.10[1:2] <- simpower(1000, 0.05, TRUE, 20, 10, 0, c(0.9, 0.9), xch, 0.5)
+sr.ub.x.99.10[3:4] <- simpower(1000, 0.05, TRUE, 20, 10, 0.2, c(0.9, 0.9), xch, 0.5)
+sr.ub.x.99.10[5:6] <- simpower(1000, 0.05, TRUE, 20, 10, 0.5, c(0.9, 0.9), xch, 0.5)
 @ 
 
 <<sr-ub-xch-rho19-csize10, echo = FALSE, eval = TRUE>>=
 sr.ub.x.19.10 <- rep(0, 6) 
-sr.ub.x.19.10[1:2] <- simpower(10000, 0.05, TRUE, 20, 10, 0, c(-0.1, 0.9), xch, 0.8)
-sr.ub.x.19.10[3:4] <- simpower(10000, 0.05, TRUE, 20, 10, 0.2, c(-0.1, 0.9), xch, 0.8)
-sr.ub.x.19.10[5:6] <- simpower(10000, 0.05, TRUE, 20, 10, 0.5, c(-0.1, 0.9), xch, 0.8)
+sr.ub.x.19.10[1:2] <- simpower(1000, 0.05, TRUE, 20, 10, 0, c(-0.1, 0.9), xch, 0.5)
+sr.ub.x.19.10[3:4] <- simpower(1000, 0.05, TRUE, 20, 10, 0.2, c(-0.1, 0.9), xch, 0.5)
+sr.ub.x.19.10[5:6] <- simpower(1000, 0.05, TRUE, 20, 10, 0.5, c(-0.1, 0.9), xch, 0.5)
 @ 
 
 
-#############################################
+
 
 <<sr-b-ar1-rho11-csize2, echo = FALSE, eval = TRUE>>=
-sr.b.x.11.2 <- rep(0, 6) 
-sr.b.x.11.2[1:2] <- simpower(10000, 0.05, TRUE, 20, 2, 0, c(0.1, 0.1), ar1, 0)
-sr.b.x.11.2[3:4] <- simpower(10000, 0.05, TRUE, 20, 2, 0.2, c(0.1, 0.1), ar1, 0)
-sr.b.x.11.2[5:6] <- simpower(10000, 0.05, TRUE, 20, 2, 0.5, c(0.1, 0.1), ar1, 0)
+sr.b.a.11.2 <- rep(0, 6) 
+sr.b.a.11.2[1:2] <- simpower(1000, 0.05, TRUE, 20, 2, 0, c(0.1, 0.1), ar1, 0)
+sr.b.a.11.2[3:4] <- simpower(1000, 0.05, TRUE, 20, 2, 0.2, c(0.1, 0.1), ar1, 0)
+sr.b.a.11.2[5:6] <- simpower(1000, 0.05, TRUE, 20, 2, 0.5, c(0.1, 0.1), ar1, 0)
 @ 
 
 <<sr-b-ar1-rho55-csize2, echo = FALSE, eval = TRUE>>=
-sr.b.x.55.2 <- rep(0, 6) 
-sr.b.x.55.2[1:2] <- simpower(10000, 0.05, TRUE, 20, 2, 0, c(0.5, 0.5), ar1, 0)
-sr.b.x.55.2[3:4] <- simpower(10000, 0.05, TRUE, 20, 2, 0.2, c(0.5, 0.5), ar1, 0)
-sr.b.x.55.2[5:6] <- simpower(10000, 0.05, TRUE, 20, 2, 0.5, c(0.5, 0.5), ar1, 0)
+sr.b.a.55.2 <- rep(0, 6) 
+sr.b.a.55.2[1:2] <- simpower(1000, 0.05, TRUE, 20, 2, 0, c(0.5, 0.5), ar1, 0)
+sr.b.a.55.2[3:4] <- simpower(1000, 0.05, TRUE, 20, 2, 0.2, c(0.5, 0.5), ar1, 0)
+sr.b.a.55.2[5:6] <- simpower(1000, 0.05, TRUE, 20, 2, 0.5, c(0.5, 0.5), ar1, 0)
 @ 
 
 <<sr-b-ar1-rho99-csize2, echo = FALSE, eval = TRUE>>=
-sr.b.x.99.2 <- rep(0, 6) 
-sr.b.x.99.2[1:2] <- simpower(10000, 0.05, TRUE, 20, 2, 0, c(0.9, 0.9), ar1, 0)
-sr.b.x.99.2[3:4] <- simpower(10000, 0.05, TRUE, 20, 2, 0.2, c(0.9, 0.9), ar1, 0)
-sr.b.x.99.2[5:6] <- simpower(10000, 0.05, TRUE, 20, 2, 0.5, c(0.9, 0.9), ar1, 0)
+sr.b.a.99.2 <- rep(0, 6) 
+sr.b.a.99.2[1:2] <- simpower(1000, 0.05, TRUE, 20, 2, 0, c(0.9, 0.9), ar1, 0)
+sr.b.a.99.2[3:4] <- simpower(1000, 0.05, TRUE, 20, 2, 0.2, c(0.9, 0.9), ar1, 0)
+sr.b.a.99.2[5:6] <- simpower(1000, 0.05, TRUE, 20, 2, 0.5, c(0.9, 0.9), ar1, 0)
 @ 
 
 <<sr-b-ar1-rho19-csize2, echo = FALSE, eval = TRUE>>=
-sr.b.x.19.2 <- rep(0, 6) 
-sr.b.x.19.2[1:2] <- simpower(10000, 0.05, TRUE, 20, 2, 0, c(-0.1, 0.9), ar1, 0)
-sr.b.x.19.2[3:4] <- simpower(10000, 0.05, TRUE, 20, 2, 0.2, c(-0.1, 0.9), ar1, 0)
-sr.b.x.19.2[5:6] <- simpower(10000, 0.05, TRUE, 20, 2, 0.5, c(-0.1, 0.9), ar1, 0)
+sr.b.a.19.2 <- rep(0, 6) 
+sr.b.a.19.2[1:2] <- simpower(1000, 0.05, TRUE, 20, 2, 0, c(-0.1, 0.9), ar1, 0)
+sr.b.a.19.2[3:4] <- simpower(1000, 0.05, TRUE, 20, 2, 0.2, c(-0.1, 0.9), ar1, 0)
+sr.b.a.19.2[5:6] <- simpower(1000, 0.05, TRUE, 20, 2, 0.5, c(-0.1, 0.9), ar1, 0)
 @ 
 
 
 
 
 <<sr-b-ar1-rho11-csize10, echo = FALSE, eval = TRUE>>=
-sr.b.x.11.10 <- rep(0, 6) 
-sr.b.x.11.10[1:2] <- simpower(10000, 0.05, TRUE, 20, 10, 0, c(0.1, 0.1), ar1, 0)
-sr.b.x.11.10[3:4] <- simpower(10000, 0.05, TRUE, 20, 10, 0.2, c(0.1, 0.1), ar1, 0)
-sr.b.x.11.10[5:6] <- simpower(10000, 0.05, TRUE, 20, 10, 0.5, c(0.1, 0.1), ar1, 0)
+sr.b.a.11.10 <- rep(0, 6) 
+sr.b.a.11.10[1:2] <- simpower(1000, 0.05, TRUE, 20, 10, 0, c(0.1, 0.1), ar1, 0)
+sr.b.a.11.10[3:4] <- simpower(1000, 0.05, TRUE, 20, 10, 0.2, c(0.1, 0.1), ar1, 0)
+sr.b.a.11.10[5:6] <- simpower(1000, 0.05, TRUE, 20, 10, 0.5, c(0.1, 0.1), ar1, 0)
 @ 
 
 <<sr-b-ar1-rho55-csize10, echo = FALSE, eval = TRUE>>=
-sr.b.x.55.10 <- rep(0, 6) 
-sr.b.x.55.10[1:2] <- simpower(10000, 0.05, TRUE, 20, 10, 0, c(0.5, 0.5), ar1, 0)
-sr.b.x.55.10[3:4] <- simpower(10000, 0.05, TRUE, 20, 10, 0.2, c(0.5, 0.5), ar1, 0)
-sr.b.x.55.10[5:6] <- simpower(10000, 0.05, TRUE, 20, 10, 0.5, c(0.5, 0.5), ar1, 0)
+sr.b.a.55.10 <- rep(0, 6) 
+sr.b.a.55.10[1:2] <- simpower(1000, 0.05, TRUE, 20, 10, 0, c(0.5, 0.5), ar1, 0)
+sr.b.a.55.10[3:4] <- simpower(1000, 0.05, TRUE, 20, 10, 0.2, c(0.5, 0.5), ar1, 0)
+sr.b.a.55.10[5:6] <- simpower(1000, 0.05, TRUE, 20, 10, 0.5, c(0.5, 0.5), ar1, 0)
 @ 
 
 <<sr-b-ar1-rho99-csize10, echo = FALSE, eval = TRUE>>=
-sr.b.x.99.10 <- rep(0, 6) 
-sr.b.x.99.10[1:2] <- simpower(10000, 0.05, TRUE, 20, 10, 0, c(0.9, 0.9), ar1, 0)
-sr.b.x.99.10[3:4] <- simpower(10000, 0.05, TRUE, 20, 10, 0.2, c(0.9, 0.9), ar1, 0)
-sr.b.x.99.10[5:6] <- simpower(10000, 0.05, TRUE, 20, 10, 0.5, c(0.9, 0.9), ar1, 0)
+sr.b.a.99.10 <- rep(0, 6) 
+sr.b.a.99.10[1:2] <- simpower(1000, 0.05, TRUE, 20, 10, 0, c(0.9, 0.9), ar1, 0)
+sr.b.a.99.10[3:4] <- simpower(1000, 0.05, TRUE, 20, 10, 0.2, c(0.9, 0.9), ar1, 0)
+sr.b.a.99.10[5:6] <- simpower(1000, 0.05, TRUE, 20, 10, 0.5, c(0.9, 0.9), ar1, 0)
 @ 
 
 <<sr-b-ar1-rho19-csize10, echo = FALSE, eval = TRUE>>=
-sr.b.x.19.10 <- rep(0, 6) 
-sr.b.x.19.10[1:2] <- simpower(10000, 0.05, TRUE, 20, 10, 0, c(-0.1, 0.9), ar1, 0)
-sr.b.x.19.10[3:4] <- simpower(10000, 0.05, TRUE, 20, 10, 0.2, c(-0.1, 0.9), ar1, 0)
-sr.b.x.19.10[5:6] <- simpower(10000, 0.05, TRUE, 20, 10, 0.5, c(-0.1, 0.9), ar1, 0)
+sr.b.a.19.10 <- rep(0, 6) 
+sr.b.a.19.10[1:2] <- simpower(1000, 0.05, TRUE, 20, 10, 0, c(-0.1, 0.9), ar1, 0)
+sr.b.a.19.10[3:4] <- simpower(1000, 0.05, TRUE, 20, 10, 0.2, c(-0.1, 0.9), ar1, 0)
+sr.b.a.19.10[5:6] <- simpower(1000, 0.05, TRUE, 20, 10, 0.5, c(-0.1, 0.9), ar1, 0)
 @ 
 
 
 
 
 <<sr-ub-ar1-rho11-csize2, echo = FALSE, eval = TRUE>>=
-sr.ub.x.11.2 <- rep(0, 6) 
-sr.ub.x.11.2[1:2] <- simpower(10000, 0.05, TRUE, 20, 2, 0, c(0.1, 0.1), ar1, 0.8)
-sr.ub.x.11.2[3:4] <- simpower(10000, 0.05, TRUE, 20, 2, 0.2, c(0.1, 0.1), ar1, 0.8)
-sr.ub.x.11.2[5:6] <- simpower(10000, 0.05, TRUE, 20, 2, 0.5, c(0.1, 0.1), ar1, 0.8)
+sr.ub.a.11.2 <- rep(0, 6) 
+sr.ub.a.11.2[1:2] <- simpower(1000, 0.05, TRUE, 20, 2, 0, c(0.1, 0.1), ar1, 0.5)
+sr.ub.a.11.2[3:4] <- simpower(1000, 0.05, TRUE, 20, 2, 0.2, c(0.1, 0.1), ar1, 0.5)
+sr.ub.a.11.2[5:6] <- simpower(1000, 0.05, TRUE, 20, 2, 0.5, c(0.1, 0.1), ar1, 0.5)
 @ 
 
 <<sr-ub-ar1-rho55-csize2, echo = FALSE, eval = TRUE>>=
-sr.ub.x.55.2 <- rep(0, 6) 
-sr.ub.x.55.2[1:2] <- simpower(10000, 0.05, TRUE, 20, 2, 0, c(0.5, 0.5), ar1, 0.8)
-sr.ub.x.55.2[3:4] <- simpower(10000, 0.05, TRUE, 20, 2, 0.2, c(0.5, 0.5), ar1, 0.8)
-sr.ub.x.55.2[5:6] <- simpower(10000, 0.05, TRUE, 20, 2, 0.5, c(0.5, 0.5), ar1, 0.8)
+sr.ub.a.55.2 <- rep(0, 6) 
+sr.ub.a.55.2[1:2] <- simpower(1000, 0.05, TRUE, 20, 2, 0, c(0.5, 0.5), ar1, 0.5)
+sr.ub.a.55.2[3:4] <- simpower(1000, 0.05, TRUE, 20, 2, 0.2, c(0.5, 0.5), ar1, 0.5)
+sr.ub.a.55.2[5:6] <- simpower(1000, 0.05, TRUE, 20, 2, 0.5, c(0.5, 0.5), ar1, 0.5)
 @ 
 
 <<sr-ub-ar1-rho99-csize2, echo = FALSE, eval = TRUE>>=
-sr.ub.x.99.2 <- rep(0, 6) 
-sr.ub.x.99.2[1:2] <- simpower(10000, 0.05, TRUE, 20, 2, 0, c(0.9, 0.9), ar1, 0.8)
-sr.ub.x.99.2[3:4] <- simpower(10000, 0.05, TRUE, 20, 2, 0.2, c(0.9, 0.9), ar1, 0.8)
-sr.ub.x.99.2[5:6] <- simpower(10000, 0.05, TRUE, 20, 2, 0.5, c(0.9, 0.9), ar1, 0.8)
+sr.ub.a.99.2 <- rep(0, 6) 
+sr.ub.a.99.2[1:2] <- simpower(1000, 0.05, TRUE, 20, 2, 0, c(0.9, 0.9), ar1, 0.5)
+sr.ub.a.99.2[3:4] <- simpower(1000, 0.05, TRUE, 20, 2, 0.2, c(0.9, 0.9), ar1, 0.5)
+sr.ub.a.99.2[5:6] <- simpower(1000, 0.05, TRUE, 20, 2, 0.5, c(0.9, 0.9), ar1, 0.5)
 @ 
 
 <<sr-ub-ar1-rho19-csize2, echo = FALSE, eval = TRUE>>=
-sr.ub.x.19.2 <- rep(0, 6) 
-sr.ub.x.19.2[1:2] <- simpower(10000, 0.05, TRUE, 20, 2, 0, c(-0.1, 0.9), ar1, 0.8)
-sr.ub.x.19.2[3:4] <- simpower(10000, 0.05, TRUE, 20, 2, 0.2, c(-0.1, 0.9), ar1, 0.8)
-sr.ub.x.19.2[5:6] <- simpower(10000, 0.05, TRUE, 20, 2, 0.5, c(-0.1, 0.9), ar1, 0.8)
+sr.ub.a.19.2 <- rep(0, 6) 
+sr.ub.a.19.2[1:2] <- simpower(1000, 0.05, TRUE, 20, 2, 0, c(-0.1, 0.9), ar1, 0.5)
+sr.ub.a.19.2[3:4] <- simpower(1000, 0.05, TRUE, 20, 2, 0.2, c(-0.1, 0.9), ar1, 0.5)
+sr.ub.a.19.2[5:6] <- simpower(1000, 0.05, TRUE, 20, 2, 0.5, c(-0.1, 0.9), ar1, 0.5)
 @ 
 
 
 
 
 <<sr-ub-ar1-rho11-csize10, echo = FALSE, eval = TRUE>>=
-sr.ub.x.11.10 <- rep(0, 6) 
-sr.ub.x.11.10[1:2] <- simpower(10000, 0.05, TRUE, 20, 10, 0, c(0.1, 0.1), ar1, 0.8)
-sr.ub.x.11.10[3:4] <- simpower(10000, 0.05, TRUE, 20, 10, 0.2, c(0.1, 0.1), ar1, 0.8)
-sr.ub.x.11.10[5:6] <- simpower(10000, 0.05, TRUE, 20, 10, 0.5, c(0.1, 0.1), ar1, 0.8)
+sr.ub.a.11.10 <- rep(0, 6) 
+sr.ub.a.11.10[1:2] <- simpower(1000, 0.05, TRUE, 20, 10, 0, c(0.1, 0.1), ar1, 0.5)
+sr.ub.a.11.10[3:4] <- simpower(1000, 0.05, TRUE, 20, 10, 0.2, c(0.1, 0.1), ar1, 0.5)
+sr.ub.a.11.10[5:6] <- simpower(1000, 0.05, TRUE, 20, 10, 0.5, c(0.1, 0.1), ar1, 0.5)
 @ 
 
 <<sr-ub-ar1-rho55-csize10, echo = FALSE, eval = TRUE>>=
-sr.ub.x.55.10 <- rep(0, 6) 
-sr.ub.x.55.10[1:2] <- simpower(10000, 0.05, TRUE, 20, 10, 0, c(0.5, 0.5), ar1, 0.8)
-sr.ub.x.55.10[3:4] <- simpower(10000, 0.05, TRUE, 20, 10, 0.2, c(0.5, 0.5), ar1, 0.8)
-sr.ub.x.55.10[5:6] <- simpower(10000, 0.05, TRUE, 20, 10, 0.5, c(0.5, 0.5), ar1, 0.8)
+sr.ub.a.55.10 <- rep(0, 6) 
+sr.ub.a.55.10[1:2] <- simpower(1000, 0.05, TRUE, 20, 10, 0, c(0.5, 0.5), ar1, 0.5)
+sr.ub.a.55.10[3:4] <- simpower(1000, 0.05, TRUE, 20, 10, 0.2, c(0.5, 0.5), ar1, 0.5)
+sr.ub.a.55.10[5:6] <- simpower(1000, 0.05, TRUE, 20, 10, 0.5, c(0.5, 0.5), ar1, 0.5)
 @ 
 
 <<sr-ub-ar1-rho99-csize10, echo = FALSE, eval = TRUE>>=
-sr.ub.x.99.10 <- rep(0, 6) 
-sr.ub.x.99.10[1:2] <- simpower(10000, 0.05, TRUE, 20, 10, 0, c(0.9, 0.9), ar1, 0.8)
-sr.ub.x.99.10[3:4] <- simpower(10000, 0.05, TRUE, 20, 10, 0.2, c(0.9, 0.9), ar1, 0.8)
-sr.ub.x.99.10[5:6] <- simpower(10000, 0.05, TRUE, 20, 10, 0.5, c(0.9, 0.9), ar1, 0.8)
+sr.ub.a.99.10 <- rep(0, 6) 
+sr.ub.a.99.10[1:2] <- simpower(1000, 0.05, TRUE, 20, 10, 0, c(0.9, 0.9), ar1, 0.5)
+sr.ub.a.99.10[3:4] <- simpower(1000, 0.05, TRUE, 20, 10, 0.2, c(0.9, 0.9), ar1, 0.5)
+sr.ub.a.99.10[5:6] <- simpower(1000, 0.05, TRUE, 20, 10, 0.5, c(0.9, 0.9), ar1, 0.5)
 @ 
 
 <<sr-ub-ar1-rho19-csize10, echo = FALSE, eval = TRUE>>=
-sr.ub.x.19.10 <- rep(0, 6) 
-sr.ub.x.19.10[1:2] <- simpower(10000, 0.05, TRUE, 20, 10, 0, c(-0.1, 0.9), ar1, 0.8)
-sr.ub.x.19.10[3:4] <- simpower(10000, 0.05, TRUE, 20, 10, 0.2, c(-0.1, 0.9), ar1, 0.8)
-sr.ub.x.19.10[5:6] <- simpower(10000, 0.05, TRUE, 20, 10, 0.5, c(-0.1, 0.9), ar1, 0.8)
+sr.ub.a.19.10 <- rep(0, 6) 
+sr.ub.a.19.10[1:2] <- simpower(1000, 0.05, TRUE, 20, 10, 0, c(-0.1, 0.9), ar1, 0.5)
+sr.ub.a.19.10[3:4] <- simpower(1000, 0.05, TRUE, 20, 10, 0.2, c(-0.1, 0.9), ar1, 0.5)
+sr.ub.a.19.10[5:6] <- simpower(1000, 0.05, TRUE, 20, 10, 0.5, c(-0.1, 0.9), ar1, 0.5)
 @ 
 
 
@@ -821,9 +841,26 @@ sr.ub.x.19.10[5:6] <- simpower(10000, 0.05, TRUE, 20, 10, 0.5, c(-0.1, 0.9), ar1
 
 
 <<sr-tab, echo = FALSE, eval = TRUE, results = 'asis'>>=
-## sum.tab <- rbind(srb.x, srub.x, srb.a, srub.a)
-## xtable(sum.tab)
+sum.tab.sr.x <- rbind(sr.b.x.11.2, sr.b.x.55.2, sr.b.x.99.2,
+                      sr.b.x.19.2,sr.b.x.11.10, sr.b.x.55.10, sr.b.x.99.10,
+                      sr.b.x.19.10, sr.ub.x.11.2, sr.ub.x.55.2, sr.ub.x.99.2,
+                      sr.ub.x.19.2,sr.ub.x.11.10, sr.ub.x.55.10, sr.ub.x.99.10,
+                      sr.ub.x.19.10)
+sum.tab.sr.a <- rbind(sr.b.a.11.2, sr.b.a.55.2, sr.b.a.99.2,
+                      sr.b.a.19.2,sr.b.a.11.10, sr.b.a.55.10, sr.b.a.99.10,
+                      sr.b.a.19.10, sr.ub.a.11.2, sr.ub.a.55.2, sr.ub.a.99.2,
+                      sr.ub.a.19.2,sr.ub.a.11.10, sr.ub.a.55.10, sr.ub.a.99.10,
+                      sr.ub.a.19.10)
+## sum.tab <- rbind(srb.x, srub.x, srb, sru)
 ## library(xtable)
+sum.tab.sr.x <- sum.tab.sr.x * 100
+sum.tab.sr.a <- sum.tab.sr.a * 100
+sum.tab.sr.x <- xtable(sum.tab.sr.x, digits = 1)
+sum.tab.sr.a <- xtable(sum.tab.sr.a, digits = 1)
+print(sum.tab.sr.x)
+print(sum.tab.sr.a)
+
+
 ## sum.tab <- rbind(srb, srub, srub10)
 ## rownames(sum.tab) <- c("bal, $\\rho = 0.1$", 
 ##                        "bal, $\\rho = 0.1, 0.9$",
