@@ -949,7 +949,7 @@ randomization is cluster and individual respectively.
 Each generated data set contains $40$ clusters. Two intra-cluster correlation
 structures, exchangeable and autocorrelated with order~1 (ar1), are
 used with different level of correlation.
-The maximum cluster size $M = \max_i n_i$ has two levels $2$ and $10$. 
+The maximum cluster size $M = \max_i n_i$ has three levels $2$, $5$ and $10$. 
 To compare the performance of the two tests on balanced data and
 unbalanced data, we set the random missing rate as $0$ and $0.5$.
 The group difference $\delta$ takes value $0$, $0.2$ and $0.5$. 
@@ -958,120 +958,86 @@ Each cell represents $1000$ replications.
 
 \begin{table}[tbp]
   \centering
-  \caption{Empirical rejection percentage  comparisons for RGL and DS clustered rank-sum test with cluster level grouping, nominal level $5\%$, $N = 40$ clusters, $M$ is the maximum cluster size, $1000$ simulations for each combination.}
-\begin{tabular}{rrrrrrrrrr}
+  \caption{Empirical rejection percentage  comparisons for RGL and DS
+    rank-sum test with cluster-level and individual-level grouping, nominal level $5\%$, $N = 40$ clusters, $M$ is the maximum cluster size, $1000$ simulations for each combination.}
+\begin{tabular}{rrrrrrrrrrr}
   \toprule
-  &&&& \multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.2$} & \multicolumn{2}{c}{$\delta = 0.5$} \\
-  \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10}
-  Corr. str. & Missing rate & M &   $\rho$ & RGL & DS & RGL & DS & RGL & DS \\
+  &&&&& \multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.2$} & \multicolumn{2}{c}{$\delta = 0.5$} \\
+  \cmidrule(lr){6-7} \cmidrule(lr){8-9} \cmidrule(lr){10-11}
+Group. &  Corr. str. & Missing rate & M &   $\rho$ & RGL & DS & RGL & DS & RGL & DS \\
 
   \midrule
   
-  ex  & 0 & 2 & 0.1, 0.1 & 4.3 & 4.7 & 17.5 & 17.9 & 64.3 & 65.3 \\ 
-  &&&           0.5, 0.5 & 3.5 & 3.7 & 14.2 & 14.8 & 53.2 & 54.5 \\ 
-  &&&          -0.1, 0.9 & 3.4 & 3.6 & 14.1 & 14.8 & 59.5 & 60.5 \\ 
-  &       & 5 & 0.1, 0.1 & 4.6 & 5.0 & 26.8 & 28.4 & 92.6 & 92.8 \\ 
-  &&&           0.5, 0.5 & 4.9 & 5.1 & 14.0 & 14.3 & 61.6 & 63.0 \\ 
-  &&&          -0.1, 0.9 & 6.2 & 6.2 & 15.7 & 16.6 & 79.2 & 79.7 \\ 
-  &&       10 & 0.1, 0.1 & 4.2 & 4.4 & 41.4 & 42.5 & 97.4 & 97.6 \\ 
-  &&&           0.5, 0.5 & 4.0 & 4.2 & 19.0 & 19.9 & 63.6 & 64.8 \\ 
-  &&&          -0.1, 0.9 & 6.1 & 6.4 & 15.8 & 16.9 & 90.2 & 90.5 \\ 
-  &  0.5 & 10 & 0.1, 0.1 & 5.9 & 6.1 & 26.0 & 30.3 & 85.4 & 89.1 \\ 
-  &&&           0.5, 0.5 & 5.1 & 5.7 & 13.6 & 16.7 & 49.6 & 62.8 \\ 
-  &&&          -0.1, 0.9 & 4.9 & 4.8 & 14.4 & 17.1 & 69.2 & 79.3 \\ 
-  ar1 & 0 & 2 & 0.1, 0.1 & 4.0 & 4.2 & 18.4 & 19.0 & 65.4 & 66.4 \\ 
-  &&&           0.5, 0.5 & 5.2 & 5.4 & 15.4 & 16.6 & 51.9 & 53.3 \\ 
-  &&&          -0.1, 0.9 & 5.1 & 5.3 & 15.9 & 16.7 & 59.6 & 60.5 \\ 
-  &       & 5 & 0.1, 0.1 & 4.9 & 5.1 & 33.4 & 35.1 & 95.6 & 95.7 \\ 
-  &&&           0.5, 0.5 & 5.7 & 5.7 & 21.8 & 23.0 & 73.2 & 74.3 \\ 
-  &&&          -0.1, 0.9 & 4.3 & 4.9 & 18.8 & 19.6 & 78.9 & 79.5 \\ 
-  &&       10 & 0.1, 0.1 & 4.1 & 4.4 & 61.0 & 62.4 & 99.8 & 99.8 \\ 
-  &&&           0.5, 0.5 & 4.8 & 5.1 & 32.5 & 33.8 & 92.5 & 93.2 \\ 
-  &&&          -0.1, 0.9 & 5.1 & 5.3 & 19.8 & 21.1 & 89.8 & 90.6 \\ 
-  & 0.5 &  10 & 0.1, 0.1 & 5.7 & 6.6 & 28.3 & 32.2 & 90.3 & 93.9 \\ 
-  &&&           0.5, 0.5 & 4.6 & 4.9 & 22.3 & 26.0 & 76.9 & 84.6 \\ 
-  &&&          -0.1, 0.9 & 4.5 & 5.1 & 15.5 & 20.3 & 68.7 & 77.8 \\ 
-   \bottomrule
+clus & ex  & 0 & 2 & 0.1, 0.1 & 4.3 & 4.7 & 17.5 & 17.9 & 64.3 & 65.3 \\ 
+  &&&&           0.5, 0.5 & 3.5 & 3.7 & 14.2 & 14.8 & 53.2 & 54.5 \\ 
+  &&&&          -0.1, 0.9 & 3.4 & 3.6 & 14.1 & 14.8 & 59.5 & 60.5 \\ 
+  &&       & 5 & 0.1, 0.1 & 4.6 & 5.0 & 26.8 & 28.4 & 92.6 & 92.8 \\ 
+  &&&&           0.5, 0.5 & 4.9 & 5.1 & 14.0 & 14.3 & 61.6 & 63.0 \\ 
+  &&&&          -0.1, 0.9 & 6.2 & 6.2 & 15.7 & 16.6 & 79.2 & 79.7 \\ 
+    &&  0.5 & 10 & 0.1, 0.1 & 5.9 & 6.1 & 26.0 & 30.3 & 85.4 & 89.1 \\ 
+  &&&&           0.5, 0.5 & 5.1 & 5.7 & 13.6 & 16.7 & 49.6 & 62.8 \\ 
+  &&&&          -0.1, 0.9 & 4.9 & 4.8 & 14.4 & 17.1 & 69.2 & 79.3 \\ 
+ & ar1 & 0 & 2 & 0.1, 0.1 & 4.0 & 4.2 & 18.4 & 19.0 & 65.4 & 66.4 \\ 
+  &&&&           0.5, 0.5 & 5.2 & 5.4 & 15.4 & 16.6 & 51.9 & 53.3 \\ 
+  &&&&          -0.1, 0.9 & 5.1 & 5.3 & 15.9 & 16.7 & 59.6 & 60.5 \\ 
+  &&       & 5 & 0.1, 0.1 & 4.9 & 5.1 & 33.4 & 35.1 & 95.6 & 95.7 \\ 
+  &&&&           0.5, 0.5 & 5.7 & 5.7 & 21.8 & 23.0 & 73.2 & 74.3 \\ 
+  &&&&          -0.1, 0.9 & 4.3 & 4.9 & 18.8 & 19.6 & 78.9 & 79.5 \\  
+ind  & ex  & 0 & 2 & 0.1, 0.1 & 4.0 & 4.3 & 17.5 & 16.7 & 69.2 & 67.8 \\ 
+ &&&&           0.5, 0.5 & 4.6 & 5.0 & 19.8 & 19.6 & 69.1 & 68.0 \\ 
+ &&&&          -0.1, 0.9 & 4.9 & 5.0 & 18.0 & 16.9 & 69.2 & 68.6 \\ 
+ &&       & 5 & 0.1, 0.1 & 5.1 & 5.6 & 26.9 & 27.6 & 90.5 & 90.9 \\ 
+ &&&&           0.5, 0.5 & 5.1 & 5.4 & 18.3 & 19.0 & 61.5 & 63.2 \\ 
+ &&&&          -0.1, 0.9 & 4.0 & 4.3 & 17.6 & 17.9 & 81.6 & 82.8 \\ 
+
+  && 0.5 &  10 & 0.1, 0.1 & 5.5 & 4.9 & 40.4 & 38.9 & 97.2 & 94.9 \\ 
+ &&&&           0.5, 0.5 & 4.6 & 4.4 & 42.3 & 35.7 & 97.2 & 93.7 \\ 
+ &&&&          -0.1, 0.9 & 4.5 & 4.1 & 48.5 & 37.5 & 97.8 & 93.3 \\ 
+ & ar1 & 0 & 2 & 0.1, 0.1 & 4.7 & 5.3 & 16.8 & 17.8 & 69.1 & 69.0 \\ 
+ &&&&           0.5, 0.5 & 4.3 & 4.3 & 18.7 & 18.4 & 68.0 & 66.9 \\ 
+ &&&&          -0.1, 0.9 & 3.9 & 4.4 & 19.9 & 20.9 & 69.1 & 67.8 \\ 
+ &&      & 5 & 0.1, 0.1 & 4.9 & 5.3 & 36.0 & 36.8 & 94.3 & 94.9 \\ 
+ &&&&           0.5, 0.5 & 3.9 & 4.0 & 21.3 & 22.1 & 74.3 & 75.4 \\ 
+ &&&&          -0.1, 0.9 & 5.4 & 6.2 & 18.2 & 18.5 & 78.7 & 79.5 \\  
+  \bottomrule
 \end{tabular}
-\label{tab:rsclus}
+\label{tab:rs}
 \end{table}
 
-% latex table generated in R 3.3.1 by xtable 1.8-2 package
-% Tue Aug 16 21:57:22 2016
-\begin{table}[tbp]
-\centering
-  \caption{Empirical rejection percentage  comparisons for RGL and DS clustered rank-sum test with individual level grouping, nominal level $5\%$, $N = 40$ clusters, $M$ is the maximum cluster size, $1000$ simulations for each combination.}
-\begin{tabular}{rrrrrrrrrr}
-  \toprule
-  &&&& \multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.2$} & \multicolumn{2}{c}{$\delta = 0.5$} \\
-  \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10}
-  Corr. str. & Missing rate & M &   $\rho$ & RGL & DS & RGL & DS & RGL & DS \\
-
-  \midrule
- ex  & 0 & 2 & 0.1, 0.1 & 4.0 & 4.3 & 17.5 & 16.7 & 69.2 & 67.8 \\ 
- &&&           0.5, 0.5 & 4.6 & 5.0 & 19.8 & 19.6 & 69.1 & 68.0 \\ 
- &&&          -0.1, 0.9 & 4.9 & 5.0 & 18.0 & 16.9 & 69.2 & 68.6 \\ 
- &&       10 & 0.1, 0.1 & 5.3 & 4.5 & 65.1 & 63.2 & 100.0 & 100.0 \\ 
- &&&           0.5, 0.5 & 4.7 & 5.0 & 70.1 & 66.1 & 99.8 & 99.7 \\ 
- &&&          -0.1, 0.9 & 4.3 & 4.2 & 70.7 & 65.5 & 99.8 & 99.8 \\ 
- &   0.5 & 2 & 0.1, 0.1 & 4.9 & 5.5 & 13.3 & 11.8 & 40.5 & 37.9 \\ 
- &&&           0.5, 0.5 & 4.0 & 3.9 & 12.5 & 12.2 & 40.5 & 36.6 \\ 
- &&&          -0.1, 0.9 & 5.5 & 5.9 & 12.1 & 12.8 & 40.1 & 36.6 \\ 
- &&       10 & 0.1, 0.1 & 5.5 & 4.9 & 40.4 & 38.9 & 97.2 & 94.9 \\ 
- &&&           0.5, 0.5 & 4.6 & 4.4 & 42.3 & 35.7 & 97.2 & 93.7 \\ 
- &&&          -0.1, 0.9 & 4.5 & 4.1 & 48.5 & 37.5 & 97.8 & 93.3 \\ 
- ar1 & 0 & 2 & 0.1, 0.1 & 4.7 & 5.3 & 16.8 & 17.8 & 69.1 & 69.0 \\ 
- &&&           0.5, 0.5 & 4.3 & 4.3 & 18.7 & 18.4 & 68.0 & 66.9 \\ 
- &&&          -0.1, 0.9 & 3.9 & 4.4 & 19.9 & 20.9 & 69.1 & 67.8 \\ 
- &&       10 & 0.1, 0.1 & 5.1 & 5.3 & 68.3 & 64.7 & 100.0 & 100.0 \\ 
- &&&           0.5, 0.5 & 6.1 & 6.1 & 69.5 & 66.5 & 100.0 & 100.0 \\ 
- &&&          -0.1, 0.9 & 4.7 & 5.2 & 67.9 & 63.9 & 99.9 & 100.0 \\ 
- &   0.5 & 2 & 0.1, 0.1 & 5.9 & 4.8 & 11.4 & 13.3 & 42.3 & 40.2 \\ 
- &&&           0.5, 0.5 & 5.1 & 6.5 & 11.5 & 11.8 & 41.0 & 38.9 \\ 
- &&&          -0.1, 0.9 & 4.8 & 6.0 & 10.2 & 10.2 & 39.4 & 37.0 \\ 
- &&       10 & 0.1, 0.1 & 5.1 & 5.3 & 37.5 & 34.4 & 96.1 & 94.1 \\ 
- &&&           0.5, 0.5 & 4.2 & 4.5 & 39.1 & 35.6 & 96.7 & 93.1 \\ 
- &&&          -0.1, 0.9 & 5.1 & 4.8 & 43.0 & 35.0 & 97.5 & 94.0 \\ 
- \bottomrule
-\end{tabular}
-\label{tab:rsind}
-\end{table}
-
-\red{highlight your discussion on the comparison that has not been done.
-  what do these results suggest? are they as expected?}
 
 
-For data with cluster-level grouping, both tests maintained the
-nominal size, however, the DS method outperforms the 
-RGL method in all situations we experimented, despite the cluster
-size, intra-cluster correlation and the variation in the cluster
-size. 
-Both tests also maintained size close to the nominal level $0.05$ in
-all scenarios. In contrast to the previous table, RGL method performs
-better than the DS method under all the conditions we experimented
-except for data with cluster size equals $2$ and with AR1 structure
-which may due to the violation of the exchangeable assumption. 
+As shown in table~\ref{tab:rs}, the empirical size of both methods are
+close to the nominal level $0.05$. When the cluster size is assigned
+at cluster level,  the DS method outperforms the RGL method in most
+cases, which might because that RGL method represents each cluster
+with its rank sum whereas the DS method exerts more information in
+nature by represneting each cluster with its conditional expected rank
+of a randomly picked member. In addition, the size of the RGL method
+is robust to the violation of the assumption of exchangeability of
+intra-cluster correlation when the correlation structure is AR1. 
+The balancedness of the data set has little impact on the power of
+both methods since with an average cluster size equals $5$, the power
+of the balanced and unbalanced are comparable.
 
 
-
-
-The empirical size of both methods are around the nominal level in all
-scenarios, though the performance in terms of power differs. When the
-intra-cluster correlation is high, the RGL method is more competent
-than DS method regardless of other configurations, while their
-performance is comparable when the correlation is low. 
-
-
-The data generation scheme used in our simulation study did not
-consider the possibility when the cluster size is informative for the
-treatment assignment when the treatment is assigned at cluster
-level. In this case, DS method performs better than RGL method as
-shown in the simulation study in \citet{Datt:Satt:rank:2005}.
+In contrast to the cluster-level grouping data, the RGL method
+performs better when treatment is assigned to each single individual
+in most cases under our experimental conditions. This is because that
+the RGL method considers the group comparison within each cluster
+whereas the DS method does not. This can be further illustrated in the
+case when there is less within cluster comparison, e.g., when cluster
+size is $2$, the performance of the two methods are then
+comparable. 
+Another interesting point is that, unlike the cluster-level grouping
+data, the power of both tests tends to increase as the correlation
+increases for individual-level grouping data, since the comparison of
+different treatment on similar objects will highlight the treatment
+effect. 
 
 
 \subsection{Signed-rank tests}
-For clustered signed-rank tests, we compare the RGL and DS methods for
-data with cluster level and individual grouping respectively.
+For clustered signed-rank tests, we generate data using
+\code{datgen.sr}. 
 Each generated data set contains $40$ clusters with
 a maximum cluster size $M = 2$ and $10$. Two correlation structures,
 exchangeable and AR1, are used.
@@ -1079,50 +1045,46 @@ We also compared the two tests with balanced and unbalanced data by
 setting missing rate as $0$ and $0.5$. There are $1000$ replications
 for each design.
 
-\red{these two tables can be combined into one}
+
 \begin{table}[tbp]
   \centering
    \caption{Empirical rejection percentage comparisons for RGL and DS clustered signed-rank test with exchangeable and ar1 intra-cluster correlation, nominal level $5\%$, $N = 40$ clusters, $1000$ simulations for each combination.}
 \begin{tabular}{rrrrrrrrrr}
   \toprule
-  &&&& \multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.2$} & \multicolumn{2}{c}{$\delta = 0.$} \\
+  &&&& \multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.2$} & \multicolumn{2}{c}{$\delta = 0.5$} \\
   \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10}
   Corr. str. & Missing rate & M &   $\rho$ & RGL & DS & RGL & DS & RGL & DS \\
   \midrule
  ex & 0   & 2 &  0.1, 0.1 & 5.2 & 5.4 & 37.7 & 38.3 & 98.0 & 98.0 \\ 
   &&   &      0.5, 0.5 & 5.0 & 5.2 & 29.1 & 29.4 & 93.3 & 93.5 \\ 
-  &&  &     -0.1, 0.9 & 3.7 & 3.9 & 30.1 & 30.6 & 95.9 & 96.0 \\ 
+  &&  &     -0.1, 0.9 & 3.7 & 3.9 & 30.1 & 30.6 & 95.9 & 96.0 \\
   &    & 10 & 0.1, 0.1 & 5.8 & 5.8 & 80.5 & 80.8 & 100.0 & 100.0 \\ 
   &&   &      0.5, 0.5 & 5.6 & 5.6 & 39.2 & 39.7 & 98.6 & 98.6 \\ 
   &&   &     -0.1, 0.9 & 5.6 & 6.0 & 42.3 & 42.4 & 98.4 & 98.4 \\ 
-  &0.5 & 2 &  0.1, 0.1 & 3.7 & 5.4 & 22.0 & 21.6 & 81.6 & 80.5 \\ 
-  &&   &      0.5, 0.5 & 4.7 & 4.4 & 18.4 & 18.7 & 77.9 & 77.6 \\ 
-  &&   &     -0.1, 0.9 & 6.0 & 6.6 & 20.6 & 21.5 & 78.6 & 77.7 \\ 
+  &0.5 & 5 & 0.1, 0.1  & 5.0 & 5.2 & 39.8 & 35.6 & 99.5 & 99.1 \\ 
+  &&   &      0.5, 0.5 & 4.7 & 5.1 & 27.4 & 26.9 & 94.1 & 94.2 \\ 
+  &&   &     -0.1, 0.9 & 5.7 & 6.1 & 32.5 & 31.2 & 94.8 & 93.1 \\ 
   &    & 10 & 0.1, 0.1 & 5.2 & 5.3 & 58.3 & 56.6 & 100.0 & 100.0 \\ 
   &&   &      0.5, 0.5 & 5.2 & 4.7 & 35.5 & 35.4 & 96.9 & 97.2 \\ 
   &&   &     -0.1, 0.9 & 4.5 & 4.6 & 40.3 & 40.0 & 98.4 & 98.4 \\ 
-  &0   & 2 &  0.1, 0.1  & 5.0 & 5.1 & 35.2 & 35.9 & 97.7 & 97.7 \\ 
+ ar1  &0   & 2 &  0.1, 0.1  & 5.0 & 5.1 & 35.2 & 35.9 & 97.7 & 97.7 \\ 
   &&   &      0.5, 0.5  & 5.8 & 5.8 & 31.6 & 32.0 & 93.8 & 93.9 \\ 
   &&   &     -0.1, 0.9  & 4.3 & 4.5 & 30.0 & 30.1 & 94.0 & 94.1 \\ 
   &    & 10 & 0.1, 0.1  & 5.1 & 5.3 & 92.7 & 92.4 & 100.0 & 100.0 \\ 
   &&   &      0.5, 0.5  & 4.4 & 4.3 & 68.1 & 68.0 & 100.0 & 100.0 \\ 
   &&   &     -0.1, 0.9  & 5.3 & 5.3 & 50.9 & 51.4 & 99.5 & 99.5 \\ 
-  &0.5 & 2 &  0.1, 0.1  & 4.8 & 5.2 & 21.0 & 20.4 & 84.9 & 82.0 \\ 
-  &&   &      0.5, 0.5  & 4.5 & 4.1 & 19.4 & 19.1 & 77.8 & 76.6 \\ 
-  &&   &     -0.1, 0.9  & 4.7 & 4.4 & 19.1 & 19.1 & 79.0 & 78.9 \\ 
-  &    & 10 & 0.1, 0.1  & 5.2 & 5.0 & 72.9 & 67.8 & 100.0 & 100.0 \\ 
-  &&   &      0.5, 0.5  & 5.4 & 5.6 & 52.1 & 50.5 & 99.9 & 99.9 \\ 
-  &&   &     -0.1, 0.9  & 4.4 & 4.2 & 45.8 & 44.0 & 98.9 & 98.9 \\ 
   \bottomrule
 \end{tabular}
 \label{tab:sr}
 \end{table}
 
-The two methods are comparable under all designs and both methods
-maintain an empirical size close to the nominal size $0.05$. The two correlation
-structure have little effect on the empirical power of both tests. An
-increase in the correlation magnitude, though, will reduce the
-empirical power by between a third and a half as when $\delta = 0.3$. 
+Both methods maintain an empirical size close to the nominal size
+$0.05$. They also have comparable empirical power in almost all cases
+except the RGL method outperforms the DS method when there is
+variation within the cluster size, e.g., when we randomly introduce
+missingness in the data to construct unbalanced data.
+Again, the empirical size of the RGL method is robust to the AR1
+correlation. 
 
 
 
