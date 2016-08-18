@@ -53,25 +53,18 @@ For independent data, they are available in
 the built-in \pkg{stats} package of \proglang{R}.
 For clustered data, several rank-based tests that accounts for
 intracluster dependence have been recently developed, 
-but few existing R package provides easy access to them at one place
-\citep{Dutt:Datt:clus:2016}.  
+but few existing R package provides easy access to them at one place.
 In package \pkg{clusrank}, the latest developments are implemented
 and wrapped under a unified high-level user-friendly function.
 Different methods are dispatched based on an input formula,
-offering great flexibility in handling various situations such as
-presence of ties and stratified data, 
+offering great flexibility in handling various situations such as stratified data,  
 Methods based on both asymptotics for large samples and
 permutation for small samples are available.
 We present some details and usages of the implemented methods,
-with illustrations via simulated and real data.
+with illustrations via simulated data.
 Some comparison of selected methods that have not been studied before
 are easily performed with the package and the results are
-discussed. We acknowledge the \proglang{SAS} and \proglang{R} code provided
-by the authors of the methods implemented in this package
-\citep{SAS:inco:2016, SAS:sub:2016, SAS:sign:2016, R:clus:2016}.
-\red{No citations in the abstract please. Reviews should be put in the
-  introduction at the right places.}
-
+discussed. 
 }
 
 
@@ -186,6 +179,10 @@ sampling within cluster.
 accommodate the situation where members of a single cluster may
 subject to different treatments, but still assumes exchangeable
 cluster members and the same intracluster dependence across groups.
+More recently, \citet{Dutt:Datt:rank:2015} extended the idea of
+within-cluster resampling to further accommodate the case where the
+number of subjects under treatment is associated with the cluster
+size. 
 
 
 For the one-sample problem or paired comparison problem,
@@ -204,7 +201,7 @@ applications such as biomedical studies and social science research,
 only the DS method of the extensions of Wilcoxon rank-sum and
 signed-rank tests reviewed above and another recent developed
 clustered rank-sum test \citep{Dutt:Datt:clus:2016} has only been implemented in a
-\proglang{R} package \pkg{ClusterRankTest} by the athors
+\proglang{R} package \pkg{ClusterRankTest} by the authors
 \citep{Datt:Satt:rank:2005, Datt:Satt:sign:2008, Dutt:Datt:clus:2016}.  This motivated our development of
 package \pkg{clusrank}.  Under a unified interface similar to
 \code{wilcox.test}, the package provides these recently available
@@ -212,7 +209,8 @@ rank-sum tests \citep{Rosn:Glyn:Lee:inco:2003,
   Rosn:Glyn:Lee:exte:2006, Datt:Satt:rank:2005} and signed-rank tests
 \citep{Rosn:Glyn:Lee:wilc:2006, Datt:Satt:sign:2008} for clustered
 data.  The package makes it very easy to compare the performances of
-the different approaches under various settings.
+the different approaches under various settings. We also acknowledge
+the R code and SAS code provided by the authors on their website \citep{SAS:inco:2016, SAS:sub:2016, SAS:sign:2016, R:clus:2016}.
 
 
 The rest of the article is organized as follows.
