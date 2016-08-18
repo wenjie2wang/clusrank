@@ -927,35 +927,34 @@ assignment for signed-rank test data.
 <<sim-sr>>=
 simpower(1000, 0.05, TRUE, 20, 3, 0., c(0.5, 0.5), ar1, 0)
 @ 
-Both methods have a empirical size that is close to the nominal level
-which shows that even though the RGL method requires the exchangeability in
-the derivation of the asymptotic distribution of the test statistic,
-it is quite robust to this assumption when the correlation structure
-is AR1. 
+Both methods have a empirical size that is close to the nominal
+level.  This is a good sign for RGL since even as the RGL method
+requires the exchangeability in the derivation of the asymptotic
+distribution of the test statistic, it is quite robust to this
+assumption when the correlation structure is AR1.
 
 
 \subsection{Rank-sum tests}
-A relatively comprehensive comparison of the two clustered rank-sum
-tests has been done by \citet{Datt:Satt:rank:2005} when treatment is
-assigned to clusters. No comparison has been done when the treatment
-is assigned at individual level yet.  Table~\ref{tab:rs} shows the
-results from $12$ designs using function \code{simpower} to compare
-the two clustered rank-sum tests under different conditions when each
-individual is the unit of randomization. 
-Each data set contains $40$ clusters. Two intra-cluster correlation
-structures, exchangeable and autocorrelated with order~1 (ar1), are used, 
-each with correlation coefficient $\rho = 0.1$ and $0.9$. 
-The maximum cluster size $M = \max_i n_i$ has two levels $5$ and $10$. 
-When maximum cluster size is $5$, we compare the
-performance of the two tests when data is balanced and unbalanced, by
-setting \code{rate} of observations which are randomly kept to be $1$
-and $0.5$. In order to introduce more variation in the cluster size of
-the unbalanced data while maintaining the same sample size, we
-increase $M$ tp $10$ and decrease \code{rate} to $0.25$. 
-The group difference $\delta$ takes $0$, $0.3$ and $0.6$ respectively. 
+A comparison of the two clustered rank-sum tests has been done by
+\citet{Datt:Satt:rank:2005} when treatment is assigned to clusters. 
+They mainly discussed the case in which the group membership is
+correlated with the cluster size and DS method has more advantage in
+these scenarios. 
+No comparison has been done when the treatment is assigned at
+individual level yet.   
+Table~\ref{tab:rsclus} and Table~\ref{tab:rsind} show the results
+from several designs using function \code{simpower} to compare the two
+clustered rank-sum tests under different conditions when the unit of
+randomization is cluster and individual respectively.  
+Each generated data set contains $40$ clusters. Two intra-cluster correlation
+structures, exchangeable and autocorrelated with order~1 (ar1), are
+used with different level of correlation.
+The maximum cluster size $M = \max_i n_i$ has two levels $2$ and $10$. 
+To compare the performance of the two tests on balanced data and
+unbalanced data, we set the random missing rate as $0$ and $0.5$.
+The group difference $\delta$ takes value $0$, $0.2$ and $0.5$. 
 Each cell represents $1000$ replications.
 
-\red{Read the log files and fix the warnings.}
 
 \begin{table}[tbp]
   \centering
@@ -997,8 +996,6 @@ Each cell represents $1000$ replications.
 \label{tab:rsclus}
 \end{table}
 
-\red{If you don't separate them by blank lines, they will be treated as
-  one paragraph!}
 % latex table generated in R 3.3.1 by xtable 1.8-2 package
 % Tue Aug 16 21:57:22 2016
 \begin{table}[tbp]
@@ -1044,6 +1041,20 @@ Each cell represents $1000$ replications.
   what do these results suggest? are they as expected?}
 
 
+For data with cluster-level grouping, both tests maintained the
+nominal size, however, the DS method outperforms the 
+RGL method in all situations we experimented, despite the cluster
+size, intra-cluster correlation and the variation in the cluster
+size. 
+Both tests also maintained size close to the nominal level $0.05$ in
+all scenarios. In contrast to the previous table, RGL method performs
+better than the DS method under all the conditions we experimented
+except for data with cluster size equals $2$ and with AR1 structure
+which may due to the violation of the exchangeable assumption. 
+
+
+
+
 The empirical size of both methods are around the nominal level in all
 scenarios, though the performance in terms of power differs. When the
 intra-cluster correlation is high, the RGL method is more competent
@@ -1071,63 +1082,40 @@ for each design.
 \red{these two tables can be combined into one}
 \begin{table}[tbp]
   \centering
-   \caption{Empirical rejection percentage comparisons for RGL and DS clustered signed-rank test with exchangeable intra-cluster correlation, nominal level $5\%$, $N = 40$ clusters, $1000$ simulations for each combination.}
-\begin{tabular}{rrrrrrrrr}
+   \caption{Empirical rejection percentage comparisons for RGL and DS clustered signed-rank test with exchangeable and ar1 intra-cluster correlation, nominal level $5\%$, $N = 40$ clusters, $1000$ simulations for each combination.}
+\begin{tabular}{rrrrrrrrrr}
   \toprule
-   &&& \multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.2$} & \multicolumn{2}{c}{$\delta = 0.5$} \\
-  \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9}
-  Missing rate & M &   $\rho$ & RGL & DS & RGL & DS & RGL & DS \\
+  &&&& \multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.2$} & \multicolumn{2}{c}{$\delta = 0.$} \\
+  \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10}
+  Corr. str. & Missing rate & M &   $\rho$ & RGL & DS & RGL & DS & RGL & DS \\
   \midrule
-  0   & 2 &  0.1, 0.1 & 5.2 & 5.4 & 37.7 & 38.3 & 98.0 & 98.0 \\ 
-  &   &      0.5, 0.5 & 5.0 & 5.2 & 29.1 & 29.4 & 93.3 & 93.5 \\ 
-  &   &      0.9, 0.9 & 5.4 & 5.5 & 23.5 & 23.7 & 86.6 & 87.0 \\ 
-  &   &     -0.1, 0.9 & 3.7 & 3.9 & 30.1 & 30.6 & 95.9 & 96.0 \\ 
-      & 10 & 0.1, 0.1 & 5.8 & 5.8 & 80.5 & 80.8 & 100.0 & 100.0 \\ 
-  &   &      0.5, 0.5 & 5.6 & 5.6 & 39.2 & 39.7 & 98.6 & 98.6 \\ 
-  &   &      0.9, 0.9 & 5.3 & 5.4 & 24.4 & 24.8 & 87.5 & 87.5 \\ 
-  &   &     -0.1, 0.9 & 5.6 & 6.0 & 42.3 & 42.4 & 98.4 & 98.4 \\ 
-  0.5 & 2 &  0.1, 0.1 & 3.7 & 5.4 & 22.0 & 21.6 & 81.6 & 80.5 \\ 
-  &   &      0.5, 0.5 & 4.7 & 4.4 & 18.4 & 18.7 & 77.9 & 77.6 \\ 
-  &   &      0.9, 0.9 & 5.2 & 5.3 & 18.9 & 18.9 & 73.9 & 74.0 \\ 
-  &   &     -0.1, 0.9 & 6.0 & 6.6 & 20.6 & 21.5 & 78.6 & 77.7 \\ 
-      & 10 & 0.1, 0.1 & 5.2 & 5.3 & 58.3 & 56.6 & 100.0 & 100.0 \\ 
-  &   &      0.5, 0.5 & 5.2 & 4.7 & 35.5 & 35.4 & 96.9 & 97.2 \\ 
-  &   &      0.9, 0.9 & 5.5 & 5.6 & 25.3 & 25.7 & 86.8 & 87.1 \\ 
-  &   &     -0.1, 0.9 & 4.5 & 4.6 & 40.3 & 40.0 & 98.4 & 98.4 \\ 
-\bottomrule
+ ex & 0   & 2 &  0.1, 0.1 & 5.2 & 5.4 & 37.7 & 38.3 & 98.0 & 98.0 \\ 
+  &&   &      0.5, 0.5 & 5.0 & 5.2 & 29.1 & 29.4 & 93.3 & 93.5 \\ 
+  &&  &     -0.1, 0.9 & 3.7 & 3.9 & 30.1 & 30.6 & 95.9 & 96.0 \\ 
+  &    & 10 & 0.1, 0.1 & 5.8 & 5.8 & 80.5 & 80.8 & 100.0 & 100.0 \\ 
+  &&   &      0.5, 0.5 & 5.6 & 5.6 & 39.2 & 39.7 & 98.6 & 98.6 \\ 
+  &&   &     -0.1, 0.9 & 5.6 & 6.0 & 42.3 & 42.4 & 98.4 & 98.4 \\ 
+  &0.5 & 2 &  0.1, 0.1 & 3.7 & 5.4 & 22.0 & 21.6 & 81.6 & 80.5 \\ 
+  &&   &      0.5, 0.5 & 4.7 & 4.4 & 18.4 & 18.7 & 77.9 & 77.6 \\ 
+  &&   &     -0.1, 0.9 & 6.0 & 6.6 & 20.6 & 21.5 & 78.6 & 77.7 \\ 
+  &    & 10 & 0.1, 0.1 & 5.2 & 5.3 & 58.3 & 56.6 & 100.0 & 100.0 \\ 
+  &&   &      0.5, 0.5 & 5.2 & 4.7 & 35.5 & 35.4 & 96.9 & 97.2 \\ 
+  &&   &     -0.1, 0.9 & 4.5 & 4.6 & 40.3 & 40.0 & 98.4 & 98.4 \\ 
+  &0   & 2 &  0.1, 0.1  & 5.0 & 5.1 & 35.2 & 35.9 & 97.7 & 97.7 \\ 
+  &&   &      0.5, 0.5  & 5.8 & 5.8 & 31.6 & 32.0 & 93.8 & 93.9 \\ 
+  &&   &     -0.1, 0.9  & 4.3 & 4.5 & 30.0 & 30.1 & 94.0 & 94.1 \\ 
+  &    & 10 & 0.1, 0.1  & 5.1 & 5.3 & 92.7 & 92.4 & 100.0 & 100.0 \\ 
+  &&   &      0.5, 0.5  & 4.4 & 4.3 & 68.1 & 68.0 & 100.0 & 100.0 \\ 
+  &&   &     -0.1, 0.9  & 5.3 & 5.3 & 50.9 & 51.4 & 99.5 & 99.5 \\ 
+  &0.5 & 2 &  0.1, 0.1  & 4.8 & 5.2 & 21.0 & 20.4 & 84.9 & 82.0 \\ 
+  &&   &      0.5, 0.5  & 4.5 & 4.1 & 19.4 & 19.1 & 77.8 & 76.6 \\ 
+  &&   &     -0.1, 0.9  & 4.7 & 4.4 & 19.1 & 19.1 & 79.0 & 78.9 \\ 
+  &    & 10 & 0.1, 0.1  & 5.2 & 5.0 & 72.9 & 67.8 & 100.0 & 100.0 \\ 
+  &&   &      0.5, 0.5  & 5.4 & 5.6 & 52.1 & 50.5 & 99.9 & 99.9 \\ 
+  &&   &     -0.1, 0.9  & 4.4 & 4.2 & 45.8 & 44.0 & 98.9 & 98.9 \\ 
+  \bottomrule
 \end{tabular}
-\label{tab:srxch}
-\end{table}
-% latex table generated in R 3.3.1 by xtable 1.8-2 package
-% Tue Aug 16 21:57:22 2016
-\begin{table}[tbp]
-  \centering
-   \caption{Empirical rejection percentage comparisons for RGL and DS clustered signed-rank test with AR1 intra-cluster correlation, nominal level $5\%$, $N = 40$ clusters, $1000$ simulations for each combination.}
-\begin{tabular}{rrrrrrrrr}
-  \toprule
-   &&& \multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.2$} & \multicolumn{2}{c}{$\delta = 0.5$} \\
-  \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9}
-  Missing rate & M &   $\rho$ & RGL & DS & RGL & DS & RGL & DS \\
-  \midrule
-  0   & 2 &  0.1, 0.1  & 5.0 & 5.1 & 35.2 & 35.9 & 97.7 & 97.7 \\ 
-  &   &      0.5, 0.5  & 5.8 & 5.8 & 31.6 & 32.0 & 93.8 & 93.9 \\ 
-  &   &      0.9, 0.9  & 5.4 & 5.7 & 21.6 & 21.9 & 86.8 & 86.9 \\ 
-  &   &     -0.1, 0.9  & 4.3 & 4.5 & 30.0 & 30.1 & 94.0 & 94.1 \\ 
-      & 10 & 0.1, 0.1  & 5.1 & 5.3 & 92.7 & 92.4 & 100.0 & 100.0 \\ 
-  &   &      0.5, 0.5  & 4.4 & 4.3 & 68.1 & 68.0 & 100.0 & 100.0 \\ 
-  &   &      0.9, 0.9  & 4.4 & 4.7 & 30.1 & 30.3 & 92.5 & 92.8 \\ 
-  &   &     -0.1, 0.9  & 5.3 & 5.3 & 50.9 & 51.4 & 99.5 & 99.5 \\ 
-  0.5 & 2 &  0.1, 0.1  & 4.8 & 5.2 & 21.0 & 20.4 & 84.9 & 82.0 \\ 
-  &   &      0.5, 0.5  & 4.5 & 4.1 & 19.4 & 19.1 & 77.8 & 76.6 \\ 
-  &   &      0.9, 0.9  & 4.9 & 4.9 & 18.5 & 19.3 & 73.2 & 73.6 \\ 
-  &   &     -0.1, 0.9  & 4.7 & 4.4 & 19.1 & 19.1 & 79.0 & 78.9 \\ 
-      & 10 & 0.1, 0.1  & 5.2 & 5.0 & 72.9 & 67.8 & 100.0 & 100.0 \\ 
-  &   &      0.5, 0.5  & 5.4 & 5.6 & 52.1 & 50.5 & 99.9 & 99.9 \\ 
-  &   &      0.9, 0.9  & 5.1 & 5.7 & 26.7 & 27.2 & 93.8 & 94.2 \\ 
-  &   &     -0.1, 0.9  & 4.4 & 4.2 & 45.8 & 44.0 & 98.9 & 98.9 \\ 
-\bottomrule
-\end{tabular}
-\label{tab:srar1}
+\label{tab:sr}
 \end{table}
 
 The two methods are comparable under all designs and both methods
