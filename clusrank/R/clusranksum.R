@@ -459,7 +459,7 @@ clusWilcox.test.ranksum.ds <- function(x, cluster, group,
         
         nij <- matrix( 0, m, M)
         for ( i in 1 : m) {
-            nij[i, ] <- table(cluster[group == group.uniq[i]])
+            nij[i, ] <- table(factor(cluster[group == group.uniq[i]], levels = unique(cluster)))
         }
         d <- apply(nij, 1, FUN = function(x) {x / ni})
         ESj <- apply(d, 2, sum) / 2
