@@ -678,9 +678,11 @@ is generated as
 \[
 X = \exp(Z_g) + \delta g,
 \]
-where $Z_g$ is a standard multivariate normal random vector with mean
-zero and an exchangeable or a AR1 correlation structure with
-correlation parameter $\rho_g$, and $\delta$ is the group difference.
+where $Z_g$ is a standard multivariate normal random vector with mean zero
+and an exchangeable or a autoregressive with order 1 (AR1) correlation matrix
+with correlation parameter $\rho_g$, and $\delta$ is the group difference.
+Correlation matrix of dimension \code{dim} with correlation parameter
+\code{rho} as follows, \code{ex} for exchangeable and \code{ar1} for AR1.
 <<corstr>>=
 ex  <- function(dim, rho) {
     diag(1 - rho, dim) + matrix(rho, dim, dim) 
@@ -691,17 +693,17 @@ ar1 <- function(dim, rho) {
 @ 
 
 
-Here is a simple implementation that allows different levels of
-grouping (cluster-level and individual-level) and unequal cluster
-sizes. The needed multivariate normal random variable is generated
-with \pkg{mvtnorm} \citep{Genz:etal:mvtn:2016, Genz:Bret:comp:2009}.
+Here is a simple implementation that allows different levels of grouping 
+(cluster-level and individual-level) and unequal cluster sizes. 
+Package \pkg{mvtnorm} \citep{Genz:etal:mvtn:2016, Genz:Bret:comp:2009}
+is used to generate multivariate normal random vectors.
 <<datgen, echo=TRUE>>= 
 library(mvtnorm)
 datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1), 
-                      cor = ex, rate = 0., clusgrp = TRUE) {
+                      corr = ex, misrate = 0., clusgrp = TRUE) {
     nn <- nclus * maxclsize
-    Sigma1 <- cor(maxclsize, rho[1])
-    Sigma2 <- cor(maxclsize, rho[2])
+    Sigma1 <- corr(maxclsize, rho[1])
+    Sigma2 <- corr(maxclsize, rho[2])
     y1 <- c(t(rmvnorm(nclus, sigma = Sigma1))) 
     y2 <- c(t(rmvnorm(nclus, sigma = Sigma2)))
     group <- rep(c(0, 1), each = nn)
@@ -709,132 +711,121 @@ datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1),
     cid <- rep(1:(2 * nclus), each = maxclsize)
     x <- exp(c(y1, y2)) + delta * group 
     dat <- data.frame(x = x, grp = group, cid = cid) 
-    drop <-  sort(sample(1:(2 * nn), size = rate * (2 * nn), FALSE))
-    if (rate == 0.) dat else dat[-drop, ]      
+    drop <-  sort(sample(1:(2 * nn), size = misrate * (2 * nn), FALSE))
+    if (misrate == 0.) dat else dat[-drop, ]      
 }
 @ 
-The function have two required inputs: \code{nclus} for number of
-clusters in each group and \code{maxclsize} for the maximum cluster
-size. 
+There are two required inputs: \code{nclus} for number of clusters 
+in each group and \code{maxclsize} for the maximum cluster size. 
 The difference between the groups is specified by \code{delta}.
-The group specific intra-cluster correlation parameter $\rho_g$ is
-controlled by \code{rho}, a numeric vector of length 2, one for each
-group.  There are two correlation structures to choose from by setting
-\code{cor}: \code{ex} for exchangeable correlation and \code{ar1} for
-AR1 correlation.  
-To allow unequal cluster sizes, \code{rate} specifies the missing rate
+The group specific intra-cluster correlation parameter $\rho_g$ is set
+by \code{rho}, a numeric vector of length 2, one for each group.  
+The \code{corr} argument specifies the function to construct correlation 
+matrix with correlation coefficients in \code{rho}.
+To allow unequal cluster sizes, \code{misrate} specifies the missing rate
 at which an individual in a cluster to be excluded at random; when
-\code{rate = 1}, balanced data with equal cluster size is generated.  
-The grouping level is controlled by the logical \code{clusgrp}:
+\code{misrate = 1}, balanced data with equal cluster size is generated.  
+The grouping level is controlled by the logical argument \code{clusgrp}:
 \code{TRUE} for cluster-level and \code{FALSE} for individual level.
-The function returns a data set with three columns: observed
-measurement \code{x}, grouping id \code{grp}, and cluster id
-\code{cid}. 
+The function returns a data set with three columns: observation
+\code{x}, grouping id \code{grp}, and cluster id \code{cid}. 
 
 
 For the replicability of the following demonstration,
-a random seed is first fixed. 
+a random seed is set.
 <<seed>>=
 set.seed(1234)
 @ 
 
-To illustrate the clustered rank-sum test, a data set with $10$
-clusters is generated with null treatment effect. 
-Each cluster contains $3$ members and the intra-cluster correlation
-is exchangeable with $\rho_g = 0.9$. 
-The basic unit of the treatment assignment is cluster.
 
+To illustrate the clustered rank-sum test, a data set with $10$
+clusters of size $3$ in each group is generated with $\delta = 0$, 
+exchangeable correlation structure, $\rho_0 = \rho_1 = 0.9$, 
+and cluster-level treatment assignment
 <<dat-clus>>=
 dat.cl <- datgen.rs(10, 3, 0, c(.9, .9), ex, 0, TRUE)
 head(dat.cl)
 @ 
 
-We first apply the formula interface and the RGL asymptotic test to the
-data set: 
+
+We first use the formula interface to perform the RGL asymptotic test:
 <<clus-rs-rgl-asymp>>=
 clusWilcox.test(x ~ grp + cluster(cid), dat.cl, method = "rgl")
 @ 
-The permutation test of RGL method is also available for data with a
+Setting \code{method = "ds''} would preform the DS test.
+The exact test of the RGL method can be done for data with a
 small number of clusters when treatment is assigned at cluster level:  
 <<clus-rs-rgl-exact>>=
 clusWilcox.test(x ~ grp + cluster(cid), dat.cl, method = "rgl", exact = TRUE)
 @ 
 
 
-We illustrate the use of numerical interface with DS method in the following:
+The numerical interface is illustrated with the DS method:
 <<clus-rs-ds>>=
 clusWilcox.test(x, group =  grp, cluster = cid, data = dat.cl, method = "ds")
 @ 
-The test staistics of RGL and DS method are very close to each
-other. Note that, when using the code provided online by the authors
+
+
+The test statistics from the two methods are very close to each other. 
+Note that, when using the code provided online by the authors
 of \citet{Rosn:Glyn:Lee:inco:2003} and \citet{Datt:Satt:rank:2005},
-statistics with different signs using both methods may occur, this is
-due to they use different group of observation to calculate the test
-statistic, in order to get the same sign, users only need to change
-the group based on which the statistic is calculated. 
-
-For cluster-level grouping data, the RGL method allows an extra
-stratum variable to add information to the test. The data set
-\code{dat.str} generated below contains a strata variable besides the
-required variables. It is obtained by combining two data sets:
-\code{dat.cl}, and \code{dat.cl1} which is generated similarly as
-\code{dat.cl} but with a non-zero effect equals $0.5$. Each data set
-is treated as from a separate stratum, and a \code{strat} variable is
-added to the combined data set to identify the strata.
+statistics with different signs may occur.
+This is a result of using the opposite group to calculating the statistic.
+To get the matching results, one just needs to switch the group numbers. 
 
 
+For data with cluster-level groups, the RGL method allows an extra
+stratum variable to accommodate stratification in the data.
+For illustration, we simply add an extra column \code{strat} to the
+dataset and perform the RGL test:
 <<clus-rs-rgl-str>>=
-dat.cl1 <- datgen.rs(10, 3, 0, c(.9, .9), ex, 0, TRUE)
-dat.cl1$cid <- rep(21 : 40, each = 3)
-dat.str <- cbind(rbind(dat.cl, dat.cl1), strat = rep(c(1, 2), each = 60))
-head(dat.str)
-clusWilcox.test(x ~ grp + cluster(cid) + stratum(strat), dat = dat.str, 
+dat.cl$strat <- rep(rep(1:2, each = 15), 2)
+clusWilcox.test(x ~ grp + cluster(cid) + stratum(strat), dat = dat.cl,
                 method = "rgl")
 @ 
 
 
-A benefit of the DS method is that it can compare more than two
-groups. We construct a data set with $4$ groups by combining
-\code{dat.cl} and \code{dat.cl1} but assign a different set of group
-id to \code{dat.cl1} than that of \code{dat.cl}.
-
+The DS method can compare more than two groups. 
+We illustrate this by changing the \code{grp} in the dataset:
 <<clus-rs-ds-mgrp>>=
-dat.cl1$grp <- rep(c(3, 4), each = 30)
-dat.m <- rbind(dat.cl, dat.cl1)
-clusWilcox.test(x ~ grp + cluster(cid), dat = dat.m, method = "ds")
+dat.cl$grp <- rep(1:4, each = 15)
+clusWilcox.test(x ~ grp + cluster(cid), dat = dat.cl, method = "ds")
 @ 
 
-
+\red{Why is this test so significant?}
 
 \subsection{Signed-rank test}
 
 
 Note: the DS paper hasn't done unbalanced, non-exchangeable simulation.
 
-We generate the data for clustered signed-rank test similarly as in
-simulation scenario $1$ in \citet{Datt:Satt:sign:2008}, both balanced
+We generate the data to illustrate clustered signed-rank tests using a
+scheme slightly modified from simulation scenario~1 in 
+\citet{Datt:Satt:sign:2008},
+both balanced
 data and unbalanced data. The observations in a cluster is generated
 as
 \[
-  X = \mathrm{sign}(Z_d)\exp(|Z_d|),
+  X = \mathrm{sign}(Z)\exp(|Z|),
 \]
-where $Z_d$ is a multivariate normal random vector with mean $\delta$
+where $Z$ is a multivariate normal random vector with mean $\delta$
 and an exchangeable or AR1 conrrelation structure with parameter $\rho$. 
 
 <<datagen-sr, echo = TRUE>>=
 datgen.sr <- function(nclus, maxclsize, delta = 0.,
-                      rho = c(0.1, 0.1), cor = xch, rate = 0) {
+                      rho = 0.1, corr = ex, misrate = 0.) {
     nn <- nclus * maxclsize
-    Sigma1 <- cor(maxclsize, rho[1])
-    Sigma2 <- cor(maxclsize, rho[2])
-    y1 <- t(rmvnorm(nclus, sigma = Sigma1))
-    y2 <- t(rmvnorm(nclus, sigma = Sigma2))
-    x <- c(y1, y2) + delta  
-    x <- sign(x) * exp(abs(x))
-    cid <- rep(1:(2*nclus), each = maxclsize)
+    ## Sigma1 <- corr(maxclsize, rho[1])
+    ## Sigma2 <- corr(maxclsize, rho[2])
+    ## y1 <- t(rmvnorm(nclus, sigma = Sigma1))
+    ## y2 <- t(rmvnorm(nclus, sigma = Sigma2))
+    Sigma <- corr(maxclsize, rho)
+    z <- c(t(mvnorm(nclus, sigma = Sigma)))
+    x <- sign(z) * exp(abs(z))
+    cid <- rep(1:nclus, each = maxclsize)
     dat <- data.frame(x = x, cid = cid)
-    drop <- sort(sample(1: (2 * nn), size = (1 - rate) * (2 * nn), FALSE))
-    if (rate == 0) dat else dat[-drop,]
+    drop <- sort(sample(1:nn, size = (1 - misrate) * nn, FALSE))
+    if (misrate == 0.) dat else dat[-drop,]
 }
 @ 
 
