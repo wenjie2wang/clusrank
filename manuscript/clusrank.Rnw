@@ -797,8 +797,6 @@ clusWilcox.test(x ~ grp + cluster(cid), dat = dat.cl, method = "ds")
 \subsection{Signed-rank test}
 
 
-Note: the DS paper hasn't done unbalanced, non-exchangeable simulation.
-
 We generate the data to illustrate clustered signed-rank tests using a
 scheme slightly modified from simulation scenario~1 in 
 \citet{Datt:Satt:sign:2008},
