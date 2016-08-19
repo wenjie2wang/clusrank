@@ -51,25 +51,23 @@ Rank based tests are distribution-free alternatives to
 the popular two-sample and paired $t$-test.
 For independent data, they are available in
 the built-in \pkg{stats} package of \proglang{R}.
-For clustered data, several rank-based tests that accounts for
-intracluster dependence have been recently developed, 
-but few existing R package provides easy access to them at one place.
-In package \pkg{clusrank}, the latest developments are implemented
-and wrapped under a unified high-level user-friendly function.
-Different methods are dispatched based on an input formula,
-offering great flexibility in handling various situations such as stratified data,  
-Methods based on both asymptotics for large samples and
-permutation for small samples are available.
-We present some details and usages of the implemented methods,
-with illustrations via simulated data.
-Some comparison of selected methods that have not been studied before
-are easily performed with the package and the results are
-discussed. 
+For clustered data, several rank-based tests that accounts for 
+intracluster dependence have been recently developed, but no existing 
+\proglang{R} package provides easy access to them at one place.
+We present a package \pkg{clusrank} where the latest developments 
+are implemented and wrapped under a unified user-friendly function.
+Different methods are dispatched based on the input, offering great
+flexibility in handling various situations such as stratified data.
+Exact tests based on permutations are provided for some methods.
+Details of the major methods are briefly reviewed.
+Usages of the main function are illustrated with simulated data.
+Comparison of selected methods that have not been studied before
+are easily performed with the package and the results are discussed. 
 }
 
 
-\Keywords{Wilcoxon rank sum test, Wilcoxon signed rank test}
-\Plainkeywords{Wilcoxon rank sum test, Wilcoxon signed rank test}
+\Keywords{Wilcoxon rank-sum test, Wilcoxon signed-rank test}
+\Plainkeywords{Wilcoxon rank-sum test, Wilcoxon signed-rank test}
 
 %% without formatting
 %% at least one keyword must be supplied
@@ -132,11 +130,11 @@ discussed.
 
 \section{Introduction}
 
-Wilcoxon rank-sum and signed rank tests are important tools for
+Wilcoxon rank-sum and signed-rank tests are important tools for
 two-group comparison and paired comparison, respectively.
 Unlike their counterparts under the normality assumption, they are
 based on ranks with no need for distributional specification.
-Implementations of Wilcoxon rank-sum and signed rank tests have
+Implementations of Wilcoxon rank-sum and signed-rank tests have
 been available in standard software packages, such as function
 \code{wilcox.test} in the built-in \proglang{R} package \pkg{stats},
 and \code{PROC NPAR1WAY} in \proglang{SAS}.
@@ -152,8 +150,9 @@ The variance of the testing statistics under independence are invalid.
 Often times, because of the positive intracluster dependence, the
 variances are underestimated, and as a consequence, the resulting
 p-values are greater than what they should be.
-The popular generalized estimating equations (GEE) approach provides a
-general modeling strategy that accounts for intracluster dependence,
+The popular generalized estimating equations (GEE) approach 
+\citep{Lian:Zege:long:1986} provides a general regression 
+modeling strategy that accounts for intracluster dependence,
 and can be used for two sample comparison as a special case.
 Unlike rank-based procedures, however, it is not invariant to
 monotonic transformations of the data.
@@ -173,16 +172,16 @@ test after ranking all the observations, but the asymptotic mean and
 the variance under the null hypothesis are derived under the clustered
 setting that accommodates unequal cluster sizes and possible strata.
 The assumptions of \citet{Rosn:Glyn:Lee:inco:2003} were relaxed in
-the approach of \citet{Datt:Satt:rank:2005}, which is based on
-sampling within cluster.
+the approach of \citet{Datt:Satt:rank:2005}, which is based on 
+within-cluster resampling \citep{Hoff:Sen:Weib:with:2001} and 
+remains valid when the cluster sizes are informative.
 \citet{Rosn:Glyn:Lee:exte:2006} extended their approach earlier to
 accommodate the situation where members of a single cluster may
 subject to different treatments, but still assumes exchangeable
 cluster members and the same intracluster dependence across groups.
 More recently, \citet{Dutt:Datt:rank:2015} extended the idea of
 within-cluster resampling to further accommodate the case where the
-number of subjects under treatment is associated with the cluster
-size. 
+number of subjects in a group within a cluster is informative.
 
 
 For the one-sample problem or paired comparison problem,
@@ -198,30 +197,39 @@ sampling within cluster that accounts for informative cluster sizes.
 
 Despite the popularity of clustered data arising from a wide range of
 applications such as biomedical studies and social science research,
-only the DS method of the extensions of Wilcoxon rank-sum and
-signed-rank tests reviewed above and another recent developed
-clustered rank-sum test \citep{Dutt:Datt:clus:2016} has only been implemented in a
-\proglang{R} package \pkg{ClusterRankTest} by the authors
-\citep{Datt:Satt:rank:2005, Datt:Satt:sign:2008, Dutt:Datt:clus:2016}.  This motivated our development of
-package \pkg{clusrank}.  Under a unified interface similar to
-\code{wilcox.test}, the package provides these recently available
-rank-sum tests \citep{Rosn:Glyn:Lee:inco:2003,
-  Rosn:Glyn:Lee:exte:2006, Datt:Satt:rank:2005} and signed-rank tests
-\citep{Rosn:Glyn:Lee:wilc:2006, Datt:Satt:sign:2008} for clustered
-data.  The package makes it very easy to compare the performances of
-the different approaches under various settings. We also acknowledge
-the R code and SAS code provided by the authors on their website \citep{SAS:inco:2016, SAS:sub:2016, SAS:sign:2016, R:clus:2016}.
+the extensions of Wilcoxon rank-sum and signed-rank tests reviewed
+above have not been implemented in \proglang{R} until very recently.
+Package \pkg{clusrank} made first CRAN appearance in December, 2015.
+The package provides these recently available rank-sum tests
+\citep{Rosn:Glyn:Lee:inco:2003, Datt:Satt:rank:2005,
+  Deni:etal:two:2010} and signed-rank tests
+\citep{Rosn:Glyn:Lee:wilc:2006, Datt:Satt:sign:2008} for clustered data.
+The methods are grouped into two categories by their authors: RGL for 
+those by Rosner, Glynn, and Lee; and DS for those by Datta and Satten.
+Before package \pkg{clusrank} appeared, the RGL methods were 
+available in \proglang{SAS} codes from Dr. Rosner's website
+(\url{https://sites.google.com/a/channing.harvard.edu/bernardrosner/channing/});
+\proglang{R} codes for the DL methods were available from Dr. Datta's website
+(\url{http://www.somnathdatta.org/software/}), which was recently
+put into \proglang{R} package \pkg{ClusterRankTest} in April, 2016.
+Modeled after the familiar \code{wilcox.test}, package \pkg{clusrank}
+unifies both RGL methods and DS methods under a unified, user-friendly
+interface that accommodates the specifications from these methods. 
+The package makes it very easy to compare the performances of the
+different approaches under various settings; see Section~\ref{s:simu}.
 
 
 The rest of the article is organized as follows.
 The recently available Wilcoxon rank-sum tests and signed-rank tests
 for clustered data are briefly reviewed in Section~\ref{s:ranksum} and
 Section~\ref{s:signedrank},  respectively.
-The usage of the main user-level function and major input arguments
-are described in Section~\ref{s:usage}.
-Numerical illustrations and comparison of the different methods with
-simulated data are presented in Section~\ref{s:illus}.
-A discussion concludes in Section~\ref{s:disc}
+The usage of the unified user-level function and major input arguments
+are described in Section~\ref{s:usage}, and illustrations of how to
+access the implemented methods are presented in Section~\ref{s:illus}.
+In Section~\ref{s:simu}, comparisons of selected methods in some 
+settings that have not been studied previously are reported, which
+are made very easy by the package and a few lines of code.
+A discussion concludes in Section~\ref{s:disc}.
 
 
 \section{Rank-Sum Test}
@@ -246,8 +254,7 @@ of the group indicator $\delta_{ij}$.
 
 
 \subsection{RGL method: cluster-level grouping}
-We use RGL to denote the method of \cite{Rosn:Glyn:Lee:inco:2003}.
-The RGL Wilcoxon rank sum test was designed for the scenario where the
+The RGL Wilcoxon rank-sum test was designed for the scenario where the
 group is assigned at the cluster level:
 $\delta_{ij} = \delta_i$ for all $1 \le j \le n_i$.
 Define $R_{i+} =\sum_{j=1}^{n_i}R_{ij}$, the sum of observed ranks of
@@ -320,7 +327,6 @@ larger clusters, and, hence, may have lower efficiency.
 
 \subsection{DS method: individual-level grouping}
 
-We use DS to denote the method of \citet{Datt:Satt:rank:2005}.
 Unlike the RGL method, the DS method allows individual observations
 within the same cluster to have different group memberships.
 The rationale is rooted in the within-cluster resampling principal
@@ -455,10 +461,10 @@ converges to a standard normal distribution as $N \to \infty$
 under mild conditions.
 
 
-\section{Signed Rank Test}
+\section{Signed-Rank Test}
 \label{s:signedrank}
 
-The Wilcoxon signed rank test is often used for paired data comparison.
+The Wilcoxon signed-rank test is often used for paired data comparison.
 Let $X_{ij}$ be the paired-difference score for the $j$th pair in the
 $i$th cluster,  $i = 1, \ldots, N$, $j = 1, \ldots, n_i$.
 The null hypothesis $H_0$ is that the marginal
@@ -467,20 +473,20 @@ Note that, unlike for the rank-sum test, there is no issue on the group
 membership of each observation in the paired comparison setting.
 Let $R_{ij}$ be the rank of $|X_{ij}|$ among
 $\{|X_{ij}|, i = 1, \ldots, N, j = 1 \ldots, n_i\}$.
-Let $S_{ij} = V_{ij}R_{ij}$ be the signed rank, where
+Let $S_{ij} = V_{ij}R_{ij}$ be the signed-rank, where
 $V_{ij} = \mathrm{sign}(X_{ij})$.
 
 
 \subsection{RGL method: uninformative cluster size}
 The RGL method for the rank-sum test \citep{Rosn:Glyn:Lee:inco:2003}
-was adapted to the signed rank test in \citet{Rosn:Glyn:Lee:wilc:2006}.
+was adapted to the signed-rank test in \citet{Rosn:Glyn:Lee:wilc:2006}.
 For balanced data where $n_i = g$ for all $i$,
-the clustered WIlcoxon signed rank statistic is
+the clustered WIlcoxon signed-rank statistic is
 \[
 T = \sum_{i=1}^N S_{i+} = \sum_{i=1}^N  \sum_{j=1}^g R_{ij} V_{ij},
 \]
 where $S_{i+} = \sum^g_{j=1}S_{ij}$ and only nonzero $X_{ij}$ is
-considered in the computation of signed ranks.
+considered in the computation of signed-ranks.
 The null sampling distribution of $T$ can be obtained from a
 randomization at the cluster level conditional on $S_{i+}$'s.
 Let $\delta_i$, $i = 1, \ldots, N$, be independent and identically
@@ -522,14 +528,14 @@ paired differences within a cluster depends on the cluster size.
 \subsection{DS method: informative cluster size}
 \citet{Datt:Satt:sign:2008} followed the same principle of
 within-cluster resampling as in \citet{Datt:Satt:rank:2005} in the
-context of clustered paired data to develop a signed rank test.
+context of clustered paired data to develop a signed-rank test.
 This method allows informative cluster sizes as long as the marginal
 distributions of $X_{ij}$'s are identical for all $i$ and $j$.
 Suppose that from each cluster, one paired difference $X_{ij}$, denoted by
 $X_i^*$, is randomly picked and pooled to form a pseudo-sample.
 Let $R_i^*$ be the mid-rank of $|X_i^*|$, $i = 1, \ldots, N$ to allow
 ties in the data, and let $V_i^* = \mathrm{sign}(X_i^*)$.
-A standard Wilcoxon signed rank test statistic for the pseudo-sample is
+A standard Wilcoxon signed-rank test statistic for the pseudo-sample is
 $\sum_{i=1}^N S_i^*$, where $S_i = V_i^* R_i^*$.
 The DS method is based on
 $T = \E (\sum_{i=1}^N S_i^* | \mathbf{X})$,
@@ -732,7 +738,7 @@ a random seed is first fixed.
 set.seed(1234)
 @ 
 
-To illustrate the clustered rank sum test, a data set with $10$
+To illustrate the clustered rank-sum test, a data set with $10$
 clusters is generated with null treatment effect. 
 Each cluster contains $3$ members and the intra-cluster correlation
 is exchangeable with $\rho_g = 0.9$. 
@@ -835,14 +841,14 @@ datgen.sr <- function(nclus, maxclsize, delta = 0.,
 For the ease of the simulation study in the following section, all of
 the arguments of \code{datgen.sr} are inherited from \code{datgen.rs}
 as necessary. No grouping is involved in the data generation for the
-signed rank test, therefore there is no \code{clusgrp} argument.
+signed-rank test, therefore there is no \code{clusgrp} argument.
 In addition, to allow variation in the intra-cluster correlation, 
 correlation parameter \code{rho} is a vector of two, each controls
 \code{nclus} clusters. 
 
 
 
-We illustrate the clustered signed rank test with a data set that
+We illustrate the clustered signed-rank test with a data set that
 contains $10$ clusters. Each cluster contains $3$ pair differences.
 An exchangeble correlation with parameter \code{rho} equals $0.9$
 is used as the intra-cluster correlation. 
@@ -1008,7 +1014,7 @@ As shown in table~\ref{tab:rs}, the empirical size of both methods are
 close to the nominal level $0.05$. When the cluster size is assigned
 at cluster level,  the DS method outperforms the RGL method in most
 cases, which might because that RGL method represents each cluster
-with its rank sum whereas the DS method exerts more information in
+with its rank-sum whereas the DS method exerts more information in
 nature by represneting each cluster with its conditional expected rank
 of a randomly picked member. In addition, the size of the RGL method
 is robust to the violation of the assumption of exchangeability of
