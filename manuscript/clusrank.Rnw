@@ -13,6 +13,17 @@
 \newcommand{\blue}[1]{\textcolor{blue}{(#1)}}
 \newcommand{\red}[1]{\textcolor{red}{(#1)}}
 
+
+
+% control floats
+\renewcommand\floatpagefraction{.9}
+\renewcommand\topfraction{.9}
+\renewcommand\bottomfraction{.9}
+\renewcommand\textfraction{.1}
+\setcounter{totalnumber}{50}
+\setcounter{topnumber}{50}
+\setcounter{bottomnumber}{50}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -682,7 +693,8 @@ where $Z_g$ is a standard multivariate normal random vector with mean zero
 and an exchangeable or a autoregressive with order 1 (AR1) correlation matrix
 with correlation parameter $\rho_g$, and $\delta$ is the group difference.
 Correlation matrix of dimension \code{dim} with correlation parameter
-\code{rho} as follows, \code{ex} for exchangeable and \code{ar1} for AR1.
+\code{rho} can be generated as follows, \code{ex} for exchangeable 
+and \code{ar1} for AR1.
 <<corstr>>=
 ex  <- function(dim, rho) {
     diag(1 - rho, dim) + matrix(rho, dim, dim) 
@@ -699,8 +711,8 @@ Package \pkg{mvtnorm} \citep{Genz:etal:mvtn:2016, Genz:Bret:comp:2009}
 is used to generate multivariate normal random vectors.
 <<datgen, echo=TRUE>>= 
 library(mvtnorm)
-datgen.rs <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1), 
-                      corr = ex, misrate = 0., clusgrp = TRUE) {
+datgen.sum <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1), 
+                       corr = ex, misrate = 0., clusgrp = TRUE) {
     nn <- nclus * maxclsize
     Sigma1 <- corr(maxclsize, rho[1])
     Sigma2 <- corr(maxclsize, rho[2])
@@ -743,7 +755,7 @@ clusters of size $3$ in each group is generated with $\delta = 0$,
 exchangeable correlation structure, $\rho_0 = \rho_1 = 0.9$, 
 and cluster-level treatment assignment
 <<dat-clus>>=
-dat.cl <- datgen.rs(10, 3, 0, c(.9, .9), ex, 0, TRUE)
+dat.cl <- datgen.sum(10, 3, 0, c(.9, .9), ex, 0, TRUE)
 head(dat.cl)
 @ 
 
@@ -752,7 +764,7 @@ We first use the formula interface to perform the RGL asymptotic test:
 <<clus-rs-rgl-asymp>>=
 clusWilcox.test(x ~ grp + cluster(cid), dat.cl, method = "rgl")
 @ 
-Setting \code{method = "ds''} would preform the DS test.
+Setting \code{method = "ds"} would preform the DS test.
 The exact test of the RGL method can be done for data with a
 small number of clusters when treatment is assigned at cluster level:  
 <<clus-rs-rgl-exact>>=
@@ -786,39 +798,30 @@ clusWilcox.test(x ~ grp + cluster(cid) + stratum(strat), dat = dat.cl,
 
 
 The DS method can compare more than two groups. 
-We illustrate this by changing the \code{grp} in the dataset:
+We illustrate this by assigning 4 groups to this data:
 <<clus-rs-ds-mgrp>>=
 dat.cl$grp <- rep(1:4, each = 15)
 clusWilcox.test(x ~ grp + cluster(cid), dat = dat.cl, method = "ds")
 @ 
 
-\red{Why is this test so significant?}
 
 \subsection{Signed-rank test}
 
-
-We generate the data to illustrate clustered signed-rank tests using a
-scheme slightly modified from simulation scenario~1 in 
-\citet{Datt:Satt:sign:2008},
-both balanced
-data and unbalanced data. The observations in a cluster is generated
-as
+To illustrate clustered signed-rank tests, we generate data from a scheme
+slightly modified from simulation scenario~1 in \citet{Datt:Satt:sign:2008}.
+The paird differences in a cluster are generated as
 \[
-  X = \mathrm{sign}(Z)\exp(|Z|),
+  X = \mathrm{sign}(Z) \exp(|Z|),
 \]
 where $Z$ is a multivariate normal random vector with mean $\delta$
 and an exchangeable or AR1 conrrelation structure with parameter $\rho$. 
-
+This is implemented by the following function:
 <<datagen-sr, echo = TRUE>>=
-datgen.sr <- function(nclus, maxclsize, delta = 0.,
-                      rho = 0.1, corr = ex, misrate = 0.) {
+datgen.sgn <- function(nclus, maxclsize, delta = 0., rho = 0.1, 
+                       corr = ex, misrate = 0.) {
     nn <- nclus * maxclsize
-    ## Sigma1 <- corr(maxclsize, rho[1])
-    ## Sigma2 <- corr(maxclsize, rho[2])
-    ## y1 <- t(rmvnorm(nclus, sigma = Sigma1))
-    ## y2 <- t(rmvnorm(nclus, sigma = Sigma2))
     Sigma <- corr(maxclsize, rho)
-    z <- c(t(mvnorm(nclus, sigma = Sigma)))
+    z <- delta + c(t(rmvnorm(nclus, sigma = Sigma)))
     x <- sign(z) * exp(abs(z))
     cid <- rep(1:nclus, each = maxclsize)
     dat <- data.frame(x = x, cid = cid)
@@ -826,52 +829,47 @@ datgen.sr <- function(nclus, maxclsize, delta = 0.,
     if (misrate == 0.) dat else dat[-drop,]
 }
 @ 
-
-For the ease of the simulation study in the following section, all of
-the arguments of \code{datgen.sr} are inherited from \code{datgen.rs}
-as necessary. No grouping is involved in the data generation for the
-signed-rank test, therefore there is no \code{clusgrp} argument.
-In addition, to allow variation in the intra-cluster correlation, 
-correlation parameter \code{rho} is a vector of two, each controls
-\code{nclus} clusters. 
+The arguments of \code{datgen.sgn} match those of \code{datgen.sum}, 
+except that it does not need a \code{clusgrp} argument because the
+data are already differences between two groups.
 
 
-
-We illustrate the clustered signed-rank test with a data set that
-contains $10$ clusters. Each cluster contains $3$ pair differences.
-An exchangeble correlation with parameter \code{rho} equals $0.9$
-is used as the intra-cluster correlation. 
-
+For illustration, we generate a dataset that consists of $10$ clusters of 
+size $3$, with exchangeble correlation parameter $\rho = 0.5$.
 <<dat-sr>>=
-dat.sr <- datgen.sr(10, 3, cor = ex, rho = c(0.1, 0.9))
-head(dat.sr)
+dat.sgn <- datgen.sgn(10, 3, cor = ex, rho = 0.5)
+head(dat.sgn)
 @ 
 
-To apply both methods to this data set:
-<<sr>>=
-clusWilcox.test(x ~ cluster(cid),  dat.sr, paired = TRUE, method = "rgl")
-clusWilcox.test(x ~ cluster(cid),  dat.sr, paired = TRUE, method = "ds")
+
+The RGL signed-rank test is performed with:
+<<sr-rgl>>=
+clusWilcox.test(x ~ cluster(cid),  dat.sgn, paired = TRUE, method = "rgl")
+@ 
+The DS signed-rank test is performed with
+<<sr-ds>>=
+clusWilcox.test(x ~ cluster(cid),  dat.sgn, paired = TRUE, method = "ds")
 @ 
 
 \section{A Simulation Study}
 \label{s:simu}
 
-Despite the recent literature, comparisons of the RGL method and the
-DS method under certain senarios have not been studied.
+Comparisons of the RGL method and the DS method under 
+certain senarios have not been studied in the recent literature.
 Such comparison can be easily done with package \pkg{clusrank}. 
-Using the two data generation functions defined above, we report a
-simulation study comparing their sizes and powers under a variety of
-scenarios. The following function generates replicates of data for a
+Using the two data generation functions defined above, we conduct a
+simulation study comparing their sizes and powers in a few settings.
+The following function generates replicates of data for a
 given scenario and returns the empirical power for a given
 significance level.
 <<simpower>>=
 simpower <- function(nrep, level, paired, nclus, maxclsize, 
-                     delta, rho, cor, rate, ...) {
+                     delta, rho, corr, misrate, ...) {
     do1rep <- function() {
-        datgen <- if (paired) datgen.sr else datgen.rs
+        datgen <- if (paired) datgen.sgn else datgen.sum
         formula <- if (paired) x ~ cluster(cid) 
                    else x ~ cluster(cid) + grp
-        dat <- datgen(nclus, maxclsize, delta, rho, cor, rate, ...)
+        dat <- datgen(nclus, maxclsize, delta, rho, corr, misrate, ...)
         p.rgl <- clusWilcox.test(formula, paired = paired, 
                                  data = dat, method = "rgl")$p.value
         p.ds  <- clusWilcox.test(formula, paired = paired, 
@@ -883,84 +881,51 @@ simpower <- function(nrep, level, paired, nclus, maxclsize,
 }
 @
 The first two arguments, \code{nrep} and \code{level} specify the
-number of replications and the significance level that the user
-desires. As in the test function, \code{paired} is a logical to switch
-between the clustered signed-rank test and rank-sum test. The value of
-\code{delta} determines the group difference. The rest arguments are
-inherited from \code{datgen.rs} or \code{datgen.sr} depending on the
-value of \code{paired}. When \code{paired} is \code{FALSE}, i.e.,
-clustered rank-sum test is under study, the last argument, \code{...},
-is the \code{clusgrp} argument in \code{datgen.rs} to determine the
-unit of randomization. 
+number of replications and the desired significance level, respectively.
+Argument \code{paired} is a logical scalar to switch between the two methods,
+\code{TRUE} for signed-rank tests and \code{FALSE} for rank-sum tests.
+Other arguments have the same meanings as those in \code{datgen.sum} 
+or \code{datgen.sgn} depending on the value of \code{paired}. 
+The last argument \code{...} is used to supply \code{clusgrp}, which
+is only needed by \code{datgen.sum} for the level of groups.
+The function returns the empirical rejection rates of the RGL method
+and the DS method for the setting defined by the inputs.
 
 
-To illustrate the usage of the function, we compare the empirical size
-of the two clustered rank-sum tests and the two clustered signed-rank
-tests through $1000$ replications on balanced data set. 
-The significance level is set as $0.05$. 
-The true group differences is $0.$. For clustered rank-sum test each
-data set contains $20$ clusters with size $3$ for each group.  
-The intra-cluster correlation structure is exchangeable. The
-correlation parameter \code{rho} is set as $0.1$ for both groups.
-The missing rate is set as $0$ to obtain balanced data.
-The unit of randomization is cluster. 
-
+As an example, consider the rank-sum tests in a setting with cluster
+level grouping, each group containing 20~clusters of size~3, with 
+exchangeable correlation parameter $\rho = 0.5$ in both groups.
+The group difference is set to be $\delta = 0$.
+We do this experiment with 1000 replicates with significance level 0.05:
 <<sim-clus-rs>>=
-simpower(1000, 0.05, FALSE, 20, 3, 0.0, c(0.5, 0.5), ex, 0, clusgrp = TRUE)
+simpower(1000, 0.05, FALSE, 20, 3, 0.0, c(0.5, 0.5), ex, 0., clusgrp = TRUE)
 @ 
-
 The empirical sizes of both methods are close to the nominal level $0.05$. 
 
 
-For the clustered signed-rank tests, we use the same setting as in the
-above simulation for clustered rank-sum test, except that the
-correlation structure is now AR1 which is not exchangeable and no
-\code{clusgrp} is needed since there is no explicit treatment 
-assignment for signed-rank test data.  
+Similarly, a comparison for signed-rank tests can be done.
+This time we use an AR1 correlation setting with $\rho = 0.5$.
 <<sim-sr>>=
-simpower(1000, 0.05, TRUE, 20, 3, 0., c(0.5, 0.5), ar1, 0)
+simpower(1000, 0.05, TRUE,  20, 3, 0.0, 0.5, ar1, 0.)
 @ 
-Both methods have a empirical size that is close to the nominal
-level.  This is a good sign for RGL since even as the RGL method
-requires the exchangeability in the derivation of the asymptotic
-distribution of the test statistic, it is quite robust to this
-assumption when the correlation structure is AR1.
+Again, both methods have empirical sizes close to the nominal level.
+This is a good sign for the RGL method because the size is maintained
+even when the exchangeable assumption is violated in this setting.
 
 
 \subsection{Rank-sum tests}
-A comparison of the two clustered rank-sum tests has been done by
-\citet{Datt:Satt:rank:2005} when treatment is assigned to clusters. 
-They mainly discussed the case in which the group membership is
-correlated with the cluster size and DS method has more advantage in
-these scenarios. 
-No comparison has been done when the treatment is assigned at
-individual level yet.   
-Table~\ref{tab:rsclus} and Table~\ref{tab:rsind} show the results
-from several designs using function \code{simpower} to compare the two
-clustered rank-sum tests under different conditions when the unit of
-randomization is cluster and individual respectively.  
-Each generated data set contains $40$ clusters. Two intra-cluster correlation
-structures, exchangeable and autocorrelated with order~1 (ar1), are
-used with different level of correlation.
-The maximum cluster size $M = \max_i n_i$ has three levels $2$, $5$ and $10$. 
-To compare the performance of the two tests on balanced data and
-unbalanced data, we set the random missing rate as $0$ and $0.5$.
-The group difference $\delta$ takes value $0$, $0.2$ and $0.5$. 
-Each cell represents $1000$ replications.
 
 
 \begin{table}[tbp]
   \centering
   \caption{Empirical rejection percentage  comparisons for RGL and DS
     rank-sum test with cluster-level and individual-level grouping, nominal level $5\%$, $N = 40$ clusters, $M$ is the maximum cluster size, $1000$ simulations for each combination.}
-\begin{tabular}{rrrrrrrrrrr}
+\begin{tabular}{ccccc rr rr rr}
   \toprule
-  &&&&& \multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.2$} & \multicolumn{2}{c}{$\delta = 0.5$} \\
+ Group & Corr & Missing & Max & Corr & \multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.2$} & \multicolumn{2}{c}{$\delta = 0.5$} \\
   \cmidrule(lr){6-7} \cmidrule(lr){8-9} \cmidrule(lr){10-11}
-Group. &  Corr. str. & Missing rate & M &   $\rho$ & RGL & DS & RGL & DS & RGL & DS \\
-
+  level &  structure & rate & $n_i$ & $\rho$ & RGL & DS & RGL & DS & RGL & DS \\
   \midrule
-  
 clus & ex  & 0 & 2 & 0.1, 0.1 & 4.3 & 4.7 & 17.5 & 17.9 & 64.3 & 65.3 \\ 
   &&&&           0.5, 0.5 & 3.5 & 3.7 & 14.2 & 14.8 & 53.2 & 54.5 \\ 
   &&&&          -0.1, 0.9 & 3.4 & 3.6 & 14.1 & 14.8 & 59.5 & 60.5 \\ 
@@ -980,17 +945,12 @@ clus & ex  & 0 & 2 & 0.1, 0.1 & 4.3 & 4.7 & 17.5 & 17.9 & 64.3 & 65.3 \\
   &&&&           0.5, 0.5 & 5.3 & 5.6 & 20.9 & 24.0 & 75.9 & 82.0 \\ 
   &&&&          -0.1, 0.9 & 4.2 & 4.3 & 14.9 & 18.3 & 73.7 & 83.1 \\ 
 
-  
-  
-  
-  
   ind  & ex  & 0 & 2 & 0.1, 0.1 & 4.0 & 4.3 & 17.5 & 16.7 & 69.2 & 67.8 \\ 
   &&&&           0.5, 0.5 & 4.6 & 5.0 & 19.8 & 19.6 & 69.1 & 68.0 \\ 
   &&&&          -0.1, 0.9 & 4.9 & 5.0 & 18.0 & 16.9 & 69.2 & 68.6 \\ 
   &&       & 5 & 0.1, 0.1 & 5.1 & 5.6 & 26.9 & 27.6 & 90.5 & 90.9 \\ 
   &&&&           0.5, 0.5 & 5.1 & 5.4 & 18.3 & 19.0 & 61.5 & 63.2 \\ 
   &&&&          -0.1, 0.9 & 4.0 & 4.3 & 17.6 & 17.9 & 81.6 & 82.8 \\ 
-  
   && 0.5 &  10 & 0.1, 0.1 & 5.5 & 4.9 & 40.4 & 38.9 & 97.2 & 94.9 \\ 
   &&&&           0.5, 0.5 & 4.6 & 4.4 & 42.3 & 35.7 & 97.2 & 93.7 \\ 
   &&&&          -0.1, 0.9 & 4.5 & 4.1 & 48.5 & 37.5 & 97.8 & 93.3 \\ 
@@ -1003,12 +963,31 @@ clus & ex  & 0 & 2 & 0.1, 0.1 & 4.3 & 4.7 & 17.5 & 17.9 & 64.3 & 65.3 \\
   && 0.5 &  10 & 0.1, 0.1 & 3.9 & 4.6 & 39.4 & 36.2 & 97.4 & 95.2 \\ 
   &&&&           0.5, 0.5 & 5.1 & 5.6 & 40.5 & 35.3 & 96.9 & 94.3 \\ 
   &&&&          -0.1, 0.9 & 4.8 & 5.1 & 42.0 & 35.5 & 96.3 & 94.4 \\ 
-  
   \bottomrule
 \end{tabular}
 \label{tab:rs}
 \end{table}
 
+
+A comparison of the two clustered rank-sum tests has been done by
+\citet{Datt:Satt:rank:2005} when treatment is assigned to clusters. 
+They mainly discussed the case in which the group membership is
+correlated with the cluster size and DS method has more advantage in
+these scenarios. 
+No comparison has been done when the treatment is assigned at
+individual level yet.   
+Table~\ref{tab:rs} show the results
+from several designs using function \code{simpower} to compare the two
+clustered rank-sum tests under different conditions when the unit of
+randomization is cluster and individual respectively.  
+Each generated data set contains $40$ clusters. Two intra-cluster correlation
+structures, exchangeable and autocorrelated with order~1 (ar1), are
+used with different level of correlation.
+The maximum cluster size $M = \max_i n_i$ has three levels $2$, $5$ and $10$. 
+To compare the performance of the two tests on balanced data and
+unbalanced data, we set the random missing rate as $0$ and $0.5$.
+The group difference $\delta$ takes value $0$, $0.2$ and $0.5$. 
+Each cell represents $1000$ replications.
 
 
 As shown in table~\ref{tab:rs}, the empirical size of both methods are
@@ -1042,7 +1021,7 @@ effect.
 
 \subsection{Signed-rank tests}
 For clustered signed-rank tests, we generate data using
-\code{datgen.sr}. 
+\code{datgen.sgn}. 
 Each generated data set contains $40$ clusters with
 a maximum cluster size $M = 2$ and $10$. Two correlation structures,
 exchangeable and AR1, are used.
