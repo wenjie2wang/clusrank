@@ -581,8 +581,8 @@ distribution under mild conditions.
 Note that as long as members from the same cluster have identical
 distribution, DS method does not require the distribution of members from
 clusters with different size to be identical, while this is
-usually an assumption that has to be made by tests designed for
-the same purpose.
+usually an traditional assumption made by most signed-rank tests for
+clustered data in literature. 
 
 
 \section{Usage}
@@ -909,24 +909,26 @@ This time we use an AR1 correlation setting with $\rho = 0.5$.
 simpower(1000, 0.05, TRUE,  20, 3, 0.0, 0.5, ar1, 0.)
 @ 
 Again, both methods have empirical sizes close to the nominal level.
-This is a good sign for the RGL method because the size is maintained
-even when the exchangeable assumption is violated in this setting.
+This means that the RGL method is robust to the violation of the
+exchangeability assumption in this setting.
 
 
 \subsection{Rank-sum tests}
 
 
 \begin{table}[tbp]
-  \centering
-  \caption{Empirical rejection percentage  comparisons for RGL and DS
-    rank-sum test with cluster-level and individual-level grouping, nominal level $5\%$, $N = 40$ clusters, $M$ is the maximum cluster size, $1000$ simulations for each combination.}
+\centering
+\caption{Empirical rejection percentage of the RGL method and the DS
+  method for rank-sum tests at nominal significance level 0.05.
+  The results are based on 1000 datasets with 20 clusters in each group. 
+}
 \begin{tabular}{ccccc rr rr rr}
   \toprule
  Group & Corr & Missing & Max & Corr & \multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.2$} & \multicolumn{2}{c}{$\delta = 0.5$} \\
   \cmidrule(lr){6-7} \cmidrule(lr){8-9} \cmidrule(lr){10-11}
   level &  structure & rate & $n_i$ & $\rho$ & RGL & DS & RGL & DS & RGL & DS \\
   \midrule
-clus & ex  & 0 & 2 & 0.1, 0.1 & 4.3 & 4.7 & 17.5 & 17.9 & 64.3 & 65.3 \\ 
+cluster & ex  & 0 & 2 & 0.1, 0.1 & 4.3 & 4.7 & 17.5 & 17.9 & 64.3 & 65.3 \\ 
   &&&&           0.5, 0.5 & 3.5 & 3.7 & 14.2 & 14.8 & 53.2 & 54.5 \\ 
   &&&&          -0.1, 0.9 & 3.4 & 3.6 & 14.1 & 14.8 & 59.5 & 60.5 \\ 
   &&       & 5 & 0.1, 0.1 & 4.6 & 5.0 & 26.8 & 28.4 & 92.6 & 92.8 \\ 
@@ -945,7 +947,7 @@ clus & ex  & 0 & 2 & 0.1, 0.1 & 4.3 & 4.7 & 17.5 & 17.9 & 64.3 & 65.3 \\
   &&&&           0.5, 0.5 & 5.3 & 5.6 & 20.9 & 24.0 & 75.9 & 82.0 \\ 
   &&&&          -0.1, 0.9 & 4.2 & 4.3 & 14.9 & 18.3 & 73.7 & 83.1 \\ 
 
-  ind  & ex  & 0 & 2 & 0.1, 0.1 & 4.0 & 4.3 & 17.5 & 16.7 & 69.2 & 67.8 \\ 
+  individual  & ex  & 0 & 2 & 0.1, 0.1 & 4.0 & 4.3 & 17.5 & 16.7 & 69.2 & 67.8 \\ 
   &&&&           0.5, 0.5 & 4.6 & 5.0 & 19.8 & 19.6 & 69.1 & 68.0 \\ 
   &&&&          -0.1, 0.9 & 4.9 & 5.0 & 18.0 & 16.9 & 69.2 & 68.6 \\ 
   &&       & 5 & 0.1, 0.1 & 5.1 & 5.6 & 26.9 & 27.6 & 90.5 & 90.9 \\ 
@@ -969,70 +971,51 @@ clus & ex  & 0 & 2 & 0.1, 0.1 & 4.3 & 4.7 & 17.5 & 17.9 & 64.3 & 65.3 \\
 \end{table}
 
 
-A comparison of the two clustered rank-sum tests has been done by
-\citet{Datt:Satt:rank:2005} when treatment is assigned to clusters. 
-They mainly discussed the case in which the group membership is
-correlated with the cluster size and DS method has more advantage in
-these scenarios. 
-No comparison has been done when the treatment is assigned at
-individual level yet.   
-Table~\ref{tab:rs} show the results
-from several designs using function \code{simpower} to compare the two
-clustered rank-sum tests under different conditions when the unit of
-randomization is cluster and individual respectively.  
-Each generated data set contains $40$ clusters. Two intra-cluster correlation
-structures, exchangeable and autocorrelated with order~1 (ar1), are
-used with different level of correlation.
-The maximum cluster size $M = \max_i n_i$ has three levels $2$, $5$ and $10$. 
-To compare the performance of the two tests on balanced data and
-unbalanced data, we set the random missing rate as $0$ and $0.5$.
+Comparison between the RGL method and the DS method for the rank-sum test
+has not been done when treatment group is assigned at the individual level. 
+Nor has it when the intracluster dependence is not exchangeable.
+Consider two groups of 20~clusters each, with either exchangeable or AR1
+intracluster correlation structure as specified in \code{datgen.sum}. 
+The correlation parameters for the two groups were set to be
+$(0.1, 0.1)$, $(0.5, 0.5)$, or $(-0.1, 0.9)$.
+The maximum cluster size $G = \max_i n_i$ has three levels: 2, 5, and 10.
+The \code{simpower} function makes the comparison very easy, and the
+\code{misrate} argument allows cluster sizes to be random, which is
+an additional scenario of interest that has not been compared before. 
+Two missing rates, $0$ and $0.5$ were considered, representing 
+balanced data and unbalanced data with missing completely at random. 
+This is different from the informative cluster size setting studied
+in \citet{Datt:Satt:rank:2005}, where cluster size depends on group. 
 The group difference $\delta$ takes value $0$, $0.2$ and $0.5$. 
-Each cell represents $1000$ replications.
+For each setting, empirical rejection was obtained from 1000 replicates. 
 
 
-As shown in table~\ref{tab:rs}, the empirical size of both methods are
-close to the nominal level $0.05$. When the cluster size is assigned
-at cluster level,  the DS method outperforms the RGL method in most
-cases, which might because that RGL method represents each cluster
-with its rank-sum whereas the DS method exerts more information in
-nature by represneting each cluster with its conditional expected rank
-of a randomly picked member. In addition, the size of the RGL method
-is robust to the violation of the assumption of exchangeability of
-intra-cluster correlation when the correlation structure is AR1. 
-The balancedness of the data set has little impact on the power of
-both methods since with an average cluster size equals $5$, the power
-of the balanced and unbalanced are comparable.
-
-
-In contrast to the cluster-level grouping data, the RGL method
-performs better when treatment is assigned to each single individual
-in most cases under our experimental conditions. This is because that
-the RGL method considers the group comparison within each cluster
-whereas the DS method does not. This can be further illustrated in the
-case when there is less within cluster comparison, e.g., when cluster
-size is $2$, the performance of the two methods are then
-comparable. 
-Another interesting point is that, unlike the cluster-level grouping
-data, the power of both tests tends to increase as the correlation
-increases for individual-level grouping data, since the comparison of
-different treatment on similar objects will highlight the treatment
-effect. 
+Selected results are summarized in Table~\ref{tab:rs}.
+The empirical size ($\delta = 0$) of both methods are close to the 
+nominal level $0.05$ in all the settings considered in this study.
+For balanced data, the powers of the two tests are very close regardless
+of the treatment group level and the intracluster configurations. 
+For unbalanced data from maximum cluster size~10 and missing rate 0.5, 
+the DS method has higher power with cluster-level group assignment, while
+the RGL method has higher power with individual-level group assignment. 
+As this setting has average cluster size~5, it can be compared with
+the balanced data setting with cluster size fixed at~5.
+Both methods have higher power in the random cluster size setting 
+when the treatment group is assigned at the individual level.
+Under cluster-level group assignment, it appears that the RGL method has
+lower power with random cluster size, while the DS method has lower
+power with fixed cluster size, though the differences are not big.
 
 
 \subsection{Signed-rank tests}
-For clustered signed-rank tests, we generate data using
-\code{datgen.sgn}. 
-Each generated data set contains $40$ clusters with
-a maximum cluster size $M = 2$ and $10$. Two correlation structures,
-exchangeable and AR1, are used.
-We also compared the two tests with balanced and unbalanced data by
-setting missing rate as $0$ and $0.5$. There are $1000$ replications
-for each design.
 
 
 \begin{table}[tbp]
   \centering
-   \caption{Empirical rejection percentage comparisons for RGL and DS clustered signed-rank test with exchangeable and ar1 intra-cluster correlation, nominal level $5\%$, $N = 40$ clusters, $1000$ simulations for each combination.}
+   \caption{
+     Empirical rejection percentage of the RGL method and the DS
+     method for signed-rank tests at nominal significance level 0.05.
+     The results are based on 1000 datasets with 20 clusters.}
 \begin{tabular}{rrrrrrrrrr}
   \toprule
   &&&& \multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.3$} & \multicolumn{2}{c}{$\delta = 0.6$} \\
@@ -1050,8 +1033,7 @@ for each design.
   &&   &       0.9 &  4.5 & 4.6 & 17.5 & 18.1 & 54.4 & 56.1 \\  
   &    & 10 &  0.1 &  6.2 & 5.9 & 62.9 & 60.3 & 99.6 & 99.4 \\  
   &&   &       0.5 &  5.8 & 5.8 & 36.1 & 36.5 & 90.1 & 90.7 \\  
-  &&   &       0.9 &  5.3 & 5.8 & 23.8 & 23.5 & 72.9 & 74.1 \\  
-                         
+  &&   &       0.9 &  5.3 & 5.8 & 23.8 & 23.5 & 72.9 & 74.1 \\                           
  ar1& 0 & 2 &  0.1 &  4.3 & 4.7 & 36.5 & 37.4 & 91.2 & 91.2 \\ 
   &&   &       0.5 &  3.6 & 4.1 & 28.5 & 29.0 & 79.0 & 80.0 \\ 
   &&   &       0.9 &  5.5 & 5.8 & 25.8 & 26.4 & 73.1 & 73.8 \\ 
@@ -1072,39 +1054,48 @@ for each design.
 \label{tab:sr}
 \end{table}
 
-Both methods maintain an empirical size close to the nominal size
-$0.05$. They also have comparable empirical power in almost all cases
-except the RGL method outperforms the DS method when there is
-variation within the cluster size, e.g., when we randomly introduce
-missingness in the data to construct unbalanced data.
-Again, the empirical size of the RGL method is robust to the AR1
-correlation. 
+For the signed-rank test, the \citet{Datt:Satt:sign:2008} did not have
+settings with completely random cluster size, and their non-exchangeable
+intracluster dependence is different from our AR1 setting.
+We considered similar settings to those for the rank-sum test.
+The differences to be tested were generated for 20~clusters.
+The intracluster correlation parameter was set to be 0.2, 0.5, and 0.8.
+The results are summarized in Table~\ref{tab:sr}.
 
-
+\red{discuss the results}
 
 \section{Discussion}
 \label{s:disc}
 
-For rank-sum test, ds method cannot be applied to collateral data due to the 
-violation of the assumption on which the asymptotic null distribution is
-derived. The rgl method works better when the intra-cluster correlation is 
-higher, the ds method works better when the intra-cluster correlation is lower. 
-DS method is more flexible with the cluster size, whereas the construction size
-are more suitable for the case where there are at least several clusters for each 
-cluster size. 
-DS rank-sum test is conservative when the number of clusters is small.
+Clustered data are frequently encountered in scientific research, and
+rank-based tests for clustered data are an indispensable tool like
+their counterparts, the Wilcoxon tests for for independent data. 
+Package \pkg{clusrank} provides two schools, the RGL method and the DS
+method, of the recently developed rank-sum tests and signed-rank tests
+in a unified, higher-level, user-friendly interface.
+Users need to be aware of the applicability of these tests when using them.
+For example, the RGL method assumes exchangeability within clusters
+and does not account for informative cluster sizes;
+the DS method cannot be applied to collateral data, i.e., each cluster
+in the data sets contains exactly the same subjects from each group.
 
 
-{\bf more than 2 groups for signed-rank test?}
+%% \red{Each statement like these should have references; we need to
+%% talk on these.}
+%% For rank-sum test, ds method cannot be applied to collateral data due to the  
+%% violation of the assumption on which the asymptotic null distribution is  
+%% derived. 
+%%  The rgl method works better when the intra-cluster correlation is 
+%% higher, the ds method works better when the intra-cluster correlation is lower. 
+%% DS method is more flexible with the cluster size, whereas the construction size
+%% are more suitable for the case where there are at least several clusters for each 
+%% cluster size. 
+%% DS rank-sum test is conservative when the number of clusters is small.
 
-What points can be discussed?
 
-Applicability of each method. {\bf discuss}
-
-{\bf Any future directions?}
-
-
-\red{discuss those methods and references that may be implemented 
+Some other rank-based tests can be incorporated in future developments.
+For example, 
+\red{list those methods and references that may be implemented 
   in the future.}
 
 \bibliography{clusrank}
