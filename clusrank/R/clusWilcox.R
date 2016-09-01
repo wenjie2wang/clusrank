@@ -4,84 +4,76 @@
 ##' on vectors of data.
 ##'
 ##' @param x A numeric vector of data values or a formula. Non-finite (e.g.,
-##'     infinite or missing) values will be omitted
-##' @param y An optional numeric vector of data values: as with
-##'     \code{x} non-finite values will be omitted
-##' @param cluster A optional numeric vector of cluster id. Does not
-##'     apply to the formula interface
-##' @param group A optional numeric vector of treatment id. Does not
-##'     apply to the formula interface
-##' @param stratum A opptional numeric vector of stratum id. Only
-##'     applies for the \code{"rgl"} method. Does not apply to the
-##'     formula interface.
+##'     infinite or missing) values will be omitted.
+##' @param y An optional numeric vector of data values, non-finite
+##'     values will be omitted. 
+##' @param cluster An optional numeric vector of cluster id. 
+##' @param group An optional numeric vector of treatment id. 
+##' @param stratum An opptional numeric vector of stratum id. Only
+##' available for \code{rgl} rank sum test when treatment is assigned at
+##'     cluster level.
 ##' @param method A character string specifying the method of
-##'     clustered wilcoxon rank test used, must be one of \code{"rgl"}
-##'     or \code{"ds"}
-##' @param paired A logical indicating whether you want a paired test
+##'     clustered wilcoxon rank test to be use, should be one of
+##'     \code{"rgl"} or \code{"ds"}.
+##' @param paired A logical indicating whether you want a paired test.
 ##' @param exact A logical indicating whether an exact p-value should
-##'     be computed. Not recommended currently.
+##'     be computed. Only available for \code{rgl} signed rank test
+##'     and \code{rgl} rank sum test when treatment is assigned at
+##'     cluster leve.
 ##' @param formula A formula of the form \code{lhs ~ rhs} where the
-##'     \code{lhs} is the observed values and
-##'     the \code{rhs} of the form group + \code{cluster}(x1) +
+##'     \code{lhs} is the measurements and
+##'     the \code{rhs} is of the form group + \code{cluster}(x1) +
 ##'     \code{stratum}(x2) for clustered rank sum test, where
 ##'     \code{x1} and \code{x2} are cluster id and stratum id in the
-##'     data.  For clustered signed rank test, only \code{cluster}(x1)
-##'     should appear on the right hand side.
-##' @param data An optional matrix or dataframe of data used in the
-##'     formula.
+##'     data frame \code{data}. For clustered signed rank test, the
+##'     \code{rhs} only contains \code{cluster}{x1}.
+##' @param data An optional dataframe containing the variables.
 ##' @param subset An optional vector specifying a subset of
 ##'     observations to be used.
 ##' @param na.action A function which indicates what should happen
-##'     when the data contain NAs. Defaults to getOption("na.action").
+##'     when the data contain NAs. Defaults to \code{getOption("na.action")}.
 ##' @param alternative A character string specifying the alternative
 ##'     hypothesis, must be one of \code{"two sided"} (default),
 ##'     \code{"greater"} or \code{"less"}. You can specify just the
-##'     initial letter
+##'     initial letter.
 ##' @param mu A number specifying an optional parameter used to form
-##'     the null hypothesis. See 'Details'
-##' @param ... Further arguments to be passed to or from methods
+##'     the null hypothesis. Default is 0. See 'Details'.
+##' @param ... Further arguments to be passed to or from methods.
 ##' @details The formula interface is to both clustered signed rank
 ##'     test and clustered rank sum test.
 ##'
-##' Given the cluster id, if both \code{x} and \code{y} are provided
-##' or only \code{x} is provided and \code{paired} is \code{TRUE}, a
-##' clustered Wilcoxon signed rank test of the null hypothesis that
-##' the distribution of \code{x - y} or of \code{x} is symmetric about
-##' \code{mu} is performed.
+##' 
+##' The default of \code{cluster} id is that there is one member in
+##'     each cluster. Both balanced data (identical cluster size) and
+##'     unbalanced data (different cluster sizes) are
+##'     supported in all tests provided in this package. For clustered
+##'     rank sum test, the data can either have treatment assigned at
+##'     cluster level or individual level.
+##' 
+##' If both \code{x} and \code{y} are given or only \code{x} is given
+##'     and \code{paired} is \code{TRUE}, a clustered Wilcoxon signed
+##'     rank test of the null that the distribution of \code{x - y}
+##'     (paired sample) or of \code{x} (one sample) is symmetric about
+##'     \code{mu} is performed.
 ##'
 ##' Otherwise, if only \code{x} is given and \code{paired} is
-##' \code{FALSE}, a Wilcoxon rank sum test is carried out. In this
-##' case, the \code{group} variable is required. If the \code{method}
-##' is \code{"rgl"} (default), the null hypothesis is that the
-##' distributions of values from the two groups differ by a location
-##' shift of \code{mu} and the alternative is that they differ by some
-##' other location shift. If the \code{method} is \code{"ds"}, when
-##' the \code{group} has 2 levels, the null and hypothesis are the
-##' same as for \code{"rgl"} test; when \code{group} has more than 2
-##' levels, the null hypothesis is that the locations
-##' are the same for data in all groups and the alternative is that
-##' they are not all the same.
+##' \code{FALSE}, a Wilcoxon rank sum test is performed. In this case,
+##' measurements from different treatment groups should be combined in
+##' \code{x} and the \code{group} variable is required.  When there
+##' are two treatment groups, the null is that the distributions of
+##' values from the two groups differ by a location shift of \code{mu}
+##' and the alternative is that they differ by some other location
+##' shift.  When there are \code{m} (>= 2) treatment groups, \code{ds}
+##' method can test if the location of the \code{m} groups are
+##' identical or not.
 ##'
+##' For RGL rank sum test when treatment is assigned at cluster level,
+##'     an extra stratification variable is allowed through \code{stratum}.
+##'
+##' The exact test is only available for RGL signed rank test and  RGL
+##'     rank sum test when treatment is assigned at cluster level.
 ##' 
-##' If \code{cluster} is not provided, the default is that there is no
-##' clutering in the data. Both \code{"rgl"} and \code{"ds"} method
-##' support balanced and unbalanced data (cluster size is identical or
-##' varied) and individual level and cluster level treatment assignment.
-##'
-##' If \code{method} is \code{"rgl"}, then a strafication variable,
-##' \code{stratum}, is allowed for the clustered Wilcoxon rank sum
-##' test.
-##'
-##' The exact test is still under development and is only available
-##' for ranksum test when treatment is assigned at cluster level and
-##' signed rank test for \code{rgl} method and can be applied when
-##' number of cluster is small (under 50). It will be slow if number
-##' of cluster is too large.
-##'
-##' There is also a formula interface for both tests. For details look
-##' at the examples.
-##' 
-##' @return A list with class \code{"ctest"}.
+##' @return A list with class \code{"htest"}.
 ##'
 ##' \item{Rstat}{The value of the rank statistic with a name discribing it}
 ##' \item{ERstat}{The expectation of the rank statistic}
