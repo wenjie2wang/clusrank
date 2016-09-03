@@ -73,20 +73,29 @@
 ##' The exact test is only available for RGL signed rank test and  RGL
 ##'     rank sum test when treatment is assigned at cluster level.
 ##' 
-##' @return A list with class \code{"htest"}.
+##' @return A list with class \code{"htest"} containing the following components, for different test the components may vary:
 ##'
-##' \item{Rstat}{The value of the rank statistic with a name discribing it}
-##' \item{ERstat}{The expectation of the rank statistic}
-##' \item{VRstat}{The variance of the rank statistic}
-##' \item{statistic}{The value of the test statistic}
-##' \item{p.value}{The p-value for the test}
-##' \item{null.value}{The location parameter \code{mu}}
-##' \item{method}{The type of test applied}
-##' \item{data.name}{A character string giving the names of the data}
-##' \item{balance}{A logical indicating whether the data are balanced}
-##' \item{n.group}{Number of treatment, is returned when there are more than 2 treatment groups}
-##' \item{df}{Degrees of freedom of chi-square distribution, is returned when there are more than 2 treatment groups}
+##' \item{Rstat}{the value of the rank statistic with a name describing it.}
+##' \item{ERstat}{the expectation of the rank statistic.}
+##' \item{VRstat}{the variance of the rank statistic.}
+##' \item{statistic}{the value of the test statistic with a name describing it.}
+##' \item{p.value}{the p-value for the test.}
+##' \item{alternative}{a character string describing the alternative hypothesis.}
+##' \item{null.value}{the location parameter 'mu'.}
+##' \item{method}{the type of test applied.}
+##' \item{data.name}{a character string giving the names of the data.}
+##' \item{balance}{a logical indicating whether the data set is balanced.}
+##' \item{n.group}{number of treatment, will be returned if there are more than 2 treatment groups and \code{ds} method is used.}
+##' \item{df}{degrees of freedom of chi-square distribution, will be returned when there are more than 2 treatment groups and \code{ds} method is used.}
+##' \item{n}{number of observations}
+##' \item{cn}{number of clusters}
 
+#' @section Warning:
+#' This function can use large amounts of memory and stack if 'exact =
+#'     TRUE' and one sample is large (and even crash R if the stack
+#'     limit is exceeded). Not recommended for data set 
+#'     with number of clusters more than 50.
+#' 
 #' @examples
 #' ## Clustered signed rank test using RGL method.
 #' data(crsd)
@@ -120,7 +129,6 @@
 #' Somath Datta, Glen A. Satten (2008) \emph{A Signed-Rank test for Clustered Data}.
 #' Biometric, \bold{64}, 501-507.
 #'
-#' @note Exact tests are not recommended in the current version of package.
 #' @importFrom  stats complete.cases na.omit terms complete.cases model.extract aggregate
 #' @importFrom stats lm ecdf pnorm qnorm var  pchisq setNames lag
 #' @importFrom MASS ginv
