@@ -64,16 +64,19 @@ For independent data, they are available in the built-in \pkg{stats}
 package of \proglang{R}.
 For clustered data, although there are some rank-based tests
 developed recently, there does not exist an \proglang{R} package
-with easy access to them at one place.  We present a package
-\pkg{clusrank} where the latest developments are implemented and
-wrapped under a unified user-friendly function.  Different methods
-are dispatched based on the input, offering great flexibility in
-handling various situations such as stratified data.  Permutation
-tests for small sample are provided for some methods.  Details of
-the major methods are briefly reviewed.  Usages of the main function
-are illustrated with simulated data.  The package also enables
-convenient comparison between selected methods under settings that
-have not been studied before and the results are discussed.
+with easy access.
+We present a package \pkg{clusrank} where the latest developments are
+implemented and wrapped under a unified user-friendly function.
+With different methods dispatched based on the input data, this
+package offers great flexibility in handling various situations such
+as stratified data.
+Exact tests based on permutations are also provided for some methods.
+Details of the major schools of different methods are briefly
+reviewed.
+Usages of main functions of the package \pkg{clusrank} are illustrated
+with simulated data.
+The package also enables convenient comparison between selected
+methods under settings that have not been studied before and the results are discussed.
 }
 
 
@@ -141,28 +144,28 @@ have not been studied before and the results are discussed.
 
 \section{Introduction}
 
-Wilcoxon rank-sum and signed-rank tests are important tools
-to detect the difference in locations of two independent or dependent
-groups, respectively.
+Wilcoxon rank-sum and signed-rank tests are important tools for
+two-group comparisons and paired comparisons, respectively.
 Unlike their counterparts under the normality assumption, they are
-distribution-free.
-Implementations of Wilcoxon rank-sum and signed-rank tests have
-been available in standard software packages, such as function
-\code{wilcox.test} in the built-in \proglang{R} package \pkg{stats},
-and \code{PROC NPAR1WAY} in \proglang{SAS}.
-Nonetheless, the existing implementations assume independent data,
-which cannot be applied to clustered data frequently arising in many fields.
-Clustered data consists of independent clusters of dependent
-measurements.
+based on ranks without the need of distributional assumptions.
+Implementations of Wilcoxon rank-sum and signed-rank tests for independent
+data have been widely available in standard software packages, such as
+function \code{wilcox.test} in the built-in \proglang{R} package
+\pkg{stats}, and \code{PROC NPAR1WAY} in \proglang{SAS}.
+These existing implementations for independent data, however,
+cannot be applied to clustered data which are frequently encountered
+in many fields.
+
+Clustered data consists of data obtained from correlated observations
+from sub-units or members in each cluster, where clusters may be
+independent but measures from members within each cluster are not.
 For example, in longitudinal studies or familial studies, measures
-from the same subject are not independent but correlated.
-The effective sample size of the clustered data will be different from
-the number of individual observations due to intracluster dependence,
-therefore the variance of the test statistics derived under the
-independence assumption are invalid.
+from observations of the same subject are not independent but correlated.
+The effective sample size for clustered data will be different from
+the number of  observations in clusters due to intracluster dependence.
 Often times, because of the positive intracluster dependence, the
-variances are underestimated, and as a consequence, the resulting
-p-values are greater than what they should be.
+variances of the test statistics are underestimated, and as a
+consequence, the resulting p-values are greater than what they should be.
 The popular generalized estimating equations (GEE) approach
 \citep{Lian:Zege:long:1986} provides a general regression
 modeling strategy that considers intracluster dependence,
@@ -172,78 +175,79 @@ monotonic transformations of the data.
 
 
 Several recent developments have extended the Wilcoxon rank-sum
-test to allow two sample comparison for clustered data.
+test to allow two-sample comparisons for clustered data.
 \citet{Rosn:Grov:use:1999} proposed a Mann--Whitney $U$-statistic for
 clustered data which corrects the variance of the test statistic for four
-types of intracluster correlation, but provided no large sample theory.
-\citet{Rosn:Glyn:Lee:inco:2003} proposed a test under the assumptions
-that all individuals from the same cluster belong to the same group,
-that cluster members are exchangeable, and that the intracluster
-dependence does not vary across groups.
-Their testing statistic is the same as the standard Wilcox rank-sum
-test after ranking all the observations, but the asymptotic mean and
-the variance under the null hypothesis are derived under the clustered
-setting that accommodates unequal cluster sizes and possible strata.
-The assumptions of \citet{Rosn:Glyn:Lee:inco:2003} were relaxed in
-the approach of \citet{Datt:Satt:rank:2005}, which is based on
-within-cluster resampling \citep{Hoff:Sen:Weib:with:2001} and
-remains valid when the cluster sizes are informative.
-\citet{Rosn:Glyn:Lee:exte:2006} extended their previous approach to
+types of intracluster correlation, but did not provide large sample theory.
+\citet{Rosn:Glyn:Lee:inco:2003} proposed an extended Wilcoxon rank-sum test under the assumptions that all sub-unit observations (or members) from the same cluster (i.e., subject) belong to the same treatment group,
+that observations within any cluster are exchangeable, and that the
+intracluster dependence does not vary across groups.
+With a test statistic in similar form as the standard Wilcoxon rank-sum
+test after ranking all the observations combined, they derived
+aymptotic mean and the variance under the clustered setting that
+accommodates unequal cluster sizes and possible strata.
+\citet{Rosn:Glyn:Lee:exte:2006} extended their (2003) approach to
 accommodate the situation where members of a single cluster may
-subject to different treatments, but the new test still assumes
-exchangeability among
-cluster members and identical intracluster dependence across groups.
+subject to different treatment groups, but still assumes
+exchangeability  with same intracluster dependence across groups.
+The assumptions of \citet{Rosn:Glyn:Lee:inco:2003} were relaxed in the
+approach of \citet{Datt:Satt:rank:2005}, which is based on
+within-cluster resampling \citep{Hoff:Sen:Weib:with:2001} and remains
+valid when the cluster sizes are informative.
 More recently, \citet{Dutt:Datt:rank:2016} extended the idea of
 within-cluster resampling to further accommodate the case where the
-number of subjects in a group within a cluster is informative.
+number of members in a group within a cluster is informative.
 
 
-For the one-sample or paired comparison problem,
-\citet{Rosn:Glyn:Lee:wilc:2006} extended the Wilcoxon signed-rank test
-to clustered data by adjusting the variance of the standard test
-statistic, assuming a common intercluster correlation across clusters.
+On the other hand, for the one-sample problems or paired comparison
+problems, \citet{Rosn:Glyn:Lee:wilc:2006} extended the Wilcoxon
+signed-rank test to clustered data by adjusting the variance of the
+standard test statistic, assuming a common intercluster correlation
+across clusters.
 The cluster sizes are allowed to vary, but the method does not
 consider the informative cluster sizes where the distribution of
 paired difference within a cluster depends on the cluster size.
 \citet{Datt:Satt:sign:2008} proposed a signed-rank test based on
-sampling within cluster that accounts for informative cluster sizes.
+sampling members within cluster that accounts for informative cluster sizes.
 
 
 Despite the popularity of clustered data arising from a wide range of
-applications such as biomedicine and social science,
+applications such as biomedical and social science studies,
 the extensions of Wilcoxon rank-sum and signed-rank tests reviewed
 above have not been implemented in \proglang{R} until very recently.
-Package \pkg{clusrank} made first CRAN appearance in December, 2015.
-The package provides these recently available rank-sum tests
+The package \pkg{clusrank} we developed made first CRAN appearance in December, 2015.
+The package provides easy computations and comparisons of these recently available rank-sum tests
 \citep{Rosn:Glyn:Lee:inco:2003, Datt:Satt:rank:2005,
   Rosn:Glyn:Lee:exte:2006} and signed-rank tests
 \citep{Rosn:Glyn:Lee:wilc:2006, Datt:Satt:sign:2008} for clustered data.
 The methods are grouped into two categories by their authors: RGL for
 those by Rosner, Glynn, and Lee; and DS for those by Datta and Satten.
-Before package \pkg{clusrank} appeared, the RGL methods were
+Note that the RGL methods were
 available in \proglang{SAS} codes from Dr. Rosner's website
-(\url{https://sites.google.com/a/channing.harvard.edu/bernardrosner/channing/});
+(\url{https://sites.google.com/a/channing.harvard.edu/bernardrosner/channing/}).
 \proglang{R} codes for the DL methods were available from Dr. Datta's website
 (\url{http://www.somnathdatta.org/software/}), which was recently
 put into \proglang{R} package \pkg{ClusterRankTest}
 \citep{Dutt:Datt:clus:2016} in April, 2016.
-Modeled after the familiar function \code{wilcox.test}, package \pkg{clusrank}
-unifies both RGL and DS methods under a user-friendly
-interface that accommodates the specifications from these methods.
-Our package makes it very easy to compare the performances of
-different approaches under various settings; see Section~\ref{s:simu}.
+Modeled after the familiar function \code{wilcox.test} in
+the \proglang{R} built-in package \pkg{stats}, the package
+\pkg{clusrank} we developed unifies unifies both RGL and DS methods
+under a user-friendly interface that accommodates the specifications from these methods.
+The \pkg{clusrank} package makes it very easy for users to compare the
+performances of different approaches under various settings; see
+Section~\ref{s:simu}.
 
 
 The rest of the article is organized as follows.
 The recently available Wilcoxon rank-sum tests and signed-rank tests
-for clustered data are briefly reviewed in Section~\ref{s:ranksum} and
-Section~\ref{s:signedrank},  respectively.
+for clustered data are briefly reviewed in Sections~\ref{s:ranksum} and
+~\ref{s:signedrank},  respectively.
 The usage of the unified user-level function and major input arguments
 are described in Section~\ref{s:usage}, and illustrations of how to
 access the implemented methods are presented in Section~\ref{s:illus}.
 In Section~\ref{s:simu}, comparisons of selected methods that have not
 been studied previously are reported, which
-are made very easy by the package and a few lines of code.
+are made very easy by the package using only a few lines of codes.
 A discussion concludes in Section~\ref{s:disc}.
 
 
@@ -251,7 +255,7 @@ A discussion concludes in Section~\ref{s:disc}.
 \label{s:ranksum}
 
 The Wilcoxon rank-sum test is used for two-sample comparison.
-Let $X_{ij}$ be the $i$th observation in the $j$th cluster,
+Let $X_{ij}$ be the $j$th observation in the $i$th cluster,
 $1 \leq i \le N$, $1 \le j \leq n_i$,
 where $n_i$ is the size of cluster $i$.
 Let $\delta_{ij}$ be the group indicator of $X_{ij}$;
@@ -263,15 +267,16 @@ $(\mathbf{X}, \boldsymbol{\delta}) =
 \{X_{ij}, \delta_{ij}: 1 \le j \le n_i; 1 \le i \le N\}$.
 Clusters are assumed to be independent, while
 individual observations within each cluster are not.
-The null hypothesis $H_0$ to be tested is that
+The null hypothesis $H_0$ to be tested is that there is no difference
+of the measures of location of the two groups, i.e.,
 the distribution of $X_{ij}$ remains the same regardless
 of the group indicator $\delta_{ij}$.
 
 
-\subsection{RGL method: cluster-level grouping}
+\subsection{Rosner, Glynn, and Lee (RGL) method with grouping at the cluster-level}
 The RGL Wilcoxon rank-sum test was designed for the scenario where the
-group is assigned at the cluster level:
-$\delta_{ij} = \delta_i$ for all $1 \le j \le n_i$.
+treatment group is assigned at the cluster level:
+i.e., $\delta_{ij} = \delta_i$ for all $1 \le j \le n_i$.
 Define $R_{i+} =\sum_{j=1}^{n_i}R_{ij}$, the sum of observed ranks of
 the individuals in the $i$th cluster.
 The Wilcoxon rank-sum statistic is
@@ -283,8 +288,8 @@ W = \sum_{i = 1}^N \delta_{i}R_{i+}.
 
 The rationale of the RGL test procedure is random permutation
 conditioning on the observed $R_{i+}$, $i = 1, \ldots, N$.
-Like all permutation methods, the RGL method assumes that the
-individuals within each cluster are exchangeable and that the
+Like all permutation-based approaches, the RGL method assumes that
+individual observations within each cluster are exchangeable and that the
 intracluster dependence remains the same across groups.
 To derive the sampling distribution of $W$ given $R_{i+}$'s,
 \citet{Rosn:Glyn:Lee:inco:2003} stratified on the cluster sizes and
@@ -329,19 +334,20 @@ mild conditions.
 The method can be extended to the case of stratified data.
 
 
-Since the RGL method compares groups at each cluster size, the
+RGL (2003) compares groups at each cluster size, the
 imbalance of sample sizes between two groups across cluster size
 strata may result in inefficiency \citep[p.911]{Datt:Satt:rank:2005}.
-If only one group shows up at a cluster size, this part of the data
+If only one group shows up at a cluster size, the corresponding data
 will be ignored.
 Further, the rank-sum statistic scores clusters by the sum of ranks of
 cluster members, which is expected to perform best if intracluster
-dependence is weak; otherwise, since the effective number of
+dependence is weak; otherwise, when the effective number of
 independent observations per cluster becomes smaller, it overweights
 larger clusters, and, hence, may have lower efficiency.
 
 
-\subsection{DS method: individual-level grouping}
+\subsection{Datta and Satten (DS) method with grouping at individual
+  cluster member-level}
 
 Unlike the RGL method, the DS method allows individual observations
 within the same cluster to have different group memberships.
@@ -350,7 +356,7 @@ of \citet{Hoff:Sen:Weib:with:2001}.
 The test statistic is constructed from randomly picking one observation
 from each cluster to form a pseudo-sample and averaging the standard
 Wilcoxon rank-sum statistic over all possible pseudo-samples.
-Let $X_i^*$ be a random pick from the $i$th cluster in a
+Let $X_i^*$ be a random pick from the $i$th cluster in the
 pseudo-sample, and $\delta_i^*$ be its group membership.
 The Wilcoxon rank-sum statistic for the pseudo-sample is
 \begin{equation*}
@@ -377,7 +383,7 @@ The expectation turns out to be
 \[
 \E(S) = \E(W^*) = \frac{1}{2}\sum_{i=1}^N \frac{n_i} {N}.
 \]
-The variance term $\VAR(S)$ is estimated by
+The variance term $\VAR(S)$ can be estimated by
 $\widehat\VAR(S) = \sum_{i=1}^N\big\{ \hat W_i - \E(W_i)\big\}^2,$
 where
 \[
@@ -401,7 +407,7 @@ from a quadratic form of group-wise rank-sum vector.
 This method allows arbitrary intracluster dependence structure (not
 necessarily exchangeable as assumed in the RGL method) within each
 cluster and remains valid when treatment affects the correlation structure.
-The construction of the test statistic allows no room for
+As shown in the construction of the test statistic, there is no room for
 randomization test since $S$ is a conditional expectation given observed data.
 In addition, it cannot be applied to data which are strictly
 contralateral (e.g., when each subject in an eye study have exactly
@@ -412,9 +418,10 @@ requirements of the asymptotic theory.
 \subsection{RGL method: individual-level grouping}
 
 \citet{Rosn:Glyn:Lee:exte:2006} extended the RGL method to allow
-individual-level grouping; i.e., $\delta_{ij}$, $j = 1, \ldots, n_i$,
-can take different values for the same $i$.
-The idea of the method is best explained with balanced data,
+individual cluster-member-level grouping; i.e., for each cluster $i$,
+treatment group indicator $\delta_{ij}$ may take different values for
+$j = 1, \ldots, n_i$.
+The idea of this method can be easily explained with balanced data,
 where all cluster sizes are all the same; i.e., $n_i = g$ for all $i$.
 The rank-sum statistic is
 \begin{equation*}
@@ -433,7 +440,7 @@ The two-stage randomization process can be used to devise a random
 permutation test to exhaust all possibilities for small $N$ and $g$.
 
 
-It was shown that
+It can be shown that
 \[
 \E(W_{g,N}) = \frac{gN + 1}{2} \sum_{q=0}^g q N_q,
 \]
@@ -484,7 +491,7 @@ Let $X_{ij}$ be the paired-difference score for the $j$th pair in the
 $i$th cluster,  $i = 1, \ldots, N$, $j = 1, \ldots, n_i$.
 The null hypothesis $H_0$ is that the marginal
 distribution of $X_{ij}$ is symmetric around $0$.
-Note that, unlike for the rank-sum test, there is no issue on the group
+Note that, unlike the rank-sum test, there is no issue on the group
 membership of each observation in the paired comparison setting.
 Let $R_{ij}$ be the rank of $|X_{ij}|$ among
 $\{|X_{ij}|, i = 1, \ldots, N, j = 1 \ldots, n_i\}$.
@@ -546,7 +553,7 @@ within-cluster resampling as in \citet{Datt:Satt:rank:2005} in the
 context of clustered paired data to develop a signed-rank test.
 This method allows informative cluster sizes as long as the marginal
 distributions of $X_{ij}$'s are identical for all $i$ and $j$.
-Suppose that from each cluster, one paired difference $X_{ij}$, denoted by
+Suppose that from the $i$th cluster, paired difference $X_{ij}$, denoted by
 $X_i^*$, is randomly picked and pooled to form a pseudo-sample.
 Let $R_i^*$ be the mid-rank of $|X_i^*|$, $i = 1, \ldots, N$ to allow
 ties in the data, and let $V_i^* = \mathrm{sign}(X_i^*)$.
@@ -582,11 +589,11 @@ $Z = T / \sqrt{\widehat\VAR(T)}$ converges to a standard normal
 distribution under mild conditions.
 
 
-Note that as long as members from the same cluster have identical
-distribution, DS method does not require the distribution of members from
-clusters with different size to be identical, while this is
-usually an traditional assumption made by most signed-rank tests for
-clustered data in literature.
+Note that as long as members from the same cluster have an identical
+distribution, the DS method does not require the distribution of
+members from clusters with different sizes to be identical, while this is
+usually a common assumption made by most signed-rank tests for
+clustered data in the literature.
 
 
 \section{Usage}
@@ -607,7 +614,7 @@ args(clusWilcox.test)
 @
 Argument \code{x} can be either a numeric vector or a formula.
 The default interface is called if \code{x} is a numeric vector, in
-which case the interface is designed to mimic that of
+which case the interface is designed to mimic that of the function
 \code{wilcox.test}:
 <<args-cd, echo=TRUE>>=
 args(clusrank:::clusWilcox.test.default)
@@ -631,33 +638,33 @@ grouping and the RGL clustered signed-rank test; otherwise
 statistic is based on conditional expectations of cluster rank
 selected with a within-cluster sampling scheme, there is no room for
 an exact test. The exact test is also unavailable for RGL clustered
-rank-sum test when the treatment is assigned individual level due to
-computational complication.  Note that an exact test is very computing
-intensive, so it is recommended to be used only with small sample.
+rank-sum test when the treatment group is assigned at individual cluster member level due to
+computational complication.  Note that an exact test is very computationally
+intensive, so it is recommended to be used only with small samples.
 
 
 
-The function specifies the cluster by a \code{cluster} variable
+The main function specifies the cluster by a \code{cluster} variable
 indicating which cluster each observations belongs to.
-Additionally, if the data is stratified, a numeric vector
+Additionally, if the dataset is stratified, a numeric vector
 \code{strata} can be provided to indicate stratum membership of each
 observation.
 Other arguments specific for clustered data include
-\code{cluster} which should be a numeric vector contain the cluster
+\code{cluster} which should be a numeric vector containing the cluster
 id. For clustered rank-sum test, the argument \code{group} should be a
-numeric vector contain the treatment group id for each observation. In
+numeric vector containing the treatment group id for each observation. In
 addition, for clustered rank-sum test using RGL method for data with
-treatment group assigned at clustered level, an extra variable
+treatment group assigned at the cluster level, an extra variable
 \code{stratum} is allowed to take the effect of stratification into
 account and therefore provide a more powerful test.
 For clustered rank-sum test, the data frame \code{data} should
 contain at least $3$ variables: the observed score, \code{x},
-the cluster id, \code{cluster} and the treatment group,
-\code{group}. For both test, two methods, RGL and DS, are available by
-switching \code{method} to \code{rgl} or \code{ds}.
+the cluster id, \code{cluster} and the treatment assignment,
+\code{group}. For both tests, the two methods, RGL and DS, are available by
+specifying \code{method} as \code{rgl} or \code{ds}.
 
 
-<<formula, echo=FALSE>>=
+<<formula, echo = TRUE>>=
 args(clusrank:::clusWilcox.test.formula)
 @
 
@@ -667,17 +674,17 @@ The formula interface mimics that of the \code{wilcox.test} from the
 and \code{na.action} have the same usage. As for the \code{formula},
 when a rank-sum test is being performed,
 the left hand side should be the variable of data values and the right
-hand side should contain the variables indicating the group, cluster
+hand side should contain the variables indicating group, cluster
 and stratum membership. Except for the group variable, other variables
-on the left need to be indicated with special terms respectively,
+on the right need to be indicated with special terms,
 e.g., \code{z ~ group + cluster(cid) + stratum(sid)}, where
 \code{group} identifies the grouping variable, \code{cid} identifies
 the clusters, and \code{sid} identifies the stratum.  See
 Section~\ref{s:illus} for detailed illustrations.
 For clustered signed-rank test, the left hand side of the formula is
 the observed paired difference and the right hand side comprises the
-cluster id. Neither \code{group} id or \code{stratum} id is applicable for signed-rank test.
-The other arguments are identical to those in the default interface.
+cluster id. Neither \code{group} or \code{stratum} is applicable for signed-rank tests.
+Other arguments are identical to those in the default interface.
 
 
 \section{Illustrations}
@@ -685,9 +692,9 @@ The other arguments are identical to those in the default interface.
 
 \subsection{Rank-sum test}
 
-We use a scheme similar to the simulation study in
+We use a scheme that is similar to the simulation study in
 \citet{Datt:Satt:rank:2005} to generate data for clustered
-rank-sum test, both balanced data and unbalanced data.
+rank-sum test with both balanced and unbalanced data.
 For group $g \in \{0, 1\}$, the observations in a cluster
 is generated as
 \[
@@ -697,7 +704,7 @@ where $Z_g$ is a standard multivariate normal random vector with mean zero
 and an exchangeable or a autoregressive with order 1 (AR1) correlation matrix
 with correlation parameter $\rho_g$, and $\delta$ is the group difference.
 Correlation matrix of dimension \code{dim} with correlation parameter
-\code{rho} can be generated as follows, \code{ex} for exchangeable
+\code{rho} can be generated as follows, with \code{ex} for exchangeable
 and \code{ar1} for AR1.
 <<corstr>>=
 ex  <- function(dim, rho) {
@@ -709,7 +716,7 @@ ar1 <- function(dim, rho) {
 @
 
 
-Here is a simple implementation that allows different levels of grouping
+Below is a simple implementation that allows different levels of grouping
 (cluster-level and individual-level) and unequal cluster sizes.
 Package \pkg{mvtnorm} \citep{Genz:etal:mvtn:2016, Genz:Bret:comp:2009}
 is used to generate multivariate normal random vectors.
@@ -731,9 +738,9 @@ datgen.sum <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1),
     if (misrate == 0.) dat else dat[-drop, ]
 }
 @
-There are two required inputs: \code{nclus} for number of clusters
+There are two required inputs: \code{nclus} for the number of clusters
 in each group and \code{maxclsize} for the maximum cluster size.
-The difference between the groups is specified by \code{delta}.
+The difference between groups is specified by \code{delta}.
 The group specific intra-cluster correlation parameter $\rho_g$ is set
 by \code{rho}, a numeric vector of length 2, one for each group.
 The \code{corr} argument specifies the function to construct correlation
@@ -757,7 +764,7 @@ set.seed(1234)
 To illustrate the clustered rank-sum test, a data set with $10$
 clusters of size $3$ in each group is generated with $\delta = 0$,
 exchangeable correlation structure, $\rho_0 = \rho_1 = 0.9$,
-and cluster-level treatment assignment
+and cluster-level treatment assignment.
 <<dat-clus>>=
 dat.cl <- datgen.sum(10, 3, 0, c(.9, .9), ex, 0, TRUE)
 head(dat.cl)
@@ -768,7 +775,7 @@ We first use the formula interface to perform the RGL asymptotic test:
 <<clus-rs-rgl-asymp>>=
 clusWilcox.test(x ~ grp + cluster(cid), dat.cl, method = "rgl")
 @
-Setting \code{method = "ds"} would preform the DS test.
+Setting \code{method = "ds"} would perform the DS test.
 The exact test of the RGL method can be done for data with a
 small number of clusters when treatment is assigned at cluster level:
 <<clus-rs-rgl-exact>>=
@@ -787,7 +794,7 @@ Note that, when using the code provided online by the authors
 of \citet{Rosn:Glyn:Lee:inco:2003} and \citet{Datt:Satt:rank:2005},
 statistics with different signs may occur.
 This is a result of using the opposite group to calculating the statistic.
-To get the matching results, one just needs to switch the group numbers.
+To get the matching results, one just needs to switch the group ids.
 
 
 For data with cluster-level groups, the RGL method allows an extra
@@ -858,8 +865,8 @@ clusWilcox.test(x ~ cluster(cid),  dat.sgn, paired = TRUE, method = "ds")
 \section{A Simulation Study}
 \label{s:simu}
 
-Comparisons of the RGL method and the DS method under
-certain scenarios have not been studied in the recent literature.
+Comparisons of the RGL and DS methods under some common
+ scenarios have not been studied in the recent literature.
 Such comparison can be easily done with package \pkg{clusrank}.
 Using the two data generation functions defined above, we conduct a
 simulation study comparing their sizes and powers in a few settings.
@@ -892,12 +899,11 @@ Other arguments have the same meanings as those in \code{datgen.sum}
 or \code{datgen.sgn} depending on the value of \code{paired}.
 The last argument \code{...} is used to supply \code{clusgrp}, which
 is only needed by \code{datgen.sum} for the level of groups.
-The function returns the empirical rejection rates of the RGL method
-and the DS method for the setting defined by the inputs.
+The function returns the empirical rejection rates of the RGL
+and DS methods for the setting defined by the inputs.
 
 
-As an example, consider the rank-sum tests in a setting with cluster
-level grouping, each group containing 20~clusters of size~3, with
+As an example, consider the rank-sum tests in a setting with cluster-level grouping, each group containing 20~clusters of size~3, with
 exchangeable correlation parameter $\rho = 0.5$ in both groups.
 The group difference is set to be $\delta = 0$.
 We do this experiment with 1000 replicates with significance level 0.05:
@@ -913,7 +919,7 @@ This time we use an AR1 correlation setting with $\rho = 0.5$.
 simpower(1000, 0.05, TRUE,  20, 3, 0.0, 0.5, ar1, 0.)
 @
 Again, both methods have empirical sizes close to the nominal level.
-This means that the RGL method is robust to the violation of the
+It means that the RGL method is robust to the violation of the
 exchangeability assumption in this setting.
 
 
@@ -922,8 +928,8 @@ exchangeability assumption in this setting.
 
 \begin{table}[tbp]
 \centering
-\caption{Empirical rejection percentage of the RGL method and the DS
-  method for rank-sum tests at nominal significance level 0.05.
+\caption{Empirical rejection percentage of the RGL and the DS
+  methods for rank-sum tests at nominal significance level 0.05.
   The results are based on 1000 datasets with 20 clusters in each group.
 }
 \begin{tabular}{ccccc rr rr rr}
@@ -975,7 +981,7 @@ cluster & ex  & 0 & 2 & 0.1, 0.1 & 4.3 & 4.7 & 17.5 & 17.9 & 64.3 & 65.3 \\
 \end{table}
 
 
-Comparison between the RGL method and the DS method for the rank-sum test
+Comparison between the RGL and DS methods for the rank-sum tests
 has not been done when treatment group is assigned at the individual level.
 Nor has it when the intracluster dependence is not exchangeable.
 Consider two groups of 20~clusters each, with either exchangeable or AR1
@@ -986,12 +992,12 @@ The maximum cluster size $G = \max_i n_i$ has three levels: 2, 5, and 10.
 The \code{simpower} function makes the comparison very easy, and the
 \code{misrate} argument allows cluster sizes to be random, which is
 an additional scenario of interest that has not been compared before.
-Two missing rates, $0$ and $0.5$ were considered, representing
-balanced data and unbalanced data with missing completely at random.
+Two missing rates, $0$ and $0.5$, were considered, representing
+balanced data and unbalanced data with missing completely at random, respectivly.
 This is different from the informative cluster size setting studied
 in \citet{Datt:Satt:rank:2005}, where cluster size depends on group.
 The group difference $\delta$ takes value $0$, $0.2$ and $0.5$.
-For each setting, empirical rejection was obtained from 1000 replicates.
+For each setting, empirical rejection rates was obtained from 1000 replicates.
 
 
 Selected results are summarized in Table~\ref{tab:rs}.
@@ -1015,7 +1021,7 @@ power with fixed cluster size, though the differences are not big.
 
 \subsection{Signed-rank tests}
 
-For the signed-rank test, the \citet{Datt:Satt:sign:2008} did not have
+For the signed-rank test, \citet{Datt:Satt:sign:2008} did not have
 settings with completely random cluster size, and their non-exchangeable
 intracluster dependence is different from our AR1 setting.
 We considered similar settings to those for the rank-sum test.
@@ -1026,8 +1032,8 @@ The intracluster correlation parameter was set to be 0.1, 0.5, and 0.9.
 \begin{table}[tbp]
   \centering
    \caption{
-     Empirical rejection percentage of the RGL method and the DS
-     method for signed-rank tests at nominal significance level 0.05.
+     Empirical rejection percentage of the RGL and DS
+     methods for signed-rank tests at nominal significance level 0.05.
      The results are based on 1000 datasets with 20 clusters.}
 \begin{tabular}{cccc  rr rr rr}
   \toprule
@@ -1070,7 +1076,7 @@ Results from selected scenarios are summarized in Table~\ref{tab:sr}.
 In all settings in this study, the empirical sizes of both methods are
 close to the nominal level, including the case of AR1 correlation setting
 where the exchangeability assumption for the RGL method is violated.
-The empirical power of both tests increases as cluster size increase,
+The empirical power of both tests increases as cluster size increases,
 and as the intracluster dependence decreases.
 Completely random cluster size reduces the powers in comparison to
 the cases where the cluster sizes are fixed at their means.
@@ -1091,18 +1097,18 @@ Users need to be aware of the applicability of these tests when using them.
 For example, the RGL method assumes exchangeability within clusters
 and does not account for informative cluster sizes;
 the DS method cannot be applied to contralateral designs with exactly one
-individual in each group within a cluster \citep{Rosn:Glyn:Lee:exte:2006};
+individual in each group within a cluster;
 both asymptotic tests need the number of clusters to not be too small.
 
 
 Implementation of other rank-based methods for clusterd data can be
 considered in future development of package \pkg{clusrank}.
-For rank-sum test, the case of informative group size within a cluster
+For the rank-sum test, the case of informative group size within a cluster
 \citep{Dutt:Datt:rank:2016} would be a useful addition, though it is
 available in package \pkg{ClusterRankTest} \citep{Dutt:Datt:clus:2016}.
 For the signed-rank test,  \citet{Laro:wilc:2005} has a variance estimator
 based on certain sums of squares over independent clusters.
-Sign test and signed-rank tests for multivariate clustered data
+Sign tests and signed-rank tests for multivariate clustered data
 \citep{Laro:affi:2003, Laro:Neva:Oja:weig:2007, Haat:etal:weig:2009} and
 multilevel data \citep{Laro:Neva:Oja:one:2008} have been studied.
 Some tests allow the distributions in two groups to have different scales
