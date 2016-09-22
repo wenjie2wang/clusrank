@@ -58,22 +58,22 @@ Yujing Jiang\\ University of Connecticut \And
 
 
 \Abstract{
-  Nonparametric tests based on rank are popular alternatives to
-  two-sample and paired $t$-tests.
-For independent data, they are available in
-the built-in \pkg{stats} package of \proglang{R}.
-For clustered data, several rank-based tests that consider
-intracluster dependence have been recently developed, but no existing
-\proglang{R} package provides easy access to them at one place.
-We present a package \pkg{clusrank} where the latest developments
-are implemented and wrapped under a unified user-friendly function.
-Different methods are dispatched based on the input, offering great
-flexibility in handling various situations such as stratified data.
-Permutation tests for small sample are provided for some methods.
-Details of the major methods are briefly reviewed.
-Usages of the main function are illustrated with simulated data.
-The package also enables convenient comparison between selected methods
-under settings that have not been studied before and the results are discussed.
+Rank-based tests are distribution-free alternatives to the
+popular two-sample and paired t-tests.
+For independent data, they are available in the built-in \pkg{stats}
+package of \proglang{R}.
+For clustered data, although there are some rank-based tests
+developed recently, there does not exist an \proglang{R} package
+with easy access to them at one place.  We present a package
+\pkg{clusrank} where the latest developments are implemented and
+wrapped under a unified user-friendly function.  Different methods
+are dispatched based on the input, offering great flexibility in
+handling various situations such as stratified data.  Permutation
+tests for small sample are provided for some methods.  Details of
+the major methods are briefly reviewed.  Usages of the main function
+are illustrated with simulated data.  The package also enables
+convenient comparison between selected methods under settings that
+have not been studied before and the results are discussed.
 }
 
 
