@@ -1119,6 +1119,10 @@ When covariates are available, rank regression for clustered data
   Fu:Wang:Bai:rank:2010} would be the next step.
 
 
+\section{Acknowledgement}
+
+We thank the Seddon Lab for the use of data for illustration. Rosner and Lee were support in part by grant NIH R01EY022445 from the National Eye Institute.
+
 \bibliography{clusrank}
 
 \end{document}

@@ -9,10 +9,10 @@ clusWilcox.test.ranksum.rgl <- function(x, cluster, group, stratum,
     temp <- temp[order(temp$Freq), ]
     temp <- split(temp$group, temp$Freq)
     check <- lapply(temp, function(x) length(unique(x)))
-### check with each stratum in which clusters have the same cluster size 
+### check with each stratum in which clusters have the same cluster size
 ### to see if they only are only assigned a single treatment.
     if (all(unlist(check) == 1))
-        warning("The two groups should contain clusters with the same size for at leaset one cluster size")  
+        warning("The two groups should contain clusters with the same size for at leaset one cluster size")
     arglist <- setNames(list(x, cluster, group, stratum, alternative,
                              mu, DNAME, METHOD, exact),
                         c("x", "cluster", "group", "stratum",
@@ -42,12 +42,12 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
     clus <- unique(cluster)
     dat <- data.frame(clus, strt, grp, csize, rksum)
     bal <- (!(length(unique(table(cluster))) != 1L))
-    
+
     csize.uniq <- unique(csize)
     strt.uniq <- unique(strt)
     l.csu <- length(csize.uniq)
     l.stu <- length(strt.uniq)
-    
+
     dat.l <- split(dat, strt) ## Split the rank data by stratumum
     csize.split <- function(dat) {
         split(dat, dat$"csize")
@@ -59,7 +59,7 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
     if (exact == TRUE) {
         METHOD <- paste0(METHOD, " (exact)")
         if(length(table(cluster)) > 40)
-            print("Number of clusters exceeds 40 for RGL clustered rank exact test") 
+            print("Number of clusters exceeds 40 for RGL clustered rank exact test")
         W <- sum(dat[dat$grp == 1, "rksum"])
         n.layer <- l.csu * l.stu
         mgv <- ngv <- rep(0, n.layer)
@@ -85,22 +85,22 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
         rkx <- as.matrix(rkx[rkxi, ])
         rkxc <- as.matrix(rkxc[rkxi, ])
         p.val.l <- pcrksum_str(W, rkx, rkxc, mgv, ngv, rep(nrow(rkx), n.layer))
-        
+
         pval<- switch(alternative,
                       less = p.val.l,
                       greater = 1 - p.val.l,
                       two.sided = 2 * min(p.val.l, 1 - p.val.l))
         names(mu) <- "location"
-        
+
         names(W) <- "W"
-        
+
         result <- list(statistic = W, p.value = pval,
                        null.value = mu, alternative = alternative,
                        data.name = DNAME, method = METHOD,
                        balance = bal, exact = exact)
         class(result) <- "htest"
-        return(result)                
-        
+        return(result)
+
     } else {
         mgv <- ngv <- Ngv <- Rsumgv <- VRgv <- numeric(l.csu * l.stu)
         ## mgv: number of clusters under trt X with csize g in stratumum v
@@ -125,7 +125,7 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
             VRgv.temp <- 0
             if (length(temp.clus) > 1) {
                 VRgv.temp <- var(temp.rksum) * (length(temp.clus) - 1)
-            } 
+            }
             summary.mat[which(Csize == i & Str == j), "VRgv"] <- VRgv.temp
         }
     }
@@ -136,7 +136,7 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
         ngv <- summary.mat[, "ngv"]
         VRgv <- summary.mat[, "VRgv"]
         Rsumgv <- summary.mat[, "Rsumgv"]
-        EW <- sum(mgv * Rsumgv / Ngv)
+        EW <- sum((mgv * Rsumgv / Ngv)[Ngv > 0])
         VarW <- sum((mgv * ngv / (Ngv * (Ngv - 1)) * VRgv)[VRgv > 0])
         Z <- (W - EW) / sqrt(VarW)
 
@@ -144,7 +144,7 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
                        greater = pnorm(abs(Z), lower.tail = FALSE),
                        two.sided = 2 * min(pnorm(abs(Z)),
                                            pnorm(abs(Z), lower.tail = FALSE)))
-        
+
         names(W) <- "W"
         names(EW) <- "Expected value of W"
         names(VarW) <- "Variance of W"
@@ -161,7 +161,7 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
         class(result) <- "htest"
         return(result)
     }
-    
+
 }
 
 
@@ -171,6 +171,7 @@ clusWilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
 ### The input data should be already arranged
     bal <- (length(table(table(cluster))) == 1) # check balance of data.
     clus <- unique(cluster)
+    if (is.numeric(clus)) clus <- sort(clus)
     cluster <- recoderFunc(cluster, clus, c(1 : length(clus)))
     n.clus <- length(clus)
     n.obs <- length(x)
@@ -182,14 +183,14 @@ clusWilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
     cluster <- cluster[temp]
     group <- group[temp]
 
-    
+
     if (bal == TRUE) {
         xrank <- rank(x)
         rksum <- stats::aggregate(xrank ~ cluster, FUN = sum)[, 2]
         csize <- (table(cluster))
         count.grp <- function(x) length(x[ x==1])
         q <-stats::aggregate(group ~ cluster, FUN = count.grp)[, 2] # obs under trt x in each cluster
-        
+
         ones <- rep(1, n.clus)
         nq.mat <- stats::aggregate(ones ~ q, FUN = sum)
         vrk <- stats::aggregate(xrank ~ cluster, FUN = var)[, 2]
@@ -265,7 +266,7 @@ clusWilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
             dat[, "group"]
         }
         grp.l <- lapply(dat.l, getGrp)
-        
+
         ## theta: estimated prob of an obs under trt1 has a larger rank than an obs from trt 2
         ## deno: the denominator used in the estimation of intercluster correlation
         theta <- deno <- numeric(n.csize)
@@ -327,7 +328,7 @@ clusWilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
 
         VarQ <- lapply(dat.l, getVarQ)
         VarQ <- unlist(VarQ)
-        
+
         VarTheta <- N.clus * (N.clus / (N.clus - 1) * as.numeric(N.clus > 1) *
                               VarQ * ssb / csize.grp ^ 2 + EQgQ * ssw / csize.grp) /
             (Qplus * (csize.grp * N.clus - Qplus)) ^ 2
@@ -347,7 +348,7 @@ clusWilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
                                            pnorm(abs(Z), lower.tail = FALSE)))
 
         names(Z) <- "Z"
-        
+
         names(mu) <- "difference in locations"
         result <- list(statistic = Z, p.value = pval,
                        alternative = alternative, null.value = mu,
@@ -368,9 +369,9 @@ clusWilcox.test.ranksum.ds <- function(x, cluster, group,
     if (group.uniq == 1) {
         stop("invalid group variable, should contain at least 2 groups")
     }
-    
+
     n.obs <- length(x)
-    
+
     Fhat <- numeric(n.obs)
     order.c <- order(cluster)
     cluster <- cluster[order.c]
@@ -379,20 +380,20 @@ clusWilcox.test.ranksum.ds <- function(x, cluster, group,
     cluster.uniq <- unique(cluster)
     M <- length(cluster.uniq)
     cluster <- recoderFunc(cluster, cluster.uniq, c(1 : M))
-   
+
 
     ni <- table(cluster)
-    
+
     temp <- unique(sort(abs(x)))
     diff.min <- min(diff(temp)) / 10 # A quntity 1 / 10 of the minimum difference between scores
-    
+
     FHat <- ecdf(x)
     Fhat <- FHat(x) / 2 + FHat(x - diff.min) / 2
-     
-    
+
+
     F.prop <- Fprop(x, cluster, ni, M, n.obs)
     F.prop2 <- F.prop
-    
+
     if (group.uniq == 2) {
 ###calculate quantity 2 (using the pooled estimate of F)
         group <- recoderFunc(group, order(unique(group)), c(1, 0))
@@ -405,12 +406,12 @@ clusWilcox.test.ranksum.ds <- function(x, cluster, group,
         Ni <- rep.int(ni, times = ni)
         S <- sum(group / Ni * (1 + F.prop))
         S <- S / (M + 1)
-        
+
         ## Calculate E(S)
         ES <- sum(ni1 / ni) / 2
-        
+
         ## Calculate var(S)
-        
+
         W <- numeric(M)
         for (i in 1 : M) {
             Wi <- ((M - 1) * group[cluster == i] -
@@ -422,7 +423,7 @@ clusWilcox.test.ranksum.ds <- function(x, cluster, group,
         EW <- M / (2 * (M + 1)) * (ni1 / ni - a / M)
         varS <- sum((W - EW)^2)
         Z <- (S - ES) / sqrt(varS)
-        
+
         pval <- switch(alternative, less = pnorm(abs(Z)),
                        greater = pnorm(abs(Z), lower.tail = FALSE),
                        two.sided = 2 * min(pnorm(abs(Z)),
@@ -437,8 +438,8 @@ clusWilcox.test.ranksum.ds <- function(x, cluster, group,
 
         class(result) <- "htest"
         result
-        
-        
+
+
     } else {
 ###calculate quantity 2 (using the pooled estimate of F)
         if (!is.null(mu) && mu != 0) {
@@ -456,14 +457,14 @@ clusWilcox.test.ranksum.ds <- function(x, cluster, group,
             }
         }
         Sj <- Sj / (M + 1)
-        
+
         nij <- matrix( 0, m, M)
         for ( i in 1 : m) {
             nij[i, ] <- table(factor(cluster[group == group.uniq[i]], levels = unique(cluster)))
         }
         d <- apply(nij, 1, FUN = function(x) {x / ni})
         ESj <- apply(d, 2, sum) / 2
-        
+
         What <- matrix(0, m, M)
         a <- t(d)
         for ( i in 1 : M) {
