@@ -95,9 +95,12 @@ extractTerm <- function(term, mf, nobs, paired) {
         if ((term == "group") & (uniq.l == 1)) {
             stop("group must contain at least two levels")
         }
+
+        var <- keep
         
         if (is.numeric(uniq) | is.character(uniq)) {
-            var <- recoderFunc(keep, uniq, c(1 : uniq.l))
+            var <- keep
+            if (is.character(uniq)) var <- recoderFunc(keep, uniq, c(1 : uniq.l)) 
         } else {
             stop(paste(term, "id should be numeric or character"))
         }

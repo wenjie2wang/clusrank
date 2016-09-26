@@ -180,9 +180,21 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
     m$... <- NULL
     m$formula <- if(missing(data)) terms(formula, special)
                  else terms(formula, special, data = data)
+    subset.ind <- NULL
+    if (!missing(subset)) {
+        if ("subset" %in% names(m)) subset.ind <- which(names(m) == "subset")
+        subset.ind <- 4
+    }
 
-    m <- if (missing(data)) m <- m[1 : 2]
-         else m <- m[1 : 3]
+      na.ind <- NULL
+    if (!missing(subset)) {
+        if ("na.action" %in% names(m)) na.ind <- which(names(m) == "na.action")
+        na.ind <- 5
+    }
+    
+    
+    m <- if (missing(data)) m <- m[c(1 : 2, subset.ind, na.ind)]
+         else m <- m[c(1 : 3, subset.ind, na.ind)]
     mf <- eval(m, parent.frame())
     Terms <- terms(mf) ## Delete 
 

@@ -1124,6 +1124,43 @@ When covariates are available, rank regression for clustered data
   Fu:Wang:Bai:rank:2010} would be the next step.
 
 
+\section{Real Data Analysis}
+
+\subsection{Data}
+We illustrate the usage of the package \pkg{clusrank} by applying the
+clustered Wilcoxon test to an eye study data set
+\citep{Ferr:Sedd:phen:2015}. The aim of the study was to characterize
+the phenotype associated with a rare variant in the complement factor
+H R1210C, a large protein. The measurements are taken on both eyes of
+each subject, therefore the measurements are clustered.
+The pheonotypic features under study are characterized by the
+Age-Related Maculopathy Staging (CARMS) score which have $5$ levels,
+where the first $3$ levels are corresponding to the severity of the
+development of the symptoms in an increasing order, and level $4$ and
+level $5$ are corresponding to two different types of advanced
+symptoms.
+Therefore the test is to be carried out on two subsets: the subset of
+observations with CARMS grade 1, 2, 3 or 4,
+and the subset of observations with CARMS grade 1, 2, 3 or 5.
+Additional information such as age and sex are also provided.
+This data set comes with the package with the name \code{eye} and
+contains $7$ variables: \code{ID} (patient ID), \code{Eye} (factor
+indicating the
+position of the eye being measured), \code{Variant} (indicator of whether
+there is H R1210C variant), \code{CARMS}, \code{Sex},
+\code{Age_group}, and \code{Agesex (a composite score constructed from
+  Sex and Age_group).
+
+<<eye1234>>=
+data(eye)
+clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = eye, subset = CARMS %in% c(1, 2, 3, 4))
+@ 
+
+
+<<eye1235>>=
+clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = eye, subset = CARMS %in% c(1, 2, 3, 5))
+@ 
+
 \section{Acknowledgement}
 
 We thank the Seddon Lab for the use of data for illustration. Rosner and Lee were support in part by grant NIH R01EY022445 from the National Eye Institute.
