@@ -183,13 +183,13 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
     subset.ind <- NULL
     if (!missing(subset)) {
         if ("subset" %in% names(m)) subset.ind <- which(names(m) == "subset")
-        subset.ind <- 4
+        else subset.ind <- 4
     }
 
       na.ind <- NULL
-    if (!missing(subset)) {
+    if (!missing(na.action)) {
         if ("na.action" %in% names(m)) na.ind <- which(names(m) == "na.action")
-        na.ind <- 5
+        else na.ind <- 5
     }
     
     

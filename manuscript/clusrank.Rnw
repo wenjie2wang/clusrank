@@ -960,8 +960,8 @@ cluster & ex  & 0 & 2 & 0.1, 0.1 & 4.3 & 4.7 & 17.5 & 17.9 & 64.3 & 65.3 \\
   &&&&           0.5, 0.5 & 5.3 & 5.6 & 20.9 & 24.0 & 75.9 & 82.0 \\
   &&&&          $-$0.1, 0.9 & 4.2 & 4.3 & 14.9 & 18.3 & 73.7 & 83.1 \\
 
-  observation member  & ex  & 0 & 2 & 0.1, 0.1 & 4.0 & 4.3 & 17.5 & 16.7 & 69.2 & 67.8 \\
-  &&&&           0.5, 0.5 & 4.6 & 5.0 & 19.8 & 19.6 & 69.1 & 68.0 \\
+  observation & ex  & 0 & 2 & 0.1, 0.1 & 4.0 & 4.3 & 17.5 & 16.7 & 69.2 & 67.8 \\
+  member &&&&           0.5, 0.5 & 4.6 & 5.0 & 19.8 & 19.6 & 69.1 & 68.0 \\
   &&&&          $-$0.1, 0.9 & 4.9 & 5.0 & 18.0 & 16.9 & 69.2 & 68.6 \\
   &&       & 5 & 0.1, 0.1 & 5.1 & 5.6 & 26.9 & 27.6 & 90.5 & 90.9 \\
   &&&&           0.5, 0.5 & 5.1 & 5.4 & 18.3 & 19.0 & 61.5 & 63.2 \\
@@ -1129,37 +1129,48 @@ When covariates are available, rank regression for clustered data
 \subsection{Data}
 We illustrate the usage of the package \pkg{clusrank} by applying the
 clustered Wilcoxon test to an eye study data set
-\citep{Ferr:Sedd:phen:2015}. The aim of the study was to characterize
+\cite{Ferr:Sedd:phen:2015}. The aim of the study was to characterize
 the phenotype associated with a rare variant in the complement factor
-H R1210C, a large protein. The measurements are taken on both eyes of
+H R1210C, a large protein. The measurements were taken on both eyes of
 each subject, therefore the measurements are clustered.
-The pheonotypic features under study are characterized by the
+The pheonotypic features under study are categorized by the
 Age-Related Maculopathy Staging (CARMS) score which have $5$ levels,
 where the first $3$ levels are corresponding to the severity of the
 development of the symptoms in an increasing order, and level $4$ and
 level $5$ are corresponding to two different types of advanced
-symptoms.
+symptoms, where level $4$ indicates the presence of geographic
+atrophy (GA) and level $5$ indicates the presence of choroidal
+neovascularization (CNV) related symptoms.
 Therefore the test is to be carried out on two subsets: the subset of
 observations with CARMS grade 1, 2, 3 or 4,
 and the subset of observations with CARMS grade 1, 2, 3 or 5.
-Additional information such as age and sex are also provided.
+Additional information such as age and sex is also provided.
 This data set comes with the package with the name \code{eye} and
 contains $7$ variables: \code{ID} (patient ID), \code{Eye} (factor
 indicating the
 position of the eye being measured), \code{Variant} (indicator of whether
 there is H R1210C variant), \code{CARMS}, \code{Sex},
-\code{Age_group}, and \code{Agesex (a composite score constructed from
-  Sex and Age_group).
+\code{Age_group}, and \code{Agesex} (a composite score constructed
+from \code{Sex} and \code{Age_group}).
 
-<<eye1234>>=
+We apply the clustered rank sum test (RGL) to the data set \code{eye}
+when the CARMS grade of the subject is one of 1, 2, 3, or 4, and use
+the variable \code{Agesex} as an extra covariate:
+<<eye1234-rgl>>=
 data(eye)
-clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = eye, subset = CARMS %in% c(1, 2, 3, 4))
-@ 
+clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = eye,
+                subset = CARMS %in% c(1, 2, 3, 4))
+@
+The p value of the RGL clustered rank sum test is less than $0.001$, which implies a strong correlation between the presence of the complement factor H R1210C variant and the severity of the symptom with GA as the advanced stage, after controlling the age and sex factors.
 
 
-<<eye1235>>=
-clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = eye, subset = CARMS %in% c(1, 2, 3, 5))
-@ 
+
+<<eye1235-rgl>>=
+clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = eye,
+                subset = CARMS %in% c(1, 2, 3, 5))
+@
+
+When the highest CARMS grade is $5$, i.e., the advanced stage is CNV related, the p-value of the test is $0.064$, which provides weak support to the hypothesis that the H R1210C variant is correlated with the CNV related symptom.
 
 \section{Acknowledgement}
 
