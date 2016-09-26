@@ -179,7 +179,10 @@ test to allow two-sample comparisons for clustered data.
 \citet{Rosn:Grov:use:1999} proposed a Mann--Whitney $U$-statistic for
 clustered data which corrects the variance of the test statistic for four
 types of intracluster correlation, but did not provide large sample theory.
-\citet{Rosn:Glyn:Lee:inco:2003} proposed an extended Wilcoxon rank-sum test under the assumptions that all sub-unit observations (or members) from the same cluster (i.e., subject) belong to the same treatment group,
+\citet{Rosn:Glyn:Lee:inco:2003} proposed an extended Wilcoxon rank-sum
+test under the assumptions that all sub-unit observations (or members)
+from the same cluster (i.e., subject) belong to the same treatment
+group,
 that observations within any cluster are exchangeable, and that the
 intracluster dependence does not vary across groups.
 With a test statistic in similar form as the standard Wilcoxon rank-sum
@@ -957,7 +960,7 @@ cluster & ex  & 0 & 2 & 0.1, 0.1 & 4.3 & 4.7 & 17.5 & 17.9 & 64.3 & 65.3 \\
   &&&&           0.5, 0.5 & 5.3 & 5.6 & 20.9 & 24.0 & 75.9 & 82.0 \\
   &&&&          $-$0.1, 0.9 & 4.2 & 4.3 & 14.9 & 18.3 & 73.7 & 83.1 \\
 
-  individual  & ex  & 0 & 2 & 0.1, 0.1 & 4.0 & 4.3 & 17.5 & 16.7 & 69.2 & 67.8 \\
+  observation member  & ex  & 0 & 2 & 0.1, 0.1 & 4.0 & 4.3 & 17.5 & 16.7 & 69.2 & 67.8 \\
   &&&&           0.5, 0.5 & 4.6 & 5.0 & 19.8 & 19.6 & 69.1 & 68.0 \\
   &&&&          $-$0.1, 0.9 & 4.9 & 5.0 & 18.0 & 16.9 & 69.2 & 68.6 \\
   &&       & 5 & 0.1, 0.1 & 5.1 & 5.6 & 26.9 & 27.6 & 90.5 & 90.9 \\
@@ -982,9 +985,11 @@ cluster & ex  & 0 & 2 & 0.1, 0.1 & 4.3 & 4.7 & 17.5 & 17.9 & 64.3 & 65.3 \\
 
 
 Comparison between the RGL and DS methods for the rank-sum tests
-has not been done when treatment group is assigned at the individual level.
-Nor has it when the intracluster dependence is not exchangeable.
-Consider two groups of 20~clusters each, with either exchangeable or AR1
+has never been done previously when treatment group is assigned at the
+individual cluster member level.
+Nor has it been done when the intracluster dependence is not exchangeable.
+Therefore we will present these comparisons in this session. Consider
+two groups of 20~clusters each, with either exchangeable or AR1
 intracluster correlation structure as specified in \code{datgen.sum}.
 The correlation parameters for the two groups were set to be
 $(0.1, 0.1)$, $(0.5, 0.5)$, or $(-0.1, 0.9)$.
@@ -1006,14 +1011,14 @@ nominal level $0.05$ in all the settings considered in this study.
 The empirical power ($\delta \ne 0$) for both methods increases as the
 cluster size increases, and as the missing rate decreases.
 For balanced data, the powers of the two tests are very close regardless
-of the treatment group level and the intracluster configurations.
+of the level of the treatment group assignment and the intracluster configurations.
 For unbalanced data from maximum cluster size~10 and missing rate 0.5,
 the DS method has higher power with cluster-level group assignment, while
-the RGL method has higher power with individual-level group assignment.
+the RGL method has higher power with individual cluster-member-level group assignment.
 As this setting has average cluster size~5, it can be compared with
 the balanced data setting with cluster size fixed at~5.
 Both methods have higher power in the random cluster size setting
-when the treatment group is assigned at the individual level.
+when the treatment group is assigned at the individual cluster-member level.
 Under cluster-level group assignment, it appears that the RGL method has
 lower power with random cluster size, while the DS method has lower
 power with fixed cluster size, though the differences are not big.
@@ -1077,7 +1082,7 @@ In all settings in this study, the empirical sizes of both methods are
 close to the nominal level, including the case of AR1 correlation setting
 where the exchangeability assumption for the RGL method is violated.
 The empirical power of both tests increases as cluster size increases,
-and as the intracluster dependence decreases.
+and increases as the intracluster dependence decreases.
 Completely random cluster size reduces the powers in comparison to
 the cases where the cluster sizes are fixed at their means.
 In all the settings considered here, the two methods have virtually
@@ -1098,7 +1103,7 @@ For example, the RGL method assumes exchangeability within clusters
 and does not account for informative cluster sizes;
 the DS method cannot be applied to contralateral designs with exactly one
 individual in each group within a cluster;
-both asymptotic tests need the number of clusters to not be too small.
+both asymptotic tests require that the number of clusters to not to be too small.
 
 
 Implementation of other rank-based methods for clusterd data can be
