@@ -349,8 +349,8 @@ independent observations per cluster becomes smaller, it overweights
 larger clusters, and, hence, may have lower efficiency.
 
 
-\subsection{Datta and Satten (DS) method with grouping at individual
-  cluster member-level}
+\subsection{Datta and Satten (DS) method with grouping at
+  cluster subunit-level}
 
 Unlike the RGL method, the DS method allows individual observations
 within the same cluster to have different group memberships.
@@ -418,7 +418,7 @@ one eye under each treatment) due to the failure in satisfying the
 requirements of the asymptotic theory.
 
 
-\subsection{RGL method: individual-level grouping}
+\subsection{RGL method: cluster subunit-level grouping}
 
 \citet{Rosn:Glyn:Lee:exte:2006} extended the RGL method to allow
 individual cluster-member-level grouping; i.e., for each cluster $i$,
@@ -960,8 +960,8 @@ cluster & ex  & 0 & 2 & 0.1, 0.1 & 4.3 & 4.7 & 17.5 & 17.9 & 64.3 & 65.3 \\
   &&&&           0.5, 0.5 & 5.3 & 5.6 & 20.9 & 24.0 & 75.9 & 82.0 \\
   &&&&          $-$0.1, 0.9 & 4.2 & 4.3 & 14.9 & 18.3 & 73.7 & 83.1 \\
 
-  observation & ex  & 0 & 2 & 0.1, 0.1 & 4.0 & 4.3 & 17.5 & 16.7 & 69.2 & 67.8 \\
-  member &&&&           0.5, 0.5 & 4.6 & 5.0 & 19.8 & 19.6 & 69.1 & 68.0 \\
+  subunit & ex  & 0 & 2 & 0.1, 0.1 & 4.0 & 4.3 & 17.5 & 16.7 & 69.2 & 67.8 \\
+   &&&&           0.5, 0.5 & 4.6 & 5.0 & 19.8 & 19.6 & 69.1 & 68.0 \\
   &&&&          $-$0.1, 0.9 & 4.9 & 5.0 & 18.0 & 16.9 & 69.2 & 68.6 \\
   &&       & 5 & 0.1, 0.1 & 5.1 & 5.6 & 26.9 & 27.6 & 90.5 & 90.9 \\
   &&&&           0.5, 0.5 & 5.1 & 5.4 & 18.3 & 19.0 & 61.5 & 63.2 \\
@@ -1089,41 +1089,6 @@ In all the settings considered here, the two methods have virtually
 the same power.
 
 
-\section{Discussion}
-\label{s:disc}
-
-Clustered data are frequently encountered in scientific research, and
-rank-based tests for clustered data are an indispensable tool like
-their counterparts, the Wilcoxon tests for independent data.
-Package \pkg{clusrank} provides two schools, the RGL method and the DS
-method, of the recently developed rank-sum tests and signed-rank tests
-in a unified, higher-level, user-friendly interface.
-Users need to be aware of the applicability of these tests when using them.
-For example, the RGL method assumes exchangeability within clusters
-and does not account for informative cluster sizes;
-the DS method cannot be applied to contralateral designs with exactly one
-individual in each group within a cluster;
-both asymptotic tests require that the number of clusters to not to be too small.
-
-
-Implementation of other rank-based methods for clusterd data can be
-considered in future development of package \pkg{clusrank}.
-For the rank-sum test, the case of informative group size within a cluster
-\citep{Dutt:Datt:rank:2016} would be a useful addition, though it is
-available in package \pkg{ClusterRankTest} \citep{Dutt:Datt:clus:2016}.
-For the signed-rank test,  \citet{Laro:wilc:2005} has a variance estimator
-based on certain sums of squares over independent clusters.
-Sign tests and signed-rank tests for multivariate clustered data
-\citep{Laro:affi:2003, Laro:Neva:Oja:weig:2007, Haat:etal:weig:2009} and
-multilevel data \citep{Laro:Neva:Oja:one:2008} have been studied.
-Some tests allow the distributions in two groups to have different scales
-and/or shapes under the null hypothesis \citep{Laro:etal:two:2010}.
-Making these tests available would be of interest to many users.
-When covariates are available, rank regression for clustered data
-\citep[e.g.,][]{Wang:Zhu:rank:2006, Wang:Zhao:weig:2008,
-  Fu:Wang:Bai:rank:2010} would be the next step.
-
-
 \section{Real Data Analysis}
 
 \subsection{Data}
@@ -1161,7 +1126,11 @@ data(eye)
 clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = eye,
                 subset = CARMS %in% c(1, 2, 3, 4))
 @
-The p value of the RGL clustered rank sum test is less than $0.001$, which implies a strong correlation between the presence of the complement factor H R1210C variant and the severity of the symptom with GA as the advanced stage, after controlling the age and sex factors.
+The p value of the RGL clustered rank sum test is less than $0.001$,
+which implies a strong correlation between the presence of the
+complement factor H R1210C variant and the severity of the symptom
+with GA as the advanced stage, after controlling the age and sex
+factors.
 
 
 
@@ -1170,11 +1139,52 @@ clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = eye,
                 subset = CARMS %in% c(1, 2, 3, 5))
 @
 
-When the highest CARMS grade is $5$, i.e., the advanced stage is CNV related, the p-value of the test is $0.064$, which provides weak support to the hypothesis that the H R1210C variant is correlated with the CNV related symptom.
+When the highest CARMS grade is $5$, i.e., the advanced stage is CNV
+related, the p-value of the test is $0.064$, which provides weak
+support to the hypothesis that the H R1210C variant is correlated with
+the CNV related symptom.
+\section{Discussion}
+\label{s:disc}
+
+
+Clustered data are frequently encountered in scientific research, and
+rank-based tests for clustered data are an indispensable tool like
+their counterparts, the Wilcoxon tests for independent data.
+Package \pkg{clusrank} provides two schools, the RGL method and the DS
+method, of the recently developed rank-sum tests and signed-rank tests
+in a unified, higher-level, user-friendly interface.
+Users need to be aware of the applicability of these tests when using them.
+For example, the RGL method assumes exchangeability within clusters
+and does not account for informative cluster sizes;
+the DS method cannot be applied to contralateral designs with exactly one
+individual in each group within a cluster;
+both asymptotic tests require that the number of clusters to not to be too small.
+
+
+Implementation of other rank-based methods for clusterd data can be
+considered in future development of package \pkg{clusrank}.
+For the rank-sum test, the case of informative group size within a cluster
+\citep{Dutt:Datt:rank:2016} would be a useful addition, though it is
+available in package \pkg{ClusterRankTest} \citep{Dutt:Datt:clus:2016}.
+For the signed-rank test,  \citet{Laro:wilc:2005} has a variance estimator
+based on certain sums of squares over independent clusters.
+Sign tests and signed-rank tests for multivariate clustered data
+\citep{Laro:affi:2003, Laro:Neva:Oja:weig:2007, Haat:etal:weig:2009} and
+multilevel data \citep{Laro:Neva:Oja:one:2008} have been studied.
+Some tests allow the distributions in two groups to have different scales
+and/or shapes under the null hypothesis \citep{Laro:etal:two:2010}.
+Making these tests available would be of interest to many users.
+When covariates are available, rank regression for clustered data
+\citep[e.g.,][]{Wang:Zhu:rank:2006, Wang:Zhao:weig:2008,
+  Fu:Wang:Bai:rank:2010} would be the next step.
+
+
 
 \section{Acknowledgement}
 
-We thank the Seddon Lab for the use of data for illustration. Rosner and Lee were support in part by grant NIH R01EY022445 from the National Eye Institute.
+We thank the Seddon Lab for the use of data for illustration. Rosner
+and Lee were support in part by grant NIH R01EY022445 from the
+National Eye Institute.
 
 \bibliography{clusrank}
 
