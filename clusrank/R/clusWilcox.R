@@ -129,7 +129,7 @@
 #' Somath Datta, Glen A. Satten (2008) \emph{A Signed-Rank test for Clustered Data}.
 #' Biometric, \bold{64}, 501-507.
 #'
-#' @importFrom  stats complete.cases na.omit terms complete.cases model.extract aggregate
+#' @importFrom stats complete.cases na.omit terms complete.cases model.extract aggregate
 #' @importFrom stats lm ecdf pnorm qnorm var  pchisq setNames lag
 #' @importFrom MASS ginv
 #' @importFrom Rcpp evalCpp
