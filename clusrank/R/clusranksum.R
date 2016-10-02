@@ -369,7 +369,7 @@ clusWilcox.test.ranksum.ds <- function(x, cluster, group,
     if (group.uniq == 1) {
         stop("invalid group variable, should contain at least 2 groups")
     }
-
+    
     n.obs <- length(x)
 
     Fhat <- numeric(n.obs)
@@ -381,7 +381,8 @@ clusWilcox.test.ranksum.ds <- function(x, cluster, group,
     M <- length(cluster.uniq)
     cluster <- recoderFunc(cluster, cluster.uniq, c(1 : M))
 
-
+   
+    
     ni <- table(cluster)
 
     temp <- unique(sort(abs(x)))
@@ -396,7 +397,7 @@ clusWilcox.test.ranksum.ds <- function(x, cluster, group,
 
     if (group.uniq == 2) {
 ###calculate quantity 2 (using the pooled estimate of F)
-        group <- recoderFunc(group, order(unique(group)), c(1, 0))
+        group <- recoderFunc(group, sort(unique(group)), c(1, 0))
         x[which(group == 0)] <- x[which(group == 0)] - mu
         ni1 <- aggregate(group ~ cluster, FUN = sum)[, 2] # number of obs under trt 2 in each cluster
         if (all(ni1 / ni == 0.5)) {

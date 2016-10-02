@@ -58,24 +58,24 @@ Yujing Jiang\\ University of Connecticut \And
 
 
 \Abstract{
-Wilcoxon Rank-based tests are distribution-free alternatives 
+Wilcoxon Rank-based tests are distribution-free alternatives
 to the popular two-sample and paired t-tests.
-For independent data, they are available in the 
+For independent data, they are available in the
 built-in \pkg{stats} package of \proglang{R}.
-For clustered data, although they have been developed 
-recently, there did not exist an \proglang{R} package 
-that makes them available at one place.  
+For clustered data, although they have been developed
+recently, there did not exist an \proglang{R} package
+that makes them available at one place.
 We present a package \pkg{clusrank} where the latest developments are
 implemented and wrapped under a unified user-friendly interface.
-With different methods dispatched based on the inputs, this package 
+With different methods dispatched based on the inputs, this package
 offers great flexibility in rank-based tests for various clustered data.
 Exact tests based on permutations are also provided for some methods.
 Details of the major schools of different methods are briefly reviewed.
 Usages of package \pkg{clusrank} are illustrated with simulated data
 as well as a real dataset from an ophthalmological study.
 The package also enables convenient comparison between
-selected methods under settings that have not been studied 
-before and the results are discussed. 
+selected methods under settings that have not been studied
+before and the results are discussed.
 }
 
 
@@ -147,8 +147,8 @@ Wilcoxon rank-sum and signed-rank tests are important tools for
 two-group comparisons and paired comparisons, respectively.
 Unlike their counterparts under the normality assumption, they are
 based on ranks without the need of distributional assumptions.
-Implementations of Wilcoxon rank-sum and signed-rank tests for 
-independent data have been widely available in standard software 
+Implementations of Wilcoxon rank-sum and signed-rank tests for
+independent data have been widely available in standard software
 packages, such as function \code{wilcox.test} in the built-in package
 \pkg{stats} in \proglang{R} and \code{PROC NPAR1WAY} in \proglang{SAS}.
 These existing implementations for independent data, however,
@@ -159,14 +159,14 @@ in many fields.
 Clustered data consists of data obtained from correlated observations
 from sub-units or members in each cluster, where clusters may be
 independent but measures from members within each cluster are not.
-For example, in longitudinal studies or familial studies, 
-measures from observations of the same subject or 
+For example, in longitudinal studies or familial studies,
+measures from observations of the same subject or
 the same family are not independent but correlated.
 The effective sample size for clustered data will be different from
 the number of  observations in clusters due to intracluster dependence.
 Often times, because of the positive intracluster dependence, the
 variances of the test statistics are underestimated, and as a consequence,
-the resulting p-values are smaller than what they should be. 
+the resulting p-values are smaller than what they should be.
 The popular generalized estimating equations (GEE) approach
 \citep{Lian:Zege:long:1986} provides a general regression
 modeling strategy that considers intracluster dependence,
@@ -210,7 +210,7 @@ The cluster sizes are allowed to vary, but the method does not
 consider the informative cluster sizes where the distribution of
 paired difference within a cluster depends on the cluster size.
 \citet{Datt:Satt:sign:2008} proposed a signed-rank test based on sampling
-members within cluster that accounts for informative cluster sizes. 
+members within cluster that accounts for informative cluster sizes.
 
 
 Despite the popularity of clustered data arising from a wide range of
@@ -221,7 +221,7 @@ The package \pkg{clusrank} we developed made first appearance on the
 Comprehensive R Archive Network (CRAN) in December, 2015.
 The package provides implementation of these recently available rank-sum
 tests \citep{Rosn:Glyn:Lee:inco:2003, Datt:Satt:rank:2005,
-  Rosn:Glyn:Lee:exte:2006} and signed-rank tests 
+  Rosn:Glyn:Lee:exte:2006} and signed-rank tests
 \citep{Rosn:Glyn:Lee:wilc:2006, Datt:Satt:sign:2008} for clustered data.
 The methods are grouped into two categories by their authors: RGL for
 those by Rosner, Glynn, and Lee; and DS for those by Datta and Satten.
@@ -229,25 +229,25 @@ Note that the RGL methods are
 available in \proglang{SAS} codes from Dr. Rosner's website
 (\url{https://sites.google.com/a/channing.harvard.edu/bernardrosner/channing/}).
 \proglang{R} codes for the DL methods are available from Dr. Datta's website
-(\url{http://www.somnathdatta.org/software/}), which was recently 
+(\url{http://www.somnathdatta.org/software/}), which was recently
 put into \proglang{R} package \pkg{ClusterRankTest}
 \citep{Dutt:Datt:clus:2016} in April, 2016.
 Modeled after the familiar function \code{wilcox.test} in
 the \proglang{R} built-in package \pkg{stats}, the \pkg{clusrank} package we
 developed unifies unifies both RGL and DS methods under a user-friendly
-interface that accommodates the specifications from these methods. 
+interface that accommodates the specifications from these methods.
 This makes it very easy for users to compare the performances of different
 approaches under various settings; see Section~\ref{s:simu}.
 
 
 The rest of the article is organized as follows.
-The recently available Wilcoxon rank-sum tests and 
-signed-rank tests for clustered data are briefly reviewed in 
+The recently available Wilcoxon rank-sum tests and
+signed-rank tests for clustered data are briefly reviewed in
 Sections~\ref{s:ranksum} and~\ref{s:signedrank},  respectively.
-The usage of the unified user-level function and major 
+The usage of the unified user-level function and major
 input arguments are described in Section~\ref{s:usage}.
-Illustrations of how to access the implemented methods 
-using both simulated data and a real dataset from an 
+Illustrations of how to access the implemented methods
+using both simulated data and a real dataset from an
 ophthalmological study are presented in Section~\ref{s:illus}.
 In Section~\ref{s:simu}, comparisons of selected methods that
 have not been studied previously are reported, which
@@ -272,12 +272,12 @@ $(\mathbf{X}, \boldsymbol{\delta}) =
 Clusters are assumed to be independent, while
 subunit observations within each cluster are not.
 The null hypothesis $H_0$ to be tested is that there is no difference
-of the measures of location of the two groups; i.e., the distribution of 
+of the measures of location of the two groups; i.e., the distribution of
 $X_{ij}$ remains the same regardless of the group indicator $\delta_{ij}$.
 
 
 \subsection{RGL method with cluster-level grouping}
-The RGL Wilcoxon rank-sum test was designed for the scenario 
+The RGL Wilcoxon rank-sum test was designed for the scenario
 where the treatment group is assigned at the cluster-level:
 i.e., $\delta_{ij} = \delta_i$ for all $1 \le j \le n_i$.
 Define $R_{i+} =\sum_{j=1}^{n_i}R_{ij}$, the sum of observed ranks of
@@ -412,8 +412,8 @@ cluster and remains valid when treatment affects the correlation structure.
 As shown in the construction of the test statistic, there is no room for
 randomization test since $S$ is a conditional expectation given observed data.
 In addition, it cannot be applied to strictly contralateral data (e.g., when
-each subject in an eye study have exactly one eye under each treatment) 
-due to violation of the assumptions required by the asymptotic theory.  
+each subject in an eye study have exactly one eye under each treatment)
+due to violation of the assumptions required by the asymptotic theory.
 
 
 \subsection{RGL method with subunit-level grouping}
@@ -609,8 +609,9 @@ opts_chunk$set(cache=TRUE, autodep=TRUE)
 Package \pkg{clusrank} provides a unified interface to all the
 methods reviewed in Sections~\ref{s:ranksum} and~\ref{s:signedrank}
 through function \code{clusWilcox.test}:
-<<args-c, echo=TRUE>>=
+<<args-cc, echo=TRUE>>=
 library(clusrank)
+sessionInfo()
 args(clusWilcox.test)
 @
 Argument \code{x} can be either a numeric vector or a formula.
@@ -645,21 +646,21 @@ intensive, it is recommended to be used only with small samples.
 
 The main function specifies the cluster by a \code{cluster} variable
 indicating which cluster each observations belongs to.
-Additionally, if the dataset is stratified, a numeric vector \code{strata} 
+Additionally, if the dataset is stratified, a numeric vector \code{strata}
 can be provided to indicate stratum membership of each observation.
-Other arguments specific for clustered data include \code{cluster} 
-which should be a numeric vector containing the cluster id. 
+Other arguments specific for clustered data include \code{cluster}
+which should be a numeric vector containing the cluster id.
 For clustered rank-sum test, the argument \code{group} should be a
-numeric vector containing the treatment group id for each observation. 
+numeric vector containing the treatment group id for each observation.
 In addition, for clustered rank-sum test using RGL method for data with
 treatment group assigned at the cluster-level, an extra variable
 \code{stratum} is allowed to take the effect of stratification into
 account and therefore provide a more powerful test.
-For clustered rank-sum test, the data frame \code{data} 
-should contain at least 3~variables: 
+For clustered rank-sum test, the data frame \code{data}
+should contain at least 3~variables:
 the observed score to feed \code{x},
-the cluster id to feed \code{cluster}, and 
-the treatment assignment to feed \code{group}. 
+the cluster id to feed \code{cluster}, and
+the treatment assignment to feed \code{group}.
 For both tests, the RGL and DS methods are requested by specifying
 \code{method} as \code{rgl} and \code{ds}, respectively.
 
@@ -668,7 +669,7 @@ For both tests, the RGL and DS methods are requested by specifying
 
 The formula interface mimics that of the \code{wilcox.test} from the
 \code{stats} package for which arguments \code{data}, \code{subset}
-and \code{na.action} have the same usage. 
+and \code{na.action} have the same usage.
 <<formula, echo = TRUE>>=
 args(clusrank:::clusWilcox.test.formula)
 @
@@ -682,7 +683,7 @@ e.g., \code{z ~ group + cluster(cid) + stratum(sid)}, where
 the clusters, and \code{sid} identifies the stratum.  See
 Section~\ref{s:illus} for detailed illustrations.
 For clustered signed-rank test, the left hand side of the formula is
-the paired difference and the right hand side comprises the cluster id. 
+the paired difference and the right hand side comprises the cluster id.
 Neither \code{group} or \code{stratum} is applicable for signed-rank tests.
 Other arguments are identical to those in the default interface.
 
@@ -866,9 +867,9 @@ clusWilcox.test(x ~ cluster(cid),  dat.sgn, paired = TRUE, method = "ds")
 
 The package contains a real dataset named \code{eye} from an
 ophthalmological study \citep{Ferr:Sedd:phen:2015}.
-The objective of the study was to characterize the phenotype 
+The objective of the study was to characterize the phenotype
 associated with a rare variant in the complement factor
-H~R1210C, a large protein. 
+H~R1210C, a large protein.
 The measurements were taken on both eyes of
 each subject, therefore the measurements are clustered.
 The pheonotypic features under study are categorized by the
@@ -889,34 +890,57 @@ indicating the
 position of the eye being measured), \code{Variant} (indicator of whether
 there is H R1210C variant), \code{CARMS}, \code{Sex},
 \code{Age_group}, and \code{Agesex} (a composite score constructed
-from \code{Sex} and \code{Age_group}).
+from \code{Sex} and \code{Age_group}). There are $283$ subjects in the data set,
 
 
-We apply the clustered rank sum test (RGL) to the data set \code{eye}
-when the CARMS grade of the subject is one of 1, 2, 3, or 4, and use
-the variable \code{Agesex} as an extra covariate:
-<<eye1234-rgl>>=
+We apply both clustered rank sum test (RGL and DS) available in the
+package to the data set \code{eye} when the CARMS grade of the subject
+is one of $1$, $2$, $3$, or $4$.
+<<eye1234-both>>=
 data(eye)
+clusWilcox.test(CARMS ~ Variant + cluster(ID), data = eye,
+                subset = CARMS %in% c(1, 2, 3, 4), method = "rgl")
+clusWilcox.test(CARMS ~ Variant + cluster(ID), data = eye,
+                subset = CARMS %in% c(1, 2, 3, 4), method = "ds")
+@
+
+The p values from both tests are close and less than $0.001$, which
+implies a strong correlation between the presence of the
+complement factor H R1210C variant and the severity of the symptom
+with GA as the advanced stage.
+
+Note that we can use the variable \code{Agesex} as an extra covariate
+when applying the RGL method:
+<<eye1234-rgl>>=
 clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = eye,
                 subset = CARMS %in% c(1, 2, 3, 4))
 @
-The p value of the RGL clustered rank sum test is less than $0.001$,
-which implies a strong correlation between the presence of the
-complement factor H R1210C variant and the severity of the symptom
-with GA as the advanced stage, after controlling the age and sex
-factors.
+The p value of the RGL clustered rank sum test is still less than
+$0.001$ after controlling for the effect of age and sex factor, which
+is consistent to the test result when the factor is not controlled.
 
 
-
-<<eye1235-rgl>>=
-clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = eye,
+We also apply the two tests to the subset of the data when the CARMS
+grade is one of $1$, $2$, $3$ and $5$ without considering other
+additional information.
+<<eye12355-both>>=
+clusWilcox.test(CARMS ~ Variant + cluster(ID), data = eye, method = "rgl",
+                subset = CARMS %in% c(1, 2, 3, 5))
+clusWilcox.test(CARMS ~ Variant + cluster(ID), data = eye, method = "ds",
                 subset = CARMS %in% c(1, 2, 3, 5))
 @
+The p values of the two approaches differ when the highest CARMS score is $5$, the p value of the RGL clustered rank sum test is $0.06455$ where as the DS clustered rank sum test reports a p value of $0.006312$.
+Therefore the results of the two tests still suggest the correlation exists between the presence of complement factor H R1210C variant and the symptom with CNV as the advanced stage.
 
-When the highest CARMS grade is $5$, i.e., the advanced stage is CNV
-related, the p-value of the test is $0.064$, which provides weak
-support to the hypothesis that the H R1210C variant is correlated with
-the CNV related symptom.
+<<eye12355-rgl>>=
+clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = eye,
+                subset = CARMS %in% c(1, 2, 3, 5), method = "rgl")
+@
+
+Further considering the effects of the age and sex using the \code{stratum} option for the RGL clustered rank test, we obtained similar result as when the age and sex effects were not considered.
+
+
+
 
 
 \section{A Simulation Study}
@@ -960,7 +984,7 @@ The function returns the empirical rejection rates of the RGL
 and DS methods for the setting defined by the inputs.
 
 
-As an example, consider the rank-sum tests in a setting with 
+As an example, consider the rank-sum tests in a setting with
 cluster-level grouping, each group containing 20~clusters of size~3, with
 exchangeable correlation parameter $\rho = 0.5$ in both groups.
 The group difference is set to be $\delta = 0$.
@@ -1159,7 +1183,7 @@ For example, the RGL method assumes exchangeability within clusters
 and does not account for informative cluster sizes;
 the DS method cannot be applied to contralateral designs with exactly one
 subunit in each group within a cluster; both asymptotic tests require that
-the number of clusters to not to be too small. 
+the number of clusters to not to be too small.
 
 
 Implementation of other rank-based methods for clusterd data can be
@@ -1182,9 +1206,9 @@ When covariates are available, rank regression for clustered data
 
 \section{Acknowledgement}
 
-We thank Dr. Johanna Seddon for sharing the data from their 
+We thank Dr. Johanna Seddon for sharing the data from their
 phenotypic characterization study of the H~R1210C rare variant.
-Rosner and Lee were supported in part by grant NIH R01EY022445 
+Rosner and Lee were supported in part by grant NIH R01EY022445
 from the National Eye Institute.
 
 \bibliography{clusrank}
