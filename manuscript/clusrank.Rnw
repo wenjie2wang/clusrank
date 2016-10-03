@@ -865,37 +865,28 @@ clusWilcox.test(x ~ cluster(cid),  dat.sgn, paired = TRUE, method = "ds")
 
 \subsection{A real data example}
 
-The package contains a real dataset named \code{eye} from an
-ophthalmological study \citep{Ferr:Sedd:phen:2015}.
-The objective of the study was to characterize the phenotype
-associated with a rare variant in the complement factor
-H~R1210C, a large protein.
-The measurements were taken on both eyes of
-each subject, therefore the measurements are clustered.
-The pheonotypic features under study are categorized by the
-Age-Related Maculopathy Staging (CARMS) score which have $5$ levels,
-where the first $3$ levels are corresponding to the severity of the
-development of the symptoms in an increasing order, and level $4$ and
-level $5$ are corresponding to two different types of advanced
-symptoms, where level $4$ indicates the presence of geographic
-atrophy (GA) and level $5$ indicates the presence of choroidal
-neovascularization (CNV) related symptoms.
-Therefore the test is to be carried out on two subsets: the subset of
-observations with CARMS grade 1, 2, 3 or 4,
-and the subset of observations with CARMS grade 1, 2, 3 or 5.
-Additional information such as age and sex is also provided.
-This data set comes with the package with the name \code{eye} and
-contains $7$ variables: \code{ID} (patient ID), \code{Eye} (factor
-indicating the
-position of the eye being measured), \code{Variant} (indicator of whether
-there is H R1210C variant), \code{CARMS}, \code{Sex},
-\code{Age_group}, and \code{Agesex} (a composite score constructed
-from \code{Sex} and \code{Age_group}). There are $283$ subjects in the data set,
+The package contains a real dataset named \code{eye} from a retrospective
+observations stuly \citep{Ferr:Sedd:phen:2015} that aims to characterize the
+phenotype associated with a rare variant in the complement factor H (CFH)
+R1210C,  a protein involved in the age-related macular degeneration (AMD). 
+The data contains 143 patients (283) eyes, among whom 62 had 
+the rare variant and 81 did not have the rare variant.
+So the clusters are the patients and the subunits are the eyes.
+The outcome variable \code{CARMS} was the AMD grading score based 
+on the Age-Related Maculopathy Staging (CARMS),  which has 5~levels.
+The first 3~levels correspond to the severity of the degeneration in
+increasing order, while level~4 and~5 correspond to two different 
+types of advanced symptoms, with level~4 indicating the presence 
+of geographic atrophy (GA) and level~5 indicating the presence of 
+choroidal neovascularization (CNV) related symptoms.  
+The rare variant grouping is indicated by variable \code{Variant}. 
+The Wilcox ranksum test is to be carried out on two subsets: 
+1) the subset of observations with CARMS grade 1, 2, 3 or~4;
+and 2) the subset of observations with CARMS grade 1, 2, 3 or~5.
 
 
-We apply both clustered rank sum test (RGL and DS) available in the
-package to the data set \code{eye} when the CARMS grade of the subject
-is one of $1$, $2$, $3$, or $4$.
+
+We apply both the RGL and DS method to the first subset:
 <<eye1234-both>>=
 data(eye)
 clusWilcox.test(CARMS ~ Variant + cluster(ID), data = eye,
@@ -903,43 +894,38 @@ clusWilcox.test(CARMS ~ Variant + cluster(ID), data = eye,
 clusWilcox.test(CARMS ~ Variant + cluster(ID), data = eye,
                 subset = CARMS %in% c(1, 2, 3, 4), method = "ds")
 @
+The p-values from both tests are close and less than $0.001$, which
+implies strong evidence to the association between CFH~R1210C rare variant
+and the severity of the symptom with GA as the advanced stage.
 
-The p values from both tests are close and less than $0.001$, which
-implies a strong correlation between the presence of the
-complement factor H R1210C variant and the severity of the symptom
-with GA as the advanced stage.
 
-Note that we can use the variable \code{Agesex} as an extra covariate
-when applying the RGL method:
+For the RGL method, a stratifying variable \code{Agesex} which categorizes
+the patients into 6~strata by their age and gender can be used as a control
+variable: 
 <<eye1234-rgl>>=
 clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = eye,
                 subset = CARMS %in% c(1, 2, 3, 4))
 @
-The p value of the RGL clustered rank sum test is still less than
-$0.001$ after controlling for the effect of age and sex factor, which
-is consistent to the test result when the factor is not controlled.
+The p-value is still less than $0.001$ after controlling for age and gender. 
 
 
-We also apply the two tests to the subset of the data when the CARMS
-grade is one of $1$, $2$, $3$ and $5$ without considering other
-additional information.
+We then apply the two tests to the subset of the second subset:
 <<eye12355-both>>=
 clusWilcox.test(CARMS ~ Variant + cluster(ID), data = eye, method = "rgl",
                 subset = CARMS %in% c(1, 2, 3, 5))
 clusWilcox.test(CARMS ~ Variant + cluster(ID), data = eye, method = "ds",
                 subset = CARMS %in% c(1, 2, 3, 5))
 @
-The p values of the two approaches differ when the highest CARMS score is $5$, the p value of the RGL clustered rank sum test is $0.06455$ where as the DS clustered rank sum test reports a p value of $0.006312$.
-Therefore the results of the two tests still suggest the correlation exists between the presence of complement factor H R1210C variant and the symptom with CNV as the advanced stage.
-
+This time, the p-values of the two approaches are easily discernable.
+The DS method reports a p-value of $0.006312$, in contrast to $0.06455$ from
+the RGL method. The results suggest association between the presence of
+CFH~R1210C rare variant and the symptom with CNV as the advanced stage.
+Again, the RGL method can be applied with age and gender controlled:
 <<eye12355-rgl>>=
 clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = eye,
                 subset = CARMS %in% c(1, 2, 3, 5), method = "rgl")
 @
-
-Further considering the effects of the age and sex using the \code{stratum} option for the RGL clustered rank test, we obtained similar result as when the age and sex effects were not considered.
-
-
+The p-value remains virtually unchanged after controlling for the age/gender strata.
 
 
 
