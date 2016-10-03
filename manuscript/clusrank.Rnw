@@ -228,13 +228,13 @@ those by Rosner, Glynn, and Lee; and DS for those by Datta and Satten.
 Note that the RGL methods are
 available in \proglang{SAS} codes from Dr. Rosner's website
 (\url{https://sites.google.com/a/channing.harvard.edu/bernardrosner/channing/}).
-\proglang{R} codes for the DL methods are available from Dr. Datta's website
+\proglang{R} codes for the DS methods are available from Dr. Datta's website
 (\url{http://www.somnathdatta.org/software/}), which was recently
 put into \proglang{R} package \pkg{ClusterRankTest}
 \citep{Dutt:Datt:clus:2016} in April, 2016.
 Modeled after the familiar function \code{wilcox.test} in
 the \proglang{R} built-in package \pkg{stats}, the \pkg{clusrank} package we
-developed unifies unifies both RGL and DS methods under a user-friendly
+developed unifies both RGL and DS methods under a user-friendly
 interface that accommodates the specifications from these methods.
 This makes it very easy for users to compare the performances of different
 approaches under various settings; see Section~\ref{s:simu}.
