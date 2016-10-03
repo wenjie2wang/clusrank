@@ -868,19 +868,19 @@ clusWilcox.test(x ~ cluster(cid),  dat.sgn, paired = TRUE, method = "ds")
 The package contains a real dataset named \code{eye} from a retrospective
 observations stuly \citep{Ferr:Sedd:phen:2015} that aims to characterize the
 phenotype associated with a rare variant in the complement factor H (CFH)
-R1210C,  a protein involved in the age-related macular degeneration (AMD). 
-The data contains 143 patients (283) eyes, among whom 62 had 
+R1210C,  a protein involved in the age-related macular degeneration (AMD).
+The data contains 143 patients (283) eyes, among whom 62 had
 the rare variant and 81 did not have the rare variant.
 So the clusters are the patients and the subunits are the eyes.
-The outcome variable \code{CARMS} was the AMD grading score based 
+The outcome variable \code{CARMS} was the AMD grading score based
 on the Age-Related Maculopathy Staging (CARMS),  which has 5~levels.
 The first 3~levels correspond to the severity of the degeneration in
-increasing order, while level~4 and~5 correspond to two different 
-types of advanced symptoms, with level~4 indicating the presence 
-of geographic atrophy (GA) and level~5 indicating the presence of 
-choroidal neovascularization (CNV) related symptoms.  
-The rare variant grouping is indicated by variable \code{Variant}. 
-The Wilcox ranksum test is to be carried out on two subsets: 
+increasing order, while level~4 and~5 correspond to two different
+types of advanced symptoms, with level~4 indicating the presence
+of geographic atrophy (GA) and level~5 indicating the presence of
+choroidal neovascularization (CNV) related symptoms.
+The rare variant grouping is indicated by variable \code{Variant}.
+The Wilcoxon rank-sum test is to be carried out on two subsets:
 1) the subset of observations with CARMS grade 1, 2, 3 or~4;
 and 2) the subset of observations with CARMS grade 1, 2, 3 or~5.
 
@@ -901,12 +901,12 @@ and the severity of the symptom with GA as the advanced stage.
 
 For the RGL method, a stratifying variable \code{Agesex} which categorizes
 the patients into 6~strata by their age and gender can be used as a control
-variable: 
+variable:
 <<eye1234-rgl>>=
 clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = eye,
                 subset = CARMS %in% c(1, 2, 3, 4))
 @
-The p-value is still less than $0.001$ after controlling for age and gender. 
+The p-value is still less than $0.001$ after controlling for age and gender.
 
 
 We then apply the two tests to the subset of the second subset:
