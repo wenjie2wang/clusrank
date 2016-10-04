@@ -611,7 +611,6 @@ methods reviewed in Sections~\ref{s:ranksum} and~\ref{s:signedrank}
 through function \code{clusWilcox.test}:
 <<args-cc, echo=TRUE>>=
 library(clusrank)
-sessionInfo()
 args(clusWilcox.test)
 @
 Argument \code{x} can be either a numeric vector or a formula.
@@ -619,7 +618,7 @@ The default interface is called if \code{x} is a numeric vector, in
 which case the interface is designed to mimic that of the function
 \code{wilcox.test}:
 <<args-cd, echo=TRUE>>=
-args(clusrank:::clusWilcox.test.default)
+args(getS3method("clusWilcox.test", "default"))
 @
 
 
@@ -665,13 +664,11 @@ For both tests, the RGL and DS methods are requested by specifying
 \code{method} as \code{rgl} and \code{ds}, respectively.
 
 
-
-
 The formula interface mimics that of the \code{wilcox.test} from the
 \code{stats} package for which arguments \code{data}, \code{subset}
 and \code{na.action} have the same usage.
 <<formula, echo = TRUE>>=
-args(clusrank:::clusWilcox.test.formula)
+args(getS3method("clusWilcox.test", "formula"))
 @
 As for the \code{formula}, when a rank-sum test is being performed,
 the left hand side should be the variable of data values and the right
@@ -869,21 +866,23 @@ The package contains a real dataset named \code{eye} from a retrospective
 observations stuly \citep{Ferr:Sedd:phen:2015} that aims to characterize the
 phenotype associated with a rare variant in the complement factor H (CFH)
 R1210C,  a protein involved in the age-related macular degeneration (AMD).
-The data contains 143 patients (283) eyes, among whom 62 had
-the rare variant and 81 did not have the rare variant.
-So the clusters are the patients and the subunits are the eyes.
-The outcome variable \code{CARMS} was the AMD grading score based
+The data contains measures of 283 eyes from 143 patients, 
+among whom 62 had the rare variant and 81 did not.
+The clusters are the patients and the subunits are the eyes.
+The outcome variable was the AMD grading score based
 on the Age-Related Maculopathy Staging (CARMS),  which has 5~levels.
 The first 3~levels correspond to the severity of the degeneration in
 increasing order, while level~4 and~5 correspond to two different
 types of advanced symptoms, with level~4 indicating the presence
 of geographic atrophy (GA) and level~5 indicating the presence of
 choroidal neovascularization (CNV) related symptoms.
-The rare variant grouping is indicated by variable \code{Variant}.
 The Wilcoxon rank-sum test is to be carried out on two subsets:
 1) the subset of observations with CARMS grade 1, 2, 3 or~4;
 and 2) the subset of observations with CARMS grade 1, 2, 3 or~5.
-
+In the \code{eye} data, the outcome variable is \code{CARMS};
+the patients ids indicating the clusters are stored in variable \code{ID};
+the rare variant grouping at the cluster (patient) level is indicated by
+variable \code{Variant}. 
 
 
 We apply both the RGL and DS method to the first subset:
@@ -895,8 +894,9 @@ clusWilcox.test(CARMS ~ Variant + cluster(ID), data = eye,
                 subset = CARMS %in% c(1, 2, 3, 4), method = "ds")
 @
 The p-values from both tests are close and less than $0.001$, which
-implies strong evidence to the association between CFH~R1210C rare variant
-and the severity of the symptom with GA as the advanced stage.
+implies strong evidence to the association between the presence of
+CFH~R1210C rare variant and the severity of the symptom with GA as the
+advanced stage.
 
 
 For the RGL method, a stratifying variable \code{Agesex} which categorizes
@@ -916,7 +916,8 @@ clusWilcox.test(CARMS ~ Variant + cluster(ID), data = eye, method = "rgl",
 clusWilcox.test(CARMS ~ Variant + cluster(ID), data = eye, method = "ds",
                 subset = CARMS %in% c(1, 2, 3, 5))
 @
-This time, the p-values of the two approaches are easily discernable.
+This time, the p-values of the two approaches are easily discernable, which
+is quite possibl because the methods are based on different assumptions. 
 The DS method reports a p-value of $0.006312$, in contrast to $0.06455$ from
 the RGL method. The results suggest association between the presence of
 CFH~R1210C rare variant and the symptom with CNV as the advanced stage.
@@ -925,8 +926,8 @@ Again, the RGL method can be applied with age and gender controlled:
 clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = eye,
                 subset = CARMS %in% c(1, 2, 3, 5), method = "rgl")
 @
-The p-value remains virtually unchanged after controlling for the age/gender strata.
-
+The p-value from the RGL method remains virtually unchanged after
+controlling for the age/gender strata.
 
 
 \section{A Simulation Study}
