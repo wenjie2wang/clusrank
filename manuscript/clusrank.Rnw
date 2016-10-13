@@ -62,7 +62,7 @@ Wilcoxon Rank-based tests are distribution-free alternatives
 to the popular two-sample and paired t-tests.
 For independent data, they are available in the
 built-in \pkg{stats} package of \proglang{R}.
-For clustered data, although they have been developed
+For clustered data, although some have been developed
 recently, there did not exist an \proglang{R} package
 that makes them available at one place.
 We present a package \pkg{clusrank} where the latest developments are
@@ -71,7 +71,7 @@ With different methods dispatched based on the inputs, this package
 offers great flexibility in rank-based tests for various clustered data.
 Exact tests based on permutations are also provided for some methods.
 Details of the major schools of different methods are briefly reviewed.
-Usages of package \pkg{clusrank} are illustrated with simulated data
+Usages of the package \pkg{clusrank} are illustrated with simulated data
 as well as a real dataset from an ophthalmological study.
 The package also enables convenient comparison between
 selected methods under settings that have not been studied
@@ -255,7 +255,7 @@ are made very easy by the package using only a few lines of codes.
 A discussion concludes in Section~\ref{s:disc}.
 
 
-\section{Rank-Sum Test}
+\section{Rank-Sum Test for Clustered Data}
 \label{s:ranksum}
 
 The Wilcoxon rank-sum test is used for two-sample comparison.
@@ -277,9 +277,9 @@ $X_{ij}$ remains the same regardless of the group indicator $\delta_{ij}$.
 
 
 \subsection{RGL method with cluster-level grouping}
-The RGL Wilcoxon rank-sum test was designed for the scenario
-where the treatment group is assigned at the cluster-level:
-i.e., $\delta_{ij} = \delta_i$ for all $1 \le j \le n_i$.
+The RGL Wilcoxon rank-sum test \citep{Rosn:Glyn:Lee:inco:2003} was
+designed for the scenario where the treatment group is assigned at the
+cluster-level: i.e., $\delta_{ij} = \delta_i$ for all $1 \le j \le n_i$.
 Define $R_{i+} =\sum_{j=1}^{n_i}R_{ij}$, the sum of observed ranks of
 the subunits in the $i$th cluster.
 The Wilcoxon rank-sum statistic is
@@ -331,9 +331,9 @@ $\E(W_g) = m_g R_{++, g}  / N_g$ and
 \sum_{i \in I_g} \left(R_{i+} - \frac{R_{++,g}}{N_g}\right)^2,
 \]
 where $R_{++,g} = \sum_{i\in I_g} R_{i+}$.
-\citet{Rosn:Glyn:Lee:inco:2003} showed that the asymptotic
-distribution of $Z$ as $N \to \infty$ is standard normal under
-mild conditions.
+\citet{Rosn:Glyn:Lee:inco:2003} showed that under mild conditions, the
+asymptotic
+distribution of the test statistic $Z$ is standard normal.
 The method can be extended to the case of stratified data.
 
 
@@ -373,7 +373,7 @@ where $S = \E(W^* | \mathbf{X}, \boldsymbol{\delta})$.
 
 
 \citet{Datt:Satt:rank:2005} derived the quantities needed to calculate
-the test statistics, using mid-rank to allow for ties in the data.
+the test statistic, using mid-ranks to allow for ties in the data.
 Let $F_i(x) = n_i^{-1} \sum_{k = 1}^{n_i} I(X_{ik} \le x)$ be the
 empirical distribution function of the observations from cluster~$i$.
 It can be shown that
@@ -462,7 +462,7 @@ Z_{g,N} = \frac{W_{g,N} - E(W_{g,N})}{\sqrt{\widehat{\VAR}(W_{g,N})}}
 \]
 converges to a standard normal distribution $N \to \infty$
 provided that $\lim_{N\to\infty} N_q / N = \xi_q$, where
-$0 \le \xi_q \le 1$, if $0 < q < g$ or $0 \le \xi_q < 1$ if
+$0 \le \xi_q \le 1$, if $0 < q < g$; or, $0 \le \xi_q < 1$, if
 $q \in \{0, g\}$.
 This test is equivalent to the RGL test for balanced data when the
 treatment is assigned at the cluster-level.
@@ -484,7 +484,7 @@ converges to a standard normal distribution as $N \to \infty$
 under mild conditions.
 
 
-\section{Signed-Rank Test}
+\section{Signed-Rank Test for Clustered Data}
 \label{s:signedrank}
 
 The Wilcoxon signed-rank test is often used for paired data comparison.
@@ -508,8 +508,9 @@ the clustered WIlcoxon signed-rank statistic is
 \[
 T = \sum_{i=1}^N S_{i+} = \sum_{i=1}^N  \sum_{j=1}^g R_{ij} V_{ij},
 \]
-where $S_{i+} = \sum^g_{j=1}S_{ij}$ and only nonzero $X_{ij}$ is
-considered in the computation of signed-ranks.
+where $S_{i+} = \sum^g_{j=1}S_{ij}$ is the rank sum within the $i$th
+cluster and only nonzero $X_{ij}$ is considered in the computation of
+signed-ranks.
 The null sampling distribution of $T$ can be obtained from a
 randomization at the cluster-level conditional on $S_{i+}$'s.
 Let $\delta_i$, $i = 1, \ldots, N$, be independent and identically
@@ -590,11 +591,18 @@ $Z = T / \sqrt{\widehat\VAR(T)}$ converges to a standard normal
 distribution under mild conditions.
 
 
-Note that as long as members from the same cluster have an identical
-distribution, the DS method does not require the distribution of
-members from clusters with different sizes to be identical, while this is
-usually a common assumption made by most signed-rank tests for
-clustered data in the literature.
+Note that the null distribution being tested using the DS method
+is the distribution of the paired difference of a randomly selected
+pair from a randomly selected cluster, regardless of the cluster size.
+Whereas the null distribution of most signed-rank tests is the common
+distribution of a randomly selected paired difference conditional on
+the size of the cluster it belongs to.
+Therefore the latter framework is a special case of the former.
+Also, the DS method accounts for the cluster size by assigning equal
+weight to each cluster instead of each paired difference, e.g., a paired
+difference from a larger cluster will be assigned a smaller weight
+than a paired difference from a smaller cluster.
+
 
 
 \section{Usage}
@@ -688,7 +696,7 @@ Other arguments are identical to those in the default interface.
 \section{Illustrations}
 \label{s:illus}
 
-\subsection{Rank-sum test}
+\subsection{Rank-sum test for Clustered Data}
 
 We use a scheme that is similar to the simulation study in
 \citet{Datt:Satt:rank:2005} to generate data for clustered
@@ -814,11 +822,11 @@ clusWilcox.test(x ~ grp + cluster(cid), dat = dat.cl, method = "ds")
 @
 
 
-\subsection{Signed-rank test}
+\subsection{Signed-rank test for Clustered Data}
 
 To illustrate clustered signed-rank tests, we generate data from a scheme
 slightly modified from simulation scenario~1 in \citet{Datt:Satt:sign:2008}.
-The paird differences in a cluster are generated as
+The paired differences in a cluster are generated as
 \[
   X = \mathrm{sign}(Z) \exp(|Z|),
 \]
@@ -866,7 +874,7 @@ The package contains a real dataset named \code{eye} from a retrospective
 observations stuly \citep{Ferr:Sedd:phen:2015} that aims to characterize the
 phenotype associated with a rare variant in the complement factor H (CFH)
 R1210C,  a protein involved in the age-related macular degeneration (AMD).
-The data contains measures of 283 eyes from 143 patients, 
+The data contains measures of 283 eyes from 143 patients,
 among whom 62 had the rare variant and 81 did not.
 The clusters are the patients and the subunits are the eyes.
 The outcome variable was the AMD grading score based
@@ -882,7 +890,7 @@ and 2) the subset of observations with CARMS grade 1, 2, 3 or~5.
 In the \code{eye} data, the outcome variable is \code{CARMS};
 the patients ids indicating the clusters are stored in variable \code{ID};
 the rare variant grouping at the cluster (patient) level is indicated by
-variable \code{Variant}. 
+variable \code{Variant}.
 
 
 We apply both the RGL and DS method to the first subset:
@@ -917,7 +925,7 @@ clusWilcox.test(CARMS ~ Variant + cluster(ID), data = eye, method = "ds",
                 subset = CARMS %in% c(1, 2, 3, 5))
 @
 This time, the p-values of the two approaches are easily discernable, which
-is quite possibl because the methods are based on different assumptions. 
+is quite possible because the methods are based on different assumptions.
 The DS method reports a p-value of $0.006312$, in contrast to $0.06455$ from
 the RGL method. The results suggest association between the presence of
 CFH~R1210C rare variant and the symptom with CNV as the advanced stage.
@@ -935,7 +943,7 @@ controlling for the age/gender strata.
 
 Comparisons of the RGL and DS methods under some common
 scenarios have not been studied in the recent literature.
-Such comparison can be easily done with package \pkg{clusrank}.
+Such comparison can be easily done with the package \pkg{clusrank}.
 Using the two data generation functions defined above, we conduct a
 simulation study comparing their sizes and powers in a few settings.
 The following function generates replicates of data for a
@@ -992,7 +1000,7 @@ It means that the RGL method is robust to the violation of the
 exchangeability assumption in this setting.
 
 
-\subsection{Rank-sum tests}
+\subsection{Rank-sum tests for Clustered Data}
 
 
 \begin{table}[tbp]
@@ -1090,7 +1098,7 @@ lower power with random cluster size, while the DS method has lower
 power with fixed cluster size, though the differences are not big.
 
 
-\subsection{Signed-rank tests}
+\subsection{Signed-rank tests for Clustered Data}
 
 For the signed-rank test, \citet{Datt:Satt:sign:2008} did not have
 settings with completely random cluster size, and their non-exchangeable
@@ -1162,7 +1170,7 @@ the same power.
 Clustered data are frequently encountered in scientific research, and
 rank-based tests for clustered data are an indispensable tool like
 their counterparts, the Wilcoxon tests for independent data.
-Package \pkg{clusrank} provides two schools, the RGL method and the DS
+The package \pkg{clusrank} provides two schools, the RGL method and the DS
 method, of the recently developed rank-sum tests and signed-rank tests
 in a unified, higher-level, user-friendly interface.
 Users need to be aware of the applicability of these tests when using them.
@@ -1174,10 +1182,10 @@ the number of clusters to not to be too small.
 
 
 Implementation of other rank-based methods for clusterd data can be
-considered in future development of package \pkg{clusrank}.
+considered in future development of the package \pkg{clusrank}.
 For the rank-sum test, the case of informative group size within a cluster
 \citep{Dutt:Datt:rank:2016} would be a useful addition, though it is
-available in package \pkg{ClusterRankTest} \citep{Dutt:Datt:clus:2016}.
+available in the package \pkg{ClusterRankTest} \citep{Dutt:Datt:clus:2016}.
 For the signed-rank test,  \citet{Laro:wilc:2005} has a variance estimator
 based on certain sums of squares over independent clusters.
 Sign tests and signed-rank tests for multivariate clustered data
