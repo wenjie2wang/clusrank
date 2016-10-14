@@ -870,7 +870,7 @@ clusWilcox.test(x ~ cluster(cid),  dat.sgn, paired = TRUE, method = "ds")
 
 \subsection{A real data example}
 
-The package contains a real dataset named \code{eye} from a retrospective
+The package contains a real dataset named \code{amd} from a retrospective
 observations stuly \citep{Ferr:Sedd:phen:2015} that aims to characterize the
 phenotype associated with a rare variant in the complement factor H (CFH)
 R1210C,  a protein involved in the age-related macular degeneration (AMD).
@@ -887,18 +887,18 @@ choroidal neovascularization (CNV) related symptoms.
 The Wilcoxon rank-sum test is to be carried out on two subsets:
 1) the subset of observations with CARMS grade 1, 2, 3 or~4;
 and 2) the subset of observations with CARMS grade 1, 2, 3 or~5.
-In the \code{eye} data, the outcome variable is \code{CARMS};
+In the \code{amd} data, the outcome variable is \code{CARMS};
 the patients ids indicating the clusters are stored in variable \code{ID};
 the rare variant grouping at the cluster (patient) level is indicated by
 variable \code{Variant}.
 
 
 We apply both the RGL and DS method to the first subset:
-<<eye1234-both>>=
-data(eye)
-clusWilcox.test(CARMS ~ Variant + cluster(ID), data = eye,
+<<amd1234-both>>=
+data(amd)
+clusWilcox.test(CARMS ~ Variant + cluster(ID), data = amd,
                 subset = CARMS %in% c(1, 2, 3, 4), method = "rgl")
-clusWilcox.test(CARMS ~ Variant + cluster(ID), data = eye,
+clusWilcox.test(CARMS ~ Variant + cluster(ID), data = amd,
                 subset = CARMS %in% c(1, 2, 3, 4), method = "ds")
 @
 The p-values from both tests are close and less than $0.001$, which
@@ -910,18 +910,18 @@ advanced stage.
 For the RGL method, a stratifying variable \code{Agesex} which categorizes
 the patients into 6~strata by their age and gender can be used as a control
 variable:
-<<eye1234-rgl>>=
-clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = eye,
+<<amd1234-rgl>>=
+clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = amd,
                 subset = CARMS %in% c(1, 2, 3, 4))
 @
 The p-value is still less than $0.001$ after controlling for age and gender.
 
 
 We then apply the two tests to the subset of the second subset:
-<<eye12355-both>>=
-clusWilcox.test(CARMS ~ Variant + cluster(ID), data = eye, method = "rgl",
+<<amd12355-both>>=
+clusWilcox.test(CARMS ~ Variant + cluster(ID), data = amd, method = "rgl",
                 subset = CARMS %in% c(1, 2, 3, 5))
-clusWilcox.test(CARMS ~ Variant + cluster(ID), data = eye, method = "ds",
+clusWilcox.test(CARMS ~ Variant + cluster(ID), data = amd, method = "ds",
                 subset = CARMS %in% c(1, 2, 3, 5))
 @
 This time, the p-values of the two approaches are easily discernable, which
@@ -930,8 +930,8 @@ The DS method reports a p-value of $0.006312$, in contrast to $0.06455$ from
 the RGL method. The results suggest association between the presence of
 CFH~R1210C rare variant and the symptom with CNV as the advanced stage.
 Again, the RGL method can be applied with age and gender controlled:
-<<eye12355-rgl>>=
-clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = eye,
+<<amd12355-rgl>>=
+clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = amd,
                 subset = CARMS %in% c(1, 2, 3, 5), method = "rgl")
 @
 The p-value from the RGL method remains virtually unchanged after

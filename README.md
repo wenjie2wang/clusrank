@@ -1,4 +1,8 @@
 # To-do #
+## Oct 04, 2016,
++ Add the functions in the paper to the testrun.R
+
+
 
 ## July 26, 2016, 11:00 am
 + ~~Go through the formulas~~
@@ -50,3 +54,4 @@
 + ~~Missing rate. <- keep rate.~~
 + Citation Laroque. one book chapter and one biometrica.
 + ~~semicolumn after score. Fix printout.~~
+

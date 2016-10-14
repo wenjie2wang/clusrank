@@ -40,6 +40,7 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
     grp <- stats::aggregate(group ~ cluster, FUN = mean)[, 2]
     strt <- stats::aggregate(stratum ~ cluster, FUN = mean)[, 2]
     clus <- unique(cluster)
+    n.clus <- length(clus)
     dat <- data.frame(clus, strt, grp, csize, rksum)
     bal <- (!(length(unique(table(cluster))) != 1L))
 
@@ -97,8 +98,9 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
         result <- list(statistic = W, p.value = pval,
                        null.value = mu, alternative = alternative,
                        data.name = DNAME, method = METHOD,
-                       balance = bal, exact = exact)
-        class(result) <- "htest"
+                       balance = bal, exact = exact, nclus = n.clus,
+                       nobs = n.obs)
+        class(result) <- "ctest"
         return(result)
 
     } else {
@@ -157,8 +159,9 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
                        null.value = mu,
                        data.name = DNAME,
                        method = METHOD,
-                       balance = bal, exact = exact)
-        class(result) <- "htest"
+                       balance = bal, exact = exact,
+                       nobs = n.obs, nclus = n.clus)
+        class(result) <- "ctest"
         return(result)
     }
 
@@ -222,8 +225,8 @@ clusWilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
                  null.value = mu,
                  data.name = DNAME,
                  method = METHOD,
-                 balance = bal)
-        class(result) <- "htest"
+                 balance = bal, nobs = n.obs, nclus = n.clus)
+        class(result) <- "ctest"
         return(result)
 
     } else {
@@ -353,8 +356,8 @@ clusWilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
         result <- list(statistic = Z, p.value = pval,
                        alternative = alternative, null.value = mu,
                        data.name = DNAME, method = METHOD,
-                       balance = bal)
-        class(result) <- "htest"
+                       balance = bal, nobs = n.obs, nclus = n.clus)
+        class(result) <- "ctest"
         return(result)
     }
 }
@@ -369,7 +372,7 @@ clusWilcox.test.ranksum.ds <- function(x, cluster, group,
     if (group.uniq == 1) {
         stop("invalid group variable, should contain at least 2 groups")
     }
-    
+
     n.obs <- length(x)
 
     Fhat <- numeric(n.obs)
@@ -378,11 +381,11 @@ clusWilcox.test.ranksum.ds <- function(x, cluster, group,
     x <- x[order.c]
     group <- group[order.c]
     cluster.uniq <- unique(cluster)
-    M <- length(cluster.uniq)
+    n.clus <- M <- length(cluster.uniq)
     cluster <- recoderFunc(cluster, cluster.uniq, c(1 : M))
 
-   
-    
+
+
     ni <- table(cluster)
 
     temp <- unique(sort(abs(x)))
@@ -435,9 +438,10 @@ clusWilcox.test.ranksum.ds <- function(x, cluster, group,
         result <- list(statistic = Z, p.value = pval, S = S,
                        ES = ES, varS = varS,
                        alternative = alternative, null.value = mu,
-                       data.name = DNAME, method = METHOD)
+                       data.name = DNAME, method = METHOD,
+                       nobs = n.obs, nclus = n.clus)
 
-        class(result) <- "htest"
+        class(result) <- "ctest"
         result
 
 
@@ -496,9 +500,10 @@ clusWilcox.test.ranksum.ds <- function(x, cluster, group,
         names(ngrp) <- "number of groups: "
         names(df) <- "degree of freedom: "
         METHOD <- paste(METHOD, "using Chi-square test")
-        result <- list(statistic = T, p.value = pval, n.group = ngrp,
-                       df = df, data.name = DNAME, method = METHOD)
-        class(result) <- "htest"
+        result <- list(statistic = T, p.value = pval, ngroup = ngrp,
+                       df = df, data.name = DNAME, method = METHOD,
+                       nobs = n.obs, nclus = n.clus)
+        class(result) <- "ctest"
         result
     }
 }
