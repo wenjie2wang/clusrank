@@ -255,7 +255,7 @@ are made very easy by the package using only a few lines of codes.
 A discussion concludes in Section~\ref{s:disc}.
 
 
-\section{Rank-Sum Test for Clustered Data}
+\section{Rank-sum test for clustered data}
 \label{s:ranksum}
 
 The Wilcoxon rank-sum test is used for two-sample comparison.
@@ -331,9 +331,8 @@ $\E(W_g) = m_g R_{++, g}  / N_g$ and
 \sum_{i \in I_g} \left(R_{i+} - \frac{R_{++,g}}{N_g}\right)^2,
 \]
 where $R_{++,g} = \sum_{i\in I_g} R_{i+}$.
-\citet{Rosn:Glyn:Lee:inco:2003} showed that under mild conditions, the
-asymptotic
-distribution of the test statistic $Z$ is standard normal.
+\citet{Rosn:Glyn:Lee:inco:2003} showed that under mild conditions, the 
+asymptotic distribution of the test statistic $Z$ is standard normal.
 The method can be extended to the case of stratified data.
 
 
@@ -484,7 +483,7 @@ converges to a standard normal distribution as $N \to \infty$
 under mild conditions.
 
 
-\section{Signed-Rank Test for Clustered Data}
+\section{Signed-rank test for clustered data}
 \label{s:signedrank}
 
 The Wilcoxon signed-rank test is often used for paired data comparison.
@@ -696,7 +695,7 @@ Other arguments are identical to those in the default interface.
 \section{Illustrations}
 \label{s:illus}
 
-\subsection{Rank-sum test for Clustered Data}
+\subsection{Rank-sum test for clustered data}
 
 We use a scheme that is similar to the simulation study in
 \citet{Datt:Satt:rank:2005} to generate data for clustered
@@ -822,7 +821,7 @@ clusWilcox.test(x ~ grp + cluster(cid), dat = dat.cl, method = "ds")
 @
 
 
-\subsection{Signed-rank test for Clustered Data}
+\subsection{Signed-rank test for clustered data}
 
 To illustrate clustered signed-rank tests, we generate data from a scheme
 slightly modified from simulation scenario~1 in \citet{Datt:Satt:sign:2008}.
@@ -1000,7 +999,7 @@ It means that the RGL method is robust to the violation of the
 exchangeability assumption in this setting.
 
 
-\subsection{Rank-sum tests for Clustered Data}
+\subsection{Rank-sum tests for clustered data}
 
 
 \begin{table}[tbp]
@@ -1098,7 +1097,7 @@ lower power with random cluster size, while the DS method has lower
 power with fixed cluster size, though the differences are not big.
 
 
-\subsection{Signed-rank tests for Clustered Data}
+\subsection{Signed-rank tests for clustered data}
 
 For the signed-rank test, \citet{Datt:Satt:sign:2008} did not have
 settings with completely random cluster size, and their non-exchangeable
