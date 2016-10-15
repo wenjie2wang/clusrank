@@ -331,7 +331,7 @@ $\E(W_g) = m_g R_{++, g}  / N_g$ and
 \sum_{i \in I_g} \left(R_{i+} - \frac{R_{++,g}}{N_g}\right)^2,
 \]
 where $R_{++,g} = \sum_{i\in I_g} R_{i+}$.
-\citet{Rosn:Glyn:Lee:inco:2003} showed that under mild conditions, the 
+\citet{Rosn:Glyn:Lee:inco:2003} showed that under mild conditions, the
 asymptotic distribution of the test statistic $Z$ is standard normal.
 The method can be extended to the case of stratified data.
 
@@ -916,7 +916,7 @@ clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = amd,
 The p-value is still less than $0.001$ after controlling for age and gender.
 
 
-We then apply the two tests to the subset of the second subset:
+We then apply the two tests to the second subset:
 <<amd12355-both>>=
 clusWilcox.test(CARMS ~ Variant + cluster(ID), data = amd, method = "rgl",
                 subset = CARMS %in% c(1, 2, 3, 5))
