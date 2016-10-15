@@ -121,17 +121,17 @@ clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
             sumrank <- c(by(data$signrank, data$cluster, sum))
             sumsq <- sum(sumrank ^ 2)
             VarT <- sumsq
-            Zc <- T / sqrt(VarT)
-            pval <- 2 * (1 - pnorm(abs(Zc)))
+            Z <- T / sqrt(VarT)
+            pval <- 2 * (1 - pnorm(abs(Z)))
             ADJUST <- FALSE
             names(T) <- "T"
-            names(Zc) <- "Zc"
+            names(Z) <- "Z"
             names(VarT) <- "variance of T"
             names(n) <- "total number of observations"
             names(m) <- "total number of clusters"
             names(VarT) <- paste("variance of ", names(T))
             names(mu) <- "shift in location"
-            result <- list(Rstat = T, VRstat = VarT, statistic = Zc,
+            result <- list(Rstat = T, VRstat = VarT, statistic = Z,
                            p.value = pval, nobs = n, nclus = m, null.value = mu,
                            alternative = alternative,
                            data.name = DNAME, method = METHOD,
@@ -172,22 +172,22 @@ clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
             T <- sum(meansumrank * wi)
             sqweightsum <- sum(wi ^ 2 * meansumrank ^ 2)
             VarT <- sqweightsum
-            Zc <-  T / (sqrt(VarT))
+            Z <-  T / (sqrt(VarT))
             pval <- switch(alternative,
-                           less = pnorm(abs(Zc)),
-                           greater = pnorm(abs(Zc), lower.tail = FALSE),
-                           two.sided = 2 * min(pnorm(abs(Zc)),
-                                               pnorm(abs(Zc), lower.tail = FALSE)))
+                           less = pnorm(abs(Z)),
+                           greater = pnorm(abs(Z), lower.tail = FALSE),
+                           two.sided = 2 * min(pnorm(abs(Z)),
+                                               pnorm(abs(Z), lower.tail = FALSE)))
 
             names(T) <- "T"
-            names(Zc) <- "Zc"
+            names(Z) <- "Z"
 
             ADJUST <- TRUE
             names(mu) <- "shift in location"
             names(n) <- "total number of observations"
             names(m) <- "total number of clusters"
             names(VarT) <- paste("variance of ", names(T))
-            result <- list(Rstat = T, VRstat = VarT, statistic = Zc,
+            result <- list(Rstat = T, VRstat = VarT, statistic = Z,
                            p.value = pval, nobs = n, nclus = m,
                            alternative = alternative,
                            null.value = mu,
@@ -245,7 +245,7 @@ clusWilcox.test.signedrank.ds <- function(x, cluster, alternative,
     result <- list(statistic = Z,
                    srstat = T,
                    vsrstat = VTS,
-                   p.value = pval, nclus = n, nclus = m,
+                   p.value = pval, nobs = n, nclus = m,
                    alternative = alternative,
                    null.value = mu,
                    data.name = DNAME, method = METHOD)
