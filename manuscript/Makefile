@@ -19,11 +19,6 @@ pdf : tex
 
 clean:
 	rm *.aux *.bbl *.log *.blg *.out *.pdf *.tex
-# watch:
-#     $(info ************  WATCHING FOR CHANGES  ************)
-#     watchman watch "$(shell pwd)"
-#     watchman -- trigger "$(shell pwd)" remake *.Rnw -- make pdf
 
-# unwatch:
-#     $(info ************  CANCELLING WATCH  ************)
-#     watchman watch-del "$(shell pwd)"
+deepClean: 
+	rm -rf cache
