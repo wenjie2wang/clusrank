@@ -492,18 +492,143 @@ clusWilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
 }
 
 
+clusWilcox.test.ranksum.ds.perm1 <- function(x, cluster, group, mu) {
+    group.uniq <- length(unique(group))
+    if (group.uniq == 1) {
+        stop("invalid group variable, should contain at least 2 groups")
+    }
 
+    n.obs <- length(x)
+
+    Fhat <- numeric(n.obs)
+    order.c <- order(cluster)
+    cluster <- cluster[order.c]
+    x <- x[order.c]
+    group <- group[order.c]
+    cluster.uniq <- unique(cluster)
+    n.clus <- M <- length(cluster.uniq)
+    cluster <- recoderFunc(cluster, cluster.uniq, c(1 : M))
+
+
+
+    ni <- table(cluster)
+
+    temp <- unique(sort(abs(x)))
+    diff.min <- min(diff(temp)) / 10 # A quntity 1 / 10 of the minimum difference between scores
+
+    FHat <- ecdf(x)
+    Fhat <- FHat(x) / 2 + FHat(x - diff.min) / 2
+
+
+    F.prop <- Fprop(x, cluster, ni, M, n.obs)
+    F.prop2 <- F.prop
+
+    if (group.uniq == 2) {
+###calculate quantity 2 (using the pooled estimate of F)
+        group <- recoderFunc(group, sort(unique(group)), c(1, 0))
+        x[which(group == 0)] <- x[which(group == 0)] - mu
+        ni1 <- aggregate(group ~ cluster, FUN = sum)[, 2] # number of
+                                        # obs under trt 2 in each
+                                        # cluster
+        if (all(ni1 / ni == 0.5)) {
+            warning("The DS ranksum test is not reliable for colateral data where each cluster is equally split between the 2 treatments.")
+        }
+        ## Calculate S = E(W*|W, g)
+        Ni <- rep.int(ni, times = ni)
+        S <- sum(group / Ni * (1 + F.prop))
+        S <- S / (M + 1)
+        return(S)
+
+    } else {
+###calculate quantity 2 (using the pooled estimate of F)
+        if (!is.null(mu) && mu != 0) {
+            warning("comparison between m (m > 2) groups cannot set location shift parameter")
+        }
+        mu <- 0
+        m <- length(unique(group))
+        Sj <- numeric(m)
+        group.uniq <- unique(group)
+        for ( j in 1 : m) {
+            for ( i in 1 : M) {
+                gik.j <- ifelse(group == j, 1, 0)
+                Sj[j] <- Sj[j] + sum(gik.j[cluster == i] *
+                                     (1 + F.prop[cluster == i])) / ni[i]
+            }
+        }
+        Sj <- Sj / (M + 1)
+
+        nij <- matrix( 0, m, M)
+        for ( i in 1 : m) {
+            nij[i, ] <- table(factor(cluster[group == group.uniq[i]], levels = unique(cluster)))
+        }
+        d <- apply(nij, 1, FUN = function(x) {x / ni})
+        ESj <- apply(d, 2, sum) / 2
+
+        What <- matrix(0, m, M)
+        a <- t(d)
+        for ( i in 1 : M) {
+            for ( j in 1 : m) {
+                gik.j <- ifelse(group[cluster == i] == j, 1, 0)
+                b <- 1 / (ni[i] * (M + 1))
+                c <- gik.j * (M - 1)
+                d <- sum(a[j, -i])
+                What[j, i] <- b * sum((c - d) * Fhat[cluster == i])
+            }
+        }
+        EW <- matrix(0, m, M)
+        for ( j in 1 : m) {
+            EW[j, ] <- (M / (2 * ( M + 1))) * (a[j, ] - sum(a[j, ]) / M)
+        }
+
+        dev.W <- What - EW
+        V <- matrix(0, m, m)
+        for ( i in 1 : M) {
+            V <- V + dev.W[, i] %*% t(dev.W[, i])
+        }
+        V <- V / M
+        T <- t(Sj - ESj) %*% ginv(V) %*% (Sj - ESj) / M
+        return(T)
+    }
+}
 
 clusWilcox.test.ranksum.ds.perm <- function(x, cluster, group,
                                             alternative,
                                             mu,
                                             DNAME, METHOD) {
     n.obs <- length(x)
+    n.clus <- length(unique(cluster))
+    W.vec <- rep(NA, exact)
+    W <- clusWilcox.test.ranksum.ds.perm1(x, cluster, group, mu)
     for ( i in 1 : exact) {
         grp.temp <- sample(group, n.obs)
-
+        W.vec[i] <- clusWilcox.test.ranksum.ds.perm1(x, cluster,
+                                                     grp.temp, mu)
 
     }
+
+    w.ecdf <- ecdf(W.vec)
+    pval <- switch(alternative, less = w.ecdf(W),
+                   greater = 1 - w.ecdf(W),
+                   two.sided = 2 * min(w.ecdf(W), 1 - w.ecds(W)))
+    METHOD <- paste0(METHOD, " (random permutation)")
+    names(mu) <- "difference in locations"
+
+    if (length(unique(group)) > 2) {
+        names(W) <- "chi-square statistic"
+        result <- list(statistic = W, p.value = pval,
+                       alternative = alternative, null.value = mu,
+                       data.name = DNAME, method = METHOD,
+                       nobs = n.obs, nclus = n.clus)
+        class(result) <- "ctest"
+    } else {
+        names(W) <- "W"
+        result <- list(statistic = W, p.value = pval,
+                       alternative = alternative, null.value = mu,
+                       data.name = DNAME, method = METHOD,
+                       nobs = n.obs, nclus = n.clus)
+        class(result) <- "ctest"
+    }
+    result
 }
 
 
