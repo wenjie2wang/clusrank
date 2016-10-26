@@ -200,6 +200,72 @@ clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
     }
 }
 
+clusWilcox.test.signedrank.ds.perm1 <- function(x, cluster) {
+    order.c <- order(cluster)
+    x <- x[order.c]
+    cluster <- cluster[order.c]
+    csize <- as.vector(table(cluster))
+    m <- length(csize)
+    cid <- as.numeric(names(csize))
+    n <- sum(csize)
+    plus <- as.numeric(x > 0)
+    minus <- as.numeric(x < 0)
+    niplus <- aggregate(plus ~ cluster, FUN = sum)[, 2]
+    niminus <- aggregate(minus ~ cluster, FUN = sum)[, 2]
+    ni <- table(cluster)
+
+
+    csize.cum <- cumsum(csize)
+    csize.cum <- c(0, csize.cum)
+    cluster <- recoderFunc(cluster, unique(cluster), c(1 : m))
+
+
+    Ftot.vec  <- Ftot_vec(abs(x), cluster, csize, n, m)
+    Fi.vec <- Fi_vec(abs(x), cluster, csize, n, m)
+    Fcom.vec <- Fcom_vec(abs(x), cluster, csize, n, m)
+
+    T <- sum((niplus - niminus) / ni) +
+        sum((sign(x) * (Ftot.vec - Fi.vec)) / rep.int(ni, times = ni))
+    T
+
+}
+
+
+clusWilcox.test.signedrank.ds.perm <- function(x, cluster, alternative,
+                                               exact,
+                                               mu, DNAME, METHOD) {
+    T.vec <- rep(NA, exact)
+    x <- x - mu
+    n.obs <- length(x)
+    n.clus <- length(unique(cluster))
+    for ( i in 1 : exact) {
+        sgn.samp <- sample(c(-1, 1), n.obs, TRUE)
+        x.samp <- abs(x) * sgn.samp
+        T.vec[i] <- clusWIlcox.test.signedrank.ds.perm1(x.samp, cluster)
+    }
+    T <- clusWIlcox.test.signedrank.ds.perm1(x, cluster)
+    t.ecdf <- ecdf(T.vec)
+
+    pval <- switch(alternative, less = t.ecdf(T),
+                   greater = 1 - t.ecdf(T),
+                   two.sided = 2 * min(t.ecdf(T), 1 - t.ecdf(T)))
+
+    names(n.obs) <- "total number of observations"
+    names(n.clus) <- "total number of clusters"
+    names(T) <- "T"
+    names(mu) <- "shift in location"
+    result <- list(statistic = T,
+                   p.value = pval, nobs = n.obs, nclus = n.clus,
+                   alternative = alternative,
+                   null.value = mu,
+                   data.name = DNAME, method = METHOD)
+    class(result) <- "ctest"
+    return(result)
+
+
+}
+
+
 clusWilcox.test.signedrank.ds <- function(x, cluster, alternative,
                                           mu, DNAME, METHOD) {
     x <- x - mu
