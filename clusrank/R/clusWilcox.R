@@ -16,16 +16,17 @@
 ##'     clustered wilcoxon rank test to be use, should be one of
 ##'     \code{"rgl"} or \code{"ds"}.
 ##' @param paired A logical indicating whether you want a paired test.
-##' @param exact A integer indicating whether an exact p-value or a
-##'     permutation p-value should be computed. When it is set as 0
-##'     (default), aymptotic test is used; when it is set as 1, exact
-##'     test is to be used; when it is set as a integer greater than
+##' @param exact A integer indicating which one of the three tests: the
+##'     exact p-value, the permutation test based on random samplng,
+##'     and the large sample test. When it is set as 0 (default),
+##'     aymptotic test is used; when it is set as 1, exact test is to
+##'     be used; when it is set as a integer greater than
 ##'     1, the permutation test based on random sampling is used and
 ##'     the number is used as the size of the random sample.
 ##'     Exact test is only available for \code{rgl} signed rank test
 ##'     and \code{rgl} rank sum test when treatment is assigned at
 ##'     cluster level and random permutataion tests are available for
-##'     all provided tests.
+##'     all other tests.
 ##' @param formula A formula of the form \code{lhs ~ rhs} where the
 ##'     \code{lhs} is the measurements and
 ##'     the \code{rhs} is of the form group + \code{cluster}(x1) +
@@ -372,12 +373,12 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
         if ((method) == "ds") {
             METHOD <- paste(METHOD, "using Datta-Satten method", sep = " ")
             arglist <- setNames(list(x, cluster, group, mu, alternative,
-                                     DNAME, METHOD),
+                                     DNAME, METHOD, exact),
                                 c("x", "cluster", "group", "mu",
-                                  "alternative", "DNAME", "METHOD"))
-            if (exact == TRUE) {
+                                  "alternative", "DNAME", "METHOD", "exact"))
+            if (exact != 0) {
                 print("Permutation test based on sampling is provided for 'ds' method")
-=            }
+            }
 
             if (length(table(stratum)) > 1L) {
                 warning("'stratum' will be ignored for the clustered rank sum test, 'ds' method")

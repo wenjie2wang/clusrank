@@ -200,7 +200,7 @@ clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
     }
 }
 
-clusWilcox.test.signedrank.ds.perm1 <- function(x, cluster) {
+clusWilcox.test.signedrank.ds.perm.1 <- function(x, cluster) {
     order.c <- order(cluster)
     x <- x[order.c]
     cluster <- cluster[order.c]
@@ -234,6 +234,7 @@ clusWilcox.test.signedrank.ds.perm1 <- function(x, cluster) {
 clusWilcox.test.signedrank.ds.perm <- function(x, cluster, alternative,
                                                exact,
                                                mu, DNAME, METHOD) {
+    METHOD <- paste0(METHOD, " (permutation test based on random sampling)")
     T.vec <- rep(NA, exact)
     x <- x - mu
     n.obs <- length(x)
@@ -241,9 +242,9 @@ clusWilcox.test.signedrank.ds.perm <- function(x, cluster, alternative,
     for ( i in 1 : exact) {
         sgn.samp <- sample(c(-1, 1), n.obs, TRUE)
         x.samp <- abs(x) * sgn.samp
-        T.vec[i] <- clusWIlcox.test.signedrank.ds.perm1(x.samp, cluster)
+        T.vec[i] <- clusWilcox.test.signedrank.ds.perm.1(x.samp, cluster)
     }
-    T <- clusWIlcox.test.signedrank.ds.perm1(x, cluster)
+    T <- clusWilcox.test.signedrank.ds.perm.1(x, cluster)
     t.ecdf <- ecdf(T.vec)
 
     pval <- switch(alternative, less = t.ecdf(T),
@@ -266,8 +267,19 @@ clusWilcox.test.signedrank.ds.perm <- function(x, cluster, alternative,
 }
 
 
-clusWilcox.test.signedrank.ds <- function(x, cluster, alternative,
+clusWilcox.test.signedrank.ds <- function(x, cluster, alternative, exact,
                                           mu, DNAME, METHOD) {
+
+
+    if (exact > 1){
+        return(clusWilcox.test.signedrank.ds.perm(x, cluster, alternative,
+                                                  exact, mu, DNAME, METHOD))
+    }
+
+    if (exact == 1) {
+        warning("Exact test is not provided for DS method for signed rank test, large sample test will be carried out")
+    }
+
     x <- x - mu
     order.c <- order(cluster)
     x <- x[order.c]

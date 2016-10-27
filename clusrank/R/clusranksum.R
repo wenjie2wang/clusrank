@@ -96,17 +96,23 @@ clusWilcox.test.ranksum.rgl.clus.perm <- function(x, cluster, group,
     for ( i in 1 : length(strt.uniq)) {
         for ( j in 1 : length(csize.uniq)) {
             temp <- (stratum == strt.uniq[i] & x.csize[, 3] == csize.uniq[j])
-            if (all(temp) == FALSE) next
+            if (all(temp == FALSE)) next
             ind.l[[ct]] <- temp
             ind.l[[ct]] <- cbind(x[temp], group[temp], cluster[temp],
                                  strt.uniq[i], csize.uniq[j])
         }
+        ct <- ct + 1
     }
 
-    ind.l <- ind.l[!lapply(ind.l, is.null)]
+    ind.l <- ind.l[!unlist(lapply(ind.l, is.null))]
 
     samp.ind <- function(x) {
-        x[, 2] <- sample(x[, 2], length(x[, 2]))
+        grp <- x[, 2]
+        cls <- x[, 3]
+        temp.grp <- stats::aggregate(grp ~ clus, FUN = mean)[, 2]
+        temp.grp <- sample(temp.grp, length(temp.grp))
+        temp.grp <- rep.int(temp.grp, times = x[1, 4])
+        x[, 2] <- temp.grp
         x
     }
 
@@ -117,12 +123,12 @@ clusWilcox.test.ranksum.rgl.clus.perm <- function(x, cluster, group,
         temp <- lapply(ind.l, samp.ind)
         temp1 <- NULL
         for ( j in 1 : length(temp)) {
-            temp1 <- rbind(temp[[j]])
+            temp1 <- rbind(temp1, temp[[j]])
         }
-        x.temp <- temp[1, ]
+        x.temp <- temp1[, 1]
         group.temp <- temp1[, 2]
         cluster.temp <- temp1[, 3]
-        str.temp <- temp[, 4]
+        str.temp <- temp1[, 4]
 
         W.vec[i] <- clusWilcox.test.ranksum.rgl.clus.perm.1(x.temp,
                                                             cluster.temp,
@@ -136,7 +142,7 @@ clusWilcox.test.ranksum.rgl.clus.perm <- function(x, cluster, group,
     pval<- switch(alternative,
                   less = w.ecdf(W),
                   greater = 1 - w.ecdf(W),
-                  two.sided = 2 * min(w.ecdf(W), 1 - p.val.l))
+                  two.sided = 2 * min(w.ecdf(W), 1 - w.ecdf(W)))
     names(mu) <- "location"
 
     names(W) <- "W"
@@ -492,7 +498,7 @@ clusWilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
 }
 
 
-clusWilcox.test.ranksum.ds.perm1 <- function(x, cluster, group, mu) {
+clusWilcox.test.ranksum.ds.perm.1 <- function(x, cluster, group, mu) {
     group.uniq <- length(unique(group))
     if (group.uniq == 1) {
         stop("invalid group variable, should contain at least 2 groups")
@@ -593,7 +599,7 @@ clusWilcox.test.ranksum.ds.perm1 <- function(x, cluster, group, mu) {
 
 clusWilcox.test.ranksum.ds.perm <- function(x, cluster, group,
                                             alternative,
-                                            mu,
+                                            mu, exact,
                                             DNAME, METHOD) {
     n.obs <- length(x)
     n.clus <- length(unique(cluster))
@@ -609,7 +615,7 @@ clusWilcox.test.ranksum.ds.perm <- function(x, cluster, group,
     w.ecdf <- ecdf(W.vec)
     pval <- switch(alternative, less = w.ecdf(W),
                    greater = 1 - w.ecdf(W),
-                   two.sided = 2 * min(w.ecdf(W), 1 - w.ecds(W)))
+                   two.sided = 2 * min(w.ecdf(W), 1 - w.ecdf(W)))
     METHOD <- paste0(METHOD, " (random permutation)")
     names(mu) <- "difference in locations"
 
@@ -632,14 +638,17 @@ clusWilcox.test.ranksum.ds.perm <- function(x, cluster, group,
 }
 
 
-
-
 #' @importFrom MASS ginv
 
 clusWilcox.test.ranksum.ds <- function(x, cluster, group,
                                        alternative,
-                                       mu,
+                                       mu, exact,
                                        DNAME, METHOD) {
+    if (exact > 1)  {
+        return(clusWilcox.test.ranksum.ds.perm(x, cluster, group,
+                                               alternative,
+                                               mu, exact, DNAME, METHOD))
+    }
     group.uniq <- length(unique(group))
     if (group.uniq == 1) {
         stop("invalid group variable, should contain at least 2 groups")

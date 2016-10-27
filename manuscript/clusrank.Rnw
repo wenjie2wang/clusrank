@@ -409,9 +409,7 @@ from a quadratic form of group-wise rank-sum vector.
 This method allows arbitrary intracluster dependence structure (not
 necessarily exchangeable as assumed in the RGL method) within each
 cluster and remains valid when treatment affects the correlation structure.
-As shown in the construction of the test statistic, there is no room for
-randomization test since $S$ is a conditional expectation given observed data.
-In addition, it cannot be applied to strictly contralateral data (e.g., when
+However, this test cannot be applied to strictly contralateral data (e.g., when
 each subject in an eye study have exactly one eye under each treatment)
 due to violation of the assumptions required by the asymptotic theory.
 
@@ -640,16 +638,18 @@ rank-sum test where the treatment group assignment of each data value
 is provided through an extra numeric vector \code{group} as the
 cluster id.  The hypothesis related arguments \code{alternative},
 \code{mu} and \code{paired} are identical of those of the
-\code{wilcox.test}.  The exact test (\code{exact = TRUE}) is only
-available for the RGL clustered rank-sum test with cluster-level
-grouping and the RGL clustered signed-rank test; otherwise
-\code{exact} should be set as \code{FALSE}. Since the DS rank-sum
-statistic is based on conditional expectations of cluster rank
-selected with a within-cluster sampling scheme, there is no room for
-an exact test. The exact test is also unavailable for RGL clustered
-rank-sum test when the treatment group is assigned at subunit-level due to
-computational complication.  Since the exact test is computationally very
-intensive, it is recommended to be used only with small samples.
+\code{wilcox.test}. The \code{exact} is an integer indicating which
+one of the three types of the test is using: the asymptotic test
+(\code{exact = 0}), the exact test (\code{exact = 1}) and the permutation
+test (with \code{exact} set as an integer greater than 1 which is taken
+as the size of the random permutation).
+The exact test (\code{exact = 1}) is only available for the RGL
+clustered rank-sum test with cluster-level grouping and the RGL
+clustered signed-rank test, nevertheless random permutation test is available
+for tests for which no exact test is provided due to the computational
+complexity. Since the exact test is computationally very
+intensive, it is recommended to be used only with small samples if it
+is available.
 
 
 The main function specifies the cluster by a \code{cluster} variable
@@ -786,7 +786,7 @@ Setting \code{method = "ds"} would perform the DS test.
 The exact test of the RGL method can be done for data with a
 small number of clusters when treatment is assigned at cluster-level:
 <<clus-rs-rgl-exact>>=
-clusWilcox.test(x ~ grp + cluster(cid), dat.cl, method = "rgl", exact = TRUE)
+clusWilcox.test(x ~ grp + cluster(cid), dat.cl, method = "rgl", exact = 1)
 @
 
 
