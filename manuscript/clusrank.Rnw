@@ -774,7 +774,10 @@ exchangeable correlation structure, $\rho_0 = \rho_1 = 0.9$,
 and cluster-level treatment assignment.
 <<dat-clus>>=
 dat.cl <- datgen.sum(10, 3, 0, c(.9, .9), ex, 0, TRUE)
-dat.cl
+@ 
+The first and last 6 rows of the data frame looks like this:
+<<dat.cl>>=
+cbind(head(dat.cl, 6), "head / tail" = "     ", tail(dat.cl, 6))
 @
 
 
@@ -810,7 +813,7 @@ For illustration, we simply add an extra column \code{strat} to the
 dataset and perform the RGL test:
 <<clus-rs-rgl-str>>=
 dat.cl$strat <- rep(rep(1:2, each = 15), 2)
-dat.cl
+cbind(head(dat.cl, 6), "head / tail" = "     ", tail(dat.cl, 6))
 clusWilcox.test(x ~ grp + cluster(cid) + stratum(strat), dat = dat.cl,
                 method = "rgl")
 @
@@ -820,7 +823,7 @@ The DS method can compare more than two groups.
 We illustrate this by assigning 4 groups to this data:
 <<clus-rs-ds-mgrp>>=
 dat.cl$grp <- rep(1:4, each = 15)
-dat.cl
+cbind(head(dat.cl, 6), "head / tail" = "     ", tail(dat.cl, 6))
 clusWilcox.test(x ~ grp + cluster(cid), dat = dat.cl, method = "ds")
 @
 
@@ -858,7 +861,7 @@ For illustration, we generate a dataset that consists of $10$ clusters of
 size $3$, with exchangeable correlation parameter $\rho = 0.5$.
 <<dat-sr>>=
 dat.sgn <- datgen.sgn(10, 3, cor = ex, rho = 0.5)
-head(dat.sgn)
+cbind(head(dat.cl, 6), "head / tail" = "     ", tail(dat.cl, 6))
 @
 
 
