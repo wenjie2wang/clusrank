@@ -19,9 +19,10 @@
 ##   along with the R package clusrank. If not, see <http://www.gnu.org/licenses/>.
 ##
 ################################################################################
-clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
-                                           mu, exact, DNAME, METHOD) {
-    ### Ties are dropped
+clusWilcox.test.signedrank.rgl.perm <- function(x, cluster,
+                                                alternative,
+                                                mu, exact, DNAME, METHOD) {
+    METHOD <- paste0(METHOD, " (random permutation)")
     x <- x - mu
     data <- data.frame(x, cluster)
     data <- data[x != 0, ]
@@ -29,9 +30,9 @@ clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
     m <- length(cluster.size)
     n <- nrow(data)
     if (length(table(cluster.size)) != 1) {
-        balance = FALSE
+        balance <- FALSE
     } else {
-        balance = TRUE
+        balance <- TRUE
     }
 
     xrank <- rank(abs(data$x))
@@ -39,11 +40,61 @@ clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
     signrank <- ifelse(data$x > 0, 1, -1) * data$xrank
     data <- cbind(data, signrank)
     colnames(data)[4] <- "signrank"
-    if (is.null(exact)) {
-        exact <- FALSE
+
+    srksum <-  stats::aggregate(signrank ~ cluster, FUN = sum)[, 2]
+
+    T <- sum(data$signrank)
+
+    ind <- replicate(exact, sample(c(1, -1), m, TRUE))
+
+    T.ecdf <- ecdf(colSums(ind * srksum))
+
+    pval <- switch(alternative,
+                   less = T.ecdf(T),
+                   greater = 1 - T.ecdf(T),
+                   two.sided = 2 * min(T.ecdf(T), 1 - T.ecdf(T)))
+
+    names(T) <- "T"
+    names(n) <- "total number of observations"
+    names(m) <- "total number of clusters"
+    names(mu) <- "shift in location"
+    result <- list(statistic = T,
+                   p.value = pval, nobs = n, nclus = m, null.value = mu,
+                   alternative = alternative,
+                   data.name = DNAME, method = METHOD)
+    class(result) <- "ctest"
+    return(result)
+}
+
+
+
+
+
+clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
+                                           mu, exact, DNAME, METHOD) {
+### Ties are dropped
+    if (exact > 1)
+        return(clusWilcox.test.signedrank.rgl.perm(x, cluster, alternative,
+                                                   mu, exact, DNAME, METHOD))
+    x <- x - mu
+    data <- data.frame(x, cluster)
+    data <- data[x != 0, ]
+    cluster.size <- table(data$cluster)
+    m <- length(cluster.size)
+    n <- nrow(data)
+    if (length(table(cluster.size)) != 1) {
+        balance <- FALSE
+    } else {
+        balance <- TRUE
     }
 
-    if (exact == TRUE) {
+    xrank <- rank(abs(data$x))
+    data <- cbind(data, xrank)
+    signrank <- ifelse(data$x > 0, 1, -1) * data$xrank
+    data <- cbind(data, signrank)
+    colnames(data)[4] <- "signrank"
+
+    if (exact == 1) {
         METHOD <- paste0(METHOD, " (exact)")
         if (length(table(cluster)) > 40)
             print("Number of clusters exceeds 40 for RGL clustered signed-rank test")
@@ -200,8 +251,86 @@ clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
     }
 }
 
-clusWilcox.test.signedrank.ds <- function(x, cluster, alternative,
+clusWilcox.test.signedrank.ds.perm.1 <- function(x, cluster) {
+    order.c <- order(cluster)
+    x <- x[order.c]
+    cluster <- cluster[order.c]
+    csize <- as.vector(table(cluster))
+    m <- length(csize)
+    cid <- as.numeric(names(csize))
+    n <- sum(csize)
+    plus <- as.numeric(x > 0)
+    minus <- as.numeric(x < 0)
+    niplus <- aggregate(plus ~ cluster, FUN = sum)[, 2]
+    niminus <- aggregate(minus ~ cluster, FUN = sum)[, 2]
+    ni <- table(cluster)
+
+
+    csize.cum <- cumsum(csize)
+    csize.cum <- c(0, csize.cum)
+    cluster <- recoderFunc(cluster, unique(cluster), c(1 : m))
+
+
+    Ftot.vec  <- Ftot_vec(abs(x), cluster, csize, n, m)
+    Fi.vec <- Fi_vec(abs(x), cluster, csize, n, m)
+    Fcom.vec <- Fcom_vec(abs(x), cluster, csize, n, m)
+
+    T <- sum((niplus - niminus) / ni) +
+        sum((sign(x) * (Ftot.vec - Fi.vec)) / rep.int(ni, times = ni))
+    T
+
+}
+
+
+clusWilcox.test.signedrank.ds.perm <- function(x, cluster, alternative,
+                                               exact,
+                                               mu, DNAME, METHOD) {
+    METHOD <- paste0(METHOD, " (permutation test based on random sampling)")
+    T.vec <- rep(NA, exact)
+    x <- x - mu
+    n.obs <- length(x)
+    n.clus <- length(unique(cluster))
+    for ( i in 1 : exact) {
+        sgn.samp <- sample(c(-1, 1), n.obs, TRUE)
+        x.samp <- abs(x) * sgn.samp
+        T.vec[i] <- clusWilcox.test.signedrank.ds.perm.1(x.samp, cluster)
+    }
+    T <- clusWilcox.test.signedrank.ds.perm.1(x, cluster)
+    t.ecdf <- ecdf(T.vec)
+
+    pval <- switch(alternative, less = t.ecdf(T),
+                   greater = 1 - t.ecdf(T),
+                   two.sided = 2 * min(t.ecdf(T), 1 - t.ecdf(T)))
+
+    names(n.obs) <- "total number of observations"
+    names(n.clus) <- "total number of clusters"
+    names(T) <- "T"
+    names(mu) <- "shift in location"
+    result <- list(statistic = T,
+                   p.value = pval, nobs = n.obs, nclus = n.clus,
+                   alternative = alternative,
+                   null.value = mu,
+                   data.name = DNAME, method = METHOD)
+    class(result) <- "ctest"
+    return(result)
+
+
+}
+
+
+clusWilcox.test.signedrank.ds <- function(x, cluster, alternative, exact,
                                           mu, DNAME, METHOD) {
+
+
+    if (exact > 1){
+        return(clusWilcox.test.signedrank.ds.perm(x, cluster, alternative,
+                                                  exact, mu, DNAME, METHOD))
+    }
+
+    if (exact == 1) {
+        warning("Exact test is not provided for DS method for signed rank test, large sample test will be carried out")
+    }
+
     x <- x - mu
     order.c <- order(cluster)
     x <- x[order.c]

@@ -143,11 +143,11 @@ before and the results are discussed.
 
 \section{Introduction}
 
-Wilcoxon rank-sum and signed-rank tests are important tools for
+The Wilcoxon rank-sum and signed-rank tests are important tools for
 two-group comparisons and paired comparisons, respectively.
 Unlike their counterparts under the normality assumption, they are
 based on ranks without the need of distributional assumptions.
-Implementations of Wilcoxon rank-sum and signed-rank tests for
+Implementations of the Wilcoxon rank-sum and signed-rank tests for
 independent data have been widely available in standard software
 packages, such as function \code{wilcox.test} in the built-in package
 \pkg{stats} in \proglang{R} and \code{PROC NPAR1WAY} in \proglang{SAS}.
@@ -188,11 +188,11 @@ intracluster dependence does not vary across groups.
 With a test statistic in similar form as the standard Wilcoxon rank-sum
 test after ranking all the observations combined, they derived the
 aymptotic mean and variance under the clustered setting that
-accommodates unequal cluster sizes and possible strata.
+accommodates unequal cluster sizes and possible stratification.
 \citet{Rosn:Glyn:Lee:exte:2006} extended their (2003) approach to
 accommodate the situation where members of a single cluster may
-subject to different treatment groups, but still assumes
-exchangeability  with same intracluster dependence across groups.
+be assigned to different treatment groups, but still assumes
+exchangeability with the same intracluster dependence across groups.
 The assumptions of \citet{Rosn:Glyn:Lee:inco:2003} were relaxed in the
 approach of \citet{Datt:Satt:rank:2005}, which is based on
 within-cluster resampling \citep{Hoff:Sen:Weib:with:2001} and remains
@@ -320,7 +320,7 @@ $Z = {(W - \E (W)) } /  {\sqrt{\VAR(W)}},$
 where $\E(W) = \sum_{g = 1}^G \E(W_g)$, and
 $\VAR(W) = \sum_{g=1}^G \VAR(W_g)$.
 Under $H_0$, for clusters with size $g$, the distribution of
-$\delta_i$ is Bernoulli with rate $m_g/N_g$, and we have
+$\delta_i$ is Bernoulli with probability $m_g/N_g$, and we have
 $\E(\delta_i) = m_g / N_g$,
 $\VAR(\delta_i) = m_g n_g / N_g^2$, and
 $\COV(\delta_i, \delta_j) = - m_g n_g / [N_g^2(N_g - 1)]$.
@@ -374,7 +374,8 @@ where $S = \E(W^* | \mathbf{X}, \boldsymbol{\delta})$.
 \citet{Datt:Satt:rank:2005} derived the quantities needed to calculate
 the test statistic, using mid-ranks to allow for ties in the data.
 Let $F_i(x) = n_i^{-1} \sum_{k = 1}^{n_i} I(X_{ik} \le x)$ be the
-empirical distribution function of the observations from cluster~$i$.
+empirical distribution function of the observations from cluster~$i$
+and define $F_i(x-) = n_i^{-1} \sum_{k = 1}^{n_i} I(X_{ik} < x)$.
 It can be shown that
 \[
 S = \frac{1}{N+1} \sum_{i=1}^N\sum_{k=1}^{n_i} \frac{\delta_{ik}}{n_i}
@@ -408,9 +409,7 @@ from a quadratic form of group-wise rank-sum vector.
 This method allows arbitrary intracluster dependence structure (not
 necessarily exchangeable as assumed in the RGL method) within each
 cluster and remains valid when treatment affects the correlation structure.
-As shown in the construction of the test statistic, there is no room for
-randomization test since $S$ is a conditional expectation given observed data.
-In addition, it cannot be applied to strictly contralateral data (e.g., when
+However, this test cannot be applied to strictly contralateral data (e.g., when
 each subject in an eye study have exactly one eye under each treatment)
 due to violation of the assumptions required by the asymptotic theory.
 
@@ -486,13 +485,13 @@ under mild conditions.
 \section{Signed-rank test for clustered data}
 \label{s:signedrank}
 
-The Wilcoxon signed-rank test is often used for paired data comparison.
+The Wilcoxon signed-rank test is often used for paired data comparisons.
 Let $X_{ij}$ be the paired-difference score for the $j$th pair in the
 $i$th cluster,  $i = 1, \ldots, N$, $j = 1, \ldots, n_i$.
 The null hypothesis $H_0$ is that the marginal
 distribution of $X_{ij}$ is symmetric around $0$.
-Note that, unlike the rank-sum test, there is no issue on the group
-membership of each observation in the paired comparison setting.
+Note that unlike the rank-sum test, all subjects belong to a single
+group in the paired comparison setting.
 Let $R_{ij}$ be the rank of $|X_{ij}|$ among
 $\{|X_{ij}|, i = 1, \ldots, N, j = 1 \ldots, n_i\}$.
 Let $S_{ij} = V_{ij}R_{ij}$ be the signed-rank, where
@@ -508,7 +507,7 @@ the clustered WIlcoxon signed-rank statistic is
 T = \sum_{i=1}^N S_{i+} = \sum_{i=1}^N  \sum_{j=1}^g R_{ij} V_{ij},
 \]
 where $S_{i+} = \sum^g_{j=1}S_{ij}$ is the rank sum within the $i$th
-cluster and only nonzero $X_{ij}$ is considered in the computation of
+cluster and only nonzero $X_{ij}$ are considered in the computation of
 signed-ranks.
 The null sampling distribution of $T$ can be obtained from a
 randomization at the cluster-level conditional on $S_{i+}$'s.
@@ -569,8 +568,9 @@ To compute $T$, let
 \[
 \hat H_i(x) = \frac{1}{2}\{ F_i(x) + F_i(x-)\},
 \]
-where $F_i$ is the empirical distribution function of the observations
-in cluster~$i$ as in the DS method for the rank-sum test.
+where $F_i(x)$ is the empirical distribution function of the observations
+in cluster~$i$ at $x$ and $F_i(x-)$ is the left limit of $F_i(x)$ at $x$ as
+in the DS method for the rank-sum test.
 It turns out that
 \[
 T = \sum_{i=1}^N \frac{n_i^+ - n_i^-}{n_i}
@@ -638,21 +638,23 @@ rank-sum test where the treatment group assignment of each data value
 is provided through an extra numeric vector \code{group} as the
 cluster id.  The hypothesis related arguments \code{alternative},
 \code{mu} and \code{paired} are identical of those of the
-\code{wilcox.test}.  The exact test (\code{exact = TRUE}) is only
-available for the RGL clustered rank-sum test with cluster-level
-grouping and the RGL clustered signed-rank test; otherwise
-\code{exact} should be set as \code{FALSE}. Since the DS rank-sum
-statistic is based on conditional expectations of cluster rank
-selected with a within-cluster sampling scheme, there is no room for
-an exact test. The exact test is also unavailable for RGL clustered
-rank-sum test when the treatment group is assigned at subunit-level due to
-computational complication.  Since the exact test is computationally very
-intensive, it is recommended to be used only with small samples.
+\code{wilcox.test}. The \code{exact} is an integer indicating which
+one of the three types of the test is using: the asymptotic test
+(\code{exact = 0}), the exact test (\code{exact = 1}) and the permutation
+test (with \code{exact} set as an integer greater than 1 which is taken
+as the size of the random permutation).
+The exact test (\code{exact = 1}) is only available for the RGL
+clustered rank-sum test with cluster-level grouping and the RGL
+clustered signed-rank test, nevertheless random permutation test is available
+for tests for which no exact test is provided due to the computational
+complexity. Since the exact test is computationally very
+intensive, it is recommended to be used only with small samples if it
+is available.
 
 
 The main function specifies the cluster by a \code{cluster} variable
 indicating which cluster each observations belongs to.
-Additionally, if the dataset is stratified, a numeric vector \code{strata}
+Additionally, if the dataset is stratified, a numeric vector \code{stratum}
 can be provided to indicate stratum membership of each observation.
 Other arguments specific for clustered data include \code{cluster}
 which should be a numeric vector containing the cluster id.
@@ -772,7 +774,7 @@ exchangeable correlation structure, $\rho_0 = \rho_1 = 0.9$,
 and cluster-level treatment assignment.
 <<dat-clus>>=
 dat.cl <- datgen.sum(10, 3, 0, c(.9, .9), ex, 0, TRUE)
-head(dat.cl)
+dat.cl
 @
 
 
@@ -784,7 +786,7 @@ Setting \code{method = "ds"} would perform the DS test.
 The exact test of the RGL method can be done for data with a
 small number of clusters when treatment is assigned at cluster-level:
 <<clus-rs-rgl-exact>>=
-clusWilcox.test(x ~ grp + cluster(cid), dat.cl, method = "rgl", exact = TRUE)
+clusWilcox.test(x ~ grp + cluster(cid), dat.cl, method = "rgl", exact = 1)
 @
 
 
@@ -808,6 +810,7 @@ For illustration, we simply add an extra column \code{strat} to the
 dataset and perform the RGL test:
 <<clus-rs-rgl-str>>=
 dat.cl$strat <- rep(rep(1:2, each = 15), 2)
+dat.cl
 clusWilcox.test(x ~ grp + cluster(cid) + stratum(strat), dat = dat.cl,
                 method = "rgl")
 @
@@ -817,6 +820,7 @@ The DS method can compare more than two groups.
 We illustrate this by assigning 4 groups to this data:
 <<clus-rs-ds-mgrp>>=
 dat.cl$grp <- rep(1:4, each = 15)
+dat.cl
 clusWilcox.test(x ~ grp + cluster(cid), dat = dat.cl, method = "ds")
 @
 
@@ -870,7 +874,7 @@ clusWilcox.test(x ~ cluster(cid),  dat.sgn, paired = TRUE, method = "ds")
 \subsection{A real data example}
 
 The package contains a real dataset named \code{amd} from a retrospective
-observations stuly \citep{Ferr:Sedd:phen:2015} that aims to characterize the
+observational stuly \citep{Ferr:Sedd:phen:2015} that aims to characterize the
 phenotype associated with a rare variant in the complement factor H (CFH)
 R1210C,  a protein involved in the age-related macular degeneration (AMD).
 The data contains measures of 283 eyes from 143 patients,
@@ -878,11 +882,11 @@ among whom 62 had the rare variant and 81 did not.
 The clusters are the patients and the subunits are the eyes.
 The outcome variable was the AMD grading score based
 on the Age-Related Maculopathy Staging (CARMS),  which has 5~levels.
-The first 3~levels correspond to the severity of the degeneration in
-increasing order, while level~4 and~5 correspond to two different
-types of advanced symptoms, with level~4 indicating the presence
+The first 3~levels correspond to the sizd of drusen which is an
+intermediate marker of AMD, while level~4 and~5 correspond to different
+types of AMD, with level~4 indicating the presence
 of geographic atrophy (GA) and level~5 indicating the presence of
-choroidal neovascularization (CNV) related symptoms.
+choroidal neovascularization (CNV).
 The Wilcoxon rank-sum test is to be carried out on two subsets:
 1) the subset of observations with CARMS grade 1, 2, 3 or~4;
 and 2) the subset of observations with CARMS grade 1, 2, 3 or~5.
@@ -901,9 +905,8 @@ clusWilcox.test(CARMS ~ Variant + cluster(ID), data = amd,
                 subset = CARMS %in% c(1, 2, 3, 4), method = "ds")
 @
 The p-values from both tests are close and less than $0.001$, which
-implies strong evidence to the association between the presence of
-CFH~R1210C rare variant and the severity of the symptom with GA as the
-advanced stage.
+implies strong evidence of an association between the presence of
+CFH~R1210C rare variant and the CARMS grade with GA as the advanced stage.
 
 
 For the RGL method, a stratifying variable \code{Agesex} which categorizes
