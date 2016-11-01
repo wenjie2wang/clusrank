@@ -1,6 +1,6 @@
 
 clusWilcox.test.ranksum.rgl <- function(x, cluster, group, stratum,
-                                         alternative, exact, mu,
+                                         alternative, perm, B, mu,
                                         DNAME = NULL, METHOD = NULL) {
     clus.grp <- lapply(split(cluster, group), unique)
     l.clus.grp <- length(unlist(clus.grp))
@@ -13,18 +13,17 @@ clusWilcox.test.ranksum.rgl <- function(x, cluster, group, stratum,
 ### to see if they only are only assigned a single treatment.
     if (all(unlist(check) == 1))
         warning("The two groups should contain clusters with the same size for at leaset one cluster size")
-    if (is.logical(exact)) exact <- as.numeric(exact)
 
     arglist <- setNames(list(x, cluster, group, stratum, alternative,
-                             mu, DNAME, METHOD, exact),
+                             mu, DNAME, METHOD, perm, B),
                         c("x", "cluster", "group", "stratum",
                           "alternative", "mu", "DNAME", "METHOD",
-                          "exact"))
+                          "perm", "B"))
     if (l.clus != l.clus.grp) {
         result <- do.call("clusWilcox.test.ranksum.rgl.sub", c(arglist))
         return(result)
     } else {
-        if (exact <= 1) {
+        if (perm == FALSE | (perm == TRUE & B == 1)) {
             result <- do.call("clusWilcox.test.ranksum.rgl.clus", c(arglist))
             return(result)
         } else {
@@ -39,10 +38,10 @@ clusWilcox.test.ranksum.rgl <- function(x, cluster, group, stratum,
 
 
 clusWilcox.test.ranksum.rgl.clus.perm.1 <- function(x, cluster, group,
-                                                    stratum, mu) {
+                                                    stratum) {
     n.obs <- length(x)
     one <- rep(1, n.obs)
-    x[which(group == 1)] <- x[which(group == 1)] - mu
+    x[which(group == 1)] <- x[which(group == 1)]
     xrank <- rank(x)
     rksum <-stats::aggregate(xrank ~ cluster, FUN = sum)[, 2]
     csize <-stats::aggregate(one ~ cluster, FUN = sum)[, 2]
@@ -70,7 +69,8 @@ clusWilcox.test.ranksum.rgl.clus.perm.1 <- function(x, cluster, group,
 
 
 clusWilcox.test.ranksum.rgl.clus.perm <- function(x, cluster, group,
-                                                  stratum, alternative, exact,
+                                                  stratum,
+                                                  alternative, perm, B,
                                                   mu, DNAME = NULL, METHOD = NULL) {
     METHOD <- paste0(METHOD, " (random permutation)")
     x <- x - mu
@@ -118,10 +118,10 @@ clusWilcox.test.ranksum.rgl.clus.perm <- function(x, cluster, group,
         x
     }
 
-    W <- clusWilcox.test.ranksum.rgl.clus.perm.1(x, cluster, group, stratum, 0)
+    W <- clusWilcox.test.ranksum.rgl.clus.perm.1(x, cluster, group, stratum)
 
-    W.vec <- rep(NA, exact)
-    for ( i in 1 : exact) {
+    W.vec <- rep(NA, B)
+    for ( i in 1 : B) {
         temp <- lapply(ind.l, samp.ind)
         temp1 <- NULL
         for ( j in 1 : length(temp)) {
@@ -135,8 +135,7 @@ clusWilcox.test.ranksum.rgl.clus.perm <- function(x, cluster, group,
         W.vec[i] <- clusWilcox.test.ranksum.rgl.clus.perm.1(x.temp,
                                                             cluster.temp,
                                                             group.temp,
-                                                            str.temp,
-                                                            0)
+                                                            str.temp)
     }
 
     w.ecdf <- ecdf(W.vec)
@@ -152,7 +151,7 @@ clusWilcox.test.ranksum.rgl.clus.perm <- function(x, cluster, group,
     result <- list(statistic = W, p.value = pval,
                    null.value = mu, alternative = alternative,
                    data.name = DNAME, method = METHOD,
-                   balance = bal, exact = exact, nclus = n.clus,
+                   balance = bal, perm = perm, B = B, nclus = n.clus,
                    nobs = n.obs)
     class(result) <- "ctest"
     return(result)
@@ -166,10 +165,10 @@ clusWilcox.test.ranksum.rgl.clus.perm <- function(x, cluster, group,
 
 
 clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
-                                             stratum, alternative, exact,
+                                             stratum, alternative,
+                                             perm, B,
                                              mu, DNAME = NULL, METHOD = NULL) {
 ### The input data should be already in the increasing order with cluster.
-    if (exact > 0
     n.obs <- length(x)
     one <- rep(1, n.obs)
     x[which(group == 1)] <- x[which(group == 1)] - mu
@@ -194,8 +193,8 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
     }
     dat.l <- lapply(dat.l, csize.split)
 
-    if (exact == 1) {
-        METHOD <- paste0(METHOD, " (exact)")
+    if (perm == TRUE & B == 1) {
+        METHOD <- paste0(METHOD, " (exact permutation)")
         if(length(table(cluster)) > 40)
             print("Number of clusters exceeds 40 for RGL clustered rank exact test")
         W <- sum(dat[dat$grp == 1, "rksum"])
@@ -235,7 +234,7 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
         result <- list(statistic = W, p.value = pval,
                        null.value = mu, alternative = alternative,
                        data.name = DNAME, method = METHOD,
-                       balance = bal, exact = exact, nclus = n.clus,
+                       balance = bal, perm = perm, B = B, nclus = n.clus,
                        nobs = n.obs)
         class(result) <- "ctest"
         return(result)
@@ -296,7 +295,8 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
                        null.value = mu,
                        data.name = DNAME,
                        method = METHOD,
-                       balance = bal, exact = exact,
+                       balance = bal, perm = perm,
+                       B = B,
                        nobs = n.obs, nclus = n.clus)
         class(result) <- "ctest"
         return(result)
@@ -308,8 +308,8 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
 
 
 
-clusWilcox.test.ranksum.rgl.sub.perm <- function(x, cluster, group,
-                                                 mu, stratum) {
+clusWilcox.test.ranksum.rgl.sub.perm.1 <- function(x, cluster, group,
+                                                 stratum) {
 
     bal <- (length(table(table(cluster))) == 1) # check balance of data.
     clus <- unique(cluster)
@@ -318,8 +318,6 @@ clusWilcox.test.ranksum.rgl.sub.perm <- function(x, cluster, group,
     n.clus <- length(clus)
     n.obs <- length(x)
     group <- recoderFunc(group, unique(group), c(1, 2))
-    x[which(group == 1)] <- x[which(group == 1)] - mu
-
     temp <- order(cluster)
     x <- x[temp]
     cluster <- cluster[temp]
@@ -446,11 +444,6 @@ clusWilcox.test.ranksum.rgl.sub.perm <- function(x, cluster, group,
         theta <- sumtheta / sumwt
         sdtheta <- sqrt(1 / sumwt)
         Z <- (theta - 1/2) / sdtheta
-        pval <- switch(alternative, less = pnorm(abs(Z)),
-                       greater = pnorm(abs(Z), lower.tail = FALSE),
-                       two.sided = 2 * min(pnorm(abs(Z)),
-                                           pnorm(abs(Z), lower.tail = FALSE)))
-
         names(Z) <- "Z"
         return(Z)
     }
@@ -458,17 +451,20 @@ clusWilcox.test.ranksum.rgl.sub.perm <- function(x, cluster, group,
 
 
 clusWilcox.test.ranksum.rgl.sub.perm <- function(x, cluster, group,
-                                                 alternative, exact, mu, DNAME = NULL,
+                                                 alternative, perm, B, mu, DNAME = NULL,
                                                  METHOD = NULL, stratum) {
     METHOD <- paste0(METHOD, " (random permutatio)")
-    bal <- (length(table(table(cluster))) == 1) # check balance of data.
+    bal <- (length(table(table(cluster))) == 1) # check balance of
+                                        # data.
+    x[which(group == 1)] <- x[which(group == 1)] - mu
+
     n.obs <- length(x)
     n.clus <- length(unique(cluster))
     one <- rep(1, n.obs)
     csize <- stats::aggregate(one ~ cluster, FUN = sum)
     colnames(csize)[2] <- "csize"
-    group.1 <- -group + 2 # switch 1 to 2 and 2 to 1 to count obs from
-                                        # group 1 in each cluster
+    group.1 <- ifelse(group == 1, 1, 0)
+
     q <- stats::aggregate(group.1 ~ cluster, FUN = sum)
     colnames(q)[2] <- "g1size"
 
@@ -507,10 +503,10 @@ clusWilcox.test.ranksum.rgl.sub.perm <- function(x, cluster, group,
     }
 
     W <- clusWilcox.test.ranksum.rgl.sub.perm.1(x, cluster,
-                                                group, mu, stratum)
+                                                group, stratum)
 
-    W.vec <- rep(NA, exact)
-    for ( i in 1 : exact) {
+    W.vec <- rep(NA, B)
+    for ( i in 1 : B) {
         temp <- lapply(ind.l, samp.ind)
         temp1 <- NULL
         for ( j in 1 : length(temp)) {
@@ -525,7 +521,7 @@ clusWilcox.test.ranksum.rgl.sub.perm <- function(x, cluster, group,
 
         W.vec[i] <- clusWilcox.test.ranksum.rgl.sub.perm.1(x.temp,
                                                            cluster.temp,
-                                                           group, mu, stratum)
+                                                           group, stratum)
     }
 
         w.ecdf <- ecdf(W.vec)
@@ -541,7 +537,7 @@ clusWilcox.test.ranksum.rgl.sub.perm <- function(x, cluster, group,
         result <- list(statistic = W, p.value = pval,
                    null.value = mu, alternative = alternative,
                    data.name = DNAME, method = METHOD,
-                   balance = bal, exact = exact, nclus = n.clus,
+                   balance = bal, perm = perm, B = B,  nclus = n.clus,
                    nobs = n.obs)
         class(result) <- "ctest"
         return(result)
@@ -555,13 +551,14 @@ clusWilcox.test.ranksum.rgl.sub.perm <- function(x, cluster, group,
 
 
 clusWilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
-                                       exact, mu, DNAME = NULL, METHOD = NULL, stratum) {
+                                       perm, B, mu, DNAME = NULL, METHOD = NULL, stratum) {
 ### The input data should be already arranged
-    if (exact > 1) return(clusWilcox.test.ranksum.rgl.sub.perm(x, cluster, group,
-                                                               alternative, exact,
-                                                               mu, DNAME, METHOD, stratum))
-    if (exact == 1)
-        warning("Exact test is not available for RGL clustered rank-sum test, will perform asymptotic test")
+    if (perm == TRUE & B > 1)
+        return(clusWilcox.test.ranksum.rgl.sub.perm(x, cluster, group,
+                                                    alternative, perm, B,
+                                                    mu, DNAME, METHOD, stratum))
+    if (perm == TRUE & B  == 1)
+        warning("Exact permutation test is not available for RGL clustered rank-sum test when treatment is assigned at subunit level, will perform asymptotic test")
     bal <- (length(table(table(cluster))) == 1) # check balance of data.
     clus <- unique(cluster)
     if (is.numeric(clus)) clus <- sort(clus)
@@ -751,6 +748,7 @@ clusWilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
     }
 }
 
+#' @importFrom MASS ginv
 
 clusWilcox.test.ranksum.ds.perm.1 <- function(x, cluster, group, mu) {
     group.uniq <- length(unique(group))
@@ -853,17 +851,17 @@ clusWilcox.test.ranksum.ds.perm.1 <- function(x, cluster, group, mu) {
 
 clusWilcox.test.ranksum.ds.perm <- function(x, cluster, group,
                                             alternative,
-                                            mu, exact,
+                                            mu, perm, B,
                                             DNAME, METHOD) {
     x <- x - mu
     n.obs <- length(x)
     n.clus <- length(unique(cluster))
-    W.vec <- rep(NA, exact)
-    W <- clusWilcox.test.ranksum.ds.perm1(x, cluster, group, 0)
-    for ( i in 1 : exact) {
+    W.vec <- rep(NA, B)
+    W <- clusWilcox.test.ranksum.ds.perm.1(x, cluster, group, 0)
+    for ( i in 1 : B) {
         grp.temp <- sample(group, n.obs)
-        W.vec[i] <- clusWilcox.test.ranksum.ds.perm1(x, cluster,
-                                                     grp.temp, 0)
+        W.vec[i] <- clusWilcox.test.ranksum.ds.perm.1(x, cluster,
+                                                      grp.temp, 0)
 
     }
 
@@ -879,6 +877,7 @@ clusWilcox.test.ranksum.ds.perm <- function(x, cluster, group,
         result <- list(statistic = W, p.value = pval,
                        alternative = alternative, null.value = mu,
                        data.name = DNAME, method = METHOD,
+                       perm = perm, B = B,
                        nobs = n.obs, nclus = n.clus)
         class(result) <- "ctest"
     } else {
@@ -886,6 +885,7 @@ clusWilcox.test.ranksum.ds.perm <- function(x, cluster, group,
         result <- list(statistic = W, p.value = pval,
                        alternative = alternative, null.value = mu,
                        data.name = DNAME, method = METHOD,
+                       perm = perm, B = B,
                        nobs = n.obs, nclus = n.clus)
         class(result) <- "ctest"
     }
@@ -897,12 +897,12 @@ clusWilcox.test.ranksum.ds.perm <- function(x, cluster, group,
 
 clusWilcox.test.ranksum.ds <- function(x, cluster, group,
                                        alternative,
-                                       mu, exact,
+                                       mu, perm, B,
                                        DNAME, METHOD) {
-    if (exact > 1)  {
+    if (perm == TRUE)  {
         return(clusWilcox.test.ranksum.ds.perm(x, cluster, group,
                                                alternative,
-                                               mu, exact, DNAME, METHOD))
+                                               mu, perm, B, DNAME, METHOD))
     }
     group.uniq <- length(unique(group))
     if (group.uniq == 1) {

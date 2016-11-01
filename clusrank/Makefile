@@ -1,12 +1,12 @@
 pkg = clusrank
 header = HEADER
 
-Rpkg: Rd build  
-	make check 
+Rpkg: Rd build
+	make check
 	make INSTALL
 
 Rd:
-	Rscript -e "library(roxygen2); roxygenize();  library(methods); devtools::document();" 
+	Rscript -e "library(roxygen2); roxygenize();  library(methods); devtools::document();"
 
 build:  Rd
 	R CMD build ../$(pkg) --compact-vignettes="gs+qpdf"
@@ -33,5 +33,5 @@ updateHeader:
 	dt=$$(date +"%Y-%m-%d");\
 	sed -i "s/Date: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/Date: $$dt/" DESCRIPTION;
 
-clean: 
-	rm -rf *~ */*~ */*.Rd *.Rhistroy NAMESPACE *.tar.gz *.Rcheck/
+clean:
+	rm -rf *~ */*~ */*.Rd *.Rhistroy NAMESPACE *.tar.gz *.Rcheck/ *.tgz

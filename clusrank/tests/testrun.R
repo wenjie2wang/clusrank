@@ -5,17 +5,28 @@ data(crsd)
 clusWilcox.test(z, cluster = id, data = crsd, paired = TRUE, method = "rgl")
 clusWilcox.test(z, cluster = id, data = crsd, paired = TRUE, method = "rgl", alternative = "greater", mu = 1)
 clusWilcox.test(z ~ cluster(id), data = crsd, paired = TRUE, method = "ds")
-clusWilcox.test(z ~ cluster(id), data = crsd, paired = TRUE, method = "rgl", exact = TRUE)
+clusWilcox.test(z ~ cluster(id), data = crsd, paired = TRUE, method = "rgl", perm = TRUE, B = 1)
+clusWilcox.test(z ~ cluster(id), data = crsd, paired = TRUE, method = "rgl", perm = TRUE, B = 5)
+clusWilcox.test(z ~ cluster(id), data = crsd, paired = TRUE, method = "ds", perm = TRUE, B = 5)
+
 data(crsdUnb)
 clusWilcox.test(z, cluster = id, data = crsdUnb, paired = TRUE, method = "rgl")
-clusWilcox.test(z, cluster = id, data = crsdUnb, paired = TRUE, method = "ds")
+clusWilcox.test(z, cluster = id, data = crsdUnb, paired = TRUE, method = "ds", B = 1)
+clusWilcox.test(z, cluster = id, data = crsdUnb, paired = TRUE, method = "rgl", perm = TRUE, B = 1)
+clusWilcox.test(z, cluster = id, data = crsdUnb, paired = TRUE, method = "rgl", perm = TRUE, B = 5)
+clusWilcox.test(z, cluster = id, data = crsdUnb, paired = TRUE, method = "ds", perm = TRUE, B = 5)
+
 data(crd)
 clusWilcox.test(z ~ group + cluster(id), data = crd)
 crd1 <- crd[c(1:20, 141:160), ]
-clusWilcox.test(z ~ group + cluster(id), data = crd1, method = "rgl", exact = TRUE)
+clusWilcox.test(z ~ group + cluster(id), data = crd1, method = "rgl", perm = TRUE, B = 1)
+clusWilcox.test(z ~ group + cluster(id), data = crd1, method = "rgl", perm = TRUE, B = 5)
+
 data(crdStr)
 clusWilcox.test(z ~ group + cluster(id) + stratum(stratum), data = crdStr)
 clusWilcox.test(z ~ group + cluster(id) + stratum(stratum), data = crdStr, method = "ds")
+clusWilcox.test(z ~ group + cluster(id) + stratum(stratum), data = crdStr, perm = TRUE, B = 5)
+clusWilcox.test(z ~ group + cluster(id) + stratum(stratum), data = crdStr, method = "ds", perm = TRUE, B = 5)
 
 
 
