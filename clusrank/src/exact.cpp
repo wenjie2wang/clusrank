@@ -7,7 +7,7 @@ int crksum(int rks, int I, int J, int sumrks, int minrks, int maxrks) {
   int i, j, res;
   Rcpp::IntegerVector score_sub, idx,  score_sum;
   /*   Rcpp::Rcout <<rks <<" " <<  I << " " << J  << " " << sumrks << " " << minrks << " " << maxrks << std::endl;  */
-  if (I < 0 | J < 0) return(0);    
+  if (I < 0 | J < 0) return(0);
   if (I > J) {
     rks = sumrks - rks;
     i = J;
@@ -31,26 +31,26 @@ int crksum(int rks, int I, int J, int sumrks, int minrks, int maxrks) {
     return(rks == 0);
   }
 
- 
+
        /*   Rcpp::Rcout << "minrks = " << minrks << " rks = " << rks << " i = " << i << " j = " << j <<  std::endl;
         Rcpp::Rcout << "rks -mrks = " << rks - meanrks << " sum(csize_sub) = " << sum(csize_sub) << std::endl; */
     if(((rks -  i * (i + 1) / 2) < (csize * j))) {
-      j = (rks - i * (i + 1) / 2) / csize;      
+      j = (rks - i * (i + 1) / 2) / csize;
       idx = seq_len(i + j) - 1;
       score_sum = score_[idx];
       sumrks = sum(score_sum);
       idx = seq_len(i) - 1 + j;
-      /*   Rcpp::Rcout <<" count = "<< count <<" idx = " << idx <<" i= " << i << " j = " << j << std::endl; */       
+      /*   Rcpp::Rcout <<" count = "<< count <<" idx = " << idx <<" i= " << i << " j = " << j << std::endl; */
       score_sub = score_[idx];
       maxrks = sum(score_sub);
-      return(crksum(rks, i, j, sumrks, minrks, maxrks));    
+      return(crksum(rks, i, j, sumrks, minrks, maxrks));
     }
-  
+
     sumrks = sumrks - score_[i + j - 1];
     // Rcpp::Rcout << "maxrks = " << maxrks << std::endl;
     res = crksum(rks - score_[i+j-1], i-1, j, sumrks, minrks - score_[i - 1], maxrks - score_[i + j - 1]) + crksum(rks, i, j-1, sumrks, minrks, maxrks - score_[i + j - 1] + score_[j - 1]);
     return(res);
-    
+
 }
 
 double pcrksum(int rks, int I, IntegerVector Score, int Csize) {
@@ -90,14 +90,14 @@ IntegerMatrix cumcrksum(int rks, int I, IntegerVector Score, int Csize) {
   n = Score.size();
   J = n - I;
   sumrks = sum(Score);
-  
+
   idx = seq_len(I) - 1;
   score_sub = score_[idx];
   minrks = sum(score_sub); /* Smallest possible rank sum */
   idx = idx + J;
   score_sub = score_[idx];
   maxrks = sum(score_sub); /* Largest possible rank sum */
-  
+
   for (int i = meanrks; i <= rks; i++) {
     res(i, 1) = crksum(i, I, J, sumrks, minrks, maxrks);
     res(i, 0) = i;
@@ -141,7 +141,7 @@ int crksum_str(int k, IntegerMatrix x, IntegerMatrix xc, IntegerVector max) {
        id = 0;
   }
 }
-    
+
 
 //[[Rcpp::export]]
 double pcrksum_str(int k, IntegerMatrix x, IntegerMatrix xc, IntegerVector xn, IntegerVector n, IntegerVector max) {
@@ -160,35 +160,54 @@ double pcrksum_str(int k, IntegerMatrix x, IntegerMatrix xc, IntegerVector xn, I
 
 
 
+
 int csrkg(int srk, IntegerVector Score) {
   /* Count the no of combination with a sum rank less than srk */
   /* The sum rank is sum(rank[ rank > 0]) in the programme*/
   /* The input sum rank is sum(sign(rank) * rank) */
-  int N, max_s, sum_s, u, j;
+  int N, max_s, sum_s, u, j, k;
   IntegerVector compare(2), w1;
   N = Score.size();
   max_s = max(Score);
   sum_s = sum(Score);
   u = max_s * (max_s + 1) / 2;
   if(srk < 0 | srk > u)
-    return 0; 
+    return 0;
   compare[1] = u;
   w = IntegerVector(u + 1);
   w1 = IntegerVector(u + 1);
-  w[Score[0]] = 1;
   w[0] = 0;
 
-  w1[Score] = 1;
+  for (int i = 0; i < N; ++ i) {
+    k = Score[i];
+    w1[k] = w1[k] + 1;
+  }
+
+
   for (j = 2; j < max_s + 1; ++j ) {
     compare[0] = j * (j + 1) / 2;
     int i, end = min(compare);
     for (i = end; i >= j; --i){
-      w[i] += w[i - j];
-      if (i == j & w1[j] == 1) w[i] += 1;
+
+      if (w1[j] == 1) {
+	w[i] += w[i - j];
+      } else if (w1[j] > 1) {
+      	for ( int k = 2; k <= w1[j]; ++k ) {
+	  if (i - k * j > 0) {
+	    w[i] += w[i - k * j];
+	  } else if (i == k * j) {
+	    w[i] += Rf_choose(w1[j], k);
+	  }
+      	}
+      }
+      if (w1[i] != 0 & i == j) {
+	w[i] += w1[i];
+      }
+
     }
   }
   w[0] = 1;
-  IntegerVector subw(w.begin(), w.begin() + srk + 1);  
+  IntegerVector subw(w.begin(), w.begin() + srk + 1);
   return(sum(subw));
 }
 
