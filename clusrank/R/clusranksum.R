@@ -111,9 +111,9 @@ clusWilcox.test.ranksum.rgl.clus.perm <- function(x, cluster, group,
     samp.ind <- function(x) {
         grp <- x[, 2]
         cls <- x[, 3]
-        temp.grp <- stats::aggregate(grp ~ clus, FUN = mean)[, 2]
+        temp.grp <- stats::aggregate(grp ~ cls, FUN = mean)[, 2]
         temp.grp <- sample(temp.grp, length(temp.grp))
-        temp.grp <- rep.int(temp.grp, times = x[1, 4])
+        temp.grp <- rep(temp.grp, each = x[1, 5])
         x[, 2] <- temp.grp
         x
     }
@@ -127,10 +127,19 @@ clusWilcox.test.ranksum.rgl.clus.perm <- function(x, cluster, group,
         for ( j in 1 : length(temp)) {
             temp1 <- rbind(temp1, temp[[j]])
         }
+
+        cluster.temp <- temp1[, 3]
+
+        temp1 <- temp1[order(cluster.temp), ]
+
         x.temp <- temp1[, 1]
         group.temp <- temp1[, 2]
         cluster.temp <- temp1[, 3]
+
         str.temp <- temp1[, 4]
+
+
+
 
         W.vec[i] <- clusWilcox.test.ranksum.rgl.clus.perm.1(x.temp,
                                                             cluster.temp,
@@ -479,9 +488,9 @@ clusWilcox.test.ranksum.rgl.sub.perm <- function(x, cluster, group,
     ## and number of cluster members from group 1
 
     ct <- 1
-    for ( i in 1 : length(q.uniq)) {
-        for ( j in 1 : length(csize.uniq)) {
-            temp <- (dat["q"] == i & dat["csize"] == j)
+    for ( i in (q.uniq)) {
+        for ( j in (csize.uniq)) {
+            temp <- (dat["g1size"] == i & dat["csize"] == j)
             if (all(temp == FALSE)) next
             ind.l[[ct]] <- dat[temp, ]
             ct <- ct + 1
@@ -490,8 +499,8 @@ clusWilcox.test.ranksum.rgl.sub.perm <- function(x, cluster, group,
     ind.l <- ind.l[!unlist(lapply(ind.l, is.null))]
 
     samp.ind <- function(x) {
-        q <- x["q"][1]
-        csize <- x["csize"][1]
+        q <- x["g1size"][[1]][1]
+        csize <- x["csize"][[1]][1]
         q2 <- csize - q
         one <- rep.int(c(1, 2), times = c(q, q2))
 
@@ -521,7 +530,7 @@ clusWilcox.test.ranksum.rgl.sub.perm <- function(x, cluster, group,
 
         W.vec[i] <- clusWilcox.test.ranksum.rgl.sub.perm.1(x.temp,
                                                            cluster.temp,
-                                                           group, stratum)
+                                                           group.temp, stratum)
     }
 
         w.ecdf <- ecdf(W.vec)

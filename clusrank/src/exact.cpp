@@ -190,11 +190,12 @@ int csrkg(int srk, IntegerVector Score) {
     for (i = end; i >= j; --i){
 
       if (w1[j] == 1) {
-	w[i] += w[i - j];
+	w[i] += w[i - j] ;
       } else if (w1[j] > 1) {
+	w[i] += w[i - j] * Rf_choose(w1[j], 1);
       	for ( int k = 2; k <= w1[j]; ++k ) {
 	  if (i - k * j > 0) {
-	    w[i] += w[i - k * j];
+	    w[i] += w[i - k * j] * Rf_choose(w1[j], k);
 	  } else if (i == k * j) {
 	    w[i] += Rf_choose(w1[j], k);
 	  }
@@ -210,7 +211,6 @@ int csrkg(int srk, IntegerVector Score) {
   IntegerVector subw(w.begin(), w.begin() + srk + 1);
   return(sum(subw));
 }
-
 
 //[[Rcpp::export]]
 

@@ -97,64 +97,16 @@ clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
     if (perm == TRUE) {
         METHOD <- paste0(METHOD, " (exact)")
         if (length(table(cluster)) > 40)
-            print("Number of clusters exceeds 40 for RGL clustered signed-rank test")
-        if (balance == TRUE ) {
-            T <- sum(data$signrank)
-            srksum <-  stats::aggregate(signrank ~ cluster, FUN = sum)[, 2]
-            T.pos <- sum(srksum[srksum > 0])
-            p.val.l <- psrkg(T.pos, sort(abs(srksum)))
-            pval <- switch(alternative,
-                           less = p.val.l,
-                           greater = 1 - p.val.l,
-                           two.sided = 2 * min(p.val.l, 1 - p.val.l))
-        } else {
-            sumclusterrank <- c(by(data$signrank, data$cluster, sum))
-            sumsq <- sum(sumclusterrank ^ 2)
-            meansumrank <- sumclusterrank / cluster.size
-            sumsqi <- sum(cluster.size ^ 2)
+            print("Number of clusters exceeds 40 for RGL clustered signed-rank test, the exact signed rank test may not work due to overflow.")
+        T <- sum(data$signrank)
+        srksum <-  stats::aggregate(signrank ~ cluster, FUN = sum)[, 2]
+        T.pos <- sum(srksum[srksum > 0])
+        p.val.l <- psrkg(T.pos, sort(abs(srksum)))
+        pval <- switch(alternative,
+                       less = p.val.l,
+                       greater = 1 - p.val.l,
+                       two.sided = 2 * min(p.val.l, 1 - p.val.l))
 
-            ## calculate intraclass correlation between signed ranks within the same cluster
-            data$cluster.f <- as.factor(data$cluster)
-            mod <- lm(signrank ~ cluster.f, data, y = TRUE)
-            errordf <- mod$df.residual
-            errorss <- sum(mod$residuals ^ 2)
-            modeldf <- n - errordf - 1
-            modelss <- sum((mod$y - mean(mod$y)) ^ 2) - errorss
-            sumi <- n
-
-            m0 <- (sumi - (sumsqi / sumi)) / (m - 1)
-            totalss <- errorss + modelss
-            totaldf <- errordf + modeldf
-            wthms <- errorss / errordf
-            betms <- modelss / modeldf
-            vars <- totalss / totaldf
-            s2b <- (betms - wthms) / m0
-            s2w <- wthms
-            rosglm <- s2b / (s2b + s2w)
-            if (rosglm < 0) {
-                rosglm = 0
-            }
-            ros <- rosglm
-            roscor <- ros * (1 + (1 - ros ^ 2) / (m - 2.5))
-            if (roscor > 1) {
-                roscor = 1
-            }
-            wi <- cluster.size / (vars * (1 + (cluster.size - 1) * roscor))
-
-            T <- sum(meansumrank * wi)
-            msr.pos <- msr.w <-  meansumrank * wi
-            msr.pos <- msr.pos[msr.pos > 0]
-            T.pos <- sum(msr.pos)
-
-            msr.dif <- min(lag(sort(abs(msr.w))))
-            msr.pos.int <- as.integer(sort(abs(msr.w) / msr.dif))
-            T.pos.int <- as.integer(T.pos / msr.dif)
-            p.val.l <- psrkg(T.pos.int, msr.pos.int)
-            pval <- switch(alternative,
-                           less = p.val.l,
-                           greater = 1 - p.val.l,
-                           two.sided = 2 * min(p.val.l, 1 - p.val.l))
-        }
         names(T) <- "T"
         names(n) <- "total number of observations"
         names(m) <- "total number of clusters"

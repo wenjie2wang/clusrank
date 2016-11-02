@@ -13,19 +13,19 @@ data(crsdUnb)
 clusWilcox.test(z, cluster = id, data = crsdUnb, paired = TRUE, method = "rgl")
 clusWilcox.test(z, cluster = id, data = crsdUnb, paired = TRUE, method = "ds", B = 1)
 clusWilcox.test(z, cluster = id, data = crsdUnb, paired = TRUE, method = "rgl", perm = TRUE, B = 1)
-clusWilcox.test(z, cluster = id, data = crsdUnb, paired = TRUE, method = "rgl", perm = TRUE, B = 5)
-clusWilcox.test(z, cluster = id, data = crsdUnb, paired = TRUE, method = "ds", perm = TRUE, B = 5)
+clusWilcox.test(z, cluster = id, data = crsdUnb, paired = TRUE, method = "rgl", perm = TRUE, B = 50)
+clusWilcox.test(z, cluster = id, data = crsdUnb, paired = TRUE, method = "ds", perm = TRUE, B = 50)
 
 data(crd)
 clusWilcox.test(z ~ group + cluster(id), data = crd)
 crd1 <- crd[c(1:20, 141:160), ]
 clusWilcox.test(z ~ group + cluster(id), data = crd1, method = "rgl", perm = TRUE, B = 1)
-clusWilcox.test(z ~ group + cluster(id), data = crd1, method = "rgl", perm = TRUE, B = 5)
+clusWilcox.test(z ~ group + cluster(id), data = crd1, method = "rgl", perm = TRUE, B = 100)
 
 data(crdStr)
 clusWilcox.test(z ~ group + cluster(id) + stratum(stratum), data = crdStr)
 clusWilcox.test(z ~ group + cluster(id) + stratum(stratum), data = crdStr, method = "ds")
-clusWilcox.test(z ~ group + cluster(id) + stratum(stratum), data = crdStr, perm = TRUE, B = 5)
+clusWilcox.test(z ~ group + cluster(id) + stratum(stratum), data = crdStr, perm = TRUE, B = 100)
 clusWilcox.test(z ~ group + cluster(id) + stratum(stratum), data = crdStr, method = "ds", perm = TRUE, B = 5)
 
 
@@ -54,9 +54,11 @@ datgen.sum <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1),
 }
 
 set.seed(1234)
-dat.cl <- datgen.sum(10, 3, 0, c(.9, .9), ex, 0, TRUE)
-clusWilcox.test(x ~ grp + cluster(cid), dat.cl, method = "rgl", exact = TRUE)
+dat.cl <- datgen.sum(10, 3, 0, c(.9, .9), ex, 0, FALSE)
+clusWilcox.test(x ~ grp + cluster(cid), dat.cl, method = "rgl", perm = TRUE, B = 10)
 clusWilcox.test(x, group =  grp, cluster = cid, data = dat.cl, method = "ds")
+clusWilcox.test(x, group =  grp, cluster = cid, data = dat.cl, method = "ds", perm = TRUE, B = 100)
+
 
 dat.cl$strat <- rep(rep(1:2, each = 15), 2)
 clusWilcox.test(x ~ grp + cluster(cid) + stratum(strat), dat = dat.cl,
