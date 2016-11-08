@@ -19,10 +19,10 @@
 ##   along with the R package clusrank. If not, see <http://www.gnu.org/licenses/>.
 ##
 ################################################################################
-clusWilcox.test.signedrank.rgl.perm <- function(x, cluster,
+clusWilcox.test.signedrank.rgl.exact <- function(x, cluster,
                                                 alternative,
                                                 mu, B, DNAME, METHOD) {
-    METHOD <- paste0(METHOD, " (random permutation)")
+    METHOD <- paste0(METHOD, " (random exactutation)")
     x <- x - mu
     data <- data.frame(x, cluster)
     data <- data[x != 0, ]
@@ -71,10 +71,10 @@ clusWilcox.test.signedrank.rgl.perm <- function(x, cluster,
 
 
 clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
-                                           mu, perm, B, DNAME, METHOD) {
+                                           mu, exact, B, DNAME, METHOD) {
 ### Ties are dropped
-    if (perm == TRUE && B > 1)
-        return(clusWilcox.test.signedrank.rgl.perm(x, cluster, alternative,
+    if (exact == TRUE && B >= 1)
+        return(clusWilcox.test.signedrank.rgl.exact(x, cluster, alternative,
                                                    mu, B, DNAME, METHOD))
     x <- x - mu
     data <- data.frame(x, cluster)
@@ -94,7 +94,7 @@ clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
     data <- cbind(data, signrank)
     colnames(data)[4] <- "signrank"
 
-    if (perm == TRUE) {
+    if (exact == TRUE) {
         METHOD <- paste0(METHOD, " (exact)")
         if (length(table(cluster)) > 40)
             print("Number of clusters exceeds 40 for RGL clustered signed-rank test, the exact signed rank test may not work due to overflow.")
@@ -203,7 +203,7 @@ clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
     }
 }
 
-clusWilcox.test.signedrank.ds.perm.1 <- function(x, cluster) {
+clusWilcox.test.signedrank.ds.exact.1 <- function(x, cluster) {
     order.c <- order(cluster)
     x <- x[order.c]
     cluster <- cluster[order.c]
@@ -234,10 +234,10 @@ clusWilcox.test.signedrank.ds.perm.1 <- function(x, cluster) {
 }
 
 
-clusWilcox.test.signedrank.ds.perm <- function(x, cluster, alternative,
+clusWilcox.test.signedrank.ds.exact <- function(x, cluster, alternative,
                                                B,
                                                mu, DNAME, METHOD) {
-    METHOD <- paste0(METHOD, " (random permutation)")
+    METHOD <- paste0(METHOD, " (random exactutation)")
     T.vec <- rep(NA, B)
     x <- x - mu
     n.obs <- length(x)
@@ -245,9 +245,9 @@ clusWilcox.test.signedrank.ds.perm <- function(x, cluster, alternative,
     for ( i in 1 : B) {
         sgn.samp <- sample(c(-1, 1), n.obs, TRUE)
         x.samp <- abs(x) * sgn.samp
-        T.vec[i] <- clusWilcox.test.signedrank.ds.perm.1(x.samp, cluster)
+        T.vec[i] <- clusWilcox.test.signedrank.ds.exact.1(x.samp, cluster)
     }
-    T <- clusWilcox.test.signedrank.ds.perm.1(x, cluster)
+    T <- clusWilcox.test.signedrank.ds.exact.1(x, cluster)
     t.ecdf <- ecdf(T.vec)
 
     pval <- switch(alternative, less = t.ecdf(T),
@@ -270,16 +270,16 @@ clusWilcox.test.signedrank.ds.perm <- function(x, cluster, alternative,
 }
 
 
-clusWilcox.test.signedrank.ds <- function(x, cluster, alternative, perm, B,
+clusWilcox.test.signedrank.ds <- function(x, cluster, alternative, exact, B,
                                           mu, DNAME, METHOD) {
 
 
-    if (perm == TRUE & B > 1){
-        return(clusWilcox.test.signedrank.ds.perm(x, cluster, alternative,
+    if (exact == TRUE & B >= 1){
+        return(clusWilcox.test.signedrank.ds.exact(x, cluster, alternative,
                                                   B, mu, DNAME, METHOD))
     }
 
-    if (perm == TRUE & B == 1) {
+    if (exact == TRUE & B == 0) {
         warning("Exact test is not provided for DS method for signed rank test, large-sample test will be carried out")
     }
 

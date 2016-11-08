@@ -16,7 +16,7 @@
 ##'     clustered wilcoxon rank test to be use, should be one of
 ##'     \code{"rgl"} or \code{"ds"}.
 ##' @param paired A logical indicating whether you want a paired test.
-##' @param perm A logical indicating if a permutation test is to be
+##' @param exact A logical indicating if a permutation test is to be
 ##'     used. If it is set as \code{FALSE}, then test based on
 ##'     large-sample theory is carried out. If it is set as
 ##'     \code{TRUE}, then a permutation test is carried out. There are
@@ -25,10 +25,10 @@
 ##'     treatment is assigned at cluster level, random permutation
 ##'     test is available for all tests. For more details look at the
 ##'     description of the argument \code{B}.
-##' @param B A integer. If is set as 1, then exact permutation test is
-##'     carried out. If is set as more than 1, then random permutation
+##' @param B A integer. If is set as 0, then exact permutation test is
+##'     carried out. If is set as a positive integer, then random permutation
 ##'     is carried out, and B is the number of replicates drawn for
-##'     the permutation test. Default is set as 1 to ran exact permutation test.
+##'     the permutation test. Default is set as 2000 to ran a random permutation test.
 ##' @param formula A formula of the form \code{lhs ~ rhs} where the
 ##'     \code{lhs} is the measurements and
 ##'     the \code{rhs} is of the form group + \code{cluster}(x1) +
@@ -173,8 +173,8 @@ clusWilcox.test <- function(x, ...) {
 clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NULL,
                                     na.action = na.omit,
                                     alternative = c("two.sided", "less", "greater"),
-                                    mu = 0, paired = FALSE, perm = FALSE,
-                                    B = 1000, method = c("rgl", "ds"),
+                                    mu = 0, paired = FALSE, exact = FALSE,
+                                    B = 2000, method = c("rgl", "ds"),
                                     ...) {
     if (missing(formula) || (length(formula) != 3L)) {
         stop("'formula' missing or incorrect")
@@ -237,7 +237,7 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
                          group = group, stratum = stratum,
                          DNAME = DNAME, paired = paired,
                          alternative = alternative,
-                         method = method, mu = mu, perm = perm,
+                         method = method, mu = mu, exact = exact,
                          B = B),
                    list(...)))
     return(y)
@@ -251,7 +251,7 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
 clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
                                     group = NULL, stratum = NULL, data = NULL,
                                     alternative = c("two.sided", "less", "greater"),
-                                    mu = 0, paired = FALSE, perm = FALSE, B
+                                    mu = 0, paired = FALSE, exact = FALSE, B
                                     = 1,
                                     method = c("rgl", "ds"), ...) {
     alternative <- match.arg(alternative)
@@ -341,23 +341,23 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
         if (method == "rgl") {
             METHOD <- paste(METHOD, "using Rosner-Glynn-Lee method", sep = " ")
             arglist <- setNames(list(x, cluster, alternative, mu, METHOD,
-                                     DNAME, perm, B),
+                                     DNAME, exact, B),
                                 c("x", "cluster", "alternative",
                                   "mu",
-                                  "METHOD", "DNAME",  "perm", "B"))
+                                  "METHOD", "DNAME",  "exact", "B"))
             result <- do.call("clusWilcox.test.signedrank.rgl", c(arglist))
             return(result)
         }
 
         if (method == "ds") {
-            if (perm == TRUE & B == 1) {
-                warning("Exact permutation test is not available for 'ds' method. Will run the large-sample test.")
-                perm <- FALSE
+            if (exact == TRUE & B == 0) {
+                warning("Exact exactutation test is not available for 'ds' method. Will run the large-sample test.")
+                exact <- FALSE
             }
             METHOD <- paste(METHOD, "using Datta-Satten method", sep = " ")
-            arglist <- setNames(list(x, cluster, alternative, mu, perm, B, METHOD, DNAME),
+            arglist <- setNames(list(x, cluster, alternative, mu, exact, B, METHOD, DNAME),
                                 c("x", "cluster", "alternative",
-                                  "mu", "perm", "B", "METHOD", "DNAME"))
+                                  "mu", "exact", "B", "METHOD", "DNAME"))
 
             result <-  do.call("clusWilcox.test.signedrank.ds",
                                c(arglist))
@@ -372,10 +372,10 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
             METHOD <- paste( METHOD, "using Rosner-Glynn-Lee method", sep = " ")
             arglist <- setNames(list(x, cluster, group, stratum,
                                      alternative, mu, DNAME,
-                                     METHOD, perm, B),
+                                     METHOD, exact, B),
                                 c("x", "cluster", "group", "stratum",
                                   "alternative", "mu", "DNAME", "METHOD",
-                                  "perm", "B"))
+                                  "exact", "B"))
             result <- do.call("clusWilcox.test.ranksum.rgl", c(arglist))
             return(result)
         }
@@ -383,12 +383,12 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
         if ((method) == "ds") {
             METHOD <- paste(METHOD, "using Datta-Satten method", sep = " ")
             arglist <- setNames(list(x, cluster, group, mu, alternative,
-                                     DNAME, METHOD, perm, B),
+                                     DNAME, METHOD, exact, B),
                                 c("x", "cluster", "group", "mu",
-                                  "alternative", "DNAME", "METHOD", "perm", "B"))
-            if (perm == TRUE & B == 1) {
-                warning("Exact permutation test is not available for 'ds' method. Will run the large-sample test.")
-                perm <- FALSE
+                                  "alternative", "DNAME", "METHOD", "exact", "B"))
+            if (exact == TRUE & B == 0) {
+                warning("Exact exactutation test is not available for 'ds' method. Will run the large-sample test.")
+                exact <- FALSE
             }
 
             if (length(table(stratum)) > 1L) {
