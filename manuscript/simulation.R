@@ -1,1082 +1,456 @@
+source("clusrank.R")
 
 
-ex  <- function(dim, rho) {
-    diag(1 - rho, dim) + matrix(rho, dim, dim)
-}
-ar1 <- function(dim, rho) {
-    rho ^ outer(1:dim, 1:dim, function(x, y) abs(x - y))
-}
+####################################################################
+### Rank sum, exchangable, rho = 0.1, 0.1, clus size = 2, delta = 0,
+### 0.2, 0.5, grpsize = 20, 50, balanced data
+####################################################################
 
-
-
-library(mvtnorm)
-datgen.sum <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1),
-                       corr = ex, misrate = 0., clusgrp = TRUE) {
-    nn <- nclus * maxclsize
-    Sigma1 <- corr(maxclsize, rho[1])
-    Sigma2 <- corr(maxclsize, rho[2])
-    y1 <- c(t(rmvnorm(nclus, sigma = Sigma1)))
-    y2 <- c(t(rmvnorm(nclus, sigma = Sigma2)))
-    group <- rep(c(0, 1), each = nn)
-    if (!clusgrp) group  <- sample(group, nn, FALSE)
-    cid <- rep(1:(2 * nclus), each = maxclsize)
-    x <- exp(c(y1, y2)) + delta * group
-    dat <- data.frame(x = x, grp = group, cid = cid)
-    drop <-  sort(sample(1:(2 * nn), size = misrate * (2 * nn), FALSE))
-    if (misrate == 0.) dat else dat[-drop, ]
-}
-
-
-datgen.sgn <- function(nclus, maxclsize, delta = 0., rho = 0.1,
-                       corr = ex, misrate = 0.) {
-    nn <- nclus * maxclsize
-    Sigma <- corr(maxclsize, rho)
-    z <- delta + c(t(rmvnorm(nclus, sigma = Sigma)))
-    x <- sign(z) * exp(abs(z))
-    cid <- rep(1:nclus, each = maxclsize)
-    dat <- data.frame(x = x, cid = cid)
-    drop <- sort(sample(1:nn, size = (1 - misrate) * nn, FALSE))
-    if (misrate == 0.) dat else dat[-drop,]
-}
-
-
-
-library(clusrank)
-simpower <- function(nrep, level, paired, nclus, maxclsize,
-                     delta, rho, corr, misrate, ...) {
-    do1rep <- function() {
-        datgen <- if (paired) datgen.sgn else datgen.sum
-        formula <- if (paired) x ~ cluster(cid)
-                   else x ~ cluster(cid) + grp
-        dat <- datgen(nclus, maxclsize, delta, rho, corr, misrate, ...)
-        p.rgl <- clusWilcox.test(formula, paired = paired,
-                                 data = dat, method = "rgl")$p.value
-        p.ds  <- clusWilcox.test(formula, paired = paired,
-                                 data = dat, method = "ds" )$p.value
-        c(rgl = p.rgl, ds = p.ds)
-    }
-    sim <- t(replicate(nrep, do1rep()))
-    apply(sim, 2, function(x) mean(x < level))
-}
-
-
-
-
-
-
-rs.b.e.11.2 <- matrix(0, 3, 6)
+rs.b.e.11.2 <- matrix(0, 2, 6)
 rs.b.e.11.2[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 2, 0, c(0.1, 0.1), ex, 0)
 rs.b.e.11.2[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 2, 0.2, c(0.1, 0.1), ex, 0)
 rs.b.e.11.2[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 2, 0.5, c(0.1, 0.1), ex, 0)
 rs.b.e.11.2[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 2, 0, c(0.1, 0.1), ex, 0)
 rs.b.e.11.2[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 2, 0.2, c(0.1, 0.1), ex, 0)
 rs.b.e.11.2[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 2, 0.5, c(0.1, 0.1), ex, 0)
-rs.b.e.11.2[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 2, 0, c(0.1, 0.1), ex, 0)
-rs.b.e.11.2[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 2, 0.2, c(0.1, 0.1), ex, 0)
-rs.b.e.11.2[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 2, 0.5, c(0.1, 0.1), ex, 0)
 
-
-
-
-
-rs.b.e.55.2 <- matrix(0, 3, 6)
+####################################################################
+### Rank sum, exchangable, rho = 0.5, 0.5, clus size = 2, delta = 0,
+### 0.2, 0.5, grpsize = 20, 50, balanced data
+####################################################################
+rs.b.e.55.2 <- matrix(0, 2, 6)
 rs.b.e.55.2[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 2, 0, c(0.5, 0.5), ex, 0)
 rs.b.e.55.2[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 2, 0.2, c(0.5, 0.5), ex, 0)
 rs.b.e.55.2[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 2, 0.5, c(0.5, 0.5), ex, 0)
 rs.b.e.55.2[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 2, 0, c(0.5, 0.5), ex, 0)
 rs.b.e.55.2[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 2, 0.2, c(0.5, 0.5), ex, 0)
 rs.b.e.55.2[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 2, 0.5, c(0.5, 0.5), ex, 0)
-rs.b.e.55.2[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 2, 0, c(0.5, 0.5), ex, 0)
-rs.b.e.55.2[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 2, 0.2, c(0.5, 0.5), ex, 0)
-rs.b.e.55.2[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 2, 0.5, c(0.5, 0.5), ex, 0)
 
-
-
-
-
-
-
-rs.b.e.19.2 <- matrix(0, 3, 6)
+####################################################################
+### Rank sum, exchangable, rho = -0.1, 0.9, clus size = 2, delta = 0,
+### 0.2, 0.5, grpsize = 20, 50, balanced data
+####################################################################
+rs.b.e.19.2 <- matrix(0, 2, 6)
 rs.b.e.19.2[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 2, 0, c(-0.1, 0.9), ex, 0)
 rs.b.e.19.2[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 2, 0.2, c(-0.1, 0.9), ex, 0)
 rs.b.e.19.2[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 2, 0.5, c(-0.1, 0.9), ex, 0)
 rs.b.e.19.2[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 2, 0, c(-0.1, 0.9), ex, 0)
 rs.b.e.19.2[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 2, 0.2, c(-0.1, 0.9), ex, 0)
 rs.b.e.19.2[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 2, 0.5, c(-0.1, 0.9), ex, 0)
-rs.b.e.19.2[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 2, 0, c(-0.1, 0.9), ex, 0)
-rs.b.e.19.2[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 2, 0.2, c(-0.1, 0.9), ex, 0)
-rs.b.e.19.2[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 2, 0.5, c(-0.1, 0.9), ex, 0)
 
-
-
-
-
-
-
-rs.b.e.11.5 <- matrix(0, 3, 6)
+####################################################################
+### Rank sum, exchangable, rho = 0.1, 0.1, clus size = 5, delta = 0,
+### 0.2, 0.5, grpsize = 20, 50, balanced data
+####################################################################
+rs.b.e.11.5 <- matrix(0, 2, 6)
 rs.b.e.11.5[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 5, 0, c(0.1, 0.1), ex, 0)
 rs.b.e.11.5[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 5, 0.2, c(0.1, 0.1), ex, 0)
 rs.b.e.11.5[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 5, 0.5, c(0.1, 0.1), ex, 0)
 rs.b.e.11.5[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 5, 0, c(0.1, 0.1), ex, 0)
 rs.b.e.11.5[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 5, 0.2, c(0.1, 0.1), ex, 0)
 rs.b.e.11.5[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 5, 0.5, c(0.1, 0.1), ex, 0)
-rs.b.e.11.5[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 5, 0, c(0.1, 0.1), ex, 0)
-rs.b.e.11.5[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 5, 0.2, c(0.1, 0.1), ex, 0)
-rs.b.e.11.5[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 5, 0.5, c(0.1, 0.1), ex, 0)
 
-
-
-
-
-rs.b.e.55.5 <- matrix(0, 3, 6)
+####################################################################
+### Rank sum, exchangable, rho = 0.5, 0.5, clus size = 5, delta = 0,
+### 0.2, 0.5, grpsize = 20, 50, balanced data
+####################################################################
+rs.b.e.55.5 <- matrix(0, 2, 6)
 rs.b.e.55.5[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 5, 0, c(0.5, 0.5), ex, 0)
 rs.b.e.55.5[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 5, 0.2, c(0.5, 0.5), ex, 0)
 rs.b.e.55.5[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 5, 0.5, c(0.5, 0.5), ex, 0)
 rs.b.e.55.5[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 5, 0, c(0.5, 0.5), ex, 0)
 rs.b.e.55.5[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 5, 0.2, c(0.5, 0.5), ex, 0)
 rs.b.e.55.5[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 5, 0.5, c(0.5, 0.5), ex, 0)
-rs.b.e.55.5[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 5, 0, c(0.5, 0.5), ex, 0)
-rs.b.e.55.5[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 5, 0.2, c(0.5, 0.5), ex, 0)
-rs.b.e.55.5[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 5, 0.5, c(0.5, 0.5), ex, 0)
 
-
-
-
-
-
-
-
-
-
-
-rs.b.e.19.5 <- matrix(0, 3, 6)
+####################################################################
+### Rank sum, exchangable, rho = -0.1, 0.9, clus size = 5, delta = 0,
+### 0.2, 0.5, grpsize = 20, 50, balanced data
+####################################################################
+rs.b.e.19.5 <- matrix(0, 2, 6)
 rs.b.e.19.5[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 5, 0, c(-0.1, 0.9), ex, 0)
 rs.b.e.19.5[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 5, 0.2, c(-0.1, 0.9), ex, 0)
 rs.b.e.19.5[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 5, 0.5, c(-0.1, 0.9), ex, 0)
 rs.b.e.19.5[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 5, 0, c(-0.1, 0.9), ex, 0)
 rs.b.e.19.5[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 5, 0.2, c(-0.1, 0.9), ex, 0)
 rs.b.e.19.5[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 5, 0.5, c(-0.1, 0.9), ex, 0)
-rs.b.e.19.5[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 5, 0, c(-0.1, 0.9), ex, 0)
-rs.b.e.19.5[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 5, 0.2, c(-0.1, 0.9), ex, 0)
-rs.b.e.19.5[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 5, 0.5, c(-0.1, 0.9), ex, 0)
 
-
-
-
-
-
-
-
-rs.ub.e.11.10 <- matrix(0, 3, 6)
+####################################################################
+### Rank sum, exchangable, rho = 0.1, 0.1, clus size = 10, delta = 0,
+### 0.2, 0.5, grpsize = 20, 50, unbalanced data, missingrate = 0.5
+####################################################################
+rs.ub.e.11.10 <- matrix(0, 2, 6)
 rs.ub.e.11.10[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 10, 0, c(0.1, 0.1), ex, 0.5)
 rs.ub.e.11.10[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 10, 0.2, c(0.1, 0.1), ex, 0.5)
 rs.ub.e.11.10[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 10, 0.5, c(0.1, 0.1), ex, 0.5)
 rs.ub.e.11.10[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 10, 0, c(0.1, 0.1), ex, 0.5)
 rs.ub.e.11.10[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 10, 0.2, c(0.1, 0.1), ex, 0.5)
 rs.ub.e.11.10[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 10, 0.5, c(0.1, 0.1), ex, 0.5)
-rs.ub.e.11.10[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 10, 0, c(0.1, 0.1), ex, 0.5)
-rs.ub.e.11.10[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 10, 0.2, c(0.1, 0.1), ex, 0.5)
-rs.ub.e.11.10[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 10, 0.5, c(0.1, 0.1), ex, 0.5)
+), ex, 0)
 
-
-
-
-
-
-
-
-
-
-rs.ub.e.55.10 <- matrix(0, 3, 6)
+####################################################################
+### Rank sum, exchangable, rho = 0.5, 0.5, clus size = 10, delta = 0,
+### 0.2, 0.5, grpsize = 20, 50, unbalanced data, missingrate = 0.5
+####################################################################
+rs.ub.e.55.10 <- matrix(0, 2, 6)
 rs.ub.e.55.10[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 10, 0, c(0.5, 0.5), ex, 0.5)
 rs.ub.e.55.10[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 10, 0.2, c(0.5, 0.5), ex, 0.5)
 rs.ub.e.55.10[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 10, 0.5, c(0.5, 0.5), ex, 0.5)
 rs.ub.e.55.10[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 10, 0, c(0.5, 0.5), ex, 0.5)
 rs.ub.e.55.10[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 10, 0.2, c(0.5, 0.5), ex, 0.5)
 rs.ub.e.55.10[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 10, 0.5, c(0.5, 0.5), ex, 0.5)
-rs.ub.e.55.10[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 10, 0, c(0.5, 0.5), ex, 0.5)
-rs.ub.e.55.10[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 10, 0.2, c(0.5, 0.5), ex, 0.5)
-rs.ub.e.55.10[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 10, 0.5, c(0.5, 0.5), ex, 0.5)
+), ex, 0)
 
-
-
-
-
-
-
-rs.ub.e.19.10 <- matrix(0, 3, 6)
+####################################################################
+### Rank sum, exchangable, rho = -0.1, 0.9, clus size = 10, delta = 0,
+### 0.2, 0.5, grpsize = 20, 50, unbalanced data, missingrate = 0.5
+####################################################################
+rs.ub.e.19.10 <- matrix(0, 2, 6)
 rs.ub.e.19.10[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 10, 0, c(-0.1, 0.9), ex, 0.5)
 rs.ub.e.19.10[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 10, 0.2, c(-0.1, 0.9), ex, 0.5)
 rs.ub.e.19.10[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 10, 0.5, c(-0.1, 0.9), ex, 0.5)
 rs.ub.e.19.10[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 10, 0, c(-0.1, 0.9), ex, 0.5)
 rs.ub.e.19.10[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 10, 0.2, c(-0.1, 0.9), ex, 0.5)
 rs.ub.e.19.10[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 10, 0.5, c(-0.1, 0.9), ex, 0.5)
-rs.ub.e.19.10[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 10, 0, c(-0.1, 0.9), ex, 0.5)
-rs.ub.e.19.10[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 10, 0.2, c(-0.1, 0.9), ex, 0.5)
-rs.ub.e.19.10[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 10, 0.5, c(-0.1, 0.9), ex, 0.5)
+), ex, 0)
 
-
-
-
-
-rs.b.e.11.2.sub <- matrix(0, 3, 6)
+####################################################################
+### Rank sum, sub-unit grouping exchangable, rho = 0.1, 0.1, clus size
+### = 2, delta = 0, 0.2, 0.5, grpsize = 20, 50
+####################################################################
+rs.b.e.11.2.sub <- matrix(0, 2, 6)
 rs.b.e.11.2.sub[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 2, 0, c(0.1, 0.1), ex, 0, FALSE)
 rs.b.e.11.2.sub[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 2, 0.2, c(0.1, 0.1), ex, 0, FALSE)
 rs.b.e.11.2.sub[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 2, 0.5, c(0.1, 0.1), ex, 0, FALSE)
 rs.b.e.11.2.sub[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 2, 0, c(0.1, 0.1), ex, 0, FALSE)
 rs.b.e.11.2.sub[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 2, 0.2, c(0.1, 0.1), ex, 0, FALSE)
 rs.b.e.11.2.sub[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 2, 0.5, c(0.1, 0.1), ex, 0, FALSE)
-rs.b.e.11.2.sub[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 2, 0, c(0.1, 0.1), ex, 0, FALSE)
-rs.b.e.11.2.sub[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 2, 0.2, c(0.1, 0.1), ex, 0, FALSE)
-rs.b.e.11.2.sub[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 2, 0.5, c(0.1, 0.1), ex, 0, FALSE)
 
-
-
-
-
-rs.b.e.55.2.sub <- matrix(0, 3, 6)
+####################################################################
+### Rank sum, sub-unit grouping, exchangable, rho = 0.5, 0.5, clus size
+### = 2, delta = 0, 0.2, 0.5, grpsize = 20, 50
+####################################################################
+rs.b.e.55.2.sub <- matrix(0, 2, 6)
 rs.b.e.55.2.sub[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 2, 0, c(0.5, 0.5), ex, 0, FALSE)
 rs.b.e.55.2.sub[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 2, 0.2, c(0.5, 0.5), ex, 0, FALSE)
 rs.b.e.55.2.sub[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 2, 0.5, c(0.5, 0.5), ex, 0, FALSE)
 rs.b.e.55.2.sub[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 2, 0, c(0.5, 0.5), ex, 0, FALSE)
 rs.b.e.55.2.sub[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 2, 0.2, c(0.5, 0.5), ex, 0, FALSE)
 rs.b.e.55.2.sub[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 2, 0.5, c(0.5, 0.5), ex, 0, FALSE)
-rs.b.e.55.2.sub[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 2, 0, c(0.5, 0.5), ex, 0, FALSE)
-rs.b.e.55.2.sub[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 2, 0.2, c(0.5, 0.5), ex, 0, FALSE)
-rs.b.e.55.2.sub[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 2, 0.5, c(0.5, 0.5), ex, 0, FALSE)
 
-
-
-
-
-
-
-rs.b.e.19.2.sub <- matrix(0, 3, 6)
+####################################################################
+### Rank sum, sub-unit grouping exchangable, rho = -0.1, 0.9, clus size
+### = 2, delta = 0, 0.2, 0.5, grpsize = 20, 50
+####################################################################
+rs.b.e.19.2.sub <- matrix(0, 2, 6)
 rs.b.e.19.2.sub[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 2, 0, c(-0.1, 0.9), ex, 0, FALSE)
 rs.b.e.19.2.sub[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 2, 0.2, c(-0.1, 0.9), ex, 0, FALSE)
 rs.b.e.19.2.sub[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 2, 0.5, c(-0.1, 0.9), ex, 0, FALSE)
 rs.b.e.19.2.sub[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 2, 0, c(-0.1, 0.9), ex, 0, FALSE)
 rs.b.e.19.2.sub[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 2, 0.2, c(-0.1, 0.9), ex, 0, FALSE)
 rs.b.e.19.2.sub[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 2, 0.5, c(-0.1, 0.9), ex, 0, FALSE)
-rs.b.e.19.2.sub[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 2, 0, c(-0.1, 0.9), ex, 0, FALSE)
-rs.b.e.19.2.sub[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 2, 0.2, c(-0.1, 0.9), ex, 0, FALSE)
-rs.b.e.19.2.sub[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 2, 0.5, c(-0.1, 0.9), ex, 0, FALSE)
 
-
-
-
-
-
-
-rs.b.e.11.5.sub <- matrix(0, 3, 6)
+####################################################################
+### Rank sum, sub-unit grouping exchangable, rho = 0.1, 0.1, clus size
+### = 5, delta = 0, 0.2, 0.5, grpsize = 20, 50
+####################################################################
+rs.b.e.11.5.sub <- matrix(0, 2, 6)
 rs.b.e.11.5.sub[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 5, 0, c(0.1, 0.1), ex, 0, FALSE)
 rs.b.e.11.5.sub[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 5, 0.2, c(0.1, 0.1), ex, 0, FALSE)
 rs.b.e.11.5.sub[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 5, 0.5, c(0.1, 0.1), ex, 0, FALSE)
 rs.b.e.11.5.sub[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 5, 0, c(0.1, 0.1), ex, 0, FALSE)
 rs.b.e.11.5.sub[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 5, 0.2, c(0.1, 0.1), ex, 0, FALSE)
 rs.b.e.11.5.sub[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 5, 0.5, c(0.1, 0.1), ex, 0, FALSE)
-rs.b.e.11.5.sub[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 5, 0, c(0.1, 0.1), ex, 0, FALSE)
-rs.b.e.11.5.sub[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 5, 0.2, c(0.1, 0.1), ex, 0, FALSE)
-rs.b.e.11.5.sub[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 5, 0.5, c(0.1, 0.1), ex, 0, FALSE)
 
-
-
-
-
-rs.b.e.55.5.sub <- matrix(0, 3, 6)
+####################################################################
+### Rank sum, sub-unit grouping exchangable, rho = 0.5, 0.5, clus size
+### = 5, delta = 0, 0.2, 0.5, grpsize = 20, 50
+####################################################################
+rs.b.e.55.5.sub <- matrix(0, 2, 6)
 rs.b.e.55.5.sub[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 5, 0, c(0.5, 0.5), ex, 0, FALSE)
 rs.b.e.55.5.sub[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 5, 0.2, c(0.5, 0.5), ex, 0, FALSE)
 rs.b.e.55.5.sub[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 5, 0.5, c(0.5, 0.5), ex, 0, FALSE)
 rs.b.e.55.5.sub[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 5, 0, c(0.5, 0.5), ex, 0, FALSE)
 rs.b.e.55.5.sub[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 5, 0.2, c(0.5, 0.5), ex, 0, FALSE)
 rs.b.e.55.5.sub[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 5, 0.5, c(0.5, 0.5), ex, 0, FALSE)
-rs.b.e.55.5.sub[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 5, 0, c(0.5, 0.5), ex, 0, FALSE)
-rs.b.e.55.5.sub[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 5, 0.2, c(0.5, 0.5), ex, 0, FALSE)
-rs.b.e.55.5.sub[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 5, 0.5, c(0.5, 0.5), ex, 0, FALSE)
 
-
-
-
-
-
-
-
-
-
-
-rs.b.e.19.5.sub <- matrix(0, 3, 6)
+####################################################################
+### Rank sum, sub-unit grouping exchangable, rho = -0.1, 0.9, clus size
+### = 5, delta = 0, 0.2, 0.5, grpsize = 20, 50
+####################################################################
+rs.b.e.19.5.sub <- matrix(0, 2, 6)
 rs.b.e.19.5.sub[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 5, 0, c(-0.1, 0.9), ex, 0, FALSE)
 rs.b.e.19.5.sub[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 5, 0.2, c(-0.1, 0.9), ex, 0, FALSE)
 rs.b.e.19.5.sub[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 5, 0.5, c(-0.1, 0.9), ex, 0, FALSE)
 rs.b.e.19.5.sub[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 5, 0, c(-0.1, 0.9), ex, 0, FALSE)
 rs.b.e.19.5.sub[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 5, 0.2, c(-0.1, 0.9), ex, 0, FALSE)
 rs.b.e.19.5.sub[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 5, 0.5, c(-0.1, 0.9), ex, 0, FALSE)
-rs.b.e.19.5.sub[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 5, 0, c(-0.1, 0.9), ex, 0, FALSE)
-rs.b.e.19.5.sub[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 5, 0.2, c(-0.1, 0.9), ex, 0, FALSE)
-rs.b.e.19.5.sub[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 5, 0.5, c(-0.1, 0.9), ex, 0, FALSE)
 
-
-
-
-
-
-
-
-rs.ub.e.11.10.sub <- matrix(0, 3, 6)
+####################################################################
+### Rank sum, sub-unit grouping exchangable, rho = 0.1, 0.1, clus size
+### = 10, delta = 0, 0.2, 0.5, grpsize = 20, 50, unbalanced data,
+### missingrate = 0.5
+####################################################################
+rs.ub.e.11.10.sub <- matrix(0, 2, 6)
 rs.ub.e.11.10.sub[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 10, 0, c(0.1, 0.1), ex, 0.5, FALSE)
 rs.ub.e.11.10.sub[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 10, 0.2, c(0.1, 0.1), ex, 0.5, FALSE)
 rs.ub.e.11.10.sub[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 10, 0.5, c(0.1, 0.1), ex, 0.5, FALSE)
 rs.ub.e.11.10.sub[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 10, 0, c(0.1, 0.1), ex, 0.5, FALSE)
 rs.ub.e.11.10.sub[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 10, 0.2, c(0.1, 0.1), ex, 0.5, FALSE)
 rs.ub.e.11.10.sub[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 10, 0.5, c(0.1, 0.1), ex, 0.5, FALSE)
-rs.ub.e.11.10.sub[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 10, 0, c(0.1, 0.1), ex, 0.5, FALSE)
-rs.ub.e.11.10.sub[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 10, 0.2, c(0.1, 0.1), ex, 0.5, FALSE)
-rs.ub.e.11.10.sub[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 10, 0.5, c(0.1, 0.1), ex, 0.5, FALSE)
+####################################################################
+### Rank sum, sub-unit grouping exchangable, rho = 0.5, 0.5, clus size
+### = 10, delta = 0, 0.2, 0.5, grpsize = 20, 50, unbalanced data,
+### missingrate = 0.5
+####################################################################
 
-
-
-
-
-
-
-
-
-
-rs.ub.e.55.10.sub <- matrix(0, 3, 6)
+rs.ub.e.55.10.sub <- matrix(0, 2, 6)
 rs.ub.e.55.10.sub[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 10, 0, c(0.5, 0.5), ex, 0.5, FALSE)
 rs.ub.e.55.10.sub[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 10, 0.2, c(0.5, 0.5), ex, 0.5, FALSE)
 rs.ub.e.55.10.sub[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 10, 0.5, c(0.5, 0.5), ex, 0.5, FALSE)
 rs.ub.e.55.10.sub[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 10, 0, c(0.5, 0.5), ex, 0.5, FALSE)
 rs.ub.e.55.10.sub[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 10, 0.2, c(0.5, 0.5), ex, 0.5, FALSE)
 rs.ub.e.55.10.sub[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 10, 0.5, c(0.5, 0.5), ex, 0.5, FALSE)
-rs.ub.e.55.10.sub[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 10, 0, c(0.5, 0.5), ex, 0.5, FALSE)
-rs.ub.e.55.10.sub[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 10, 0.2, c(0.5, 0.5), ex, 0.5, FALSE)
-rs.ub.e.55.10.sub[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 10, 0.5, c(0.5, 0.5), ex, 0.5, FALSE)
+####################################################################
+### Rank sum, sub-unit grouping exchangable, rho = -0.1, 0.9, clus size
+### = 10, delta = 0, 0.2, 0.5, grpsize = 20, 50, unbalanced data,
+### missingrate = 0.5
+####################################################################
 
-
-
-
-
-
-
-rs.ub.e.19.10.sub <- matrix(0, 3, 6)
+rs.ub.e.19.10.sub <- matrix(0, 2, 6)
 rs.ub.e.19.10.sub[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 10, 0, c(-0.1, 0.9), ex, 0.5, FALSE)
 rs.ub.e.19.10.sub[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 10, 0.2, c(-0.1, 0.9), ex, 0.5, FALSE)
 rs.ub.e.19.10.sub[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 10, 0.5, c(-0.1, 0.9), ex, 0.5, FALSE)
 rs.ub.e.19.10.sub[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 10, 0, c(-0.1, 0.9), ex, 0.5, FALSE)
 rs.ub.e.19.10.sub[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 10, 0.2, c(-0.1, 0.9), ex, 0.5, FALSE)
 rs.ub.e.19.10.sub[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 10, 0.5, c(-0.1, 0.9), ex, 0.5, FALSE)
-rs.ub.e.19.10.sub[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 10, 0, c(-0.1, 0.9), ex, 0.5, FALSE)
-rs.ub.e.19.10.sub[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 10, 0.2, c(-0.1, 0.9), ex, 0.5, FALSE)
-rs.ub.e.19.10.sub[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 10, 0.5, c(-0.1, 0.9), ex, 0.5, FALSE)
 
 
 
 
 
+####################################################################
+### Rank sum, ar1, rho = 0.1, 0.1, clus size = 2, delta = 0,
+### 0.2, 0.5, grpsize = 20, 50, balanced data
+####################################################################
 
+rs.b.a.11.2 <- matrix(0, 2, 6)
+rs.b.a.11.2[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 2, 0, c(0.1, 0.1), ex, 0)
+rs.b.a.11.2[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 2, 0.2, c(0.1, 0.1), ex, 0)
+rs.b.a.11.2[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 2, 0.5, c(0.1, 0.1), ex, 0)
+rs.b.a.11.2[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 2, 0, c(0.1, 0.1), ex, 0)
+rs.b.a.11.2[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 2, 0.2, c(0.1, 0.1), ex, 0)
+rs.b.a.11.2[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 2, 0.5, c(0.1, 0.1), ex, 0)
 
+####################################################################
+### Rank sum, ar1, rho = 0.5, 0.5, clus size = 2, delta = 0,
+### 0.2, 0.5, grpsize = 20, 50, balanced data
+####################################################################
+rs.b.a.55.2 <- matrix(0, 2, 6)
+rs.b.a.55.2[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 2, 0, c(0.5, 0.5), ex, 0)
+rs.b.a.55.2[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 2, 0.2, c(0.5, 0.5), ex, 0)
+rs.b.a.55.2[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 2, 0.5, c(0.5, 0.5), ex, 0)
+rs.b.a.55.2[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 2, 0, c(0.5, 0.5), ex, 0)
+rs.b.a.55.2[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 2, 0.2, c(0.5, 0.5), ex, 0)
+rs.b.a.55.2[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 2, 0.5, c(0.5, 0.5), ex, 0)
 
+####################################################################
+### Rank sum, ar1, rho = -0.1, 0.9, clus size = 2, delta = 0,
+### 0.2, 0.5, grpsize = 20, 50, balanced data
+####################################################################
+rs.b.a.19.2 <- matrix(0, 2, 6)
+rs.b.a.19.2[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 2, 0, c(-0.1, 0.9), ex, 0)
+rs.b.a.19.2[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 2, 0.2, c(-0.1, 0.9), ex, 0)
+rs.b.a.19.2[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 2, 0.5, c(-0.1, 0.9), ex, 0)
+rs.b.a.19.2[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 2, 0, c(-0.1, 0.9), ex, 0)
+rs.b.a.19.2[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 2, 0.2, c(-0.1, 0.9), ex, 0)
+rs.b.a.19.2[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 2, 0.5, c(-0.1, 0.9), ex, 0)
 
+####################################################################
+### Rank sum, ar1, rho = 0.1, 0.1, clus size = 5, delta = 0,
+### 0.2, 0.5, grpsize = 20, 50, balanced data
+####################################################################
+rs.b.a.11.5 <- matrix(0, 2, 6)
+rs.b.a.11.5[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 5, 0, c(0.1, 0.1), ex, 0)
+rs.b.a.11.5[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 5, 0.2, c(0.1, 0.1), ex, 0)
+rs.b.a.11.5[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 5, 0.5, c(0.1, 0.1), ex, 0)
+rs.b.a.11.5[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 5, 0, c(0.1, 0.1), ex, 0)
+rs.b.a.11.5[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 5, 0.2, c(0.1, 0.1), ex, 0)
+rs.b.a.11.5[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 5, 0.5, c(0.1, 0.1), ex, 0)
 
+####################################################################
+### Rank sum, ar1, rho = 0.5, 0.5, clus size = 5, delta = 0,
+### 0.2, 0.5, grpsize = 20, 50, balanced data
+####################################################################
+rs.b.a.55.5 <- matrix(0, 2, 6)
+rs.b.a.55.5[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 5, 0, c(0.5, 0.5), ex, 0)
+rs.b.a.55.5[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 5, 0.2, c(0.5, 0.5), ex, 0)
+rs.b.a.55.5[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 5, 0.5, c(0.5, 0.5), ex, 0)
+rs.b.a.55.5[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 5, 0, c(0.5, 0.5), ex, 0)
+rs.b.a.55.5[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 5, 0.2, c(0.5, 0.5), ex, 0)
+rs.b.a.55.5[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 5, 0.5, c(0.5, 0.5), ex, 0)
 
+####################################################################
+### Rank sum, ar1, rho = -0.1, 0.9, clus size = 5, delta = 0,
+### 0.2, 0.5, grpsize = 20, 50, balanced data
+####################################################################
+rs.b.a.19.5 <- matrix(0, 2, 6)
+rs.b.a.19.5[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 5, 0, c(-0.1, 0.9), ex, 0)
+rs.b.a.19.5[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 5, 0.2, c(-0.1, 0.9), ex, 0)
+rs.b.a.19.5[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 5, 0.5, c(-0.1, 0.9), ex, 0)
+rs.b.a.19.5[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 5, 0, c(-0.1, 0.9), ex, 0)
+rs.b.a.19.5[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 5, 0.2, c(-0.1, 0.9), ex, 0)
+rs.b.a.19.5[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 5, 0.5, c(-0.1, 0.9), ex, 0)
 
+####################################################################
+### Rank sum, ar1, rho = 0.1, 0.1, clus size = 10, delta = 0,
+### 0.2, 0.5, grpsize = 20, 50, unbalanced data, missingrate = 0.5
+####################################################################
+rs.ub.a.11.10 <- matrix(0, 2, 6)
+rs.ub.a.11.10[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 10, 0, c(0.1, 0.1), ex, 0.5)
+rs.ub.a.11.10[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 10, 0.2, c(0.1, 0.1), ex, 0.5)
+rs.ub.a.11.10[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 10, 0.5, c(0.1, 0.1), ex, 0.5)
+rs.ub.a.11.10[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 10, 0, c(0.1, 0.1), ex, 0.5)
+rs.ub.a.11.10[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 10, 0.2, c(0.1, 0.1), ex, 0.5)
+rs.ub.a.11.10[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 10, 0.5, c(0.1, 0.1), ex, 0.5)
+), ex, 0)
 
+####################################################################
+### Rank sum, ar1, rho = 0.5, 0.5, clus size = 10, delta = 0,
+### 0.2, 0.5, grpsize = 20, 50, unbalanced data, missingrate = 0.5
+####################################################################
+rs.ub.a.55.10 <- matrix(0, 2, 6)
+rs.ub.a.55.10[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 10, 0, c(0.5, 0.5), ex, 0.5)
+rs.ub.a.55.10[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 10, 0.2, c(0.5, 0.5), ex, 0.5)
+rs.ub.a.55.10[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 10, 0.5, c(0.5, 0.5), ex, 0.5)
+rs.ub.a.55.10[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 10, 0, c(0.5, 0.5), ex, 0.5)
+rs.ub.a.55.10[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 10, 0.2, c(0.5, 0.5), ex, 0.5)
+rs.ub.a.55.10[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 10, 0.5, c(0.5, 0.5), ex, 0.5)
+), ex, 0)
 
+####################################################################
+### Rank sum, ar1, rho = -0.1, 0.9, clus size = 10, delta = 0,
+### 0.2, 0.5, grpsize = 20, 50, unbalanced data, missingrate = 0.5
+####################################################################
+rs.ub.a.19.10 <- matrix(0, 2, 6)
+rs.ub.a.19.10[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 10, 0, c(-0.1, 0.9), ex, 0.5)
+rs.ub.a.19.10[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 10, 0.2, c(-0.1, 0.9), ex, 0.5)
+rs.ub.a.19.10[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 10, 0.5, c(-0.1, 0.9), ex, 0.5)
+rs.ub.a.19.10[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 10, 0, c(-0.1, 0.9), ex, 0.5)
+rs.ub.a.19.10[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 10, 0.2, c(-0.1, 0.9), ex, 0.5)
+rs.ub.a.19.10[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 10, 0.5, c(-0.1, 0.9), ex, 0.5)
+), ex, 0)
 
-rs.b.a.11.2.sub <- matrix(0, 3, 6)
+####################################################################
+### Rank sum, sub-unit grouping ar1, rho = 0.1, 0.1, clus size
+### = 2, delta = 0, 0.2, 0.5, grpsize = 20, 50
+####################################################################
+rs.b.a.11.2.sub <- matrix(0, 2, 6)
 rs.b.a.11.2.sub[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 2, 0, c(0.1, 0.1), ex, 0, FALSE)
 rs.b.a.11.2.sub[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 2, 0.2, c(0.1, 0.1), ex, 0, FALSE)
 rs.b.a.11.2.sub[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 2, 0.5, c(0.1, 0.1), ex, 0, FALSE)
 rs.b.a.11.2.sub[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 2, 0, c(0.1, 0.1), ex, 0, FALSE)
 rs.b.a.11.2.sub[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 2, 0.2, c(0.1, 0.1), ex, 0, FALSE)
 rs.b.a.11.2.sub[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 2, 0.5, c(0.1, 0.1), ex, 0, FALSE)
-rs.b.a.11.2.sub[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 2, 0, c(0.1, 0.1), ex, 0, FALSE)
-rs.b.a.11.2.sub[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 2, 0.2, c(0.1, 0.1), ex, 0, FALSE)
-rs.b.a.11.2.sub[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 2, 0.5, c(0.1, 0.1), ex, 0, FALSE)
 
-
-
-
-
-rs.b.a.55.2.sub <- matrix(0, 3, 6)
+####################################################################
+### Rank sum, sub-unit grouping, ar1, rho = 0.5, 0.5, clus size
+### = 2, delta = 0, 0.2, 0.5, grpsize = 20, 50
+####################################################################
+rs.b.a.55.2.sub <- matrix(0, 2, 6)
 rs.b.a.55.2.sub[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 2, 0, c(0.5, 0.5), ex, 0, FALSE)
 rs.b.a.55.2.sub[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 2, 0.2, c(0.5, 0.5), ex, 0, FALSE)
 rs.b.a.55.2.sub[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 2, 0.5, c(0.5, 0.5), ex, 0, FALSE)
 rs.b.a.55.2.sub[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 2, 0, c(0.5, 0.5), ex, 0, FALSE)
 rs.b.a.55.2.sub[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 2, 0.2, c(0.5, 0.5), ex, 0, FALSE)
 rs.b.a.55.2.sub[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 2, 0.5, c(0.5, 0.5), ex, 0, FALSE)
-rs.b.a.55.2.sub[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 2, 0, c(0.5, 0.5), ex, 0, FALSE)
-rs.b.a.55.2.sub[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 2, 0.2, c(0.5, 0.5), ex, 0, FALSE)
-rs.b.a.55.2.sub[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 2, 0.5, c(0.5, 0.5), ex, 0, FALSE)
 
-
-
-
-
-
-
-rs.b.a.19.2.sub <- matrix(0, 3, 6)
+####################################################################
+### Rank sum, sub-unit grouping ar1, rho = -0.1, 0.9, clus size
+### = 2, delta = 0, 0.2, 0.5, grpsize = 20, 50
+####################################################################
+rs.b.a.19.2.sub <- matrix(0, 2, 6)
 rs.b.a.19.2.sub[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 2, 0, c(-0.1, 0.9), ex, 0, FALSE)
 rs.b.a.19.2.sub[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 2, 0.2, c(-0.1, 0.9), ex, 0, FALSE)
 rs.b.a.19.2.sub[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 2, 0.5, c(-0.1, 0.9), ex, 0, FALSE)
 rs.b.a.19.2.sub[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 2, 0, c(-0.1, 0.9), ex, 0, FALSE)
 rs.b.a.19.2.sub[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 2, 0.2, c(-0.1, 0.9), ex, 0, FALSE)
 rs.b.a.19.2.sub[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 2, 0.5, c(-0.1, 0.9), ex, 0, FALSE)
-rs.b.a.19.2.sub[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 2, 0, c(-0.1, 0.9), ex, 0, FALSE)
-rs.b.a.19.2.sub[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 2, 0.2, c(-0.1, 0.9), ex, 0, FALSE)
-rs.b.a.19.2.sub[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 2, 0.5, c(-0.1, 0.9), ex, 0, FALSE)
 
-
-
-
-
-
-
-rs.b.a.11.5.sub <- matrix(0, 3, 6)
+####################################################################
+### Rank sum, sub-unit grouping ar1, rho = 0.1, 0.1, clus size
+### = 5, delta = 0, 0.2, 0.5, grpsize = 20, 50
+####################################################################
+rs.b.a.11.5.sub <- matrix(0, 2, 6)
 rs.b.a.11.5.sub[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 5, 0, c(0.1, 0.1), ex, 0, FALSE)
 rs.b.a.11.5.sub[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 5, 0.2, c(0.1, 0.1), ex, 0, FALSE)
 rs.b.a.11.5.sub[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 5, 0.5, c(0.1, 0.1), ex, 0, FALSE)
 rs.b.a.11.5.sub[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 5, 0, c(0.1, 0.1), ex, 0, FALSE)
 rs.b.a.11.5.sub[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 5, 0.2, c(0.1, 0.1), ex, 0, FALSE)
 rs.b.a.11.5.sub[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 5, 0.5, c(0.1, 0.1), ex, 0, FALSE)
-rs.b.a.11.5.sub[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 5, 0, c(0.1, 0.1), ex, 0, FALSE)
-rs.b.a.11.5.sub[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 5, 0.2, c(0.1, 0.1), ex, 0, FALSE)
-rs.b.a.11.5.sub[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 5, 0.5, c(0.1, 0.1), ex, 0, FALSE)
 
-
-
-
-
-rs.b.a.55.5.sub <- matrix(0, 3, 6)
+####################################################################
+### Rank sum, sub-unit grouping ar1, rho = 0.5, 0.5, clus size
+### = 5, delta = 0, 0.2, 0.5, grpsize = 20, 50
+####################################################################
+rs.b.a.55.5.sub <- matrix(0, 2, 6)
 rs.b.a.55.5.sub[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 5, 0, c(0.5, 0.5), ex, 0, FALSE)
 rs.b.a.55.5.sub[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 5, 0.2, c(0.5, 0.5), ex, 0, FALSE)
 rs.b.a.55.5.sub[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 5, 0.5, c(0.5, 0.5), ex, 0, FALSE)
 rs.b.a.55.5.sub[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 5, 0, c(0.5, 0.5), ex, 0, FALSE)
 rs.b.a.55.5.sub[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 5, 0.2, c(0.5, 0.5), ex, 0, FALSE)
 rs.b.a.55.5.sub[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 5, 0.5, c(0.5, 0.5), ex, 0, FALSE)
-rs.b.a.55.5.sub[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 5, 0, c(0.5, 0.5), ex, 0, FALSE)
-rs.b.a.55.5.sub[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 5, 0.2, c(0.5, 0.5), ex, 0, FALSE)
-rs.b.a.55.5.sub[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 5, 0.5, c(0.5, 0.5), ex, 0, FALSE)
 
-
-
-
-
-
-
-
-
-
-
-rs.b.a.19.5.sub <- matrix(0, 3, 6)
+####################################################################
+### Rank sum, sub-unit grouping ar1, rho = -0.1, 0.9, clus size
+### = 5, delta = 0, 0.2, 0.5, grpsize = 20, 50
+####################################################################
+rs.b.a.19.5.sub <- matrix(0, 2, 6)
 rs.b.a.19.5.sub[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 5, 0, c(-0.1, 0.9), ex, 0, FALSE)
 rs.b.a.19.5.sub[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 5, 0.2, c(-0.1, 0.9), ex, 0, FALSE)
 rs.b.a.19.5.sub[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 5, 0.5, c(-0.1, 0.9), ex, 0, FALSE)
 rs.b.a.19.5.sub[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 5, 0, c(-0.1, 0.9), ex, 0, FALSE)
 rs.b.a.19.5.sub[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 5, 0.2, c(-0.1, 0.9), ex, 0, FALSE)
 rs.b.a.19.5.sub[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 5, 0.5, c(-0.1, 0.9), ex, 0, FALSE)
-rs.b.a.19.5.sub[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 5, 0, c(-0.1, 0.9), ex, 0, FALSE)
-rs.b.a.19.5.sub[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 5, 0.2, c(-0.1, 0.9), ex, 0, FALSE)
-rs.b.a.19.5.sub[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 5, 0.5, c(-0.1, 0.9), ex, 0, FALSE)
 
-
-
-
-
-
-
-
-rs.ub.a.11.10.sub <- matrix(0, 3, 6)
+####################################################################
+### Rank sum, sub-unit grouping ar1, rho = 0.1, 0.1, clus size
+### = 10, delta = 0, 0.2, 0.5, grpsize = 20, 50, unbalanced data,
+### missingrate = 0.5
+####################################################################
+rs.ub.a.11.10.sub <- matrix(0, 2, 6)
 rs.ub.a.11.10.sub[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 10, 0, c(0.1, 0.1), ex, 0.5, FALSE)
 rs.ub.a.11.10.sub[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 10, 0.2, c(0.1, 0.1), ex, 0.5, FALSE)
 rs.ub.a.11.10.sub[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 10, 0.5, c(0.1, 0.1), ex, 0.5, FALSE)
 rs.ub.a.11.10.sub[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 10, 0, c(0.1, 0.1), ex, 0.5, FALSE)
 rs.ub.a.11.10.sub[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 10, 0.2, c(0.1, 0.1), ex, 0.5, FALSE)
 rs.ub.a.11.10.sub[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 10, 0.5, c(0.1, 0.1), ex, 0.5, FALSE)
-rs.ub.a.11.10.sub[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 10, 0, c(0.1, 0.1), ex, 0.5, FALSE)
-rs.ub.a.11.10.sub[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 10, 0.2, c(0.1, 0.1), ex, 0.5, FALSE)
-rs.ub.a.11.10.sub[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 10, 0.5, c(0.1, 0.1), ex, 0.5, FALSE)
+####################################################################
+### Rank sum, sub-unit grouping ar1, rho = 0.5, 0.5, clus size
+### = 10, delta = 0, 0.2, 0.5, grpsize = 20, 50, unbalanced data,
+### missingrate = 0.5
+####################################################################
 
-
-
-
-
-
-
-
-
-
-rs.ub.a.55.10.sub <- matrix(0, 3, 6)
+rs.ub.a.55.10.sub <- matrix(0, 2, 6)
 rs.ub.a.55.10.sub[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 10, 0, c(0.5, 0.5), ex, 0.5, FALSE)
 rs.ub.a.55.10.sub[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 10, 0.2, c(0.5, 0.5), ex, 0.5, FALSE)
 rs.ub.a.55.10.sub[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 10, 0.5, c(0.5, 0.5), ex, 0.5, FALSE)
 rs.ub.a.55.10.sub[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 10, 0, c(0.5, 0.5), ex, 0.5, FALSE)
 rs.ub.a.55.10.sub[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 10, 0.2, c(0.5, 0.5), ex, 0.5, FALSE)
 rs.ub.a.55.10.sub[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 10, 0.5, c(0.5, 0.5), ex, 0.5, FALSE)
-rs.ub.a.55.10.sub[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 10, 0, c(0.5, 0.5), ex, 0.5, FALSE)
-rs.ub.a.55.10.sub[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 10, 0.2, c(0.5, 0.5), ex, 0.5, FALSE)
-rs.ub.a.55.10.sub[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 10, 0.5, c(0.5, 0.5), ex, 0.5, FALSE)
+####################################################################
+### Rank sum, sub-unit grouping ar1, rho = -0.1, 0.9, clus size
+### = 10, delta = 0, 0.2, 0.5, grpsize = 20, 50, unbalanced data,
+### missingrate = 0.5
+####################################################################
 
-
-
-
-
-
-
-rs.ub.a.19.10.sub <- matrix(0, 3, 6)
+rs.ub.a.19.10.sub <- matrix(0, 2, 6)
 rs.ub.a.19.10.sub[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 10, 0, c(-0.1, 0.9), ex, 0.5, FALSE)
 rs.ub.a.19.10.sub[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 10, 0.2, c(-0.1, 0.9), ex, 0.5, FALSE)
 rs.ub.a.19.10.sub[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 10, 0.5, c(-0.1, 0.9), ex, 0.5, FALSE)
 rs.ub.a.19.10.sub[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 10, 0, c(-0.1, 0.9), ex, 0.5, FALSE)
 rs.ub.a.19.10.sub[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 10, 0.2, c(-0.1, 0.9), ex, 0.5, FALSE)
-rs.ub.a.19.10.sub[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 10, 0.5, c(-0.1, 0.9), ex, 0.5, FALSE)
-rs.ub.a.19.10.sub[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 10, 0, c(-0.1, 0.9), ex, 0.5, FALSE)
-rs.ub.a.19.10.sub[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 10, 0.2, c(-0.1, 0.9), ex, 0.5, FALSE)
-rs.ub.a.19.10.sub[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 10, 0.5, c(-0.1, 0.9), ex, 0.5, FALSE)
-
-
-
-
-
-
-
-sr.b.e.1.2 <- matrix(0, 3, 6)
-sr.b.e.1.2[1, 1:2] <- simpower(4000, 0.05, TRUE, 20, 2, 0, 0.1, ex, 0)
-sr.b.e.1.2[1, 3:4] <- simpower(4000, 0.05, TRUE, 20, 2, 0.2, 0.1, ex, 0)
-sr.b.e.1.2[1, 5:6] <- simpower(4000, 0.05, TRUE, 20, 2, 0.5, 0.1, ex, 0)
-sr.b.e.1.2[2, 1:2] <- simpower(4000, 0.05, TRUE, 50, 2, 0, 0.1, ex, 0)
-sr.b.e.1.2[2, 3:4] <- simpower(4000, 0.05, TRUE, 50, 2, 0.2, 0.1, ex, 0)
-sr.b.e.1.2[2, 5:6] <- simpower(4000, 0.05, TRUE, 50, 2, 0.5, 0.1, ex, 0)
-sr.b.e.1.2[3, 1:2] <- simpower(4000, 0.05, TRUE, 100, 2, 0, 0.1, ex, 0)
-sr.b.e.1.2[3, 3:4] <- simpower(4000, 0.05, TRUE, 100, 2, 0.2, 0.1, ex, 0)
-sr.b.e.1.2[3, 5:6] <- simpower(4000, 0.05, TRUE, 100, 2, 0.5, 0.1, ex, 0)
-
-
-
-
-
-sr.b.e.5.2 <- matrix(0, 3, 6)
-sr.b.e.5.2[1, 1:2] <- simpower(4000, 0.05, TRUE, 20, 2, 0, 0.5, ex, 0)
-sr.b.e.5.2[1, 3:4] <- simpower(4000, 0.05, TRUE, 20, 2, 0.2, 0.5, ex, 0)
-sr.b.e.5.2[1, 5:6] <- simpower(4000, 0.05, TRUE, 20, 2, 0.5, 0.5, ex, 0)
-sr.b.e.5.2[2, 1:2] <- simpower(4000, 0.05, TRUE, 50, 2, 0, 0.5, ex, 0)
-sr.b.e.5.2[2, 3:4] <- simpower(4000, 0.05, TRUE, 50, 2, 0.2, 0.5, ex, 0)
-sr.b.e.5.2[2, 5:6] <- simpower(4000, 0.05, TRUE, 50, 2, 0.5, 0.5, ex, 0)
-sr.b.e.5.2[3, 1:2] <- simpower(4000, 0.05, TRUE, 100, 2, 0, 0.5, ex, 0)
-sr.b.e.5.2[3, 3:4] <- simpower(4000, 0.05, TRUE, 100, 2, 0.2, 0.5, ex, 0)
-sr.b.e.5.2[3, 5:6] <- simpower(4000, 0.05, TRUE, 100, 2, 0.5, 0.5, ex, 0)
-
-
-sr.b.e.9.2 <- matrix(0, 3, 6)
-sr.b.e.9.2[1, 1:2] <- simpower(4000, 0.05, TRUE, 20, 2, 0, 0.9, ex, 0)
-sr.b.e.9.2[1, 3:4] <- simpower(4000, 0.05, TRUE, 20, 2, 0.2, 0.9, ex, 0)
-sr.b.e.9.2[1, 5:6] <- simpower(4000, 0.05, TRUE, 20, 2, 0.5, 0.9, ex, 0)
-sr.b.e.9.2[2, 1:2] <- simpower(4000, 0.05, TRUE, 50, 2, 0, 0.9, ex, 0)
-sr.b.e.9.2[2, 3:4] <- simpower(4000, 0.05, TRUE, 50, 2, 0.2, 0.9, ex, 0)
-sr.b.e.9.2[2, 5:6] <- simpower(4000, 0.05, TRUE, 50, 2, 0.5, 0.9, ex, 0)
-sr.b.e.9.2[3, 1:2] <- simpower(4000, 0.05, TRUE, 100, 2, 0, 0.9, ex, 0)
-sr.b.e.9.2[3, 3:4] <- simpower(4000, 0.05, TRUE, 100, 2, 0.2, 0.9, ex, 0)
-sr.b.e.9.2[3, 5:6] <- simpower(4000, 0.05, TRUE, 100, 2, 0.5, 0.9, ex, 0)
-
-
-
-
-
-
-
-
-sr.b.e.1.10 <- matrix(0, 3, 6)
-sr.b.e.1.10[1, 1:2] <- simpower(4000, 0.05, TRUE, 20, 10, 0, 0.1, ex, 0)
-sr.b.e.1.10[1, 3:4] <- simpower(4000, 0.05, TRUE, 20, 10, 0.2, 0.1, ex, 0)
-sr.b.e.1.10[1, 5:6] <- simpower(4000, 0.05, TRUE, 20, 10, 0.5, 0.1, ex, 0)
-sr.b.e.1.10[2, 1:2] <- simpower(4000, 0.05, TRUE, 50, 10, 0, 0.1, ex, 0)
-sr.b.e.1.10[2, 3:4] <- simpower(4000, 0.05, TRUE, 50, 10, 0.2, 0.1, ex, 0)
-sr.b.e.1.10[2, 5:6] <- simpower(4000, 0.05, TRUE, 50, 10, 0.5, 0.1, ex, 0)
-sr.b.e.1.10[3, 1:2] <- simpower(4000, 0.05, TRUE, 100, 10, 0, 0.1, ex, 0)
-sr.b.e.1.10[3, 3:4] <- simpower(4000, 0.05, TRUE, 100, 10, 0.2, 0.1, ex, 0)
-sr.b.e.1.10[3, 5:6] <- simpower(4000, 0.05, TRUE, 100, 10, 0.5, 0.1, ex, 0)
-
-
-
-
-
-sr.b.e.5.10 <- matrix(0, 3, 6)
-sr.b.e.5.10[1, 1:2] <- simpower(4000, 0.05, TRUE, 20, 10, 0, 0.5, ex, 0)
-sr.b.e.5.10[1, 3:4] <- simpower(4000, 0.05, TRUE, 20, 10, 0.2, 0.5, ex, 0)
-sr.b.e.5.10[1, 5:6] <- simpower(4000, 0.05, TRUE, 20, 10, 0.5, 0.5, ex, 0)
-sr.b.e.5.10[2, 1:2] <- simpower(4000, 0.05, TRUE, 50, 10, 0, 0.5, ex, 0)
-sr.b.e.5.10[2, 3:4] <- simpower(4000, 0.05, TRUE, 50, 10, 0.2, 0.5, ex, 0)
-sr.b.e.5.10[2, 5:6] <- simpower(4000, 0.05, TRUE, 50, 10, 0.5, 0.5, ex, 0)
-sr.b.e.5.10[3, 1:2] <- simpower(4000, 0.05, TRUE, 100, 10, 0, 0.5, ex, 0)
-sr.b.e.5.10[3, 3:4] <- simpower(4000, 0.05, TRUE, 100, 10, 0.2, 0.5, ex, 0)
-sr.b.e.5.10[3, 5:6] <- simpower(4000, 0.05, TRUE, 100, 10, 0.5, 0.5, ex, 0)
-
-
-sr.b.e.9.10 <- matrix(0, 3, 6)
-sr.b.e.9.10[1, 1:2] <- simpower(4000, 0.05, TRUE, 20, 10, 0, 0.9, ex, 0)
-sr.b.e.9.10[1, 3:4] <- simpower(4000, 0.05, TRUE, 20, 10, 0.2, 0.9, ex, 0)
-sr.b.e.9.10[1, 5:6] <- simpower(4000, 0.05, TRUE, 20, 10, 0.5, 0.9, ex, 0)
-sr.b.e.9.10[2, 1:2] <- simpower(4000, 0.05, TRUE, 50, 10, 0, 0.9, ex, 0)
-sr.b.e.9.10[2, 3:4] <- simpower(4000, 0.05, TRUE, 50, 10, 0.2, 0.9, ex, 0)
-sr.b.e.9.10[2, 5:6] <- simpower(4000, 0.05, TRUE, 50, 10, 0.5, 0.9, ex, 0)
-sr.b.e.9.10[3, 1:2] <- simpower(4000, 0.05, TRUE, 100, 10, 0, 0.9, ex, 0)
-sr.b.e.9.10[3, 3:4] <- simpower(4000, 0.05, TRUE, 100, 10, 0.2, 0.9, ex, 0)
-sr.b.e.9.10[3, 5:6] <- simpower(4000, 0.05, TRUE, 100, 10, 0.5, 0.9, ex, 0)
-
-
-
-
-
-
-sr.ub.e.1.5 <- matrix(0, 3, 6)
-sr.ub.e.1.5[1, 1:2] <- simpower(4000, 0.05, TRUE, 20, 5, 0, 0.1, ex, 0.5)
-sr.ub.e.1.5[1, 3:4] <- simpower(4000, 0.05, TRUE, 20, 5, 0.2, 0.1, ex, 0.5)
-sr.ub.e.1.5[1, 5:6] <- simpower(4000, 0.05, TRUE, 20, 5, 0.5, 0.1, ex, 0.5)
-sr.ub.e.1.5[2, 1:2] <- simpower(4000, 0.05, TRUE, 50, 5, 0, 0.1, ex, 0.5)
-sr.ub.e.1.5[2, 3:4] <- simpower(4000, 0.05, TRUE, 50, 5, 0.2, 0.1, ex, 0.5)
-sr.ub.e.1.5[2, 5:6] <- simpower(4000, 0.05, TRUE, 50, 5, 0.5, 0.1, ex, 0.5)
-sr.ub.e.1.5[3, 1:2] <- simpower(4000, 0.05, TRUE, 100, 5, 0, 0.1, ex, 0.5)
-sr.ub.e.1.5[3, 3:4] <- simpower(4000, 0.05, TRUE, 100, 5, 0.2, 0.1, ex, 0.5)
-sr.ub.e.1.5[3, 5:6] <- simpower(4000, 0.05, TRUE, 100, 5, 0.5, 0.1, ex, 0.5)
-
-
-
-
-
-sr.ub.e.5.5 <- matrix(0, 3, 6)
-sr.ub.e.5.5[1, 1:2] <- simpower(4000, 0.05, TRUE, 20, 5, 0, 0.5, ex, 0.5)
-sr.ub.e.5.5[1, 3:4] <- simpower(4000, 0.05, TRUE, 20, 5, 0.2, 0.5, ex, 0.5)
-sr.ub.e.5.5[1, 5:6] <- simpower(4000, 0.05, TRUE, 20, 5, 0.5, 0.5, ex, 0.5)
-sr.ub.e.5.5[2, 1:2] <- simpower(4000, 0.05, TRUE, 50, 5, 0, 0.5, ex, 0.5)
-sr.ub.e.5.5[2, 3:4] <- simpower(4000, 0.05, TRUE, 50, 5, 0.2, 0.5, ex, 0.5)
-sr.ub.e.5.5[2, 5:6] <- simpower(4000, 0.05, TRUE, 50, 5, 0.5, 0.5, ex, 0.5)
-sr.ub.e.5.5[3, 1:2] <- simpower(4000, 0.05, TRUE, 100, 5, 0, 0.5, ex, 0.5)
-sr.ub.e.5.5[3, 3:4] <- simpower(4000, 0.05, TRUE, 100, 5, 0.2, 0.5, ex, 0.5)
-sr.ub.e.5.5[3, 5:6] <- simpower(4000, 0.05, TRUE, 100, 5, 0.5, 0.5, ex, 0.5)
-
-
-sr.ub.e.9.5 <- matrix(0, 3, 6)
-sr.ub.e.9.5[1, 1:2] <- simpower(4000, 0.05, TRUE, 20, 5, 0, 0.9, ex, 0.5)
-sr.ub.e.9.5[1, 3:4] <- simpower(4000, 0.05, TRUE, 20, 5, 0.2, 0.9, ex, 0.5)
-sr.ub.e.9.5[1, 5:6] <- simpower(4000, 0.05, TRUE, 20, 5, 0.5, 0.9, ex, 0.5)
-sr.ub.e.9.5[2, 1:2] <- simpower(4000, 0.05, TRUE, 50, 5, 0, 0.9, ex, 0.5)
-sr.ub.e.9.5[2, 3:4] <- simpower(4000, 0.05, TRUE, 50, 5, 0.2, 0.9, ex, 0.5)
-sr.ub.e.9.5[2, 5:6] <- simpower(4000, 0.05, TRUE, 50, 5, 0.5, 0.9, ex, 0.5)
-sr.ub.e.9.5[3, 1:2] <- simpower(4000, 0.05, TRUE, 100, 5, 0, 0.9, ex, 0.5)
-sr.ub.e.9.5[3, 3:4] <- simpower(4000, 0.05, TRUE, 100, 5, 0.2, 0.9, ex, 0.5)
-sr.ub.e.9.5[3, 5:6] <- simpower(4000, 0.05, TRUE, 100, 5, 0.5, 0.9, ex, 0.5)
-
-
-
-
-
-
-
-
-
-
-sr.ub.e.1.10 <- matrix(0, 3, 6)
-sr.ub.e.1.10[1, 1:2] <- simpower(4000, 0.05, TRUE, 20, 10, 0, 0.1, ex, 0.5)
-sr.ub.e.1.10[1, 3:4] <- simpower(4000, 0.05, TRUE, 20, 10, 0.2, 0.1, ex, 0.5)
-sr.ub.e.1.10[1, 5:6] <- simpower(4000, 0.05, TRUE, 20, 10, 0.5, 0.1, ex, 0.5)
-sr.ub.e.1.10[2, 1:2] <- simpower(4000, 0.05, TRUE, 50, 10, 0, 0.1, ex, 0.5)
-sr.ub.e.1.10[2, 3:4] <- simpower(4000, 0.05, TRUE, 50, 10, 0.2, 0.1, ex, 0.5)
-sr.ub.e.1.10[2, 5:6] <- simpower(4000, 0.05, TRUE, 50, 10, 0.5, 0.1, ex, 0.5)
-sr.ub.e.1.10[3, 1:2] <- simpower(4000, 0.05, TRUE, 100, 10, 0, 0.1, ex, 0.5)
-sr.ub.e.1.10[3, 3:4] <- simpower(4000, 0.05, TRUE, 100, 10, 0.2, 0.1, ex, 0.5)
-sr.ub.e.1.10[3, 5:6] <- simpower(4000, 0.05, TRUE, 100, 10, 0.5, 0.1, ex, 0.5)
-
-
-
-
-
-sr.ub.e.5.10 <- matrix(0, 3, 6)
-sr.ub.e.5.10[1, 1:2] <- simpower(4000, 0.05, TRUE, 20, 10, 0, 0.5, ex, 0.5)
-sr.ub.e.5.10[1, 3:4] <- simpower(4000, 0.05, TRUE, 20, 10, 0.2, 0.5, ex, 0.5)
-sr.ub.e.5.10[1, 5:6] <- simpower(4000, 0.05, TRUE, 20, 10, 0.5, 0.5, ex, 0.5)
-sr.ub.e.5.10[2, 1:2] <- simpower(4000, 0.05, TRUE, 50, 10, 0, 0.5, ex, 0.5)
-sr.ub.e.5.10[2, 3:4] <- simpower(4000, 0.05, TRUE, 50, 10, 0.2, 0.5, ex, 0.5)
-sr.ub.e.5.10[2, 5:6] <- simpower(4000, 0.05, TRUE, 50, 10, 0.5, 0.5, ex, 0.5)
-sr.ub.e.5.10[3, 1:2] <- simpower(4000, 0.05, TRUE, 100, 10, 0, 0.5, ex, 0.5)
-sr.ub.e.5.10[3, 3:4] <- simpower(4000, 0.05, TRUE, 100, 10, 0.2, 0.5, ex, 0.5)
-sr.ub.e.5.10[3, 5:6] <- simpower(4000, 0.05, TRUE, 100, 10, 0.5, 0.5, ex, 0.5)
-
-
-sr.ub.e.9.10 <- matrix(0, 3, 6)
-sr.ub.e.9.10[1, 1:2] <- simpower(4000, 0.05, TRUE, 20, 10, 0, 0.9, ex, 0.5)
-sr.ub.e.9.10[1, 3:4] <- simpower(4000, 0.05, TRUE, 20, 10, 0.2, 0.9, ex, 0.5)
-sr.ub.e.9.10[1, 5:6] <- simpower(4000, 0.05, TRUE, 20, 10, 0.5, 0.9, ex, 0.5)
-sr.ub.e.9.10[2, 1:2] <- simpower(4000, 0.05, TRUE, 50, 10, 0, 0.9, ex, 0.5)
-sr.ub.e.9.10[2, 3:4] <- simpower(4000, 0.05, TRUE, 50, 10, 0.2, 0.9, ex, 0.5)
-sr.ub.e.9.10[2, 5:6] <- simpower(4000, 0.05, TRUE, 50, 10, 0.5, 0.9, ex, 0.5)
-sr.ub.e.9.10[3, 1:2] <- simpower(4000, 0.05, TRUE, 100, 10, 0, 0.9, ex, 0.5)
-sr.ub.e.9.10[3, 3:4] <- simpower(4000, 0.05, TRUE, 100, 10, 0.2, 0.9, ex, 0.5)
-sr.ub.e.9.10[3, 5:6] <- simpower(4000, 0.05, TRUE, 100, 10, 0.5, 0.9, ex, 0.5)
-
-
-
-
-
-
-
-
-
-
-
-
-
-rs.b.a.11.2 <- matrix(0, 3, 6)
-rs.b.a.11.2[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 2, 0, c(0.1, 0.1), ar1, 0)
-rs.b.a.11.2[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 2, 0.2, c(0.1, 0.1), ar1, 0)
-rs.b.a.11.2[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 2, 0.5, c(0.1, 0.1), ar1, 0)
-rs.b.a.11.2[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 2, 0, c(0.1, 0.1), ar1, 0)
-rs.b.a.11.2[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 2, 0.2, c(0.1, 0.1), ar1, 0)
-rs.b.a.11.2[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 2, 0.5, c(0.1, 0.1), ar1, 0)
-rs.b.a.11.2[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 2, 0, c(0.1, 0.1), ar1, 0)
-rs.b.a.11.2[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 2, 0.2, c(0.1, 0.1), ar1, 0)
-rs.b.a.11.2[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 2, 0.5, c(0.1, 0.1), ar1, 0)
-
-
-
-
-
-rs.b.a.55.2 <- matrix(0, 3, 6)
-rs.b.a.55.2[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 2, 0, c(0.5, 0.5), ar1, 0)
-rs.b.a.55.2[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 2, 0.2, c(0.5, 0.5), ar1, 0)
-rs.b.a.55.2[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 2, 0.5, c(0.5, 0.5), ar1, 0)
-rs.b.a.55.2[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 2, 0, c(0.5, 0.5), ar1, 0)
-rs.b.a.55.2[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 2, 0.2, c(0.5, 0.5), ar1, 0)
-rs.b.a.55.2[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 2, 0.5, c(0.5, 0.5), ar1, 0)
-rs.b.a.55.2[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 2, 0, c(0.5, 0.5), ar1, 0)
-rs.b.a.55.2[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 2, 0.2, c(0.5, 0.5), ar1, 0)
-rs.b.a.55.2[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 2, 0.5, c(0.5, 0.5), ar1, 0)
-
-
-
-
-
-
-
-rs.b.a.19.2 <- matrix(0, 3, 6)
-rs.b.a.19.2[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 2, 0, c(-0.1, 0.9), ar1, 0)
-rs.b.a.19.2[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 2, 0.2, c(-0.1, 0.9), ar1, 0)
-rs.b.a.19.2[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 2, 0.5, c(-0.1, 0.9), ar1, 0)
-rs.b.a.19.2[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 2, 0, c(-0.1, 0.9), ar1, 0)
-rs.b.a.19.2[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 2, 0.2, c(-0.1, 0.9), ar1, 0)
-rs.b.a.19.2[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 2, 0.5, c(-0.1, 0.9), ar1, 0)
-rs.b.a.19.2[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 2, 0, c(-0.1, 0.9), ar1, 0)
-rs.b.a.19.2[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 2, 0.2, c(-0.1, 0.9), ar1, 0)
-rs.b.a.19.2[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 2, 0.5, c(-0.1, 0.9), ar1, 0)
-
-
-
-
-
-
-
-rs.b.a.11.5 <- matrix(0, 3, 6)
-rs.b.a.11.5[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 5, 0, c(0.1, 0.1), ar1, 0)
-rs.b.a.11.5[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 5, 0.2, c(0.1, 0.1), ar1, 0)
-rs.b.a.11.5[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 5, 0.5, c(0.1, 0.1), ar1, 0)
-rs.b.a.11.5[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 5, 0, c(0.1, 0.1), ar1, 0)
-rs.b.a.11.5[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 5, 0.2, c(0.1, 0.1), ar1, 0)
-rs.b.a.11.5[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 5, 0.5, c(0.1, 0.1), ar1, 0)
-rs.b.a.11.5[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 5, 0, c(0.1, 0.1), ar1, 0)
-rs.b.a.11.5[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 5, 0.2, c(0.1, 0.1), ar1, 0)
-rs.b.a.11.5[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 5, 0.5, c(0.1, 0.1), ar1, 0)
-
-
-
-
-
-rs.b.a.55.5 <- matrix(0, 3, 6)
-rs.b.a.55.5[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 5, 0, c(0.5, 0.5), ar1, 0)
-rs.b.a.55.5[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 5, 0.2, c(0.5, 0.5), ar1, 0)
-rs.b.a.55.5[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 5, 0.5, c(0.5, 0.5), ar1, 0)
-rs.b.a.55.5[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 5, 0, c(0.5, 0.5), ar1, 0)
-rs.b.a.55.5[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 5, 0.2, c(0.5, 0.5), ar1, 0)
-rs.b.a.55.5[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 5, 0.5, c(0.5, 0.5), ar1, 0)
-rs.b.a.55.5[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 5, 0, c(0.5, 0.5), ar1, 0)
-rs.b.a.55.5[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 5, 0.2, c(0.5, 0.5), ar1, 0)
-rs.b.a.55.5[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 5, 0.5, c(0.5, 0.5), ar1, 0)
-
-
-
-
-
-
-
-
-
-
-
-rs.b.a.19.5 <- matrix(0, 3, 6)
-rs.b.a.19.5[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 5, 0, c(-0.1, 0.9), ar1, 0)
-rs.b.a.19.5[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 5, 0.2, c(-0.1, 0.9), ar1, 0)
-rs.b.a.19.5[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 5, 0.5, c(-0.1, 0.9), ar1, 0)
-rs.b.a.19.5[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 5, 0, c(-0.1, 0.9), ar1, 0)
-rs.b.a.19.5[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 5, 0.2, c(-0.1, 0.9), ar1, 0)
-rs.b.a.19.5[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 5, 0.5, c(-0.1, 0.9), ar1, 0)
-rs.b.a.19.5[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 5, 0, c(-0.1, 0.9), ar1, 0)
-rs.b.a.19.5[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 5, 0.2, c(-0.1, 0.9), ar1, 0)
-rs.b.a.19.5[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 5, 0.5, c(-0.1, 0.9), ar1, 0)
-
-
-
-
-
-
-
-
-rs.ub.a.11.10 <- matrix(0, 3, 6)
-rs.ub.a.11.10[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 10, 0, c(0.1, 0.1), ar1, 0.5)
-rs.ub.a.11.10[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 10, 0.2, c(0.1, 0.1), ar1, 0.5)
-rs.ub.a.11.10[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 10, 0.5, c(0.1, 0.1), ar1, 0.5)
-rs.ub.a.11.10[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 10, 0, c(0.1, 0.1), ar1, 0.5)
-rs.ub.a.11.10[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 10, 0.2, c(0.1, 0.1), ar1, 0.5)
-rs.ub.a.11.10[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 10, 0.5, c(0.1, 0.1), ar1, 0.5)
-rs.ub.a.11.10[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 10, 0, c(0.1, 0.1), ar1, 0.5)
-rs.ub.a.11.10[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 10, 0.2, c(0.1, 0.1), ar1, 0.5)
-rs.ub.a.11.10[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 10, 0.5, c(0.1, 0.1), ar1, 0.5)
-
-
-
-
-
-
-
-
-
-
-rs.ub.a.55.10 <- matrix(0, 3, 6)
-rs.ub.a.55.10[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 10, 0, c(0.5, 0.5), ar1, 0.5)
-rs.ub.a.55.10[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 10, 0.2, c(0.5, 0.5), ar1, 0.5)
-rs.ub.a.55.10[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 10, 0.5, c(0.5, 0.5), ar1, 0.5)
-rs.ub.a.55.10[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 10, 0, c(0.5, 0.5), ar1, 0.5)
-rs.ub.a.55.10[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 10, 0.2, c(0.5, 0.5), ar1, 0.5)
-rs.ub.a.55.10[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 10, 0.5, c(0.5, 0.5), ar1, 0.5)
-rs.ub.a.55.10[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 10, 0, c(0.5, 0.5), ar1, 0.5)
-rs.ub.a.55.10[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 10, 0.2, c(0.5, 0.5), ar1, 0.5)
-rs.ub.a.55.10[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 10, 0.5, c(0.5, 0.5), ar1, 0.5)
-
-
-
-
-
-
-
-rs.ub.a.19.10 <- matrix(0, 3, 6)
-rs.ub.a.19.10[1, 1:2] <- simpower(4000, 0.05, FALSE, 20, 10, 0, c(-0.1, 0.9), ar1, 0.5)
-rs.ub.a.19.10[1, 3:4] <- simpower(4000, 0.05, FALSE, 20, 10, 0.2, c(-0.1, 0.9), ar1, 0.5)
-rs.ub.a.19.10[1, 5:6] <- simpower(4000, 0.05, FALSE, 20, 10, 0.5, c(-0.1, 0.9), ar1, 0.5)
-rs.ub.a.19.10[2, 1:2] <- simpower(4000, 0.05, FALSE, 50, 10, 0, c(-0.1, 0.9), ar1, 0.5)
-rs.ub.a.19.10[2, 3:4] <- simpower(4000, 0.05, FALSE, 50, 10, 0.2, c(-0.1, 0.9), ar1, 0.5)
-rs.ub.a.19.10[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 10, 0.5, c(-0.1, 0.9), ar1, 0.5)
-rs.ub.a.19.10[3, 1:2] <- simpower(4000, 0.05, FALSE, 100, 10, 0, c(-0.1, 0.9), ar1, 0.5)
-rs.ub.a.19.10[3, 3:4] <- simpower(4000, 0.05, FALSE, 100, 10, 0.2, c(-0.1, 0.9), ar1, 0.5)
-rs.ub.a.19.10[3, 5:6] <- simpower(4000, 0.05, FALSE, 100, 10, 0.5, c(-0.1, 0.9), ar1, 0.5)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-sr.b.a.1.2 <- matrix(0, 3, 6)
-sr.b.a.1.2[1, 1:2] <- simpower(4000, 0.05, TRUE, 20, 2, 0, 0.1, ar1, 0)
-sr.b.a.1.2[1, 3:4] <- simpower(4000, 0.05, TRUE, 20, 2, 0.2, 0.1, ar1, 0)
-sr.b.a.1.2[1, 5:6] <- simpower(4000, 0.05, TRUE, 20, 2, 0.5, 0.1, ar1, 0)
-sr.b.a.1.2[2, 1:2] <- simpower(4000, 0.05, TRUE, 50, 2, 0, 0.1, ar1, 0)
-sr.b.a.1.2[2, 3:4] <- simpower(4000, 0.05, TRUE, 50, 2, 0.2, 0.1, ar1, 0)
-sr.b.a.1.2[2, 5:6] <- simpower(4000, 0.05, TRUE, 50, 2, 0.5, 0.1, ar1, 0)
-sr.b.a.1.2[3, 1:2] <- simpower(4000, 0.05, TRUE, 100, 2, 0, 0.1, ar1, 0)
-sr.b.a.1.2[3, 3:4] <- simpower(4000, 0.05, TRUE, 100, 2, 0.2, 0.1, ar1, 0)
-sr.b.a.1.2[3, 5:6] <- simpower(4000, 0.05, TRUE, 100, 2, 0.5, 0.1, ar1, 0)
-
-
-
-
-
-sr.b.a.5.2 <- matrix(0, 3, 6)
-sr.b.a.5.2[1, 1:2] <- simpower(4000, 0.05, TRUE, 20, 2, 0, 0.5, ar1, 0)
-sr.b.a.5.2[1, 3:4] <- simpower(4000, 0.05, TRUE, 20, 2, 0.2, 0.5, ar1, 0)
-sr.b.a.5.2[1, 5:6] <- simpower(4000, 0.05, TRUE, 20, 2, 0.5, 0.5, ar1, 0)
-sr.b.a.5.2[2, 1:2] <- simpower(4000, 0.05, TRUE, 50, 2, 0, 0.5, ar1, 0)
-sr.b.a.5.2[2, 3:4] <- simpower(4000, 0.05, TRUE, 50, 2, 0.2, 0.5, ar1, 0)
-sr.b.a.5.2[2, 5:6] <- simpower(4000, 0.05, TRUE, 50, 2, 0.5, 0.5, ar1, 0)
-sr.b.a.5.2[3, 1:2] <- simpower(4000, 0.05, TRUE, 100, 2, 0, 0.5, ar1, 0)
-sr.b.a.5.2[3, 3:4] <- simpower(4000, 0.05, TRUE, 100, 2, 0.2, 0.5, ar1, 0)
-sr.b.a.5.2[3, 5:6] <- simpower(4000, 0.05, TRUE, 100, 2, 0.5, 0.5, ar1, 0)
-
-
-sr.b.a.9.2 <- matrix(0, 3, 6)
-sr.b.a.9.2[1, 1:2] <- simpower(4000, 0.05, TRUE, 20, 2, 0, 0.9, ar1, 0)
-sr.b.a.9.2[1, 3:4] <- simpower(4000, 0.05, TRUE, 20, 2, 0.2, 0.9, ar1, 0)
-sr.b.a.9.2[1, 5:6] <- simpower(4000, 0.05, TRUE, 20, 2, 0.5, 0.9, ar1, 0)
-sr.b.a.9.2[2, 1:2] <- simpower(4000, 0.05, TRUE, 50, 2, 0, 0.9, ar1, 0)
-sr.b.a.9.2[2, 3:4] <- simpower(4000, 0.05, TRUE, 50, 2, 0.2, 0.9, ar1, 0)
-sr.b.a.9.2[2, 5:6] <- simpower(4000, 0.05, TRUE, 50, 2, 0.5, 0.9, ar1, 0)
-sr.b.a.9.2[3, 1:2] <- simpower(4000, 0.05, TRUE, 100, 2, 0, 0.9, ar1, 0)
-sr.b.a.9.2[3, 3:4] <- simpower(4000, 0.05, TRUE, 100, 2, 0.2, 0.9, ar1, 0)
-sr.b.a.9.2[3, 5:6] <- simpower(4000, 0.05, TRUE, 100, 2, 0.5, 0.9, ar1, 0)
-
-
-
-
-
-
-
-
-sr.b.a.1.10 <- matrix(0, 3, 6)
-sr.b.a.1.10[1, 1:2] <- simpower(4000, 0.05, TRUE, 20, 10, 0, 0.1, ar1, 0)
-sr.b.a.1.10[1, 3:4] <- simpower(4000, 0.05, TRUE, 20, 10, 0.2, 0.1, ar1, 0)
-sr.b.a.1.10[1, 5:6] <- simpower(4000, 0.05, TRUE, 20, 10, 0.5, 0.1, ar1, 0)
-sr.b.a.1.10[2, 1:2] <- simpower(4000, 0.05, TRUE, 50, 10, 0, 0.1, ar1, 0)
-sr.b.a.1.10[2, 3:4] <- simpower(4000, 0.05, TRUE, 50, 10, 0.2, 0.1, ar1, 0)
-sr.b.a.1.10[2, 5:6] <- simpower(4000, 0.05, TRUE, 50, 10, 0.5, 0.1, ar1, 0)
-sr.b.a.1.10[3, 1:2] <- simpower(4000, 0.05, TRUE, 100, 10, 0, 0.1, ar1, 0)
-sr.b.a.1.10[3, 3:4] <- simpower(4000, 0.05, TRUE, 100, 10, 0.2, 0.1, ar1, 0)
-sr.b.a.1.10[3, 5:6] <- simpower(4000, 0.05, TRUE, 100, 10, 0.5, 0.1, ar1, 0)
-
-
-
-
-
-sr.b.a.5.10 <- matrix(0, 3, 6)
-sr.b.a.5.10[1, 1:2] <- simpower(4000, 0.05, TRUE, 20, 10, 0, 0.5, ar1, 0)
-sr.b.a.5.10[1, 3:4] <- simpower(4000, 0.05, TRUE, 20, 10, 0.2, 0.5, ar1, 0)
-sr.b.a.5.10[1, 5:6] <- simpower(4000, 0.05, TRUE, 20, 10, 0.5, 0.5, ar1, 0)
-sr.b.a.5.10[2, 1:2] <- simpower(4000, 0.05, TRUE, 50, 10, 0, 0.5, ar1, 0)
-sr.b.a.5.10[2, 3:4] <- simpower(4000, 0.05, TRUE, 50, 10, 0.2, 0.5, ar1, 0)
-sr.b.a.5.10[2, 5:6] <- simpower(4000, 0.05, TRUE, 50, 10, 0.5, 0.5, ar1, 0)
-sr.b.a.5.10[3, 1:2] <- simpower(4000, 0.05, TRUE, 100, 10, 0, 0.5, ar1, 0)
-sr.b.a.5.10[3, 3:4] <- simpower(4000, 0.05, TRUE, 100, 10, 0.2, 0.5, ar1, 0)
-sr.b.a.5.10[3, 5:6] <- simpower(4000, 0.05, TRUE, 100, 10, 0.5, 0.5, ar1, 0)
-
-
-sr.b.a.9.10 <- matrix(0, 3, 6)
-sr.b.a.9.10[1, 1:2] <- simpower(4000, 0.05, TRUE, 20, 10, 0, 0.9, ar1, 0)
-sr.b.a.9.10[1, 3:4] <- simpower(4000, 0.05, TRUE, 20, 10, 0.2, 0.9, ar1, 0)
-sr.b.a.9.10[1, 5:6] <- simpower(4000, 0.05, TRUE, 20, 10, 0.5, 0.9, ar1, 0)
-sr.b.a.9.10[2, 1:2] <- simpower(4000, 0.05, TRUE, 50, 10, 0, 0.9, ar1, 0)
-sr.b.a.9.10[2, 3:4] <- simpower(4000, 0.05, TRUE, 50, 10, 0.2, 0.9, ar1, 0)
-sr.b.a.9.10[2, 5:6] <- simpower(4000, 0.05, TRUE, 50, 10, 0.5, 0.9, ar1, 0)
-sr.b.a.9.10[3, 1:2] <- simpower(4000, 0.05, TRUE, 100, 10, 0, 0.9, ar1, 0)
-sr.b.a.9.10[3, 3:4] <- simpower(4000, 0.05, TRUE, 100, 10, 0.2, 0.9, ar1, 0)
-sr.b.a.9.10[3, 5:6] <- simpower(4000, 0.05, TRUE, 100, 10, 0.5, 0.9, ar1, 0)
-
-
-
-
-
-
-sr.ub.a.1.5 <- matrix(0, 3, 6)
-sr.ub.a.1.5[1, 1:2] <- simpower(4000, 0.05, TRUE, 20, 5, 0, 0.1, ar1, 0.5)
-sr.ub.a.1.5[1, 3:4] <- simpower(4000, 0.05, TRUE, 20, 5, 0.2, 0.1, ar1, 0.5)
-sr.ub.a.1.5[1, 5:6] <- simpower(4000, 0.05, TRUE, 20, 5, 0.5, 0.1, ar1, 0.5)
-sr.ub.a.1.5[2, 1:2] <- simpower(4000, 0.05, TRUE, 50, 5, 0, 0.1, ar1, 0.5)
-sr.ub.a.1.5[2, 3:4] <- simpower(4000, 0.05, TRUE, 50, 5, 0.2, 0.1, ar1, 0.5)
-sr.ub.a.1.5[2, 5:6] <- simpower(4000, 0.05, TRUE, 50, 5, 0.5, 0.1, ar1, 0.5)
-sr.ub.a.1.5[3, 1:2] <- simpower(4000, 0.05, TRUE, 100, 5, 0, 0.1, ar1, 0.5)
-sr.ub.a.1.5[3, 3:4] <- simpower(4000, 0.05, TRUE, 100, 5, 0.2, 0.1, ar1, 0.5)
-sr.ub.a.1.5[3, 5:6] <- simpower(4000, 0.05, TRUE, 100, 5, 0.5, 0.1, ar1, 0.5)
-
-
-
-
-
-sr.ub.a.5.5 <- matrix(0, 3, 6)
-sr.ub.a.5.5[1, 1:2] <- simpower(4000, 0.05, TRUE, 20, 5, 0, 0.5, ar1, 0.5)
-sr.ub.a.5.5[1, 3:4] <- simpower(4000, 0.05, TRUE, 20, 5, 0.2, 0.5, ar1, 0.5)
-sr.ub.a.5.5[1, 5:6] <- simpower(4000, 0.05, TRUE, 20, 5, 0.5, 0.5, ar1, 0.5)
-sr.ub.a.5.5[2, 1:2] <- simpower(4000, 0.05, TRUE, 50, 5, 0, 0.5, ar1, 0.5)
-sr.ub.a.5.5[2, 3:4] <- simpower(4000, 0.05, TRUE, 50, 5, 0.2, 0.5, ar1, 0.5)
-sr.ub.a.5.5[2, 5:6] <- simpower(4000, 0.05, TRUE, 50, 5, 0.5, 0.5, ar1, 0.5)
-sr.ub.a.5.5[3, 1:2] <- simpower(4000, 0.05, TRUE, 100, 5, 0, 0.5, ar1, 0.5)
-sr.ub.a.5.5[3, 3:4] <- simpower(4000, 0.05, TRUE, 100, 5, 0.2, 0.5, ar1, 0.5)
-sr.ub.a.5.5[3, 5:6] <- simpower(4000, 0.05, TRUE, 100, 5, 0.5, 0.5, ar1, 0.5)
-
-
-sr.ub.a.9.5 <- matrix(0, 3, 6)
-sr.ub.a.9.5[1, 1:2] <- simpower(4000, 0.05, TRUE, 20, 5, 0, 0.9, ar1, 0.5)
-sr.ub.a.9.5[1, 3:4] <- simpower(4000, 0.05, TRUE, 20, 5, 0.2, 0.9, ar1, 0.5)
-sr.ub.a.9.5[1, 5:6] <- simpower(4000, 0.05, TRUE, 20, 5, 0.5, 0.9, ar1, 0.5)
-sr.ub.a.9.5[2, 1:2] <- simpower(4000, 0.05, TRUE, 50, 5, 0, 0.9, ar1, 0.5)
-sr.ub.a.9.5[2, 3:4] <- simpower(4000, 0.05, TRUE, 50, 5, 0.2, 0.9, ar1, 0.5)
-sr.ub.a.9.5[2, 5:6] <- simpower(4000, 0.05, TRUE, 50, 5, 0.5, 0.9, ar1, 0.5)
-sr.ub.a.9.5[3, 1:2] <- simpower(4000, 0.05, TRUE, 100, 5, 0, 0.9, ar1, 0.5)
-sr.ub.a.9.5[3, 3:4] <- simpower(4000, 0.05, TRUE, 100, 5, 0.2, 0.9, ar1, 0.5)
-sr.ub.a.9.5[3, 5:6] <- simpower(4000, 0.05, TRUE, 100, 5, 0.5, 0.9, ar1, 0.5)
-
-
-
-
-
-
-
-
-
-
-sr.ub.a.1.10 <- matrix(0, 3, 6)
-sr.ub.a.1.10[1, 1:2] <- simpower(4000, 0.05, TRUE, 20, 10, 0, 0.1, ar1, 0.5)
-sr.ub.a.1.10[1, 3:4] <- simpower(4000, 0.05, TRUE, 20, 10, 0.2, 0.1, ar1, 0.5)
-sr.ub.a.1.10[1, 5:6] <- simpower(4000, 0.05, TRUE, 20, 10, 0.5, 0.1, ar1, 0.5)
-sr.ub.a.1.10[2, 1:2] <- simpower(4000, 0.05, TRUE, 50, 10, 0, 0.1, ar1, 0.5)
-sr.ub.a.1.10[2, 3:4] <- simpower(4000, 0.05, TRUE, 50, 10, 0.2, 0.1, ar1, 0.5)
-sr.ub.a.1.10[2, 5:6] <- simpower(4000, 0.05, TRUE, 50, 10, 0.5, 0.1, ar1, 0.5)
-sr.ub.a.1.10[3, 1:2] <- simpower(4000, 0.05, TRUE, 100, 10, 0, 0.1, ar1, 0.5)
-sr.ub.a.1.10[3, 3:4] <- simpower(4000, 0.05, TRUE, 100, 10, 0.2, 0.1, ar1, 0.5)
-sr.ub.a.1.10[3, 5:6] <- simpower(4000, 0.05, TRUE, 100, 10, 0.5, 0.1, ar1, 0.5)
-
-
-
-
-
-sr.ub.a.5.10 <- matrix(0, 3, 6)
-sr.ub.a.5.10[1, 1:2] <- simpower(4000, 0.05, TRUE, 20, 10, 0, 0.5, ar1, 0.5)
-sr.ub.a.5.10[1, 3:4] <- simpower(4000, 0.05, TRUE, 20, 10, 0.2, 0.5, ar1, 0.5)
-sr.ub.a.5.10[1, 5:6] <- simpower(4000, 0.05, TRUE, 20, 10, 0.5, 0.5, ar1, 0.5)
-sr.ub.a.5.10[2, 1:2] <- simpower(4000, 0.05, TRUE, 50, 10, 0, 0.5, ar1, 0.5)
-sr.ub.a.5.10[2, 3:4] <- simpower(4000, 0.05, TRUE, 50, 10, 0.2, 0.5, ar1, 0.5)
-sr.ub.a.5.10[2, 5:6] <- simpower(4000, 0.05, TRUE, 50, 10, 0.5, 0.5, ar1, 0.5)
-sr.ub.a.5.10[3, 1:2] <- simpower(4000, 0.05, TRUE, 100, 10, 0, 0.5, ar1, 0.5)
-sr.ub.a.5.10[3, 3:4] <- simpower(4000, 0.05, TRUE, 100, 10, 0.2, 0.5, ar1, 0.5)
-sr.ub.a.5.10[3, 5:6] <- simpower(4000, 0.05, TRUE, 100, 10, 0.5, 0.5, ar1, 0.5)
-
-
-sr.ub.a.9.10 <- matrix(0, 3, 6)
-sr.ub.a.9.10[1, 1:2] <- simpower(4000, 0.05, TRUE, 20, 10, 0, 0.9, ar1, 0.5)
-sr.ub.a.9.10[1, 3:4] <- simpower(4000, 0.05, TRUE, 20, 10, 0.2, 0.9, ar1, 0.5)
-sr.ub.a.9.10[1, 5:6] <- simpower(4000, 0.05, TRUE, 20, 10, 0.5, 0.9, ar1, 0.5)
-sr.ub.a.9.10[2, 1:2] <- simpower(4000, 0.05, TRUE, 50, 10, 0, 0.9, ar1, 0.5)
-sr.ub.a.9.10[2, 3:4] <- simpower(4000, 0.05, TRUE, 50, 10, 0.2, 0.9, ar1, 0.5)
-sr.ub.a.9.10[2, 5:6] <- simpower(4000, 0.05, TRUE, 50, 10, 0.5, 0.9, ar1, 0.5)
-sr.ub.a.9.10[3, 1:2] <- simpower(4000, 0.05, TRUE, 100, 10, 0, 0.9, ar1, 0.5)
-sr.ub.a.9.10[3, 3:4] <- simpower(4000, 0.05, TRUE, 100, 10, 0.2, 0.9, ar1, 0.5)
-sr.ub.a.9.10[3, 5:6] <- simpower(4000, 0.05, TRUE, 100, 10, 0.5, 0.9, ar1, 0.5)
+rs.ub.a.19.10.sub[2, 5:6] <- simpower(4000, 0.05, FALSE, 50, 10, 0.5,
+                                      c(-0.1, 0.9), ex, 0.5, FALSE)
 
 
 
@@ -1137,13 +511,13 @@ sum.tab.sr.e2 <- as.data.frame(sum.tab.sr.e / 4000)
 sum.tab.sr.a2 <- as.data.frame(sum.tab.sr.a / 4000)
 
 colnames(sum.tab.rs.e2) <- paste0(rep(c("RGL", "DS"), 3), c("(d=0)", "", "(d=0.2)", "", "(d=0.5)", ""))
-sum.tab.rs.e3 <- cbind(N = c("20", "50", "100"), sum.tab.rs.e2)
-sum.tab.rs.e3 <- cbind(rho = c("0.1, 0.1", "", "" ,"0.5, 0.5", "", "","$-$0.1, 0.9", "", ""), sum.tab.rs.e3)
-ni <- c(2, rep("", 8), 5, rep("", 8), 10, rep("", 8))
+sum.tab.rs.e3 <- cbind(N = c("20", "50"), sum.tab.rs.e2)
+sum.tab.rs.e3 <- cbind(rho = c("0.1, 0.1", "", "0.5, 0.5", "", "$-$0.1, 0.9",  ""), sum.tab.rs.e3)
+ni <- c(2, rep("", 5), 5, rep("", 5), 10, rep("", 5))
 sum.tab.rs.e3 <- cbind(ni = ni, sum.tab.rs.e3)
-missingrate <- c(0, rep("", 17), 0.5, rep("", 8))
+missingrate <- c(0, rep("", 11), 0.5, rep("", 5))
 sum.tab.rs.e3 <- cbind(missingrate = missingrate, sum.tab.rs.e3)
-grplev <- c("cluster", rep("", 26), "subunit", rep("", 26))
+grplev <- c("cluster", rep("", 17), "subunit", rep("", 17))
 sum.tab.rs.e3 <- cbind(grplev = grplev, sum.tab.rs.e3)
 print(xtable(sum.tab.rs.e3, caption = "Empirical rejection percentage of the RGL and the DS methods for rank-sum tests at nominal significance level 0.05 when intracluster correlation is exchangable. The results are based on 4000 datasets.", digits = 1), include.rownames = FALSE, sanitize.text.function = function(x) {x})
 
@@ -1154,23 +528,23 @@ print(xtable(sum.tab.rs.e3, caption = "Empirical rejection percentage of the RGL
 
 
 colnames(sum.tab.rs.a2) <- paste0(rep(c("RGL", "DS"), 3), c("(d=0)", "", "(d=0.2)", "", "(d=0.5)", ""))
-sum.tab.rs.a3 <- cbind(N = c("20", "50", "100"), sum.tab.rs.a2)
-sum.tab.rs.a3 <- cbind(rho = c("0.1, 0.1", "", "" ,"0.5, 0.5", "", "","$-$0.1, 0.9", "", ""), sum.tab.rs.a3)
-ni <- c(2, rep("", 8), 5, rep("", 8), 10, rep("", 8))
+sum.tab.rs.a3 <- cbind(N = c("20", "50"), sum.tab.rs.a2)
+sum.tab.rs.a3 <- cbind(rho = c("0.1, 0.1", "", "0.5, 0.5", "", "$-$0.1, 0.9", ""), sum.tab.rs.a3)
+ni <- c(2, rep("", 5), 5, rep("", 5), 10, rep("", 5))
 sum.tab.rs.a3 <- cbind(ni = ni, sum.tab.rs.a3)
-missingrate <- c(0, rep("", 17), 0.5, rep("", 8))
+missingrate <- c(0, rep("", 11), 0.5, rep("", 5))
 sum.tab.rs.a3 <- cbind(missingrate = missingrate, sum.tab.rs.a3)
-grplev <- c("cluster", rep("", 26), "subunit", rep("", 26))
+grplev <- c("cluster", rep("", 17), "subunit", rep("", 17))
 sum.tab.rs.a3 <- cbind(grplev = grplev, sum.tab.rs.a3)
 print(xtable(sum.tab.rs.a3, caption = "Empirical rejection percentage of the RGL and the DS methods for rank-sum tests at nominal significance level 0.05 when intracluster correlation is AR1. The results are based on 4000 datasets.", digits = 1), include.rownames = FALSE, sanitize.text.function = function(x) {x})
 
 
 colnames(sum.tab.sr.e2) <- paste0(rep(c("RGL", "DS"), 3), c("(d=0)", "", "(d=0.2)", "", "(d=0.5)", ""))
-sum.tab.sr.e3 <- cbind(N = c("20", "50", "100"), sum.tab.sr.e2)
-sum.tab.sr.e3 <- cbind(rho = c("0.1", "", "" ,"0.5", "", "","0.9", "", ""), sum.tab.sr.e3)
-ni <- c(2, rep("", 8), 10, rep("", 8), 5, rep("", 8), 10, rep("", 8))
+sum.tab.sr.e3 <- cbind(N = c("20", "50"), sum.tab.sr.e2)
+sum.tab.sr.e3 <- cbind(rho = c("0.1", "", "0.5", "", "0.9",  ""), sum.tab.sr.e3)
+ni <- c(2, rep("", 5), 10, rep("", 5), 5, rep("", 5), 10, rep("", 5))
 sum.tab.sr.e3 <- cbind(ni = ni, sum.tab.sr.e3)
-missingrate <- c(0, rep("", 17), 0.5, rep("", 17))
+missingrate <- c(0, rep("", 11), 0.5, rep("", 11))
 sum.tab.sr.e3 <- cbind(missingrate = missingrate, sum.tab.sr.e3)
 print(xtable(sum.tab.sr.e3, caption = "Empirical rejection percentage of the RGL and DS methods for signed-rank tests at nominal significance level 0.05 with exchangable intracluster correlation. The results are based on 4000 datasets.", digits = 1), include.rownames = FALSE)
 
@@ -1180,15 +554,19 @@ print(xtable(sum.tab.sr.e3, caption = "Empirical rejection percentage of the RGL
 
 
 colnames(sum.tab.sr.a2) <- paste0(rep(c("RGL", "DS"), 3), c("(d=0)", "", "(d=0.2)", "", "(d=0.5)", ""))
-sum.tab.sr.a3 <- cbind(N = c("20", "50", "100"), sum.tab.sr.a2)
-sum.tab.sr.a3 <- cbind(rho = c("0.1", "", "" ,"0.5", "", "","0.9", "", ""), sum.tab.sr.a3)
-ni <- c(2, rep("", 8), 10, rep("", 8), 5, rep("", 8), 10, rep("", 8))
+sum.tab.sr.a3 <- cbind(N = c("20", "50"), sum.tab.sr.a2)
+sum.tab.sr.a3 <- cbind(rho = c("0.1", "", "0.5", "", "0.9", ""), sum.tab.sr.a3)
+ni <- c(2, rep("", 5), 10, rep("", 5), 5, rep("", 5), 10, rep("", 5))
 sum.tab.sr.a3 <- cbind(ni = ni, sum.tab.sr.a3)
-missingrate <- c(0, rep("", 17), 0.5, rep("", 17))
+missingrate <- c(0, rep("", 11), 0.5, rep("", 11))
 sum.tab.sr.a3 <- cbind(missingrate = missingrate, sum.tab.sr.a3)
 print(xtable(sum.tab.sr.a3, caption = "Empirical rejection percentage of the RGL and DS methods for signed-rank tests at nominal significance level 0.05 with AR1 intracluster correlation. The results are based on 4000 datasets."), include.rownames = FALSE)
 
 
 
-save(sum.tab.rs.e, sum.tab.rs.a, sum.tab.sr.e, sum.tab.sr.a, file = "simu4000-1.RData")
+
+
+
+
+
 
