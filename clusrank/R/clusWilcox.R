@@ -251,8 +251,7 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
 clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
                                     group = NULL, stratum = NULL, data = NULL,
                                     alternative = c("two.sided", "less", "greater"),
-                                    mu = 0, paired = FALSE, exact = FALSE, B
-                                    = 1,
+                                    mu = 0, paired = FALSE, exact = FALSE, B = 0,
                                     method = c("rgl", "ds"), ...) {
     alternative <- match.arg(alternative)
     method <- match.arg(method)
