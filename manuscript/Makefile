@@ -17,8 +17,11 @@ pdf : tex
 	pdflatex $(filestem)
 	pdflatex $(filestem)
 
+R: $(knitrfile)
+	Rscript -e "Stangle('$(knitrfile)')"
+
 clean:
 	rm *.aux *.bbl *.log *.blg *.out *.pdf *.tex
 
 deepClean: 
-	rm -rf cache
+	rm -rf cache *.aux *.bbl *.log *.blg *.out *.pdf *.tex
