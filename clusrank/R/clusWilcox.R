@@ -25,10 +25,10 @@
 ##'     treatment is assigned at cluster level, random permutation
 ##'     test is available for all tests. For more details look at the
 ##'     description of the argument \code{B}.
-##' @param B A integer. If is set as 0, then exact permutation test is
-##'     carried out. If is set as a positive integer, then random permutation
-##'     is carried out, and B is the number of replicates drawn for
-##'     the permutation test. Default is set as 2000 to ran a random permutation test.
+##' @param B An integer specifying the number of permutations if exact = TRUE.
+##'     If B = 0, then the test is the exact permutation test.
+##'     If B > 0, then an approximation to the exact test with B random permutation.
+##'     Default is set as 2000 to ran a random permutation test.
 ##' @param formula A formula of the form \code{lhs ~ rhs} where the
 ##'     \code{lhs} is the measurements and
 ##'     the \code{rhs} is of the form group + \code{cluster}(x1) +
@@ -82,8 +82,8 @@
 ##' The exact test is only available for RGL signed rank test and  RGL
 ##'     rank sum test when treatment is assigned at cluster level.
 ##'
-##' @return A list with class \code{"htest"} containing the following components, for different test the components may vary:
-##'
+##' @return A list with class \code{"htest"} containing the following components,
+##' for different test the components may vary:
 ##' \item{Rstat}{the value of the rank statistic with a name describing it.}
 ##' \item{ERstat}{the expectation of the rank statistic.}
 ##' \item{VRstat}{the variance of the rank statistic.}
@@ -94,8 +94,10 @@
 ##' \item{method}{the type of test applied.}
 ##' \item{data.name}{a character string giving the names of the data.}
 ##' \item{balance}{a logical indicating whether the data set is balanced.}
-##' \item{n.group}{number of treatment, will be returned if there are more than 2 treatment groups and \code{ds} method is used.}
-##' \item{df}{degrees of freedom of chi-square distribution, will be returned when there are more than 2 treatment groups and \code{ds} method is used.}
+##' \item{n.group}{number of treatment, will be returned if there are more than
+##'    2 treatment groups and \code{ds} method is used.}
+##' \item{df}{degrees of freedom of chi-square distribution, will be returned
+##'    when there are more than 2 treatment groups and \code{ds} method is used.}
 ##' \item{n}{number of observations}
 ##' \item{cn}{number of clusters}
 
@@ -251,7 +253,7 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
 clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
                                     group = NULL, stratum = NULL, data = NULL,
                                     alternative = c("two.sided", "less", "greater"),
-                                    mu = 0, paired = FALSE, exact = FALSE, B = 0,
+                                    mu = 0, paired = FALSE, exact = FALSE, B = 2000,
                                     method = c("rgl", "ds"), ...) {
     alternative <- match.arg(alternative)
     method <- match.arg(method)
