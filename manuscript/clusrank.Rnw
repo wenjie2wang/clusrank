@@ -1,19 +1,12 @@
 %% The tex file is not to be edited; it is generated.
 %% Only edit .Rnw file
 
-\documentclass[nojss]{jss}
+\documentclass[article]{jss}
 
 \usepackage{amsmath, bm, amssymb}
 % \usepackage{graphicx}
 \usepackage{natbib}
 \usepackage{booktabs}
-
-
-% For in-house revision purpose only
-\usepackage{color}
-\newcommand{\blue}[1]{\textcolor{blue}{(#1)}}
-\newcommand{\red}[1]{\textcolor{red}{(#1)}}
-
 
 
 % control floats
@@ -44,16 +37,16 @@ Yujing Jiang\\ University of Connecticut \And
   Bernard Rosner\\ Harvard University  \And
   Jun Yan\\ University of Connecticut
   }
-\title{Rank-Based Tests for Clustered Data with \proglang{R} Package
+\title{Wilcoxon Rank-Based Tests for Clustered Data with \proglang{R} Package
 \pkg{clusrank}}
 
 %% for pretty printing and a nice hypersummary also set:
 \Plainauthor{Yujing Jiang, Mei-Ling Ting Lee, Xin He,
   Bernard Rosner, Jun Yan}
 %% comma-separated
-\Plaintitle{Rank-Based Tests for Clustered Data with R package clusrank}
+\Plaintitle{Wilcoxon Rank-Based Tests for Clustered Data with R package clusrank}
 %% without formatting
-\Shorttitle{Rank Tests for Cluster Data} %% a short title (if necessary)
+\Shorttitle{Rank-Based Tests for Cluster Data} %% a short title (if necessary)
 
 %% an abstract and keywords
 
@@ -188,7 +181,7 @@ that observations within any cluster are exchangeable, and that the
 intracluster dependence does not vary across groups.
 With a test statistic in similar form as the standard Wilcoxon rank-sum
 test after ranking all the observations combined, they derived the
-aymptotic mean and variance under the clustered setting that
+asymptotic mean and variance under the clustered setting that
 accommodates unequal cluster sizes and possible stratification.
 \citet{Rosn:Glyn:Lee:exte:2006} extended their (2003) approach to
 accommodate the situation where members of a single cluster may
@@ -628,64 +621,54 @@ which case the interface is designed to mimic that of the function
 <<args-cd, echo=TRUE>>=
 args(getS3method("clusWilcox.test", "default"))
 @
+The arguments \code{x}, \code{y}, \code{alternative}, \code{mu},
+\code{paired}, and \code{exact} have the same meaning as those in the
+familiar default interface of \code{wilcox.test}.
+Clustered rank-sum test is requested if \code{paired = FALSE};
+clustered signed-rank test is requested if \code{paired = TRUE}.
+For both tests, the RGL and DS methods are requested with
+\code{method} set to be \code{rgl} and \code{ds}, respectively.
 
 
-As in the default interface of \code{wilcox.test}, \code{x} and
-\code{y} are numeric vectors of data values.  Unlike
-\code{wilcox.test}, though, \code{y} is optional only for the
-clustered signed-rank test where \code{x} and \code{y} are pre- and
-post-treatment observations; it is not in use for the clustered
-rank-sum test where the treatment group assignment of each data value
-is provided through an extra numeric vector \code{group} as the
-cluster id.  The hypothesis related arguments \code{alternative},
-\code{mu} and \code{paired} are identical of those of the
-\code{wilcox.test}. The random permutation test (\code{exact = TRUE},
-and \code{B} determines the size of the permutation sample) is
-available for all tests, though exact permutation test is only
-available for the RGL clustered rank-sum test with cluster-level
-grouping and the RGL clustered signed-rank test (\code{exact = TRUE},
-and \code{B = 0}); otherwise \code{exact} should be set as \code{FALSE}.
-Since the permutation test (especially the exact test) is computationally very
-intensive, it is recommended to be used only with small samples if it
-is available.
+For clustered rank-sum tests, \code{x}, \code{cluster}, and \code{group} are
+required,  which are of the same length; \code{cluster} and \code{group}
+specify the cluster membership and group membership, respectively.
+Argument \code{y} is not used for clustered rank-sum tests.
+The group assignment can be at either the cluster or the subunit level. 
+When using RGL method for data with treatment group assigned at the
+cluster-level, an optional argument \code{stratum} can be specified to
+account for the stratification and therefore provide a more powerful test.
+The variables \code{x}, \code{cluster}, \code{group} and \code{stratum} can
+be found from a data frame specified by argument \code{data}.
+For clustered signed-rank tests, \code{group} is not needed.
+Argument \code{x} can be already the difference between the pre- and
+post-treatment observations; alternatively, \code{x} and \code{y} can
+specify the pre- and post-treatment observations, respectively.
 
 
-The main function specifies the cluster by a \code{cluster} variable
-indicating which cluster each observations belongs to.
-Additionally, if the dataset is stratified, a numeric vector \code{stratum}
-can be provided to indicate stratum membership of each observation.
-Other arguments specific for clustered data include \code{cluster}
-which should be a numeric vector containing the cluster id.
-For clustered rank-sum test, the argument \code{group} should be a
-numeric vector containing the treatment group id for each observation.
-In addition, for clustered rank-sum test using RGL method for data with
-treatment group assigned at the cluster-level, an extra variable
-\code{stratum} is allowed to take the effect of stratification into
-account and therefore provide a more powerful test.
-For clustered rank-sum test, the data frame \code{data}
-should contain at least 3~variables:
-the observed score to feed \code{x},
-the cluster id to feed \code{cluster}, and
-the treatment assignment to feed \code{group}.
-For both tests, the RGL and DS methods are requested by specifying
-\code{method} as \code{rgl} and \code{ds}, respectively.
+The exact version of the test is requested by \code{exact = TRUE}.
+In this case, argument \code{B} is the number of random permutations to
+approximate the exact test, with default value 2000.
+The truly exact test is available for the RGL clustered rank-sum test with
+cluster-level grouping and the RGL clustered signed-rank test, which can be
+requested by setting \code{B = 0}; since this test is very computing
+intensive, it is recommended to be used only with small samples.
 
 
-The formula interface mimics that of the \code{wilcox.test} from the
-\code{stats} package for which arguments \code{data}, \code{subset}
-and \code{na.action} have the same usage.
+The formula interface mimics that of the \code{wilcox.test} too
+with arguments \code{formula}, \code{subset} and \code{na.action}:
 <<formula, echo = TRUE>>=
 args(getS3method("clusWilcox.test", "formula"))
 @
-As for the \code{formula}, when a rank-sum test is being performed,
-the left hand side should be the variable of data values and the right
-hand side should contain the variables indicating group, cluster
-and stratum membership. Except for the group variable, other variables
-on the right need to be indicated with special terms,
-e.g., \code{z ~ group + cluster(cid) + stratum(sid)}, where
+For clustered rank-sum tests, the left hand side of \code{formula} should be
+the data vector to be tested, and the right hand side of \code{formula}
+should contain the variables indicating group, cluster and possibly stratum. 
+Except for the group variable, other variables on the right need to be
+indicated with special terms; for example, in formula
+\code{z ~ group + cluster(cid) + stratum(sid)}, 
 \code{group} identifies the grouping variable, \code{cid} identifies
-the clusters, and \code{sid} identifies the stratum.  See
-Section~\ref{s:illus} for detailed illustrations.
+the clusters, and \code{sid} identifies the stratum. 
+See Section~\ref{s:illus} for detailed illustrations.
 For clustered signed-rank test, the left hand side of the formula is
 the paired difference and the right hand side comprises the cluster id.
 Neither \code{group} or \code{stratum} is applicable for signed-rank tests.
@@ -706,14 +689,13 @@ is generated as
 X = \exp(Z_g) + \delta g,
 \]
 where $Z_g$ is a standard multivariate normal random vector with mean zero
-and an exchangeable or a autoregressive with order 1 (AR1) correlation matrix
+and an exchangeable or autoregressive of order~1 (AR1) correlation matrix
 with correlation parameter $\rho_g$, and $\delta$ is the group difference.
-The AR1 correlation structure within clusters is common in
-longitudinal studies, and we choose it to demonstrate the performance
-of the clustered tests when the intra-cluster correlation is not
-exchangable. Correlation matrix of dimension \code{dim} with
-correlation parameter \code{rho} can be generated as follows, with
-\code{ex} for exchangeable and \code{ar1} for AR1.
+The AR1 correlation structure is common in longitudinal studies, and it can
+be used to investigate the robustness of the methods when the intra-cluster
+correlation is not exchangeable. A correlation matrix of dimension
+\code{dim} with correlation parameter \code{rho} can be generated as
+follows, with \code{ex} for exchangeable and \code{ar1} for AR1.
 <<corstr>>=
 ex  <- function(dim, rho) {
     diag(1 - rho, dim) + matrix(rho, dim, dim)
@@ -879,7 +861,7 @@ clusWilcox.test(x ~ cluster(cid),  dat.sgn, paired = TRUE, method = "ds")
 \subsection{A real data example}
 
 The package contains a real dataset named \code{amd} from a retrospective
-observational stuly \citep{Ferr:Sedd:phen:2015} that aims to characterize the
+observational study \citep{Ferr:Sedd:phen:2015} that aims to characterize the
 phenotype associated with a rare variant in the complement factor H (CFH)
 R1210C,  a protein involved in the age-related macular degeneration (AMD).
 The data contains measures of 283 eyes from 143 patients,
@@ -887,7 +869,7 @@ among whom 62 had the rare variant and 81 did not.
 The clusters are the patients and the subunits are the eyes.
 The outcome variable was the AMD grading score based
 on the Age-Related Maculopathy Staging (CARMS),  which has 5~levels.
-The first 3~levels correspond to the sizd of drusen which is an
+The first 3~levels correspond to the size of drusen which is an
 intermediate marker of AMD, while level~4 and~5 correspond to different
 types of AMD, with level~4 indicating the presence
 of geographic atrophy (GA) and level~5 indicating the presence of
@@ -990,7 +972,7 @@ As an example, consider the rank-sum tests in a setting with
 cluster-level grouping, each group containing 20~clusters of size~3, with
 exchangeable correlation parameter $\rho = 0.5$ in both groups.
 The group difference is set to be $\delta = 0$.
-We do this experiment with 1000 replicates with significance level 0.05:
+We do this experiment with 1000 replicates at significance level 0.05:
 <<sim-clus-rs>>=
 simpower(1000, 0.05, FALSE, 20, 3, 0.0, c(0.5, 0.5), ex, 0., clusgrp = TRUE)
 @
@@ -1010,15 +992,13 @@ exchangeability assumption in this setting.
 \subsection{Rank-sum tests for clustered data}
 
 
-
-
 \begin{table}[tbp]
 \centering
 \caption{Empirical rejection percentage of the RGL and the DS methods
-  for rank-sum tests at nominal significance level 0.05 when
-  intracluster correlation is exchangable.
-  The results are based on 4000 datasets. Each group contains
-  same number of clusters.}
+  for the clustered rank-sum test at nominal significance level 0.05 with 
+  data generated under exchangeable intracluster correlation. 
+  The results are based on 4000 datasets. 
+  Each group contains same number of clusters.}
 \begin{tabular}{ccccc rr rr rr}
   \toprule
 Group & Missing & Max & Corr & Group &\multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.2$} & \multicolumn{2}{c}{$\delta = 0.5$}  \\
@@ -1070,14 +1050,15 @@ cluster & 0 & 2 & 0.1, 0.1 & 20 & 4.3 & 4.5 & 16.3 & 17.0 & 64.1 & 65.2 \\
 \begin{table}[tbp]
 \centering
 \caption{Empirical rejection percentage of the RGL and the DS methods
-  for rank-sum tests at nominal significance level 0.05 when
-  intracluster correlation is AR1. The results are based on
-  4000 datasets. Each group contains same number of clusters.}
+  for the clustered rank-sum tests at nominal significance level 0.05 with
+  data generated under AR1 intracluster correlation. 
+  The results are based on 4000 datasets. 
+  Each group contains same number of clusters.} 
 \begin{tabular}{ccccc rr rr rr}
   \toprule
-Group & Missing & Max & Corr & GrpSize &\multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.2$} & \multicolumn{2}{c}{$\delta = 0.5$}  \\
+Group & Missing & Max & Corr & Group &\multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.2$} & \multicolumn{2}{c}{$\delta = 0.5$}  \\
     \cmidrule(lr){6-7} \cmidrule(lr){8-9} \cmidrule(lr){10-11}
- level & rate & $n_i$ & $\rho$ &  & RGL & DS & RGL & DS & RGL & DS \\
+ level & rate & $n_i$ & $\rho$ & Size & RGL & DS & RGL & DS & RGL & DS \\
   \midrule
 cluster & 0 & 2 & 0.1, 0.1 & 20 & 5.0 & 5.3 & 19.3 & 20.0 & 63.8 & 64.8 \\
    &  &  &  & 50 & 4.8 & 4.9 & 35.9 & 36.5 & 96.2 & 96.2 \\
@@ -1121,13 +1102,8 @@ cluster & 0 & 2 & 0.1, 0.1 & 20 & 5.0 & 5.3 & 19.3 & 20.0 & 63.8 & 64.8 \\
 \end{table}
 
 
-
-
-
-
 Comparison between the RGL and DS methods for the rank-sum tests
-has never been done previously when treatment group is assigned at the
-subunit- level.
+has never been done previously under subunit-level treatment group.
 Nor has it been done when the intracluster dependence is not exchangeable.
 Therefore we will present these comparisons in this session. Consider
 two equal size groups, with 20 or 50~clusters, and with exchangeable
@@ -1139,14 +1115,14 @@ The \code{simpower} function makes the comparison very easy, and the
 \code{misrate} argument allows cluster sizes to be random, which is
 an additional scenario of interest that has not been compared before.
 Two missing rates, $0$ and $0.5$, were considered, representing
-balanced data and unbalanced data with missing completely at random, respectivly.
+balanced data and unbalanced data with missing completely at random, respectively.
 This is different from the informative cluster size setting studied
 in \citet{Datt:Satt:rank:2005}, where cluster size depends on group.
-The group difference $\delta$ takes value $0$, $0.2$ and $0.5$.
+The group difference $\delta$ was set to be $0$, $0.2$ and $0.5$.
 For each setting, empirical rejection rates was obtained from 4000 replicates.
 
 
-Selected results are summarized in Table~\ref{tab:rsex} and Table~\ref{tab:rsar}.
+The results are summarized in Table~\ref{tab:rsex}--\ref{tab:rsar}.
 The empirical size ($\delta = 0$) of both methods are close to the
 nominal level $0.05$ in all the settings considered in this study.
 The empirical power ($\delta \ne 0$) for both methods increases as the
@@ -1163,26 +1139,19 @@ when the treatment group is assigned at the subunit-level.
 Under cluster-level group assignment, it appears that the RGL method has
 lower power with random cluster size, while the DS method has lower
 power with fixed cluster size, though the differences are not big.
+Both tests seem to be robust to the intracluster correlation structure.
 
 
 \subsection{Signed-rank tests for clustered data}
 
-For the signed-rank test, \citet{Datt:Satt:sign:2008} did not have
-settings with completely random cluster size, and their non-exchangeable
-intracluster dependence is different from our AR1 setting.
-We considered similar settings to those for the rank-sum test.
-The differences to be tested were generated for 20, 50, and
-100~clusters, respectively.
-The intracluster correlation parameter was set to be 0.1, 0.5, and 0.9.
-
 
 \begin{table}[tbp]
   \centering
-   \caption{
-     Empirical rejection percentage of the RGL and DS methods for
-     signed-rank tests at nominal significance level 0.05 with
-     exchangable intracluster correlation. The results are based on
-     4000 datasets. Each group contains same number of clusters.}
+   \caption{Empirical rejection percentage of the RGL and DS methods for
+     the clustered signed-rank test at nominal significance level 0.05 with
+     data generated under exchangeable intracluster correlation. 
+     The results are based on 4000 datasets. 
+     Each group contains same number of clusters.}
 \begin{tabular}{cccc  rr rr rr}
   \toprule
  Missing & Max & Corr & Group & \multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.2$} & \multicolumn{2}{c}{$\delta = 0.5$} \\
@@ -1221,11 +1190,11 @@ The intracluster correlation parameter was set to be 0.1, 0.5, and 0.9.
 
 \begin{table}[tbp]
   \centering
-   \caption{
-     Empirical rejection percentage of the RGL and DS methods for
-     signed-rank tests at nominal significance level 0.05 with
-     AR1 intracluster correlation. The results are based on
-     4000 datasets. Each group contains same number of clusters.}
+   \caption{Empirical rejection percentage of the RGL and DS methods for
+     the clustered signed-rank tests at nominal significance level 0.05 with
+     data generated under AR1 intracluster correlation. 
+     The results are based on 4000 datasets. 
+     Each group contains same number of clusters.}
 \begin{tabular}{cccc  rr rr rr}
   \toprule
  Missing & Max & Corr & Group & \multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.2$} & \multicolumn{2}{c}{$\delta = 0.5$} \\
@@ -1262,17 +1231,26 @@ The intracluster correlation parameter was set to be 0.1, 0.5, and 0.9.
 \end{table}
 
 
-Results from selected scenarios are summarized in Table~\ref{tab:srex}
-and Table~\ref{tab:srar}.
+For the signed-rank test, \citet{Datt:Satt:sign:2008} did not have
+settings with completely random cluster size, and their non-exchangeable
+intracluster dependence is different from our AR1 setting.
+We considered settings similar to those for the rank-sum test.
+The paired differences were generated for 20 or 50 clusters.
+The intracluster correlation parameter was set to be 0.1, 0.5, and 0.9.
+The true difference $\delta$ was set to be $0$, $0.2$ and $0.5$.
+For each setting, 4000 replicates were generated.
+
+
+Selected results are summarized in Table~\ref{tab:srex}--\ref{tab:srar}.
 In all settings in this study, the empirical sizes of both methods are
-close to the nominal level, including the case of AR1 correlation setting
+close to the nominal level, including the cases under of AR1 correlation
 where the exchangeability assumption for the RGL method is violated
-The empirical power of both tests increases as cluster size increases,
-and increases as the intracluster dependence decreases.
+The empirical power of both tests increases as the cluster size increases,
+and as the intracluster dependence decreases.
 Completely random cluster size reduces the powers in comparison to
 the cases where the cluster sizes are fixed at their means.
-In all the settings considered here, the two methods have virtually
-the same power.
+In all the settings considered here, the two methods preformed similarly.
+
 
 
 \section{Discussion}
@@ -1293,7 +1271,7 @@ subunit in each group within a cluster; both asymptotic tests require that
 the number of clusters to not to be too small.
 
 
-Implementation of other rank-based methods for clusterd data can be
+Implementation of other rank-based methods for clustered data can be
 considered in future development of the package \pkg{clusrank}.
 For the rank-sum test, the case of informative group size within a cluster
 \citep{Dutt:Datt:rank:2016} would be a useful addition, though it is
