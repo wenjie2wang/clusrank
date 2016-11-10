@@ -640,10 +640,14 @@ cluster-level, an optional argument \code{stratum} can be specified to
 account for the stratification and therefore provide a more powerful test.
 The variables \code{x}, \code{cluster}, \code{group} and \code{stratum} can
 be found from a data frame specified by argument \code{data}.
-For clustered signed-rank tests, \code{group} is not needed.
-Argument \code{x} can be already the difference between the pre- and
+
+
+For clustered signed-rank tests, \code{x} and \code{cluster} are required
+while \code{group} is not needed because the data are paird differences. 
+Argument \code{x} can be the parid difference between the pre- and
 post-treatment observations; alternatively, \code{x} and \code{y} can
 specify the pre- and post-treatment observations, respectively.
+This interface is also similar to that of \code{wilcox.test}.
 
 
 The exact version of the test is requested by \code{exact = TRUE}.
