@@ -1,6 +1,6 @@
 Package: clusrank
-Date: 2016-10-13
-Version: 0.4-6
+Date: 2016-11-10
+Version: 0.5-1
 Title: Wilcoxon Rank Sum Test for Clustered Data
 Description: Non-parametric tests (Wilcoxon rank sum test and Wilcoxon signed rank test) for clustered data.
 Imports: stats, MASS, Rcpp (>= 0.12.2)

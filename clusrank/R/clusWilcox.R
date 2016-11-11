@@ -1,6 +1,6 @@
 ##' Wilcoxon Rank Sum and Signed Rank Test for Clustered Data
 ##'
-##' Performs one-sample and two-sample Wilcoxon test for clutered data
+##' Performs one-sample and two-sample Wilcoxon test for clustered data
 ##' on vectors of data.
 ##'
 ##' @param x A numeric vector of data values or a formula. Non-finite (e.g.,
@@ -9,11 +9,11 @@
 ##'     values will be omitted.
 ##' @param cluster An optional numeric vector of cluster id.
 ##' @param group An optional numeric vector of treatment id.
-##' @param stratum An opptional numeric vector of stratum id. Only
+##' @param stratum An optional numeric vector of stratum id. Only
 ##' available for \code{rgl} rank sum test when treatment is assigned at
 ##'     cluster level.
 ##' @param method A character string specifying the method of
-##'     clustered wilcoxon rank test to be use, should be one of
+##'     clustered Wilcoxon rank test to be use, should be one of
 ##'     \code{"rgl"} or \code{"ds"}.
 ##' @param paired A logical indicating whether you want a paired test.
 ##' @param exact A logical indicating if a permutation test is to be
@@ -25,7 +25,7 @@
 ##'     treatment is assigned at cluster level, random permutation
 ##'     test is available for all tests. For more details look at the
 ##'     description of the argument \code{B}.
-##' @param B A integer. If is set as 0, then exact permutation test is
+##' @param B An integer. If is set as 0, then exact permutation test is
 ##'     carried out. If is set as a positive integer, then random permutation
 ##'     is carried out, and B is the number of replicates drawn for
 ##'     the permutation test. Default is set as 2000 to ran a random permutation test.
@@ -36,7 +36,7 @@
 ##'     \code{x1} and \code{x2} are cluster id and stratum id in the
 ##'     data frame \code{data}. For clustered signed rank test, the
 ##'     \code{rhs} only contains \code{cluster}{x1}.
-##' @param data An optional dataframe containing the variables.
+##' @param data An optional data frame containing the variables.
 ##' @param subset An optional vector specifying a subset of
 ##'     observations to be used.
 ##' @param na.action A function which indicates what should happen
@@ -94,10 +94,10 @@
 ##' \item{method}{the type of test applied.}
 ##' \item{data.name}{a character string giving the names of the data.}
 ##' \item{balance}{a logical indicating whether the data set is balanced.}
-##' \item{n.group}{number of treatment, will be returned if there are more than 2 treatment groups and \code{ds} method is used.}
+##' \item{ngroup}{number of treatment, will be returned if there are more than 2 treatment groups and \code{ds} method is used.}
 ##' \item{df}{degrees of freedom of chi-square distribution, will be returned when there are more than 2 treatment groups and \code{ds} method is used.}
-##' \item{n}{number of observations}
-##' \item{cn}{number of clusters}
+##' \item{nobs}{number of observations}
+##' \item{nclus}{number of clusters}
 
 #' @section Warning:
 #' This function can use large amounts of memory and stack if 'exact =
