@@ -171,11 +171,17 @@ monotonic transformations of the data.
 
 When the treatments are permutated within each cluster, for instance in a
 multi-center randomized clinical trial where randomization occurs within
-each center, the \prolang{R} R package \pkg{coin}
-\citep{Hoth:etal:empl:2008} is a good tool kit of conditional
+each center, the \proglang{R} R package \pkg{coin}
+\citep{Hoth:etal:impl:2008} is a good tool kit of conditional
 permutation test controlled on the blocks. However, the situation where the
 sampling unit is cluster or cluster along with its subunits is not under the
 framework of the package \pkg{coin}.
+
+
+One common practice to extend Wilcoxon rank-sum test to clustered data is to treat
+clusters as independent individuals and use the mid-rank of the subunits as
+the "rank" of each cluster and apply the ordinary Wilcoxon rank-sum test
+(e.g., as implemented in \proglang{StatXact} \citep{Cyte:stat:2013}).
 
 
 Several recent developments have extended the Wilcoxon rank-sum
