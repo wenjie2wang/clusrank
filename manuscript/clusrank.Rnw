@@ -53,7 +53,7 @@ Yujing Jiang\\ University of Connecticut \And
 %% comma-separated
 \Plaintitle{Rank-Based Tests for Clustered Data with R package clusrank}
 %% without formatting
-\Shorttitle{Rank Tests for Cluster Data} %% a short title (if necessary)
+\Shorttitle{Rank Tests for Clustered Data} %% a short title (if necessary)
 
 %% an abstract and keywords
 
@@ -611,6 +611,7 @@ than a paired difference from a smaller cluster.
 <<knitr, echo=FALSE>>=
 library(knitr)
 opts_chunk$set(cache=TRUE, autodep=TRUE)
+render_sweave()
 @
 
 
@@ -672,7 +673,7 @@ For both tests, the RGL and DS methods are requested by specifying
 
 
 The formula interface mimics that of the \code{wilcox.test} from the
-\code{stats} package for which arguments \code{data}, \code{subset}
+\pkg{stats} package for which arguments \code{data}, \code{subset}
 and \code{na.action} have the same usage.
 <<formula, echo = TRUE>>=
 args(getS3method("clusWilcox.test", "formula"))
@@ -797,7 +798,7 @@ clusWilcox.test(x ~ grp + cluster(cid), dat.cl, method = "rgl",
 
 The numerical interface is illustrated with the DS method:
 <<clus-rs-ds>>=
-clusWilcox.test(x, group =  grp, cluster = cid, data = dat.cl, method = "ds")
+clusWilcox.test(x, group = grp, cluster = cid, data = dat.cl, method = "ds")
 @
 
 
@@ -945,7 +946,7 @@ The p-value from the RGL method remains virtually unchanged after
 controlling for the age/gender strata.
 
 
-\section{A Simulation Study}
+\section{A simulation study}
 \label{s:simu}
 
 Comparisons of the RGL and DS methods under some common
@@ -1014,16 +1015,11 @@ exchangeability assumption in this setting.
 
 \begin{table}[tbp]
 \centering
-\caption{Empirical rejection percentage of the RGL and the DS methods
-  for rank-sum tests at nominal significance level 0.05 when
-  intracluster correlation is exchangable.
-  The results are based on 4000 datasets. Each group contains
-  same number of clusters.}
 \begin{tabular}{ccccc rr rr rr}
   \toprule
 Group & Missing & Max & Corr & Group &\multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.2$} & \multicolumn{2}{c}{$\delta = 0.5$}  \\
     \cmidrule(lr){6-7} \cmidrule(lr){8-9} \cmidrule(lr){10-11}
- level & rate & $n_i$ & $\rho$ & Size   & RGL & DS & RGL & DS & RGL & DS \\
+ level & rate & $n_i$ & $\rho$ & size  & RGL & DS & RGL & DS & RGL & DS \\
   \midrule
 cluster & 0 & 2 & 0.1, 0.1 & 20 & 4.3 & 4.5 & 16.3 & 17.0 & 64.1 & 65.2 \\
    &  &  &  & 50 & 4.7 & 4.8 & 36.5 & 37.0 & 96.4 & 96.5 \\
@@ -1063,21 +1059,22 @@ cluster & 0 & 2 & 0.1, 0.1 & 20 & 4.3 & 4.5 & 16.3 & 17.0 & 64.1 & 65.2 \\
    &  &  &  & 50 & 4.8 & 4.7 & 79.8 & 70.4 & 100.0 & 99.9 \\
    \bottomrule
 \end{tabular}
+\caption{Empirical rejection percentage of the RGL and the DS methods
+  for rank-sum tests at nominal significance level 0.05 when
+  intracluster correlation is exchangable.
+  The results are based on 4000 datasets. Each group contains
+  same number of clusters.}
 \label{tab:rsex}
 \end{table}
 
 
 \begin{table}[tbp]
 \centering
-\caption{Empirical rejection percentage of the RGL and the DS methods
-  for rank-sum tests at nominal significance level 0.05 when
-  intracluster correlation is AR1. The results are based on
-  4000 datasets. Each group contains same number of clusters.}
 \begin{tabular}{ccccc rr rr rr}
   \toprule
-Group & Missing & Max & Corr & GrpSize &\multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.2$} & \multicolumn{2}{c}{$\delta = 0.5$}  \\
+Group & Missing & Max & Corr & Group &\multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.2$} & \multicolumn{2}{c}{$\delta = 0.5$}  \\
     \cmidrule(lr){6-7} \cmidrule(lr){8-9} \cmidrule(lr){10-11}
- level & rate & $n_i$ & $\rho$ &  & RGL & DS & RGL & DS & RGL & DS \\
+ level & rate & $n_i$ & $\rho$ & size  & RGL & DS & RGL & DS & RGL & DS \\
   \midrule
 cluster & 0 & 2 & 0.1, 0.1 & 20 & 5.0 & 5.3 & 19.3 & 20.0 & 63.8 & 64.8 \\
    &  &  &  & 50 & 4.8 & 4.9 & 35.9 & 36.5 & 96.2 & 96.2 \\
@@ -1117,6 +1114,10 @@ cluster & 0 & 2 & 0.1, 0.1 & 20 & 5.0 & 5.3 & 19.3 & 20.0 & 63.8 & 64.8 \\
    &  &  &  & 50 & 5.5 & 5.4 & 81.6 & 72.0 & 100.0 & 100.0 \\
    \bottomrule
 \end{tabular}
+\caption{Empirical rejection percentage of the RGL and the DS methods
+  for rank-sum tests at nominal significance level 0.05 when
+  intracluster correlation is AR1. The results are based on
+  4000 datasets. Each group contains same number of clusters.}
 \label{tab:rsar}
 \end{table}
 
@@ -1178,16 +1179,11 @@ The intracluster correlation parameter was set to be 0.1, 0.5, and 0.9.
 
 \begin{table}[tbp]
   \centering
-   \caption{
-     Empirical rejection percentage of the RGL and DS methods for
-     signed-rank tests at nominal significance level 0.05 with
-     exchangable intracluster correlation. The results are based on
-     4000 datasets. Each group contains same number of clusters.}
 \begin{tabular}{cccc  rr rr rr}
   \toprule
  Missing & Max & Corr & Group & \multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.2$} & \multicolumn{2}{c}{$\delta = 0.5$} \\
   \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10}
-  rate & $n_i$ & $\rho$ & Size  & RGL & DS & RGL & DS & RGL & DS \\
+  rate & $n_i$ & $\rho$ & size  & RGL & DS & RGL & DS & RGL & DS \\
   \midrule
  0 & 2 & 0.1 & 20 & 5.4 & 5.6 & 19.7 & 20.4 & 78.8 & 79.0 \\
    &  &  & 50 & 5.0 & 5.1 & 44.2 & 44.4 & 99.6 & 99.6 \\
@@ -1215,22 +1211,22 @@ The intracluster correlation parameter was set to be 0.1, 0.5, and 0.9.
    &  &  & 50 & 5.1 & 5.2 & 30.0 & 30.2 & 93.9 & 93.9 \\
   \bottomrule
 \end{tabular}
+   \caption{
+     Empirical rejection percentage of the RGL and DS methods for
+     signed-rank tests at nominal significance level 0.05 with
+     exchangable intracluster correlation. The results are based on
+     4000 datasets. Each group contains same number of clusters.}
 \label{tab:srex}
 \end{table}
 
 
 \begin{table}[tbp]
   \centering
-   \caption{
-     Empirical rejection percentage of the RGL and DS methods for
-     signed-rank tests at nominal significance level 0.05 with
-     AR1 intracluster correlation. The results are based on
-     4000 datasets. Each group contains same number of clusters.}
 \begin{tabular}{cccc  rr rr rr}
   \toprule
  Missing & Max & Corr & Group & \multicolumn{2}{c}{$\delta = 0$} & \multicolumn{2}{c}{$\delta = 0.2$} & \multicolumn{2}{c}{$\delta = 0.5$} \\
   \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10}
-  rate & $n_i$ & $\rho$ & Size & RGL & DS & RGL & DS & RGL & DS \\
+  rate & $n_i$ & $\rho$ & size & RGL & DS & RGL & DS & RGL & DS \\
   \midrule
   0 & 2 & 0.1 & 20 & 4.35 & 4.60 & 21.12 & 21.25 & 78.22 & 78.60 \\
    &  &  & 50 & 5.00 & 5.10 & 44.50 & 44.75 & 99.47 & 99.47 \\
@@ -1258,6 +1254,11 @@ The intracluster correlation parameter was set to be 0.1, 0.5, and 0.9.
    &  &  & 50 & 4.60 & 4.70 & 34.50 & 34.38 & 97.40 & 97.42 \\
   \bottomrule
 \end{tabular}
+\caption{
+     Empirical rejection percentage of the RGL and DS methods for
+     signed-rank tests at nominal significance level 0.05 with
+     AR1 intracluster correlation. The results are based on
+     4000 datasets. Each group contains same number of clusters.}
 \label{tab:srar}
 \end{table}
 
@@ -1311,7 +1312,7 @@ When covariates are available, rank regression for clustered data
   Fu:Wang:Bai:rank:2010} would be the next step.
 
 
-\section{Acknowledgement}
+\section*{Acknowledgement}
 
 We thank Dr. Johanna Seddon for sharing the data from their
 phenotypic characterization study of the H~R1210C rare variant.
