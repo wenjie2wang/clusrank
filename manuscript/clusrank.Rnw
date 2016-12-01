@@ -236,7 +236,9 @@ The methods are grouped into two categories by their authors: RGL for
 those by Rosner, Glynn, and Lee; and DS for those by Datta and Satten.
 Note that the RGL methods are
 available in \proglang{SAS} codes from Dr. Rosner's website
-(\url{https://sites.google.com/a/channing.harvard.edu/bernardrosner/channing/}).
+(\url{https://sites.google.com/a/channing.harvard.edu/bernardrosner/channing/})
+and in \proglang{STATA} \citep{stat:2015} package \pkg{cluswilcox} from Dr. Lee's website
+(\url{http://cls.umd.edu/mtlee/}).
 \proglang{R} codes for the DS methods are available from Dr. Datta's website
 (\url{http://www.somnathdatta.org/software/}), which was recently
 put into \proglang{R} package \pkg{ClusterRankTest}
