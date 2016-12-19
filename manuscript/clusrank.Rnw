@@ -143,8 +143,7 @@ based on ranks without the need of distributional assumptions.
 Implementations of the Wilcoxon rank-sum and signed-rank tests for
 independent data have been widely available in standard software
 packages, such as function \code{wilcox.test} in the built-in package
-\pkg{stats} in \proglang{R} and \code{PROC NPAR1WAY} in \proglang{SAS}
-software.
+\pkg{stats} of \proglang{R} and \code{PROC NPAR1WAY} of \proglang{SAS}.
 These existing implementations for independent data, however,
 cannot be applied to clustered data which are frequently encountered
 in many fields.
@@ -619,6 +618,7 @@ than a paired difference from a smaller cluster.
 \label{s:usage}
 
 <<knitr, echo=FALSE>>=
+options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
 library(knitr)
 opts_chunk$set(cache=TRUE, autodep=TRUE)
 render_sweave()
@@ -796,7 +796,7 @@ The exact test of the RGL method can be done for data with a
 small number of clusters when treatment is assigned at cluster-level:
 <<clus-rs-rgl-exact>>=
 clusWilcox.test(x ~ grp + cluster(cid), dat.cl, method = "rgl",
-                exact = TRUE, B = 0)
+  exact = TRUE, B = 0)
 @
 
 
@@ -822,7 +822,7 @@ dataset and perform the RGL test:
 dat.cl$strat <- rep(rep(1:2, each = 15), 2)
 cbind(head(dat.cl, 6), "head / tail" = "     ", tail(dat.cl, 6))
 clusWilcox.test(x ~ grp + cluster(cid) + stratum(strat), dat = dat.cl,
-                method = "rgl")
+  method = "rgl")
 @
 
 
@@ -910,9 +910,9 @@ We apply both the RGL and DS method to the first subset:
 <<amd1234-both>>=
 data(amd)
 clusWilcox.test(CARMS ~ Variant + cluster(ID), data = amd,
-                subset = CARMS %in% c(1, 2, 3, 4), method = "rgl")
+  subset = CARMS %in% c(1, 2, 3, 4), method = "rgl")
 clusWilcox.test(CARMS ~ Variant + cluster(ID), data = amd,
-                subset = CARMS %in% c(1, 2, 3, 4), method = "ds")
+  subset = CARMS %in% c(1, 2, 3, 4), method = "ds")
 @
 The p-values from both tests are close and less than $0.001$, which
 implies strong evidence of an association between the presence of
@@ -924,7 +924,7 @@ the patients into 6~strata by their age and gender can be used as a control
 variable:
 <<amd1234-rgl>>=
 clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = amd,
-                subset = CARMS %in% c(1, 2, 3, 4))
+  subset = CARMS %in% c(1, 2, 3, 4))
 @
 The p-value is still less than $0.001$ after controlling for age and gender.
 
@@ -932,9 +932,9 @@ The p-value is still less than $0.001$ after controlling for age and gender.
 We then apply the two tests to the second subset:
 <<amd12355-both>>=
 clusWilcox.test(CARMS ~ Variant + cluster(ID), data = amd, method = "rgl",
-                subset = CARMS %in% c(1, 2, 3, 5))
+ subset = CARMS %in% c(1, 2, 3, 5))
 clusWilcox.test(CARMS ~ Variant + cluster(ID), data = amd, method = "ds",
-                subset = CARMS %in% c(1, 2, 3, 5))
+ subset = CARMS %in% c(1, 2, 3, 5))
 @
 This time, the p-values of the two approaches are easily discernable, which
 is quite possible because the methods are based on different assumptions.
@@ -944,7 +944,7 @@ CFH~R1210C rare variant and the symptom with CNV as the advanced stage.
 Again, the RGL method can be applied with age and gender controlled:
 <<amd12355-rgl>>=
 clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = amd,
-                subset = CARMS %in% c(1, 2, 3, 5), method = "rgl")
+  subset = CARMS %in% c(1, 2, 3, 5), method = "rgl")
 @
 The p-value from the RGL method remains virtually unchanged after
 controlling for the age/gender strata.
