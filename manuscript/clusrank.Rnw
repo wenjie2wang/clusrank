@@ -54,9 +54,9 @@ Yujing Jiang\\ University of Connecticut \And
 Wilcoxon Rank-based tests are distribution-free alternatives
 to the popular two-sample and paired t-tests.
 For independent data, they are available in several \proglang{R}
-packages such as \pkg{stats} and\pkg{coin}.
-For clustered data, in spite of the recent methodological 
-developments, there did not exist an \proglang{R} package 
+packages such as \pkg{stats} and \pkg{coin}.
+For clustered data, in spite of the recent methodological
+developments, there did not exist an \proglang{R} package
 that makes them available at one place.
 We present a package \pkg{clusrank} where the latest developments are
 implemented and wrapped under a unified user-friendly interface.
@@ -141,9 +141,9 @@ The Wilcoxon rank-sum and signed-rank tests are important tools for
 two-group comparisons and paired comparisons, respectively.
 Unlike their counterparts under the normality assumption, they are attractive
 because they are rank-based without the need of distributional assumptions.
-Nonetheless, standard versions of such tests presume independent data, and 
+Nonetheless, standard versions of such tests presume independent data, and
 cannot be applied to clustered data which frequently arise in many fields.
-Clustered data consists of data obtained from correlated observations
+Clustered data consist of data obtained from correlated observations
 from sub-units or members in each cluster, where clusters may be
 independent but measures from members within each cluster are not.
 For example, in longitudinal studies or familial studies,
@@ -208,7 +208,7 @@ in the built-in package \pkg{stats} of \proglang{R} \citep{R:2016},
 \code{ranksum} and \code{signrank} of \proglang{Stata} \citep{stata:2015}.
 Permutation methods are available in \pkg{StatXact} \citep{Cytel:2013}.
 These implementations cannot, however, handle clustered data in general.
-One exception is, for instance, a multi-center randomized clinical trial, 
+One exception is, for instance, a multi-center randomized clinical trial,
 where the centers can be viewed as blocks across the treatment groups.
 In this case, the \proglang{R} package \pkg{coin} \citep{Hoth:etal:impl:2008},
 which provides a powerful toolkit for conditional inferences, can be applied.
@@ -231,7 +231,7 @@ those by Rosner, Glynn, and Lee; and DS for those by Datta and Satten.
 Note that the RGL methods are
 available in \proglang{SAS} codes from Dr. Rosner's website
 (\url{https://sites.google.com/a/channing.harvard.edu/bernardrosner/channing/})
-and in \proglang{Stata} \citep{stata:2015} package \pkg{cluswilcox} from 
+and in \proglang{Stata} \citep{stata:2015} package \pkg{cluswilcox} from
 Dr. Lee's website (\url{http://cls.umd.edu/mtlee/}).
 \proglang{R} codes for the DS methods are available from Dr. Datta's website
 (\url{http://www.somnathdatta.org/software/}), which was recently
@@ -755,7 +755,7 @@ The \code{corr} argument specifies the function to construct correlation
 matrix with correlation coefficients in \code{rho}.
 To allow unequal cluster sizes, \code{misrate} specifies the missing rate
 at which an subunit in a cluster to be excluded at random; when
-\code{misrate = 1}, balanced data with equal cluster size is generated.
+\code{misrate = 0}, balanced data with equal cluster size are generated.
 The grouping level is controlled by the logical argument \code{clusgrp}:
 \code{TRUE} for cluster-level and \code{FALSE} for subunit-level.
 The function returns a data set with three columns: observation
@@ -850,7 +850,7 @@ datgen.sgn <- function(nclus, maxclsize, delta = 0., rho = 0.1,
     x <- sign(z) * exp(abs(z))
     cid <- rep(1:nclus, each = maxclsize)
     dat <- data.frame(x = x, cid = cid)
-    drop <- sort(sample(1:nn, size = (1 - misrate) * nn, FALSE))
+    drop <- sort(sample(1:nn, size = misrate * nn, FALSE))
     if (misrate == 0.) dat else dat[-drop,]
 }
 @

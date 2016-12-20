@@ -10,7 +10,7 @@ print.ctest <- function (x, digits = getOption("digits"), prefix = "\t", ...)
     cat("number of observations: ", x$nobs, ";  ", sep = "")
     cat("number of clusters: ", x$nclus, "\n", sep = "")
     if (!is.null(x$ngroup))
-        cat("number of groups: ", x$ngroup, "n", sep = "")
+        cat("number of groups: ", x$ngroup, "\n", sep = "")
     if (!is.null(x$statistic))
         out <- c(out, paste(names(x$statistic), "=", format(signif(x$statistic,
             max(1L, digits - 2L)))))
