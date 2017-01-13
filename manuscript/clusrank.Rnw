@@ -192,7 +192,7 @@ number of members in a group within a cluster is informative.
 On the other hand, for the one-sample problems or paired comparison
 problems, \citet{Rosn:Glyn:Lee:wilc:2006} extended the Wilcoxon
 signed-rank test to clustered data by adjusting the variance of the standard
-test statistic, assuming a common intercluster correlation across clusters.
+test statistic, assuming a common intracluster correlation across clusters.
 The cluster sizes are allowed to vary, but the method does not
 consider the informative cluster sizes where the distribution of
 paired difference within a cluster depends on the cluster size.
@@ -208,7 +208,7 @@ in the built-in package \pkg{stats} of \proglang{R} \citep{R:2016},
 \code{ranksum} and \code{signrank} of \proglang{Stata} \citep{stata:2015}.
 Permutation methods are available in \pkg{StatXact} \citep{Cytel:2013}.
 These implementations cannot, however, handle clustered data in general.
-One exception is, for instance, a multi-center randomized clinical trial,
+One exception is, for instance, multi-center randomized clinical trials,
 where the centers can be viewed as blocks across the treatment groups.
 In this case, the \proglang{R} package \pkg{coin} \citep{Hoth:etal:impl:2008},
 which provides a powerful toolkit for conditional inferences, can be applied.
