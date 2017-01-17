@@ -1,46 +1,37 @@
-objects := $(wildcard R/*.R) DESCRIPTION
-dir := $(shell pwd)
-version := $(shell grep "Version" DESCRIPTION | sed "s/Version: //")
-pkg := $(shell grep "Package" DESCRIPTION | sed "s/Package: //")
-tar := $(pkg)_$(version).tar.gz
-checkLog := $(pkg).Rcheck/00check.log
-yr := $(shell date +"%Y")
-dt := $(shell date +"%Y-%m-%d")
-cprt := COPYRIGHT
+pkg = clusrank
+header = HEADER
 
+Rpkg: Rd build
+	make check
+	make INSTALL
 
-.PHONY: check
-check: $(checkLog)
+Rd:
+	Rscript -e "library(roxygen2); roxygenize();  library(methods); devtools::document();"
 
-.PHONY: build
-build: $(tar)
+build:  Rd
+	R CMD build ../$(pkg) --compact-vignettes="gs+qpdf"
 
-.PHONY: install
-install: $(tar)
-	R CMD INSTALL $(tar)
+check: $(pkg)_*.tar.gz
+	R CMD check --as-cran $(pkg)_*.tar.gz
 
-$(tar): $(objects)
-	@make -s updateMeta
-	Rscript -e "roxygen2::roxygenize(); library(methods); devtools::document();";
-	R CMD build $(dir) --compact-vignettes="gs+qpdf"
+INSTALL: $(pkg)_*.tar.gz
+	sudo R CMD INSTALL --build $(pkg)_*.tar.gz
 
-$(checkLog): $(tar)
-	R CMD check --as-cran $(tar)
-
-## update copyright year in R script and date in DESCRIPTION
-.PHONY: updateMeta
-updateMeta: $(cprt) $(objects)
-	@echo "Updating date, version, and copyright year"
-	@sed -i "s/Copyright (C) 20[0-9]\{2\}-*[0-9]*/Copyright (C) 2015-$(yr)/" $(cprt)
-	@for Rfile in R/*.R; do \
-	if ! grep -q 'Copyright (C)' $$Rfile;\
-	then cat $(cprt) $$Rfile > tmp;\
+## update copyright year in HEADER, R script and date in DESCRIPTION
+updateHeader:
+	yr=$$(date +"%Y");\
+	sed -i "s/Copyright (C) [0-9]\{4\}/Copyright (C) $$yr/" $(header);\
+# add HEADER file if there is no header
+	for Rfile in R/*.R; do \
+	if ! grep -e 'Copyright (C)' $$Rfile ;\
+	then cat $(header) $$Rfile > tmp ;\
 	mv tmp $$Rfile;\
 	fi;\
-	sed -i "s/Copyright (C) 20[0-9]\{2\}-*[0-9]*/Copyright (C) 2015-$(yr)/" $$Rfile;\
-	done;
-	@sed -i "s/Date: [0-9]\{4\}-[0-9]\{1,2\}-[0-9]\{1,2\}/Date: $(dt)/" DESCRIPTION
+	yr=$$(date +"%Y");\
+	sed -i "s/Copyright (C) [0-9]\{4\}/Copyright (C) $$yr/" $$Rfile;\
+	done;\
+	dt=$$(date +"%Y-%m-%d");\
+	sed -i "s/Date: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/Date: $$dt/" DESCRIPTION;
 
-.PHONY: clean
 clean:
-	rm -rf *~ */*~ *.Rhistroy src/*.o *.tar.gz *.Rcheck/ .\#*
+	rm -rf *~ */*~ */*.Rd *.Rhistroy NAMESPACE *.tar.gz *.Rcheck/ *.tgz
