@@ -1,3 +1,26 @@
+################################################################################
+##
+##   R package clusrank by Mei-Ling Ting Lee, Jun Yan, and Yujing Jiang
+##   Copyright (C) 2015-2017
+##
+##   This file is part of the R package clusrank.
+##
+##   The R package clusrank is free software: you can redistribute it and/or
+##   modify it under the terms of the GNU General Public License as published
+##   by the Free Software Foundation, either version 3 of the License, or
+##   (at your option) any later version.
+##
+##   The R package clusrank is distributed in the hope that it will be useful,
+##   but WITHOUT ANY WARRANTY without even the implied warranty of
+##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##   GNU General Public License for more details.
+##
+##   You should have received a copy of the GNU General Public License
+##   along with the R package clusrank. If not, see <http://www.gnu.org/licenses/>.
+##
+################################################################################
+
+
 
 clusWilcox.test.ranksum.rgl <- function(x, cluster, group, stratum,
                                         alternative, exact, B, mu,
@@ -72,7 +95,7 @@ clusWilcox.test.ranksum.rgl.clus.exact <- function(x, cluster, group,
                                                   stratum,
                                                   alternative, exact, B,
                                                   mu, DNAME = NULL, METHOD = NULL) {
-    METHOD <- paste0(METHOD, " (random exactutation)")
+    METHOD <- paste0(METHOD, " (random permutation)")
     x <- x - mu
     n.obs <- length(x)
     one <- rep(1, n.obs)
@@ -287,8 +310,8 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
         VarW <- sum((mgv * ngv / (Ngv * (Ngv - 1)) * VRgv)[VRgv > 0])
         Z <- (W - EW) / sqrt(VarW)
 
-        pval <- switch(alternative, less = pnorm(abs(Z)),
-                       greater = pnorm(abs(Z), lower.tail = FALSE),
+        pval <- switch(alternative, less = pnorm(Z),
+                       greater = pnorm(Z, lower.tail = FALSE),
                        two.sided = 2 * min(pnorm(abs(Z)),
                                            pnorm(abs(Z), lower.tail = FALSE)))
 
@@ -462,7 +485,7 @@ clusWilcox.test.ranksum.rgl.sub.exact.1 <- function(x, cluster, group,
 clusWilcox.test.ranksum.rgl.sub.exact <- function(x, cluster, group,
                                                  alternative, exact, B, mu, DNAME = NULL,
                                                  METHOD = NULL, stratum) {
-    METHOD <- paste0(METHOD, " (random exactutatio)")
+    METHOD <- paste0(METHOD, " (random permutation)")
     bal <- (length(table(table(cluster))) == 1) # check balance of
                                         # data.
     x[which(group == 1)] <- x[which(group == 1)] - mu
@@ -604,8 +627,8 @@ clusWilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
         VarW <- n.clus * (n.clus / (n.clus - 1) * varQ * sb.2 / unique(csize) ^ 2 + varb / n.clus)
         Z <- (W - EW) / sqrt(VarW)
         pval <- switch(alternative,
-                       less = pnorm(abs(Z)),
-                       greater = pnorm(abs(Z), lower.tail = FALSE),
+                       less = pnorm(Z),
+                       greater = pnorm(Z, lower.tail = FALSE),
                        two.sided = 2 * min(pnorm(abs(Z)),
                                            pnorm(abs(Z), lower.tail = FALSE)))
         names(W) <- "W"
@@ -740,8 +763,8 @@ clusWilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
         theta <- sumtheta / sumwt
         sdtheta <- sqrt(1 / sumwt)
         Z <- (theta - 1/2) / sdtheta
-        pval <- switch(alternative, less = pnorm(abs(Z)),
-                       greater = pnorm(abs(Z), lower.tail = FALSE),
+        pval <- switch(alternative, less = pnorm(Z),
+                       greater = pnorm(Z, lower.tail = FALSE),
                        two.sided = 2 * min(pnorm(abs(Z)),
                                            pnorm(abs(Z), lower.tail = FALSE)))
 
@@ -878,7 +901,7 @@ clusWilcox.test.ranksum.ds.exact <- function(x, cluster, group,
     pval <- switch(alternative, less = w.ecdf(W),
                    greater = 1 - w.ecdf(W),
                    two.sided = 2 * min(w.ecdf(W), 1 - w.ecdf(W)))
-    METHOD <- paste0(METHOD, " (random exactutation)")
+    METHOD <- paste0(METHOD, " (random permutation)")
     names(mu) <- "difference in locations"
 
     if (length(unique(group)) > 2) {
@@ -973,8 +996,8 @@ clusWilcox.test.ranksum.ds <- function(x, cluster, group,
         varS <- sum((W - EW)^2)
         Z <- (S - ES) / sqrt(varS)
 
-        pval <- switch(alternative, less = pnorm(abs(Z)),
-                       greater = pnorm(abs(Z), lower.tail = FALSE),
+        pval <- switch(alternative, less = pnorm(Z),
+                       greater = pnorm(Z, lower.tail = FALSE),
                        two.sided = 2 * min(pnorm(abs(Z)),
                                            pnorm(abs(Z), lower.tail = FALSE)))
         names(Z) <- "Z"

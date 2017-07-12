@@ -1,7 +1,7 @@
 ################################################################################
 ##
 ##   R package clusrank by Mei-Ling Ting Lee, Jun Yan, and Yujing Jiang
-##   Copyright (C) 2016
+##   Copyright (C) 2015-2017
 ##
 ##   This file is part of the R package clusrank.
 ##
@@ -22,7 +22,7 @@
 clusWilcox.test.signedrank.rgl.exact <- function(x, cluster,
                                                 alternative,
                                                 mu, B, DNAME, METHOD) {
-    METHOD <- paste0(METHOD, " (random exactutation)")
+    METHOD <- paste0(METHOD, " (random permutation)")
     x <- x - mu
     data <- data.frame(x, cluster)
     data <- data[x != 0, ]
@@ -125,7 +125,11 @@ clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
             sumsq <- sum(sumrank ^ 2)
             VarT <- sumsq
             Z <- T / sqrt(VarT)
-            pval <- 2 * (1 - pnorm(abs(Z)))
+            pval <- switch(alternative,
+                           less = pnorm(Z),
+                           greater = pnorm(Z, lower.tail = FALSE),
+                           two.sided = 2 * min(pnorm(abs(Z)),
+                                               pnorm(abs(Z), lower.tail = FALSE)))
             ADJUST <- FALSE
             names(T) <- "T"
             names(Z) <- "Z"
@@ -177,8 +181,8 @@ clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
             VarT <- sqweightsum
             Z <-  T / (sqrt(VarT))
             pval <- switch(alternative,
-                           less = pnorm(abs(Z)),
-                           greater = pnorm(abs(Z), lower.tail = FALSE),
+                           less = pnorm(Z),
+                           greater = pnorm(Z, lower.tail = FALSE),
                            two.sided = 2 * min(pnorm(abs(Z)),
                                                pnorm(abs(Z), lower.tail = FALSE)))
 
@@ -237,7 +241,7 @@ clusWilcox.test.signedrank.ds.exact.1 <- function(x, cluster) {
 clusWilcox.test.signedrank.ds.exact <- function(x, cluster, alternative,
                                                B,
                                                mu, DNAME, METHOD) {
-    METHOD <- paste0(METHOD, " (random exactutation)")
+    METHOD <- paste0(METHOD, " (random permutation)")
     T.vec <- rep(NA, B)
     x <- x - mu
     n.obs <- length(x)
@@ -314,8 +318,8 @@ clusWilcox.test.signedrank.ds <- function(x, cluster, alternative, exact, B,
     temp <- aggregate(temp ~ cluster, FUN = sum)[, 2]
     VTS <- sum(((niplus - niminus) / ni + (m - 1) / ni * temp) ^ 2 )
     Z <- T / sqrt(VTS)
-    pval <- switch(alternative, less = pnorm(abs(Z)),
-                   greater = pnorm(abs(Z), lower.tail = FALSE),
+    pval <- switch(alternative, less = pnorm(Z),
+                   greater = pnorm(Z, lower.tail = FALSE),
                    two.sided = 2 * min(pnorm(abs(Z)),
                                        pnorm(abs(Z), lower.tail = FALSE)))
 
