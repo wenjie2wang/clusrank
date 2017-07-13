@@ -155,7 +155,7 @@ library(clusrank)
 ```
 The synopsis of the formula interface of the function is
 ```{r, echo = FALSE}
-args(clusrank:::cluswilcox.test.formula)
+args(clusrank:::clusWilcox.test.formula)
 ```
 
 
@@ -203,14 +203,14 @@ head(dat0.cls)
 ```
 ## Illustration: Clustered Rank Sum Test
 ```{r dat-clus1, echo = TRUE, fig.width = 2, fig.height = 2, warning = FALSE}
-cluswilcox.test(score ~ group(grp) + cluster(id),
+clusWilcox.test(score ~ grp + cluster(id),
                 data = dat0.cls, method = "rgl")
 ```
 
 ## Illustration: Clustered Rank Sum Test
 
 ```{r dat-clus2, echo = TRUE, fig.width = 2, fig.height = 2, warning = FALSE}
-cluswilcox.test(score ~ group(grp) + cluster(id),
+clusWilcox.test(score ~ grp + cluster(id),
                 data = dat0.cls, method = "ds")
 ```
 
@@ -225,13 +225,13 @@ head(dat1.ind)
 
 ## Illustration: Clustered Rank Sum Test
 ```{r dat-indi1, echo = TRUE, warning = FALSE}
-cluswilcox.test(score ~ group(grp) + cluster(id),
+clusWilcox.test(score ~ grp + cluster(id),
                 data = dat1.ind, method = "rgl")
 ```
 
 ## Illustration: Clustered Rank Sum Test
 ```{r dat-indi2, echo = TRUE, warning = FALSE}
-cluswilcox.test(score ~ group(grp) + cluster(id),
+clusWilcox.test(score ~ grp + cluster(id),
                 data = dat1.ind, method = "ds")
 ```
 
@@ -266,9 +266,9 @@ datgen.sr <- function(nclus, maxclsize, delta = 0.,
 simpower <- function(nrep, level, delta, rho, rate, grplevel, nclus, maxclsize) {
     do1rep <- function() {
         dat <- datgen.rs(nclus, maxclsize, delta, rho, rate, grplevel);
-        p.rgl <- cluswilcox.test(score, cluster = id, group = grp,
+        p.rgl <- clusWilcox.test(score, cluster = id, group = grp,
                                  data = dat, method = "rgl")$p.value
-        p.ds  <- cluswilcox.test(score, cluster = id, group = grp,
+        p.ds  <- clusWilcox.test(score, cluster = id, group = grp,
                                  data = dat, method = "ds" )$p.value
         c(rgl = p.rgl, ds = p.ds)
     }
@@ -298,20 +298,20 @@ head(dat1)
 ## Illustration: Clustered Signed Rank Test
 ```{r, echo = TRUE}
 ## Default method is RGL.
-cluswilcox.test(score ~ cluster(id), data = dat1,
+clusWilcox.test(score ~ cluster(id), data = dat1,
                 paired = TRUE)
 
 ```
 
 ## Illustration: Clustered Signed Rank Test
 ```{r, echo = TRUE}
-cluswilcox.test(score ~ cluster(id), data = dat1,
+clusWilcox.test(score ~ cluster(id), data = dat1,
                 paired = TRUE, method = "ds")
 ```
 
 
 ## Conclusion
-- \texttt{cluswilcox.test} from package \textbf{clusrank} is a unified interface of clustered rank sum test and clustered signed rank test.
+- \texttt{clusWilcox.test} from package \textbf{clusrank} is a unified interface of clustered rank sum test and clustered signed rank test.
 - For each test, there are $2$ methods available: RGL and DS. 
 
 ## References
