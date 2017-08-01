@@ -31,9 +31,9 @@ options(width = 60)
 * Analogy of rank sum test for clustered data: @Rosn:Glyn:Lee:inco:2003, @Rosn:Glyn:Lee:exte:2006  and @Datt:Satt:rank:2005.
 * Analogy of signed rank test for clustered data: @Rosn:Grov:use:1999, @Rosn:Glyn:Lee:inco:2003 and @Datt:Satt:rank:2005.
 
-## Package **clusrank**
+## R Package **clusrank**
 - Provides a unified interface for rank-based tests for clustered data
-- Modeled after the base function \texttt{wilcox}
+- Modeled after the base function \texttt{wilcox.test}
 - Wilcoxon rank sum test and signed rank test
 - Can handel unbalanced data (unequal cluster sizes)
 - Available on \texttt{CRAN}
@@ -45,11 +45,11 @@ options(width = 60)
 - RGL method:  @Rosn:Glyn:Lee:inco:2003, @Rosn:Glyn:Lee:exte:2006
 - DS method: @Datt:Satt:rank:2005
 - Notations: 
-    + $X_{ij}$: the $i$th observation in the $j$th cluster, $1 \leq i \ leq N$, $1 \leq j \leq n_i$, where $n_i$ is the size of cluster $i$.
+    + $X_{ij}$: the $i$th observation in the $j$th cluster, $i = 1, \ldots, N$, $j = 1, \ldots, n_i$, where $n_i$ is the size of cluster $i$.
     + $\delta_{ij}$: the group indicator of $X_{ij}$; $\delta_{ij} = 1$ if $X_{ij}$ is in group $1$, and
 $\delta_{ij} = 0$ if $X_{ij}$ is in group $2$.
     + $R_{ij}$: the rank of $X_{ij}$ among all the observed data.
-    + $g$: the cluster size (for all clusters, for ease of presentation only)
+    + $g$: the cluster size (for all clusters; i.e., $n_i = g$, for ease of presentation only)
 
 
 
@@ -67,17 +67,18 @@ W = \sum_{i = 1}^N \delta_{i}R_{i+}.
 - Asymptotic normal distribution.
 - An extra \texttt{stratum} covariate is allowed.
 
-## RGL method: individual-level grouping
+## RGL method: subunit-level grouping
 - The treatment is assigned at individual level.
 - The rank-sum statistic is
 \begin{equation*}
   W_{g,N} = \sum_{i = 1}^N\sum_{j=1}^g\delta_{ij}R_{ij},
 \end{equation*}
 - Rationale:
-    + each cluster is assigned a random number $Q_i$ which is the number of individuals under treatment 1 in that cluster given the observed distribution of $Q$.
+    + each cluster is assigned a random number $Q_i$ which is the number of subunits under treatment 1 in that cluster given the observed distribution of $Q$.
     + permuate the individuals within each cluster according to $Q_i$.
+    + when cluster sizes are not equal, permute for each cluster size.
   
-## DS method: individual-level grouping
+## DS method: subunit-level grouping
 - The treatment is assigned at individual level.
 - Rationale:
     + randomly pick an observation, $X_i^*$ from each cluster to form a pseudo-sample, and $\delta_i^*$ be its group membership.
@@ -147,8 +148,10 @@ args(clusrank:::clusWilcox.test.formula)
 ```
 
 
-## Illustration: Two Within-Cluster Correlation Structure
+## Illustration: Two Within-Cluster Correlation Structures
 ```{r, echo = TRUE, tidy = TRUE, size = 'smallsize'}
+library(mvtnorm)
+
 ex  <- function(dim, rho) {
   diag(1 - rho, dim) + matrix(rho, dim, dim)
 }
@@ -160,9 +163,8 @@ ar1 <- function(dim, rho) {
 
 ## Illustration: Generate Data for Clustered Rank-Sum Test
 ```{r, echo = TRUE, tidy = TRUE, size = 'smallsize'}
-library(mvtnorm)
-datgen.sum <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1),
-  corr = ex, misrate = 0., clusgrp = TRUE) {
+datgen.sum <- function(nclus, maxclsize, delta = 0.,
+  rho = c(0.1, 0.1), corr = ex, misrate = 0., clusgrp = TRUE) {
     nn <- nclus * maxclsize
     Sigma1 <- corr(maxclsize, rho[1])
     Sigma2 <- corr(maxclsize, rho[2])
@@ -233,9 +235,8 @@ clusWilcox.test(x ~ grp + cluster(cid),
 ## Illustration: Clustered Signed Rank Test
  Data generating function:
 ```{r, echo = TRUE}
-library(mvtnorm)
-datgen.sgn <- function(nclus, maxclsize, delta = 0., rho = 0.1,
-  corr = ex, misrate = 0.) {
+datgen.sgn <- function(nclus, maxclsize, delta = 0.,
+  rho = 0.1, corr = ex, misrate = 0.) {
     nn <- nclus * maxclsize
     Sigma <- corr(maxclsize, rho)
     z <- delta + c(t(rmvnorm(nclus, sigma = Sigma)))
@@ -300,7 +301,8 @@ simpower <- function(nrep, level, paired, nclus, maxclsize,
 ## Simulation comparison
 ```{r, echo = TRUE}
 ## Rank-sum tests
-simpower(1000, 0.05, FALSE, 20, 3, 0.0, c(0.5, 0.5), ex,  0., clusgrp = TRUE)
+simpower(1000, 0.05, FALSE, 20, 3, 0.0, c(0.5, 0.5), ex,  0.,
+         clusgrp = TRUE)
 ## Signed-rank tests
 simpower(1000, 0.05, TRUE,  20, 3, 0.0, 0.5, ar1, 0.)
 ```
@@ -313,4 +315,6 @@ simpower(1000, 0.05, TRUE,  20, 3, 0.0, 0.5, ar1, 0.)
 - New methods (e.g., ANOVA analog) can be added
 - Questions and request to maintainer: Yujing Jiang
 
-# References
+
+
+## References
