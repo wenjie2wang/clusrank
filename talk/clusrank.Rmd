@@ -26,10 +26,14 @@ options(width = 60)
 ## Background
 * Two-group comparison: Wilcoxon rank sum test.
 * Paired comparison: Wilcoxon signed rank test.
-* Available implementations: \texttt{wilcox.test} in R package \textbf{stats}, \texttt{PROC NPAR1WAY} in \texttt{SAS} and etc.  
+* Available implementations: \texttt{wilcox.test} in R package \textbf{stats}, \texttt{PROC NPAR1WAY} in SAS, \texttt{ranksum/signrank} in Stata, StatXact and etc.  
 * Clustered data: data which consists of a number of independent clusters.
 * Analogy of rank sum test for clustered data: @Rosn:Glyn:Lee:inco:2003, @Rosn:Glyn:Lee:exte:2006  and @Datt:Satt:rank:2005.
 * Analogy of signed rank test for clustered data: @Rosn:Grov:use:1999, @Rosn:Glyn:Lee:inco:2003 and @Datt:Satt:rank:2005.
+* Some existing software for clustered data
+    + R package \texttt{coin}
+    + R package \texttt{ClusterRankTest}: @Dutt:Datt:clus:2016, @Dutt:Datt:rank:2016
+    + Stata function \texttt{cluswilcox} 
 
 ## R Package **clusrank**
 - Provides a unified interface for rank-based tests for clustered data
@@ -146,7 +150,7 @@ The synopsis of the formula interface of the function is
 ```{r, echo = FALSE}
 args(clusrank:::clusWilcox.test.formula)
 ```
-
+The model formula can have \texttt{cluster()}.
 
 ## Illustration: Two Within-Cluster Correlation Structures
 ```{r, echo = TRUE, tidy = TRUE, size = 'smallsize'}
