@@ -240,6 +240,11 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
     group <- extractTerm("group", mf, n.obs, paired)
     DNAME <- paste0(DNAME, group[["name"]])
     group <- group[["var"]]
+    if (length(unique(group)) > 2 & method == "rgl") {
+        warning("RGL method cannot handle data with more than 2 groups. The test will switch to DS method instead.")
+        method <- "ds"
+    }
+
 
     cluster <- extractTerm("cluster", mf, n.obs, paired)
     DNAME <- paste0(DNAME, cluster[["name"]])

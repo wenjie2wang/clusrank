@@ -661,15 +661,14 @@ post-treatment observations; alternatively, \code{x} and \code{y} can
 specify the pre- and post-treatment observations, respectively.
 This interface is also similar to that of \code{wilcox.test}.
 
-
-The exact version of the test is requested by \code{exact = TRUE}.
-In this case, argument \code{B} is the number of random permutations to
-approximate the exact test, with default value 2000.
-The truly exact test is available for the RGL clustered rank-sum test with
-cluster-level grouping and the RGL clustered signed-rank test, which can be
-requested by setting \code{B = 0}; since this test is very computing
-intensive, it is recommended to be used only with small samples.
-
+Besides the asymptotic tests, exact tests for RGL clustered rank-sum test
+with cluster-level grouping and the RGL clustered signed-rank test can be
+requested by setting \code{exact = TRUE} and \code{B = 0}. However, the
+exact tests can be very computing intensive and it is recommended to be used
+only with small samples (will test the size of sample). The package also
+provides a remedy by allowing random permutation test to approximate the
+exact test with the argument \code{B}, which is the number of permutations
+with default value 2000.
 
 The formula interface mimics that of the \code{wilcox.test} too
 with arguments \code{formula}, \code{subset} and \code{na.action}:
@@ -785,7 +784,6 @@ We first use the formula interface to perform the RGL asymptotic test:
 <<clus-rs-rgl-asymp>>=
 clusWilcox.test(x ~ grp + cluster(cid), dat.cl, method = "rgl")
 @
-Setting \code{method = "ds"} would perform the DS test.
 The exact test of the RGL method can be done for data with a
 small number of clusters when treatment is assigned at cluster-level:
 <<clus-rs-rgl-exact>>=
@@ -793,14 +791,15 @@ clusWilcox.test(x ~ grp + cluster(cid), dat.cl, method = "rgl",
   exact = TRUE, B = 0)
 @
 
-
-The numerical interface is illustrated with the DS method:
+The numerical interface is illustrated with the DS method by setting
+\code{method = ``ds''}:
 <<clus-rs-ds>>=
 clusWilcox.test(x, group = grp, cluster = cid, data = dat.cl, method = "ds")
 @
 
 
-The test statistics from the two methods are very close to each other.
+The test statistics from the two methods (using the asymptotic thoery)
+are very close to each other.
 Note that, when using the code provided online by the authors
 of \citet{Rosn:Glyn:Lee:inco:2003} and \citet{Datt:Satt:rank:2005},
 statistics with different signs may occur.
@@ -821,6 +820,9 @@ clusWilcox.test(x ~ grp + cluster(cid) + stratum(strat), dat = dat.cl,
 
 
 The DS method can compare more than two groups.
+If user set \code{method = "rgl"} while the data contains more than $2$
+groups, a warning will show up and the test will be switched to use the DS
+method.
 We illustrate this by assigning 4 groups to this data:
 <<clus-rs-ds-mgrp>>=
 dat.cl$grp <- rep(1:4, each = 15)
@@ -862,7 +864,7 @@ For illustration, we generate a dataset that consists of $10$ clusters of
 size $3$, with exchangeable correlation parameter $\rho = 0.5$.
 <<dat-sr>>=
 dat.sgn <- datgen.sgn(10, 3, cor = ex, rho = 0.5)
-cbind(head(dat.cl, 6), "head / tail" = "     ", tail(dat.cl, 6))
+cbind(head(dat.cl, 6), "head / tail" = "   ", tail(dat.cl, 6))
 @
 
 

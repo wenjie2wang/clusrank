@@ -74,6 +74,6 @@
 #'                subset = CARMS %in% c(1, 2, 3, 4), method = "ds")
 #' clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = amd,
 #'                subset = CARMS %in% c(1, 2, 3, 4))
-#' @keywords datasets internal
+#' @keywords datasets
 
 NULL
