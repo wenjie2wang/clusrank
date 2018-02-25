@@ -4,7 +4,7 @@ using namespace Rcpp;
 
 NumericVector Fprop(NumericVector x, NumericVector clus,
 		    IntegerVector nvec, int m , int n) {
- 
+
   Rcpp::NumericVector Fj(m), Fprop(n);
   for (int i = 0; i < n; i++ ) {
     for (int j = 0; j < m; j++ ) {
@@ -16,8 +16,8 @@ NumericVector Fprop(NumericVector x, NumericVector clus,
       }
       Fj[j] = Fj[j] / nvec[j];
       if ((j + 1) != clus[i])
-        Fprop[i] += Fj[j];     
- 
+        Fprop[i] += Fj[j];
+
     }
     std::fill(Fj.begin(), Fj.end(), 0);
   }
@@ -32,7 +32,7 @@ double Fi(double X, int I, NumericVector x, IntegerVector clus,
   /* X_: a value, i_: no. of cluster, x_: all scores */
   /* clus_: cluster id, nvec_: number of objects in each cluster */
   /* n_: total number of obs  */
-  
+
   double Fi = 0;
   for (int i = 0;  i < N;i ++) {
     if (clus[i] == I) {
@@ -47,9 +47,9 @@ double Fi(double X, int I, NumericVector x, IntegerVector clus,
   Fi = Fi / nvec[I - 1];
   return((Fi));
 }
-      
-  
-    
+
+
+
 //[[Rcpp::export]]
 
 double Ftot(double X,  NumericVector x, IntegerVector clus,

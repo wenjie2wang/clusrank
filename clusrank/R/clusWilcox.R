@@ -165,7 +165,7 @@
 #' @importFrom stats lm ecdf pnorm qnorm var  pchisq setNames lag
 #' @importFrom MASS ginv
 #' @importFrom Rcpp evalCpp
-#' @useDynLib clusrank
+#' @useDynLib clusrank, .registration = TRUE
 #' @export
 
 clusWilcox.test <- function(x, ...) {
