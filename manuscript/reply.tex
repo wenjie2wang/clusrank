@@ -41,8 +41,8 @@
 \section*{Summary}
 
 We thank the two reviewers for carefully reviewing the manuscript and
-providing their detailed, constructive comments.  
-The manuscript has been largely revised to incorporate these comments. 
+providing their detailed, constructive comments.
+The manuscript has been largely revised to incorporate these comments.
 A summary of the major changes is as follows.
 
 \begin{enumerate}
@@ -61,6 +61,7 @@ Wilcoxon-Mann-Whitney-type tests for clustered data, that is when the classical
 assumption of independent data across the two groups is violated and units may be
 observed more than once. The package is freely available on CRAN.
 \end{comment}
+Thank you for this precise summary of our work.
 
 \begin{comment}
 The paper is very well written and provides a comprehensive overview of existing
@@ -70,17 +71,30 @@ use both in data analysis and teaching purposes. However, few remarks remain and
 hope that these may help to improve the paper.
 \end{comment}
 
+Thank you for being appreciate of the paper and the package. We address each
+remark point-by-point in the following.
+
 \begin{comment}
 Throughout the paper the authors write the null hypothesis and alternative in
 terms of differences in location. I wonder if the correction formulation wouldn't
 be "differences in distribution".
 \end{comment}
 
+The Wilcoxon rank-sum test is used for testing whether observations in one
+population tend to be larger than observations in the other. And the
+Wilcoxon signed-rank test is used for testing whether the difference scores
+are symmetric about zero or another value. In essence both are testing the
+central tendency of the distribution regardless of the shape of the
+distributions, e.g., the RGL rank-sum test has no power when comparing data
+from an $N(0, 1)$ distribution and data from an $N(0, 2)$ distribution.
+
 \begin{comment}
 Regarding comment 1: The output of the functions also say "alternative
 hypothesis: true difference in locations is not equal to 0". The distributions are
 not identical or something similar.
 \end{comment}
+
+See reply for the last comment.
 
 \begin{comment}
 The illustrative data generating functions would greatly benefit if other
@@ -109,6 +123,8 @@ proposed methodology, a case study in the ophthal- mological field and a
 simulation scenario in order to compare the two proposed methods.
 \end{comment}
 
+Thank you for the comprehensive and precise summary.
+
 \begin{comment}
 I have two main concerns regarding this paper. The first one is that, in
 the introduction section, another package (\texttt{ClusterRankTest}) is
@@ -116,6 +132,8 @@ mentioned which implements the DS methods. It is not clear to me what the
 differences are between both... Would there be any advantage if I used the
 \texttt{clusrank} with method = "ds"?
 \end{comment}
+
+
 
 \begin{comment}
 And the other important question is if this package, which includes only one function
@@ -134,18 +152,24 @@ invariant to monotonic transformations of the data". I miss some
 references here.
 \end{comment}
 
+\citet{Datt:Satt:rank:2005}
+
 \begin{comment}
 Page 3, line 16-17: ``...which are made very easy by the package using only a few
 lines of codes". I think that this is not very important to mention it in this part.
 \end{comment}
 
+Removed.
+
 \begin{comment}
 Page 9, line 9: ``parid difference" I guess ``paired"
 \end{comment}
 
+Corrected.
+
 \begin{comment}
 Page 9, second paragraph: I had to read the help file of the package in
-order to understand clearer this functionality. 
+order to understand clearer this functionality.
 I would like to see a new version of this paragraph.
 I propose to mention first ``exact = TRUE", the you must talk about ``B = 0" and
 then ``B = 2000".
@@ -185,7 +209,7 @@ alpha?? one pvalue is 0.006312 and the other is 0.06404...
 
 \begin{comment}
 Additionally, I would like to see a help file for the package (?clusrank)
-where you can find some description. 
+where you can find some description.
 Additionally, if a click on index I do not see the amd link to the dataset.
 \end{comment}
 
