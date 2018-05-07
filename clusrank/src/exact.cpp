@@ -7,7 +7,7 @@ int crksum(int rks, int I, int J, int sumrks, int minrks, int maxrks) {
   int i, j, res;
   Rcpp::IntegerVector score_sub, idx,  score_sum;
   /*   Rcpp::Rcout <<rks <<" " <<  I << " " << J  << " " << sumrks << " " << minrks << " " << maxrks << std::endl;  */
-  if (I < 0 | J < 0) return(0);
+  if ((I < 0) | (J < 0)) return(0);
   if (I > J) {
     rks = sumrks - rks;
     i = J;
@@ -122,7 +122,7 @@ int crksum_str(int k, IntegerMatrix x, IntegerMatrix xc, IntegerVector max) {
          }
          temp += x(slots[i], i);
        }
-       if (zero == 0 & temp <= k) {
+       if ((zero == 0) & (temp <= k)) {
          for (int i = 0; i < d; i ++ ) {
            ctp *= xc(slots[i], i);
          }
@@ -171,7 +171,7 @@ int csrkg(int srk, IntegerVector Score) {
   max_s = max(Score);
   sum_s = sum(Score);
   u = max_s * (max_s + 1) / 2;
-  if(srk < 0 | srk > u)
+  if((srk < 0) | (srk > u))
     return 0;
   compare[1] = u;
   w = IntegerVector(u + 1);
@@ -201,7 +201,7 @@ int csrkg(int srk, IntegerVector Score) {
 	  }
       	}
       }
-      if (w1[i] != 0 & i == j) {
+      if ((w1[i] != 0) & (i == j)) {
 	w[i] += w1[i];
       }
 
