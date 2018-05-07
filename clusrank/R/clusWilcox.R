@@ -131,16 +131,16 @@
 #' @examples
 #' ## Clustered signed rank test using RGL method.
 #' data(crsd)
-#' clusWilcox.test(z, cluster = id, data = crsd, paired = TRUE)
+#' clusWilcox.test(z, cluster = id, data = crsd, paired = TRUE, method = "rgl")
 #' ## or
-#' clusWilcox.test(z ~ cluster(id), data = crsd, paired = TRUE)
+#' clusWilcox.test(z ~ cluster(id), data = crsd, paired = TRUE, method = "rgl")
 #' \dontrun{clusWilcox.test(z, cluster = id, data = crsd)
 #' ## Default is rank sum test. The group variable is required.}
 #' ## Clustered rank sum test using RGL method.
 #' data(crd)
-#' clusWilcox.test(z ~ group + cluster(id), data = crd)
+#' clusWilcox.test(z ~ group + cluster(id), data = crd, method = "rgl")
 #' ## or
-#' clusWilcox.test(z, cluster = id, group = group, data = crd)
+#' clusWilcox.test(z, cluster = id, group = group, data = crd, method = "rgl")
 #' @author Yujing Jiang
 #' @references
 #' Bernard Rosner, Robert J. Glynn, Mei-Ling T. Lee (2006)
@@ -240,6 +240,10 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
     group <- extractTerm("group", mf, n.obs, paired)
     DNAME <- paste0(DNAME, group[["name"]])
     group <- group[["var"]]
+    if (length(method) == 2) {
+        warning("The default method is RGL.")
+        method <- "rgl"
+    }
     if (length(unique(group)) > 2 & method == "rgl") {
         warning("RGL method cannot handle data with more than 2 groups. The test will switch to DS method instead.")
         method <- "ds"
