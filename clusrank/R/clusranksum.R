@@ -1075,3 +1075,78 @@ clusWilcox.test.ranksum.ds <- function(x, cluster, group,
         result
     }
 }
+
+
+
+
+
+clusWilcox.test.ranksum.dd <- function(x, cluster, group,
+                                       alternative,
+                                       mu, exact, B,
+                                       DNAME, METHOD) {
+    if (exact == TRUE)  {
+        warning("No exact test is available for the DD ranksum test, will apply the asymptotic test.")
+    }
+    group.uniq <- length(unique(group))
+    if (group.uniq == 1) {
+        stop("invalid group variable, should contain 2 groups")
+    }
+
+    rn <- function(dv) {
+        ik <- dv[1]
+        x <- dv[2]
+        ds1 <- data[data[, 3] == 1, ]
+        vs1 <- (kh == 2) * (ds1[, 2] < x) + (kh == 1) * (ds1[, 2] <= x)
+        sl1 <- aggregate(vs1, list(ds1[, 1]), mean)[, 2]
+        ds2 <- data[data[, 3] == 0, ]
+        vs2 <- (kh == 2) * (ds2[, 2] < x) + (kh == 1) * (ds2[, 2] <= x)
+        sl2 <- aggregate(vs2, list(ds2[, 1]), mean)[, 2]
+        fg <- (sl1 + sl2)/2
+        fg[ik] <- 0
+        return(fg)
+    }
+    rst <- function(il) {
+        ly <- sum(mat[-which(dw[, 1] == il), -il])
+        return(ly)
+    }
+    data <- cbind(Cluster, X, grp)
+    m <- length(unique(data[, 1]))
+    dw <- data[(data[, 3] == 1), ]
+    ns <- (dw[, 1])
+    nv <- as.vector(table(ns)[match(ns, names(table(ns)))])
+    kh <- 1
+    mat <- t(apply(cbind(dw[, 1:2]), 1, rn))/nv
+    vf1 <- apply(cbind(seq(1, m)), 1, rst)
+    sFs1 <- sum(mat)
+    kh <- 2
+    mat <- t(apply(cbind(dw[, 1:2]), 1, rn))/nv
+    vf2 <- apply(cbind(seq(1, m)), 1, rst)
+    sFs2 <- sum(mat)
+    v1 <- ((sFs1 + sFs2)/4) + (m/2)
+    vd <- ((vf1 + vf2)/4) + (m - 1)/2
+    h <- 1
+    S <- v1
+    ES <- 0.25 * m * (m + 1)
+    test <- (m/m^h) * v1 - ((m - 1)/(m - 1)^h) * vd
+    v.test <- var(test)
+    v_hat <- (((m^h)^2)/(m - 1)) * v.test
+    varS <- ifelse(v_hat == 0, 1e-08, v_hat)
+    Z <- (S - ES)/sqrt(varS)
+
+    pval <- switch(alternative, less = pnorm(Z),
+                   greater = pnorm(Z, lower.tail = FALSE),
+                   two.sided = 2 * min(pnorm(abs(Z)),
+                                       pnorm(abs(Z), lower.tail = FALSE)))
+    names(Z) <- "Z"
+    names(mu) <- "difference in locations"
+
+    result <- list(statistic = Z, p.value = pval, S = S,
+                   ES = ES, varS = varS,
+                   alternative = alternative, null.value = mu,
+                   data.name = DNAME, method = METHOD,
+                   nobs = n.obs, nclus = n.clus)
+
+    class(result) <- "ctest"
+    result
+
+}
