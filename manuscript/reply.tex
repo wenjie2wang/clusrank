@@ -14,6 +14,9 @@
 \usepackage{color}
 \newcommand{\red}[1]{\textcolor{red}{#1}}
 \newcommand{\blue}[1]{\textcolor{blue}{#1}}
+\newcommand{\pkg}[1]{{\fontseries{b}\selectfont #1}}
+\newcommand\code{\bgroup\@makeother\_\@makeother\~\@makeother\$\@codex}
+\def\@codex#1{{\normalfont\ttfamily\hyphenchar\font=-1 #1}\egroup}
 
 \usepackage[colorlinks=true, urlcolor=blue, linkcolor=blue, citecolor=blue]{hyperref}
 
@@ -86,7 +89,11 @@ Wilcoxon signed-rank test is used for testing whether the difference scores
 are symmetric about zero or another value. In essence both are testing the
 central tendency of the distribution regardless of the shape of the
 distributions, e.g., the RGL rank-sum test has no power when comparing data
-from an $N(0, 1)$ distribution and data from an $N(0, 2)$ distribution.
+from an $N(0, 1)$ distribution and data from an $N(0, 2)$
+distribution. Moreover, the \code{wilcox.text} in the \pkg{stats} package
+has an output which put the alternative hypothesis as there is a location
+shift. Our test is essentially a generalization of the ordinal Wilcoxon
+tests, therefore we follow the same style as the \code{wilcox.test}.
 
 \begin{comment}
 Regarding comment 1: The output of the functions also say "alternative
@@ -101,6 +108,12 @@ The illustrative data generating functions would greatly benefit if other
 distributions than normal could be generated.
 \end{comment}
 
+The data generating function in the paper actually generates log-normal
+distribution, which is skewed distribution. The heaviness of its tail can
+also be tuned by choosing different scale parameter. Since one advantage of
+using a non-parametric test is that it works for non-normal data, so we have
+this in our mind when we design the data generating function.
+
 \begin{comment}
 The authors added a simulation study that compares the RGL method with the
 DS method in Section 6. I wonder why a paper that should demonstrate the
@@ -108,9 +121,15 @@ usage of a software benefits from that comparison. I would suggest moving
 that Section to the appendix. Furthermore, how do the methods compare
 under skewed distributions or ties?
 \end{comment}
-
-Adjusting for ties will be critical if the data are ordinal.
-
+Thanks for this suggestion. We have put the simulation into the appendix.
+For skewed distribution, since the simulated data have a log-normal
+distribution, the result in Table 2 in the paper is already a comparison.
+All methods can deal with ties. Nevertheless, the data property that may
+induce significant difference among this method should be the way the data
+are clustered, e.g., whether distribution of group within each cluster is
+related to cluster size, or whether different clusters have different
+correlation structure. These points are partly illustrated in the simulation
+done by \citet{Datt:Satt:rank:2005} and \citet{Datt:Satt:sign:2008}.
 
 \subsection*{To Reviewer 2}
 
@@ -135,7 +154,9 @@ differences are between both... Would there be any advantage if I used the
 \texttt{clusrank} with method = "ds"?
 \end{comment}
 
-
+Since the implemented test is the same, the output should be the
+same. One difference may be that our function should be faster, since we put
+some computationally heavy steps into C++ code while they solely used R.
 
 \begin{comment}
 And the other important question is if this package, which includes only one function
@@ -147,6 +168,8 @@ ple , ``...implementation of other rank-based methods for clustered data can be 
 in future development of the package clusrank" or ``...when covariates are available, rank
 regression for clustered data")
 \end{comment}
+
+Sorry Prof. Yan, I don't know how to answer this one.
 
 \begin{comment}
 Page 2, line 13: ``Unlike rank-based procedures, however, it is not
@@ -215,6 +238,7 @@ changed in the current version!
 ?
 
 \begin{comment}
+
 Page 16, line 5: ``The results suggest association between the presence of CFH
 R1210C rare variant and the symptom with CNV as the advanced stage." for what
 alpha?? one pvalue is 0.006312 and the other is 0.06404...
@@ -226,7 +250,7 @@ where you can find some description.
 Additionally, if a click on index I do not see the amd link to the dataset.
 \end{comment}
 
-Modified amd.R, removed internal keyword.
+Have fixed in the updated package.
 
 \bibliographystyle{Chicago}
 \bibliography{clusrank}
