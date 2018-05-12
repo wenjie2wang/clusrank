@@ -177,20 +177,24 @@ invariant to monotonic transformations of the data". I miss some
 references here.
 \end{comment}
 
-\citet{Datt:Satt:rank:2005}
+Using GEE to compare two groups can be done by adding an indicator of the
+group membership to the covariants of the expected observation and
+estimating the corresponding coefficient. The estimation of a GEE is solving a set
+of score equations , therefore transforming the data values will induce
+change in the estimates and may lead to different conclusions.
 
 \begin{comment}
 Page 3, line 16-17: ``...which are made very easy by the package using only a few
 lines of codes". I think that this is not very important to mention it in this part.
 \end{comment}
 
-Removed.
+Thanks for pointing this out. We have removed it.
 
 \begin{comment}
 Page 9, line 9: ``parid difference" I guess ``paired"
 \end{comment}
 
-Corrected.
+Thanks for pointing out this typo. We have corrected it.
 
 \begin{comment}
 Page 9, second paragraph: I had to read the help file of the package in
@@ -200,26 +204,28 @@ I propose to mention first ``exact = TRUE", the you must talk about ``B = 0" and
 then ``B = 2000".
 \end{comment}
 
-Have rewritten.
+We have rewritten this passage to make it more readable.
 
 \begin{comment}
 Page 11, line 6: ``Setting method = ``ds" would perform the DS test". Put this
 sentence below when you are using the method.
 \end{comment}
 
-Corrected.
+We have moved it to a more suitable place, right before using the method.
 
 \begin{comment}
 Page 11, line 17: ``... with a small number of clusters..." Could you give a recom-
 mendation of the number?
 \end{comment}
 
+Added in the manuscript.
+
 \begin{comment}
 Page 12, second paragraph: Include ``?methods (using the asymptotic theory) are
 very?"
 \end{comment}
 
-Added.
+We have added this sentence into the manuscript.
 
 \begin{comment}
 Page 12, last line: The DS method can compare more than two groups. We illustrate
@@ -227,15 +233,15 @@ this by assigning 4 groups to this data... What happens if you use the RGL metho
 maybe a warning would be useful!
 \end{comment}
 
-Done with the package. (Will change the code in the manuscript to ``method =
-``rgl" " after the package is updated.)
+Thanks for this suggestion. We have added a warning to remind the user about
+this point in the package.
 
 \begin{comment}
 Page 13, R code, last line: you have to introduce and extra space here? it was
 changed in the current version!
 \end{comment}
 
-?
+Prof. Yan I couldn't find out the space he mentioned.
 
 \begin{comment}
 
@@ -243,6 +249,12 @@ Page 16, line 5: ``The results suggest association between the presence of CFH
 R1210C rare variant and the symptom with CNV as the advanced stage." for what
 alpha?? one pvalue is 0.006312 and the other is 0.06404...
 \end{comment}
+
+We tried to avoid giving a specific conclusion here since if we set the
+alpha as one of the commonly used values, 0.01 or 0.05, these two tests will
+give contradictory conclusions, though both p-values are reasonably small,
+which implies association to some degree between the presence of CFH R1210C
+rare variant and the symptom with CNV as the advanced stage.
 
 \begin{comment}
 Additionally, I would like to see a help file for the package (?clusrank)

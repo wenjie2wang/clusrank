@@ -784,12 +784,18 @@ We first use the formula interface to perform the RGL asymptotic test:
 <<clus-rs-rgl-asymp>>=
 clusWilcox.test(x ~ grp + cluster(cid), dat.cl, method = "rgl")
 @
-The exact test of the RGL method can be done for data with a
-small number of clusters when treatment is assigned at cluster-level:
+
+The exact test of the RGL method can be done for data with a small number of
+clusters when treatment is assigned at cluster-level:
 <<clus-rs-rgl-exact>>=
 clusWilcox.test(x ~ grp + cluster(cid), dat.cl, method = "rgl",
   exact = TRUE, B = 0)
 @
+Note that in our experiment, the speed of the exact test is fast when each
+group contains $10$ or $11$ clusters, but more clusters can dramatically
+increase the computing time. Therefore we recommend the Boostrap option to
+approximate the exact test when needed.
+
 
 The numerical interface is illustrated with the DS method by setting
 \code{method = ``ds''}:
