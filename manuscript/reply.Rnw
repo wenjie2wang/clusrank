@@ -41,32 +41,20 @@
   {\Large\bf Response to the Comments}
 \end{center}
 
-\section*{Summary}
 
-We thank the two reviewers for carefully reviewing the manuscript and
-providing their detailed, constructive comments.
-The manuscript has been largely revised to incorporate these comments.
-A summary of the major changes is as follows.
-
-\begin{enumerate}
-\item to be added
-\end{enumerate}
-
-Point-by-point responses are as follows, with the original comments
-quoted in smaller, italic font.
-
+We thank the two reviewers for their detailed, constructive comments.
+The manuscript and the package have been revised accordingly.
+Point-by-point responses are as follows.
 
 \subsection*{To Reviewer 1}
 
 \begin{comment}
-  The authors provide a comprehensive R package for the numerical computation of
+The authors provide a comprehensive R package for the numerical computation of
 Wilcoxon-Mann-Whitney-type tests for clustered data, that is when the classical
 assumption of independent data across the two groups is violated and units may be
 observed more than once. The package is freely available on CRAN.
-\end{comment}
-Thank you for this precise summary of our work.
 
-\begin{comment}
+
 The paper is very well written and provides a comprehensive overview of existing
 methods. Indeed, clustered data occur frequently in applications and I have used the
 R package for data analysis before. The package is very user-friendly and easy to
@@ -74,45 +62,47 @@ use both in data analysis and teaching purposes. However, few remarks remain and
 hope that these may help to improve the paper.
 \end{comment}
 
-Thank you for being appreciate of the paper and the package. We address each
-remark point-by-point in the following.
+Thank you for precise summary of our work and the remarks, which have been
+addressed as follows.
 
 \begin{comment}
-Throughout the paper the authors write the null hypothesis and alternative in
+1. Throughout the paper the authors write the null hypothesis and alternative in
 terms of differences in location. I wonder if the correction formulation wouldn't
-be "differences in distribution".
-\end{comment}
+be ``differences in distribution".
 
-The Wilcoxon rank-sum test is used for testing whether observations in one
-population tend to be larger than observations in the other. And the
-Wilcoxon signed-rank test is used for testing whether the difference scores
-are symmetric about zero or another value. In essence both are testing the
-central tendency of the distribution regardless of the shape of the
-distributions, e.g., the RGL rank-sum test has no power when comparing data
-from an $N(0, 1)$ distribution and data from an $N(0, 2)$
-distribution. Moreover, the \texttt{wilcox.text} in the \pkg{stats} package
-has an output which put the alternative hypothesis as there is a location
-shift. Our test is essentially a generalization of the ordinal Wilcoxon
-tests, therefore we follow the same style as the \texttt{wilcox.test}.
-
-\begin{comment}
-Regarding comment 1: The output of the functions also say "alternative
+2. Regarding comment 1: The output of the functions also say ``alternative
 hypothesis: true difference in locations is not equal to 0". The distributions are
 not identical or something similar.
 \end{comment}
 
-See reply for the last comment.
+The Wilcoxon rank-sum test is a nonparametric test of the null hypothesis
+that the two samples come from the same population. The rationale of the test,
+however, is based on checking whether it is equally likely that a randomly
+selected value from one sample will be less than or greater than a randomly
+selected value from a second sample. Consequently, it is best suited to detect a
+location shift but may has no power in other situations such as a scale change.
+For example, it has no power to distinguish $N(0, 1)$ and $N(0, 2)$ even with
+a sample of size $n = 1000$:
+<<wilcox, echo=TRUE>>=
+n <- 1000
+wilcox.test(rnorm(n), rnorm(n, sd = 2))
+summary(replicate(200, wilcox.test(rnorm(n), rnorm(n, sd = 2))$p.value))
+@ 
+The tests that we implemted in this package are extensions of the standard
+Wilcoxon test (\texttt{wilcox.test} in R) to handle clustered data.
+We believe that it is desirable to keep the hypothesis formulation and
+function output similar to those of \texttt{wilcox.test}.
 
 \begin{comment}
-The illustrative data generating functions would greatly benefit if other
+3. The illustrative data generating functions would greatly benefit if other
 distributions than normal could be generated.
 \end{comment}
 
-The data generating function in the paper actually generates log-normal
-distribution, which is skewed distribution. The heaviness of its tail can
-also be tuned by choosing different scale parameter. Since one advantage of
-using a non-parametric test is that it works for non-normal data, so we have
-this in our mind when we design the data generating function.
+Thxe data generating schemes were adapted from \citet{Datt:Satt:rank:2005},
+which generate log-normal variables with a possible location shift.
+The distribution is skewed and have longer tail than the normal distribution,
+controlled by its shape parameter (the standard deviation on the log scale).
+
 
 \begin{comment}
 The authors added a simulation study that compares the RGL method with the
@@ -121,15 +111,21 @@ usage of a software benefits from that comparison. I would suggest moving
 that Section to the appendix. Furthermore, how do the methods compare
 under skewed distributions or ties?
 \end{comment}
-Thanks for this suggestion. We have put the simulation into the appendix.
-For skewed distribution, since the simulated data have a log-normal
-distribution, the result in Table 2 in the paper is already a comparison.
-All methods can deal with ties. Nevertheless, the data property that may
+
+The simulation study has been moved to the Appendix.
+
+The current comparison is under skewed distribution.
+
+All methods can deal with ties. 
+\red{This sentence is unclear. Rephrase.}
+Nevertheless, the data property that may
 induce significant difference among this method should be the way the data
 are clustered, e.g., whether distribution of group within each cluster is
 related to cluster size, or whether different clusters have different
 correlation structure. These points are partly illustrated in the simulation
 done by \citet{Datt:Satt:rank:2005} and \citet{Datt:Satt:sign:2008}.
+A comment has been added to paragraph ??? in the Discussion section.
+
 
 \subsection*{To Reviewer 2}
 
@@ -142,21 +138,25 @@ them in two methods: (i) RGL for those by Rosner, Glynn, and Lee; and (ii)
 DS for those by Datta and Satten.  The authors provide a review of the
 proposed methodology, a case study in the ophthal- mological field and a
 simulation scenario in order to compare the two proposed methods.
-\end{comment}
 
-Thank you for the comprehensive and precise summary.
 
-\begin{comment}
 I have two main concerns regarding this paper. The first one is that, in
 the introduction section, another package (\texttt{ClusterRankTest}) is
 mentioned which implements the DS methods. It is not clear to me what the
 differences are between both... Would there be any advantage if I used the
-\texttt{clusrank} with method = "ds"?
+\texttt{clusrank} with method = ``ds"?
 \end{comment}
 
-Since the implemented test is the same, the output should be the
-same. One difference may be that our function should be faster, since we put
-some computationally heavy steps into C++ code while they solely used R.
+They are two independent implementations of the same tests and should give the
+same results when applied to the same data. Under the hood, however, our
+implemenaton puts some computationally heavy steps into C++ code while their
+code are purely R. Therefore, ours is faster:
+<<ds-speed>>=
+# do a speed comparison for a few sample sizes using the simulation
+# setting in the paper using microbenchmark
+# clusWilcox.test(...)
+@ 
+A comment has been added to the end of paragraph~1 in the Discussion section.
 
 \begin{comment}
 And the other important question is if this package, which includes only one function
@@ -169,7 +169,12 @@ in future development of the package clusrank" or ``...when covariates are avail
 regression for clustered data")
 \end{comment}
 
-Sorry Prof. Yan, I don't know how to answer this one.
+The single function is a feature, allowing the users to access conveniently at
+one place approches for nonparametric two sample comparison with clustered
+data from five recent published papers from two groups of researchers.
+We have added an implementation of the method of \citet{Dutt:Datt:rank:2016},
+which allows informative group size within a cluster.
+A comment has been added to paragraph~2 in the Discussion section.
 
 \begin{comment}
 Page 2, line 13: ``Unlike rank-based procedures, however, it is not
@@ -177,24 +182,24 @@ invariant to monotonic transformations of the data". I miss some
 references here.
 \end{comment}
 
-Using GEE to compare two groups can be done by adding an indicator of the
-group membership to the covariants of the expected observation and
-estimating the corresponding coefficient. The estimation of a GEE is solving a set
-of score equations , therefore transforming the data values will induce
-change in the estimates and may lead to different conclusions.
+Two sample comparison for clustered data with GEE is done by regressing the
+outcome of interest on the group indicator and testing whether its coefficient
+equals zero. The result of the test depends on the variation of the response,
+which is not invariant to monotonic transformations.
+This preceedent sentence has been rephrased for clarification.
 
 \begin{comment}
 Page 3, line 16-17: ``...which are made very easy by the package using only a few
 lines of codes". I think that this is not very important to mention it in this part.
 \end{comment}
 
-Thanks for pointing this out. We have removed it.
+Removed.
 
 \begin{comment}
 Page 9, line 9: ``parid difference" I guess ``paired"
 \end{comment}
 
-Thanks for pointing out this typo. We have corrected it.
+Corrected.
 
 \begin{comment}
 Page 9, second paragraph: I had to read the help file of the package in
@@ -204,28 +209,30 @@ I propose to mention first ``exact = TRUE", the you must talk about ``B = 0" and
 then ``B = 2000".
 \end{comment}
 
-We have rewritten this passage to make it more readable.
+This paragraph has been rephrased.
+\red{Has it?}
 
 \begin{comment}
 Page 11, line 6: ``Setting method = ``ds" would perform the DS test". Put this
 sentence below when you are using the method.
 \end{comment}
 
-We have moved it to a more suitable place, right before using the method.
+Done.
 
 \begin{comment}
-Page 11, line 17: ``... with a small number of clusters..." Could you give a recom-
-mendation of the number?
+Page 11, line 17: ``... with a small number of clusters..." Could you give a
+recommendation of the number?
 \end{comment}
 
-Added in the manuscript.
+\red{Too vague. Is there a difference between 10 and 11? does it depends on
+  cluster size? Give some numbers like how long you need to wait.}
 
 \begin{comment}
-Page 12, second paragraph: Include ``?methods (using the asymptotic theory) are
-very?"
+Page 12, second paragraph: Include ``... methods (using the asymptotic theory) are
+very ..."
 \end{comment}
 
-We have added this sentence into the manuscript.
+Done.
 
 \begin{comment}
 Page 12, last line: The DS method can compare more than two groups. We illustrate
@@ -233,18 +240,23 @@ this by assigning 4 groups to this data... What happens if you use the RGL metho
 maybe a warning would be useful!
 \end{comment}
 
-Thanks for this suggestion. We have added a warning to remind the user about
-this point in the package.
+Thanks for this suggestion. \red{Can the RGL method be extended to handle
+  this? }
+We have added a warning to remind the user about
+this point in the package:
+<<rgl-warning>>=
+## demo this
+@ 
 
 \begin{comment}
 Page 13, R code, last line: you have to introduce and extra space here? it was
 changed in the current version!
 \end{comment}
 
-Prof. Yan I couldn't find out the space he mentioned.
+We are not sure what this refers to.
+We checked the code and found no extra space.
 
 \begin{comment}
-
 Page 16, line 5: ``The results suggest association between the presence of CFH
 R1210C rare variant and the symptom with CNV as the advanced stage." for what
 alpha?? one pvalue is 0.006312 and the other is 0.06404...
@@ -255,6 +267,7 @@ alpha as one of the commonly used values, 0.01 or 0.05, these two tests will
 give contradictory conclusions, though both p-values are reasonably small,
 which implies association to some degree between the presence of CFH R1210C
 rare variant and the symptom with CNV as the advanced stage.
+\red{What did you do to the text?}
 
 \begin{comment}
 Additionally, I would like to see a help file for the package (?clusrank)
@@ -263,6 +276,7 @@ Additionally, if a click on index I do not see the amd link to the dataset.
 \end{comment}
 
 Have fixed in the updated package.
+\red{I don't see clusrank-package.Rd.}
 
 \bibliographystyle{Chicago}
 \bibliography{clusrank}

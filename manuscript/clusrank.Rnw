@@ -155,9 +155,10 @@ Often times, because of the positive intracluster dependence, the
 variances of the test statistics are underestimated, and as a consequence,
 the resulting p-values are smaller than what they should be.
 The popular generalized estimating equations (GEE) approach
-\citep{Lian:Zege:long:1986} provides a general regression
-modeling strategy that considers intracluster dependence,
-and can be used to compare two groups as a special case.
+\citep{Lian:Zege:long:1986} provides a general regression modeling strategy
+that accounts for unspecified intracluster dependence, which can be applied to
+compare two groups by regressing the response to the group indicator and
+testing whether its coefficient equals zero.
 Unlike rank-based procedures, however, it is not invariant to
 monotonic transformations of the data.
 
@@ -254,9 +255,9 @@ input arguments are described in Section~\ref{s:usage}.
 Illustrations of how to access the implemented methods
 using both simulated data and a real dataset from an
 ophthalmological study are presented in Section~\ref{s:illus}.
-In Section~\ref{s:simu}, comparisons of selected methods that
-have not been studied previously are reported.
 A discussion concludes in Section~\ref{s:disc}.
+A comparison study of selected methods that has not been
+studied previously are reported In Appendix~\ref{s:simu},
 
 
 \section{Rank-sum test for clustered data}
@@ -793,12 +794,12 @@ clusWilcox.test(x ~ grp + cluster(cid), dat.cl, method = "rgl",
 @
 Note that in our experiment, the speed of the exact test is fast when each
 group contains $10$ or $11$ clusters, but more clusters can dramatically
-increase the computing time. Therefore we recommend the Boostrap option to
+increase the computing time. Therefore we recommend the Bootstrap option to
 approximate the exact test when needed.
 
 
 The numerical interface is illustrated with the DS method by setting
-\code{method = ``ds''}:
+\code{method = "ds''}:
 <<clus-rs-ds>>=
 clusWilcox.test(x, group = grp, cluster = cid, data = dat.cl, method = "ds")
 @
@@ -920,7 +921,7 @@ The p-values from both tests are close and less than $0.001$, which
 implies strong evidence of an association between the presence of
 CFH~R1210C rare variant and the CARMS grade with GA as the advanced stage.
 
-
+{\bf use AgeSex instead of Agesex}
 For the RGL method, a stratifying variable \code{Agesex} which categorizes
 the patients into 6~strata by their age and gender can be used as a control
 variable:
@@ -929,6 +930,7 @@ clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = amd,
   subset = CARMS %in% c(1, 2, 3, 4))
 @
 The p-value is still less than $0.001$ after controlling for age and gender.
+{\bf check why there is warning here}
 
 
 We then apply the two tests to the second subset:
@@ -969,12 +971,16 @@ and does not account for informative cluster sizes;
 the DS method cannot be applied to contralateral designs with exactly one
 subunit in each group within a cluster; both asymptotic tests require that
 the number of clusters to not to be too small.
+Our implementation of the DS methods gives the same results as those in the
+\pkg{ClusterRankTest} package. Nonetheless, since some heavy computing tasks
+are performed with \proglang{C++} code, our implemenation is faster.
 
 
 Implementation of other rank-based methods for clustered data can be
 considered in future development of the package \pkg{clusrank}.
 For the rank-sum test, the case of informative group size within a cluster
-\citep{Dutt:Datt:rank:2016} would be a useful addition, though it is
+\citep{Dutt:Datt:rank:2016} was recently added to the package
+{\bf is ours faster?}, though it is
 available in the package \pkg{ClusterRankTest} \citep{Dutt:Datt:clus:2016}.
 For the signed-rank test,  \citet{Laro:wilc:2005} has a variance estimator
 based on certain sums of squares over independent clusters.
