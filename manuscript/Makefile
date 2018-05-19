@@ -21,7 +21,7 @@ R: $(knitrfile)
 	Rscript -e "Stangle('$(knitrfile)')"
 
 clean:
-	rm *.aux *.bbl *.log *.blg *.out *.pdf *.tex
+	rm *.aux *.bbl *.log *.blg *.out *.pdf $(texfile)
 
 deepClean: 
-	rm -rf cache *.aux *.bbl *.log *.blg *.out *.pdf *.tex
+	rm -rf cache *.aux *.bbl *.log *.blg *.out *.pdf $(texfile)
