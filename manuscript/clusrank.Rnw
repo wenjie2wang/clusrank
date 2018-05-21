@@ -943,7 +943,9 @@ clusWilcox.test(CARMS ~ Variant + cluster(ID), data = amd, method = "ds",
 This time, the p-values of the two approaches are easily discernable, which
 is quite possible because the methods are based on different assumptions.
 The DS method reports a p-value of $0.006312$, in contrast to $0.06455$ from
-the RGL method. The results suggest association between the presence of
+the RGL method. Using traditional significance level such as $0.01$ or
+$0.05$ will lead to different conclusions. Though both p-values are still
+reasonably which still suggests that there is association between the presence of
 CFH~R1210C rare variant and the symptom with CNV as the advanced stage.
 Again, the RGL method can be applied with age and gender controlled:
 <<amd12355-rgl>>=

@@ -87,7 +87,7 @@ a sample of size $n = 1000$:
 n <- 1000
 wilcox.test(rnorm(n), rnorm(n, sd = 2))
 summary(replicate(200, wilcox.test(rnorm(n), rnorm(n, sd = 2))$p.value))
-@ 
+@
 The tests that we implemted in this package are extensions of the standard
 Wilcoxon test (\texttt{wilcox.test} in R) to handle clustered data.
 We believe that it is desirable to keep the hypothesis formulation and
@@ -116,8 +116,18 @@ The simulation study has been moved to the Appendix.
 
 The current comparison is under skewed distribution.
 
-All methods can deal with ties. 
-\red{This sentence is unclear. Rephrase.}
+The aymptotic result for large sample clustered rank-sum and signed-rank
+statistics proposed by \citet{Rosn:Glyn:Lee:inco:2003} and
+\citet{Rosn:Glyn:Lee:wilc:2006} hold even when the data are discrete with
+tied values. Though this point is not explicitly illustrated in
+\citet{Rosn:Grov:Lee:2006} for the clustered rank-sum test when the group
+memebership is assigned at the subcluster level, the simulation study
+therein using data with tied values showed that the test still preserves the
+appropriate size.
+
+For the DS clustered rank-sum test and signed-rank test, the tied values are
+taken into account by using mid-rank to define the test statistics.
+
 Nevertheless, the data property that may
 induce significant difference among this method should be the way the data
 are clustered, e.g., whether distribution of group within each cluster is
@@ -155,7 +165,7 @@ code are purely R. Therefore, ours is faster:
 # do a speed comparison for a few sample sizes using the simulation
 # setting in the paper using microbenchmark
 # clusWilcox.test(...)
-@ 
+@
 A comment has been added to the end of paragraph~1 in the Discussion section.
 
 \begin{comment}
@@ -170,7 +180,7 @@ regression for clustered data")
 \end{comment}
 
 The single function is a feature, allowing the users to access conveniently at
-one place approches for nonparametric two sample comparison with clustered
+one place approaches for nonparametric two sample comparison with clustered
 data from five recent published papers from two groups of researchers.
 We have added an implementation of the method of \citet{Dutt:Datt:rank:2016},
 which allows informative group size within a cluster.
@@ -186,7 +196,7 @@ Two sample comparison for clustered data with GEE is done by regressing the
 outcome of interest on the group indicator and testing whether its coefficient
 equals zero. The result of the test depends on the variation of the response,
 which is not invariant to monotonic transformations.
-This preceedent sentence has been rephrased for clarification.
+This precedent sentence has been rephrased for clarification.
 
 \begin{comment}
 Page 3, line 16-17: ``...which are made very easy by the package using only a few
@@ -210,7 +220,6 @@ then ``B = 2000".
 \end{comment}
 
 This paragraph has been rephrased.
-\red{Has it?}
 
 \begin{comment}
 Page 11, line 6: ``Setting method = ``ds" would perform the DS test". Put this
@@ -246,7 +255,7 @@ We have added a warning to remind the user about
 this point in the package:
 <<rgl-warning>>=
 ## demo this
-@ 
+@
 
 \begin{comment}
 Page 13, R code, last line: you have to introduce and extra space here? it was
@@ -267,7 +276,6 @@ alpha as one of the commonly used values, 0.01 or 0.05, these two tests will
 give contradictory conclusions, though both p-values are reasonably small,
 which implies association to some degree between the presence of CFH R1210C
 rare variant and the symptom with CNV as the advanced stage.
-\red{What did you do to the text?}
 
 \begin{comment}
 Additionally, I would like to see a help file for the package (?clusrank)

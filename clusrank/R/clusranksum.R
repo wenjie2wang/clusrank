@@ -227,8 +227,8 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
 
     if (exact == TRUE & B == 0) {
         METHOD <- paste0(METHOD, " (exact exactutation)")
-        if(length(table(cluster)) > 40)
-            print("Number of clusters exceeds 40 for RGL clustered rank exact test")
+        if(length(table(cluster)) > 20)
+            print("Number of clusters exceeds 20 for RGL clustered rank exact test")
         W <- sum(dat[dat$grp == 1, "rksum"])
         n.layer <- l.csu * l.stu
         mgv <- ngv <- rep(0, n.layer)
@@ -1103,19 +1103,19 @@ clusWilcox.test.ranksum.dd <- function(x, cluster, group,
         sl2 <- aggregate(vs2, list(ds2[, 1]), mean)[, 2]
         fg <- (sl1 + sl2)/2
         fg[ik] <- 0
-        return(fg)
+        return(sum(fg))
     }
     rst <- function(il) {
         ly <- sum(mat[-which(dw[, 1] == il), -il])
         return(ly)
     }
-    data <- cbind(Cluster, X, grp)
+    data <- cbind(cluster, x, grp)
     m <- length(unique(data[, 1]))
     dw <- data[(data[, 3] == 1), ]
     ns <- (dw[, 1])
     nv <- as.vector(table(ns)[match(ns, names(table(ns)))])
     kh <- 1
-    mat <- t(apply(cbind(dw[, 1:2]), 1, rn))/nv
+    mat <- t(cbind(apply(dw[, 1:2], 1, rn)))/nv
     vf1 <- apply(cbind(seq(1, m)), 1, rst)
     sFs1 <- sum(mat)
     kh <- 2
