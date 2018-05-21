@@ -36,7 +36,6 @@ clusWilcox.test.ranksum.rgl <- function(x, cluster, group, stratum,
 ### to see if they only are only assigned a single treatment.
     if (all(unlist(check) == 1))
         warning("The two groups should contain clusters with the same size for at leaset one cluster size")
-
     arglist <- setNames(list(x, cluster, group, stratum, alternative,
                              mu, DNAME, METHOD, exact, B),
                         c("x", "cluster", "group", "stratum",
@@ -1092,16 +1091,28 @@ clusWilcox.test.ranksum.dd <- function(x, cluster, group,
         stop("invalid group variable, should contain 2 groups")
     }
 
+    cgrp1 <- aggregate(group == 1, list(cluster), sum)
+    cgrp2 <- aggregate(group == 2, list(cluster), sum)
+    cid <- cgrp1[, 1]
+    cid <- cid[which(cgrp1[, 2] > 0)]
+    cid20 <- cid[which((cgrp1[, 2] > 0) & cgrp2[, 2] == 0)]
+    ## Take out clusters which have obs from group 1
+    data <- cbind(cluster, x, grp)
+    data <- data[cluster %in% cid, ]
+    m <- length(unique(data[, 1]))
+
     rn <- function(dv) {
         ik <- dv[1]
         x <- dv[2]
         ds1 <- data[data[, 3] == 1, ]
         vs1 <- (kh == 2) * (ds1[, 2] < x) + (kh == 1) * (ds1[, 2] <= x)
         sl1 <- aggregate(vs1, list(ds1[, 1]), mean)[, 2]
-        ds2 <- data[data[, 3] == 0, ]
+        ds2 <- data[data[, 3] == 2, ]
+        ds2 <- rbind(ds2, cbind(cid20, 0, 2))
         vs2 <- (kh == 2) * (ds2[, 2] < x) + (kh == 1) * (ds2[, 2] <= x)
         sl2 <- aggregate(vs2, list(ds2[, 1]), mean)[, 2]
-        fg <- (sl1 + sl2)/2
+        id <- M %in% cid20
+        fg <- (id == FALSE) * (sl1 + sl2)/2 + (id == TRUE) * (sl1)
         fg[ik] <- 0
         return(sum(fg))
     }
@@ -1109,24 +1120,29 @@ clusWilcox.test.ranksum.dd <- function(x, cluster, group,
         ly <- sum(mat[-which(dw[, 1] == il), -il])
         return(ly)
     }
-    data <- cbind(cluster, x, grp)
-    m <- length(unique(data[, 1]))
+    ## data <- cbind(cluster, x, grp)
+    ## M <- length(unique(data[, 1]))
     dw <- data[(data[, 3] == 1), ]
     ns <- (dw[, 1])
     nv <- as.vector(table(ns)[match(ns, names(table(ns)))])
     kh <- 1
-    mat <- t(cbind(apply(dw[, 1:2], 1, rn)))/nv
+    mat <- t(cbind(apply(dw[, 1:2], 1, rn)))/ (nv * 2)
+    idmul <- idadd <- 1 + data[, 1] %in% cid20
+    idmul <- idmul / 2
+    idadd <- idadd / (nv * 2)
+    mat <- t(t(mat) * idmul)
     vf1 <- apply(cbind(seq(1, m)), 1, rst)
     sFs1 <- sum(mat)
     kh <- 2
-    mat <- t(apply(cbind(dw[, 1:2]), 1, rn))/nv
+    mat <- t(apply(cbind(dw[, 1:2]), 1, rn))/ (nv * 2)
+    mat <- t(t(mat) * idmul + idadd)
     vf2 <- apply(cbind(seq(1, m)), 1, rst)
     sFs2 <- sum(mat)
-    v1 <- ((sFs1 + sFs2)/4) + (m/2)
-    vd <- ((vf1 + vf2)/4) + (m - 1)/2
+    v1 <- (sFs1 + sFs2)
+    vd <- (vf1 + vf2)
     h <- 1
     S <- v1
-    ES <- 0.25 * m * (m + 1)
+    ES <- 0.25 * (m + 1) * (m + length(unique(cid20)))
     test <- (m/m^h) * v1 - ((m - 1)/(m - 1)^h) * vd
     v.test <- var(test)
     v_hat <- (((m^h)^2)/(m - 1)) * v.test
