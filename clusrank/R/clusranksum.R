@@ -1077,79 +1077,76 @@ clusWilcox.test.ranksum.ds <- function(x, cluster, group,
 
 
 
-
-
 clusWilcox.test.ranksum.dd <- function(x, cluster, group,
                                        alternative,
                                        mu, exact, B,
                                        DNAME, METHOD) {
-    if (exact == TRUE)  {
-        warning("No exact test is available for the DD ranksum test, will apply the asymptotic test.")
+     if (exact == TRUE)  {
+        stop("No exact test is available for the DD ranksum test.")
     }
     group.uniq <- length(unique(group))
     if (group.uniq == 1) {
         stop("invalid group variable, should contain 2 groups")
     }
+     cgrp0 <- aggregate(group == 0, list(cluster), sum)
+     cgrp1 <- aggregate(group == 1, list(cluster), sum)
+     cid <- cgrp0[, 1]
+     cid <- cid[which(cgrp0[, 2] > 0)]  # Take out clusters with at least one member from group 0
+     cid10 <- cid[which((cgrp0[, 2] > 0) & grp1[, 2] == 0)] # Further take out clusters with no member from group 1
 
-    cgrp1 <- aggregate(group == 1, list(cluster), sum)
-    cgrp2 <- aggregate(group == 2, list(cluster), sum)
-    cid <- cgrp1[, 1]
-    cid <- cid[which(cgrp1[, 2] > 0)]
-    cid20 <- cid[which((cgrp1[, 2] > 0) & cgrp2[, 2] == 0)]
-    ## Take out clusters which have obs from group 1
-    data <- cbind(cluster, x, grp)
-    data <- data[cluster %in% cid, ]
-    m <- length(unique(data[, 1]))
+     ## Take out clusters which have obs from group 1
+     data <- cbind(cluster, x, group)
+     data <- data[cluster %in% cid, ]
+     m <- length(unique(data[, 1]))
+     n.obs <- nrow(data)
 
-    rn <- function(dv) {
-        ik <- dv[1]
-        x <- dv[2]
-        ds1 <- data[data[, 3] == 1, ]
-        vs1 <- (kh == 2) * (ds1[, 2] < x) + (kh == 1) * (ds1[, 2] <= x)
-        sl1 <- aggregate(vs1, list(ds1[, 1]), mean)[, 2]
-        ds2 <- data[data[, 3] == 2, ]
-        ds2 <- rbind(ds2, cbind(cid20, 0, 2))
-        vs2 <- (kh == 2) * (ds2[, 2] < x) + (kh == 1) * (ds2[, 2] <= x)
-        sl2 <- aggregate(vs2, list(ds2[, 1]), mean)[, 2]
-        id <- M %in% cid20
-        fg <- (id == FALSE) * (sl1 + sl2)/2 + (id == TRUE) * (sl1)
-        fg[ik] <- 0
-        return(sum(fg))
-    }
-    rst <- function(il) {
+     rn <- function(dv) {
+         cx <- dv[1]
+         x <- dv[2]
+         ds1 <- data[data[, 3] == 0, ]
+         vs1 <- (ds1[, 2] < x) + (ds1[, 2] <= x)
+         sl1 <- aggregate(vs1, list(ds1[, 1]), mean)
+         ds2 <- data[data[, 3] == 1, ]
+
+         if (length(cid20) > 0) {
+             ds2 <- rbind(ds2, cbind(cid20, 0, 2))
+         }
+
+         vs2 <- (ds2[, 2] < x) + (ds2[, 2] <= x)
+         sl2 <- aggregate(vs2, list(ds2[, 1]), mean)
+
+         id <- cx %in% cid10
+         fg <- (id == FALSE) % (sl1 + sl2) / 2 + (id == TRUE) * (sl1)
+         fg[cx] <- 0
+         return(fg)
+     }
+
+      rst <- function(il) {
         ly <- sum(mat[-which(dw[, 1] == il), -il])
         return(ly)
-    }
-    ## data <- cbind(cluster, x, grp)
-    ## M <- length(unique(data[, 1]))
-    dw <- data[(data[, 3] == 1), ]
-    ns <- (dw[, 1])
-    nv <- as.vector(table(ns)[match(ns, names(table(ns)))])
-    kh <- 1
-    mat <- t(cbind(apply(dw[, 1:2], 1, rn)))/ (nv * 2)
-    idmul <- idadd <- 1 + data[, 1] %in% cid20
-    idmul <- idmul / 2
-    idadd <- idadd / (nv * 2)
-    mat <- t(t(mat) * idmul)
-    vf1 <- apply(cbind(seq(1, m)), 1, rst)
-    sFs1 <- sum(mat)
-    kh <- 2
-    mat <- t(apply(cbind(dw[, 1:2]), 1, rn))/ (nv * 2)
-    mat <- t(t(mat) * idmul + idadd)
-    vf2 <- apply(cbind(seq(1, m)), 1, rst)
-    sFs2 <- sum(mat)
-    v1 <- (sFs1 + sFs2)
-    vd <- (vf1 + vf2)
-    h <- 1
-    S <- v1
-    ES <- 0.25 * (m + 1) * (m + length(unique(cid20)))
-    test <- (m/m^h) * v1 - ((m - 1)/(m - 1)^h) * vd
-    v.test <- var(test)
-    v_hat <- (((m^h)^2)/(m - 1)) * v.test
-    varS <- ifelse(v_hat == 0, 1e-08, v_hat)
-    Z <- (S - ES)/sqrt(varS)
+      }
 
-    pval <- switch(alternative, less = pnorm(Z),
+     d0 <- data[data[, 3] == 0, ]
+     cd0 <- (d0[, 1])
+     nv <- as.vector(table(cd0)[match(cd0, names(table(cd0)))])
+     mat <- t(cbind(apply(dw[, 1:2], 1, rn)))/ (nv * 2)
+     idmul <- ((!(ns %in% cid10)) + 2 * cgrp1[, 2] * (ns %in% cid10)) / 2
+     mat <- t(t(mat) * idmul)
+     idadd <- ((!(ns %in% cid10)) / 2 + (ns %in% cid10)) / nv
+     mat <- t(t(mat) + idadd)
+
+     v1 <- sum(mat)
+     vd <- apply(cbind(seq(1, m)), 1, rst)
+     S <- v1
+     ES <- 0.25 * (m + 1) * (m + length(unique(cid10)))
+     h <- 1
+     test <- (m/m^h) * v1 - ((m - 1)/(m - 1)^h) * vd
+     v.test <- var(test)
+     v_hat <- (((m^h)^2)/(m - 1)) * v.test
+     varS <- ifelse(v_hat == 0, 1e-08, v_hat)
+     Z <- (S - ES)/sqrt(varS)
+
+     pval <- switch(alternative, less = pnorm(Z),
                    greater = pnorm(Z, lower.tail = FALSE),
                    two.sided = 2 * min(pnorm(abs(Z)),
                                        pnorm(abs(Z), lower.tail = FALSE)))
@@ -1160,9 +1157,8 @@ clusWilcox.test.ranksum.dd <- function(x, cluster, group,
                    ES = ES, varS = varS,
                    alternative = alternative, null.value = mu,
                    data.name = DNAME, method = METHOD,
-                   nobs = n.obs, nclus = n.clus)
+                   nobs = n.obs, nclus = m)
 
     class(result) <- "ctest"
     result
-
 }
