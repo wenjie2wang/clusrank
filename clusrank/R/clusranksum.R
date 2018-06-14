@@ -1081,6 +1081,7 @@ clusWilcox.test.ranksum.dd <- function(x, cluster, group,
                                        alternative,
                                        mu, exact, B,
                                        DNAME, METHOD) {
+    group <- group - 1
      if (exact == TRUE)  {
         stop("No exact test is available for the DD ranksum test.")
     }
@@ -1092,7 +1093,7 @@ clusWilcox.test.ranksum.dd <- function(x, cluster, group,
      cgrp1 <- aggregate(group == 1, list(cluster), sum)
      cid <- cgrp0[, 1]
      cid <- cid[which(cgrp0[, 2] > 0)]  # Take out clusters with at least one member from group 0
-     cid10 <- cid[which((cgrp0[, 2] > 0) & grp1[, 2] == 0)] # Further take out clusters with no member from group 1
+     cid10 <- cid[which((cgrp0[, 2] > 0) & cgrp1[, 2] == 0)] # Further take out clusters with no member from group 1
 
      ## Take out clusters which have obs from group 1
      data <- cbind(cluster, x, group)
@@ -1105,38 +1106,42 @@ clusWilcox.test.ranksum.dd <- function(x, cluster, group,
          x <- dv[2]
          ds1 <- data[data[, 3] == 0, ]
          vs1 <- (ds1[, 2] < x) + (ds1[, 2] <= x)
-         sl1 <- aggregate(vs1, list(ds1[, 1]), mean)
+         sl1 <- aggregate(vs1, list(ds1[, 1]), mean)[, 2]
          ds2 <- data[data[, 3] == 1, ]
 
-         if (length(cid20) > 0) {
-             ds2 <- rbind(ds2, cbind(cid20, 0, 2))
+         if (length(cid10) > 0) {
+             ds2 <- rbind(ds2, cbind(cid10, 0, 2))
          }
 
          vs2 <- (ds2[, 2] < x) + (ds2[, 2] <= x)
-         sl2 <- aggregate(vs2, list(ds2[, 1]), mean)
+         sl2 <- aggregate(vs2, list(ds2[, 1]), mean)[, 2]
 
          id <- cx %in% cid10
-         fg <- (id == FALSE) % (sl1 + sl2) / 2 + (id == TRUE) * (sl1)
+         fg <- (id == FALSE) * (sl1 + sl2) / 2 + (id == TRUE) * (sl1)
          fg[cx] <- 0
          return(fg)
      }
 
       rst <- function(il) {
-        ly <- sum(mat[-which(dw[, 1] == il), -il])
+        ly <- sum(mat[-which(d0[, 1] == il), -il])
         return(ly)
       }
+
+     rst.add <- function(il) {
+         ly <- sum(idadd[-which(d0[, 1] == il)])
+         return(ly)
+     }
 
      d0 <- data[data[, 3] == 0, ]
      cd0 <- (d0[, 1])
      nv <- as.vector(table(cd0)[match(cd0, names(table(cd0)))])
-     mat <- t(cbind(apply(dw[, 1:2], 1, rn)))/ (nv * 2)
-     idmul <- ((!(ns %in% cid10)) + 2 * cgrp1[, 2] * (ns %in% cid10)) / 2
+     mat <- t((apply(cbind(d0[, 1:2]), 1, rn)))/ (nv * 2)
+     idmul <- ((!(unique(cd0) %in% cid10)) + 2 * cgrp1[, 2] * (unique(cd0) %in% cid10)) / 2
      mat <- t(t(mat) * idmul)
-     idadd <- ((!(ns %in% cid10)) / 2 + (ns %in% cid10)) / nv
-     mat <- t(t(mat) + idadd)
+     idadd <- (!(cd0 %in% cid10)) / (2 * nv) + (cd0 %in% cid10) / nv
 
-     v1 <- sum(mat)
-     vd <- apply(cbind(seq(1, m)), 1, rst)
+     v1 <- sum(mat) + sum(idadd)
+     vd <- apply(cbind(seq(1, m)), 1, rst) + apply(cbind(seq(1, m)), 1, rst.add)
      S <- v1
      ES <- 0.25 * (m + 1) * (m + length(unique(cid10)))
      h <- 1

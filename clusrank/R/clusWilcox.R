@@ -37,7 +37,8 @@
 ##'     cluster level.
 ##' @param method A character string specifying the method of
 ##'     clustered Wilcoxon rank test to be use, should be one of
-##'     \code{"rgl"} or \code{"ds"}.
+##'     \code{"rgl"} or \code{"ds"}. For rank-sum test, the \code{"dd"}
+##'     method is also available.
 ##' @param paired A logical indicating whether you want a paired test.
 ##' @param exact A logical indicating if a permutation test is to be
 ##'     used. If it is set as \code{FALSE}, then test based on
@@ -158,8 +159,13 @@
 #' Somnath Datta, Glen A. Satten (2005) \emph{Rank-Sum Tests for Clustered Data}.
 #' Journal of the American Statistical Association, \bold{100}, 908-915.
 #'
-#' Somath Datta, Glen A. Satten (2008) \emph{A Signed-Rank test for Clustered Data}.
-#' Biometric, \bold{64}, 501-507.
+#' Somath Datta, Glen A. Satten (2008) \emph{A Signed-Rank Test for Clustered Data}.
+#' Biometrics, \bold{64}, 501-507.
+#'
+#' Sandipan Dutta, Somnath Datta (2015) \emph{A Rank-Sum Test for Clustered
+#'     Data When the Number of Subjects in a Group within a Cluster is
+#'     Informative}.
+#' Biometrics, \bold{72}, 432-440.
 #'
 #' @importFrom stats complete.cases na.omit terms complete.cases model.extract aggregate
 #' @importFrom stats lm ecdf pnorm qnorm var  pchisq setNames lag
@@ -197,7 +203,7 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
                                     na.action = na.omit,
                                     alternative = c("two.sided", "less", "greater"),
                                     mu = 0, paired = FALSE, exact = FALSE,
-                                    B = 2000, method = c("rgl", "ds"),
+                                    B = 2000, method = c("rgl", "ds", "dd"),
                                     ...) {
     if (missing(formula) || (length(formula) != 3L)) {
         stop("'formula' missing or incorrect")
@@ -283,7 +289,7 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
                                     group = NULL, stratum = NULL, data = NULL,
                                     alternative = c("two.sided", "less", "greater"),
                                     mu = 0, paired = FALSE, exact = FALSE, B = 2000,
-                                    method = c("rgl", "ds"), ...) {
+                                    method = c("rgl", "ds", "dd"), ...) {
     alternative <- match.arg(alternative)
     method <- match.arg(method)
     pars <- as.list(match.call()[-1])
@@ -381,8 +387,7 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
 
         if (method == "ds") {
             if (exact == TRUE & B == 0) {
-                warning("Exact exactutation test is not available for 'ds' method. Will run the large-sample test.")
-                exact <- FALSE
+                stop("Exact exactutation test is not available for 'ds' method.")
             }
             METHOD <- paste(METHOD, "using Datta-Satten method", sep = " ")
             arglist <- setNames(list(x, cluster, alternative, mu, exact, B, METHOD, DNAME),
@@ -393,7 +398,7 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
                                c(arglist))
             return(result)
         } else {
-            stop("Method should be one of 'rgl' and 'ds'")
+            stop("Method should be one of 'rgl' and 'ds'.")
         }
 
     } else {
@@ -409,6 +414,21 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
             result <- do.call("clusWilcox.test.ranksum.rgl", c(arglist))
             return(result)
         }
+
+
+        if (method == "dd") {
+            if (exact == TRUE & B == 0) {
+                stop("Exact exactutation test is not available for 'dd' method.")
+            }
+            METHOD <- paste(METHOD, "using Dutta-Datta method.", sep = " ")
+            arglist <- setNames(list(x, cluster, group, alternative, mu, exact, B, METHOD, DNAME),
+                                c("x", "cluster", "group", "alternative",
+                                  "mu", "exact", "B", "METHOD", "DNAME"))
+            result <- do.call("clusWilcox.test.ranksum.dd", c(arglist))
+            return(result)
+
+        }
+
 
         if ((method) == "ds") {
             METHOD <- paste(METHOD, "using Datta-Satten method", sep = " ")
@@ -429,7 +449,7 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
         }
 
         else {
-            stop("Method should be one of 'rgl' and 'ds'")
+            stop("Method should be one of 'rgl', 'dd' or 'ds'.")
         }
     }
 }
