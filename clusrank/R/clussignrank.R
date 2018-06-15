@@ -287,50 +287,57 @@ clusWilcox.test.signedrank.ds <- function(x, cluster, alternative, exact, B,
         warning("Exact test is not provided for DS method for signed rank test, large-sample test will be carried out")
     }
 
-    x <- x - mu
-    order.c <- order(cluster)
-    x <- x[order.c]
-    cluster <- cluster[order.c]
-    csize <- as.vector(table(cluster))
-    m <- length(csize)
-    cid <- as.numeric(names(csize))
-    n <- sum(csize)
-    plus <- as.numeric(x > 0)
-    minus <- as.numeric(x < 0)
-    niplus <- aggregate(plus ~ cluster, FUN = sum)[, 2]
-    niminus <- aggregate(minus ~ cluster, FUN = sum)[, 2]
-    ni <- table(cluster)
+    Xij <- x - mu
+    ni <- as.vector(table(cluster))
 
 
-    csize.cum <- cumsum(csize)
-    csize.cum <- c(0, csize.cum)
-    cluster <- recoderFunc(cluster, unique(cluster), c(1 : m))
+    g <- length(ni)
+    n <- sum(ni)
+    cni <- cumsum(ni)
+    cni <- c(0, cni)
+    Fi <- function(x, i) {
+        Xi <- Xij[(cni[i] + 1):(cni[i + 1])]
+        (sum(abs(Xi) <= x) + sum(abs(Xi) < x))/(2 * ni[i])
+        }
+    Ftot <- function(x) {
+        st <- 0
+        for (i in 1:g) st <- st + Fi(x, i)
+        return(st)
+    }
+    Fcom <- function(x) {
+        st <- 0
+        for (i in 1:g) st <- st + Fi(x, i) * ni[i]
+        return(st/n)
+    }
+    TS <- VTS <- 0
+    for (i in 1:g) {
+        Xi <- Xij[(cni[i] + 1):(cni[i + 1])]
+        first <- (sum(Xi > 0) - sum(Xi < 0))/length(Xi)
+        second <- 0
+        third <- 0
+        for (x in Xi) {
+            second <- second + sign(x) * (Ftot(abs(x)) -
+                                          Fi(abs(x), i))
+                third <- third + sign(x) * Fcom(abs(x))
+        }
+        TS <- TS + first + second/length(Xi)
+        VTS <- VTS + (first + (g - 1) * third/length(Xi))^2
+    }
 
-
-    Ftot.vec  <- Ftot_vec(abs(x), cluster, csize, n, m)
-    Fi.vec <- Fi_vec(abs(x), cluster, csize, n, m)
-    Fcom.vec <- Fcom_vec(abs(x), cluster, csize, n, m)
-
-    T <- sum((niplus - niminus) / ni) +
-        sum((sign(x) * (Ftot.vec - Fi.vec)) / rep.int(ni, times = ni))
-    temp <- sign(x) * Fcom.vec
-
-    temp <- aggregate(temp ~ cluster, FUN = sum)[, 2]
-    VTS <- sum(((niplus - niminus) / ni + (m - 1) / ni * temp) ^ 2 )
-    Z <- T / sqrt(VTS)
+    Z <- TS / sqrt(VTS)
     pval <- switch(alternative, less = pnorm(Z),
                    greater = pnorm(Z, lower.tail = FALSE),
                    two.sided = 2 * min(pnorm(abs(Z)),
                                        pnorm(abs(Z), lower.tail = FALSE)))
 
     names(n) <- "total number of observations"
-    names(m) <- "total number of clusters"
+    names(g) <- "total number of clusters"
     names(Z) <- "Z"
     names(mu) <- "shift in location"
     result <- list(statistic = Z,
                    srstat = T,
                    vsrstat = VTS,
-                   p.value = pval, nobs = n, nclus = m,
+                   p.value = pval, nobs = n, nclus = g,
                    alternative = alternative,
                    null.value = mu,
                    data.name = DNAME, method = METHOD)

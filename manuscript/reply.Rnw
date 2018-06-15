@@ -134,7 +134,7 @@ are clustered, e.g., whether distribution of group within each cluster is
 related to cluster size, or whether different clusters have different
 correlation structure. These points are partly illustrated in the simulation
 done by \citet{Datt:Satt:rank:2005} and \citet{Datt:Satt:sign:2008}.
-A comment has been added to paragraph ??? in the Discussion section.
+A comment has been added to paragraph~1 in the Discussion section.
 
 
 \subsection*{To Reviewer 2}
@@ -157,15 +157,9 @@ differences are between both... Would there be any advantage if I used the
 \texttt{clusrank} with method = ``ds"?
 \end{comment}
 
-They are two independent implementations of the same tests and should give the
-same results when applied to the same data. Under the hood, however, our
-implemenaton puts some computationally heavy steps into C++ code while their
-code are purely R. Therefore, ours is faster:
-<<ds-speed>>=
-# do a speed comparison for a few sample sizes using the simulation
-# setting in the paper using microbenchmark
-# clusWilcox.test(...)
-@
+These two implementations are actually the same. We pull them together in
+order to let users have a more convenient access to different methods for
+the same test.
 A comment has been added to the end of paragraph~1 in the Discussion section.
 
 \begin{comment}
@@ -233,8 +227,13 @@ Page 11, line 17: ``... with a small number of clusters..." Could you give a
 recommendation of the number?
 \end{comment}
 
-\red{Too vague. Is there a difference between 10 and 11? does it depends on
-  cluster size? Give some numbers like how long you need to wait.}
+We would recommend to use the exact test when the number of clusters in each
+group is under $10$ or $11$ (The total number of clusters is $20$ or
+$22$). When the number of clusters in each group is $10$, it takes $2$
+seconds on average to run once. When the number of clusters in each group is
+$11$, it takes $5$ seconds on average to run the test. But as soon as the
+number of clusters goes up to $13$, it can take more than $1$ minute to
+finish one run.
 
 \begin{comment}
 Page 12, second paragraph: Include ``... methods (using the asymptotic theory) are
@@ -249,12 +248,34 @@ this by assigning 4 groups to this data... What happens if you use the RGL metho
 maybe a warning would be useful!
 \end{comment}
 
-Thanks for this suggestion. \red{Can the RGL method be extended to handle
-  this? }
+Thanks for this suggestion.
 We have added a warning to remind the user about
 this point in the package:
-<<rgl-warning>>=
+<<rgl-warning, echo = FALSE>>=
 ## demo this
+ex  <- function(dim, rho) {
+  diag(1 - rho, dim) + matrix(rho, dim, dim)
+}
+library(mvtnorm)
+datgen.sum <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1),
+  corr = ex, misrate = 0., clusgrp = TRUE) {
+    nn <- nclus * maxclsize
+    Sigma1 <- corr(maxclsize, rho[1])
+    Sigma2 <- corr(maxclsize, rho[2])
+    y1 <- c(t(rmvnorm(nclus, sigma = Sigma1)))
+    y2 <- c(t(rmvnorm(nclus, sigma = Sigma2)))
+    group <- rep(c(0, 1), each = nn)
+    if (!clusgrp) group  <- sample(group, nn, FALSE)
+    cid <- rep(1:(2 * nclus), each = maxclsize)
+    x <- exp(c(y1, y2)) + delta * group
+    dat <- data.frame(x = x, grp = group, cid = cid)
+    drop <-  sort(sample(1:(2 * nn), size = misrate * (2 * nn), FALSE))
+    if (misrate == 0.) dat else dat[-drop, ]
+}
+dat.cl <- datgen.sum(10, 3, 0, c(.9, .9), ex, 0, TRUE)
+dat.cl$grp <- rep(1:4, each = 15)
+cbind(head(dat.cl, 6), "head / tail" = "     ", tail(dat.cl, 6))
+clusWilcox.test(x ~ grp + cluster(cid), dat = dat.cl, method = "rgl")
 @
 
 \begin{comment}
@@ -284,7 +305,6 @@ Additionally, if a click on index I do not see the amd link to the dataset.
 \end{comment}
 
 Have fixed in the updated package.
-\red{I don't see clusrank-package.Rd.}
 
 \bibliographystyle{Chicago}
 \bibliography{clusrank}

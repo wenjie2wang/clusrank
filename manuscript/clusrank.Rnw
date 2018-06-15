@@ -974,27 +974,24 @@ the DS method cannot be applied to contralateral designs with exactly one
 subunit in each group within a cluster; both asymptotic tests require that
 the number of clusters to not to be too small.
 Our implementation of the DS methods gives the same results as those in the
-\pkg{ClusterRankTest} package. Nonetheless, since some heavy computing tasks
-are performed with \proglang{C++} code, our implemenation is faster.
-
+\pkg{ClusterRankTest} package. We put them together in order for the users
+to have a more convenient access to different methods for the same test.
 
 Implementation of other rank-based methods for clustered data can be
-considered in future development of the package \pkg{clusrank}.
-For the rank-sum test, the case of informative group size within a cluster
-\citep{Dutt:Datt:rank:2016} was recently added to the package
-{\bf is ours faster?}, though it is
+considered in future development of the package \pkg{clusrank}.  For the
+rank-sum test, the case of informative group size within a cluster
+\citep{Dutt:Datt:rank:2016} was recently added to the package, though it is
 available in the package \pkg{ClusterRankTest} \citep{Dutt:Datt:clus:2016}.
-For the signed-rank test,  \citet{Laro:wilc:2005} has a variance estimator
-based on certain sums of squares over independent clusters.
-Sign tests and signed-rank tests for multivariate clustered data
-\citep{Laro:affi:2003, Laro:Neva:Oja:weig:2007, Haat:etal:weig:2009} and
-multilevel data \citep{Laro:Neva:Oja:one:2008} have been studied.
-Some tests allow the distributions in two groups to have different scales
-and/or shapes under the null hypothesis \citep{Laro:etal:two:2010}.
-Making these tests available would be of interest to many users.
-When covariates are available, rank regression for clustered data
-\citep[e.g.,][]{Wang:Zhu:rank:2006, Wang:Zhao:weig:2008,
-  Fu:Wang:Bai:rank:2010} would be the next step.
+For the signed-rank test, \citet{Laro:wilc:2005} has a variance estimator
+based on certain sums of squares over independent clusters.  Sign tests and
+signed-rank tests for multivariate clustered data \citep{Laro:affi:2003,
+  Laro:Neva:Oja:weig:2007, Haat:etal:weig:2009} and multilevel data
+\citep{Laro:Neva:Oja:one:2008} have been studied.  Some tests allow the
+distributions in two groups to have different scales and/or shapes under the
+null hypothesis \citep{Laro:etal:two:2010}.  Making these tests available
+would be of interest to many users.  When covariates are available, rank
+regression for clustered data \citep[e.g.,][]{Wang:Zhu:rank:2006,
+  Wang:Zhao:weig:2008, Fu:Wang:Bai:rank:2010} would be the next step.
 
 
 \section*{Acknowledgement}
