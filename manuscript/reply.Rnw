@@ -98,7 +98,7 @@ function output similar to those of \texttt{wilcox.test}.
 distributions than normal could be generated.
 \end{comment}
 
-Thxe data generating schemes were adapted from \citet{Datt:Satt:rank:2005},
+The data generating schemes were adapted from \citet{Datt:Satt:rank:2005},
 which generate log-normal variables with a possible location shift.
 The distribution is skewed and have longer tail than the normal distribution,
 controlled by its shape parameter (the standard deviation on the log scale).
@@ -157,10 +157,50 @@ differences are between both... Would there be any advantage if I used the
 \texttt{clusrank} with method = ``ds"?
 \end{comment}
 
-These two implementations are actually the same. We pull them together in
-order to let users have a more convenient access to different methods for
-the same test.
-A comment has been added to the end of paragraph~1 in the Discussion section.
+Besides the asymptotic test for which the \texttt{clusrank} and
+\texttt{ClusterRankTest} have the same implementation, \texttt{clusrank}
+also provides a random permutation test for the small-sample cases.
+A comment is added to the end of paragraph~5 in the Usage section.
+
+<<ds-random-permutation, echo = TRUE>>=
+ex  <- function(dim, rho) {
+  diag(1 - rho, dim) + matrix(rho, dim, dim)
+}
+library(mvtnorm)
+datgen.sum <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1),
+  corr = ex, misrate = 0., clusgrp = TRUE) {
+    nn <- nclus * maxclsize
+    Sigma1 <- corr(maxclsize, rho[1])
+    Sigma2 <- corr(maxclsize, rho[2])
+    y1 <- c(t(rmvnorm(nclus, sigma = Sigma1)))
+    y2 <- c(t(rmvnorm(nclus, sigma = Sigma2)))
+    group <- rep(c(0, 1), each = nn)
+    if (!clusgrp) group  <- sample(group, nn, FALSE)
+    cid <- rep(1:(2 * nclus), each = maxclsize)
+    x <- exp(c(y1, y2)) + delta * group
+    dat <- data.frame(x = x, grp = group, cid = cid)
+    drop <-  sort(sample(1:(2 * nn), size = misrate * (2 * nn), FALSE))
+    if (misrate == 0.) dat else dat[-drop, ]
+}
+dat.cl <- datgen.sum(5, 3, 0, c(.9, .9), ex, 0, TRUE)
+clusWilcox.test(x ~ grp + cluster(cid), dat = dat.cl, method = "ds")
+clusWilcox.test(x ~ grp + cluster(cid), dat = dat.cl, method = "ds", exact = TRUE, B = 100)
+
+datgen.sgn <- function(nclus, maxclsize, delta = 0., rho = 0.1,
+  corr = ex, misrate = 0.) {
+    nn <- nclus * maxclsize
+    Sigma <- corr(maxclsize, rho)
+    z <- delta + c(t(rmvnorm(nclus, sigma = Sigma)))
+    x <- sign(z) * exp(abs(z))
+    cid <- rep(1:nclus, each = maxclsize)
+    dat <- data.frame(x = x, cid = cid)
+    drop <- sort(sample(1:nn, size = misrate * nn, FALSE))
+    if (misrate == 0.) dat else dat[-drop,]
+}
+dat.sgn <- datgen.sgn(10, 3, cor = ex, rho = 0.5)
+clusWilcox.test(x ~ cluster(cid),  dat.sgn, paired = TRUE, method = "ds")
+clusWilcox.test(x ~ cluster(cid),  dat.sgn, paired = TRUE, method = "ds", exact = TRUE, B = 100)
+@
 
 \begin{comment}
 And the other important question is if this package, which includes only one function
@@ -197,13 +237,13 @@ Page 3, line 16-17: ``...which are made very easy by the package using only a fe
 lines of codes". I think that this is not very important to mention it in this part.
 \end{comment}
 
-Removed.
+This sentence has been removed.
 
 \begin{comment}
 Page 9, line 9: ``parid difference" I guess ``paired"
 \end{comment}
 
-Corrected.
+This typoe has been corrected.
 
 \begin{comment}
 Page 9, second paragraph: I had to read the help file of the package in
@@ -220,7 +260,7 @@ Page 11, line 6: ``Setting method = ``ds" would perform the DS test". Put this
 sentence below when you are using the method.
 \end{comment}
 
-Done.
+This sentence has been moved to the place that the editor mentioned.
 
 \begin{comment}
 Page 11, line 17: ``... with a small number of clusters..." Could you give a
@@ -232,15 +272,25 @@ group is under $10$ or $11$ (The total number of clusters is $20$ or
 $22$). When the number of clusters in each group is $10$, it takes $2$
 seconds on average to run once. When the number of clusters in each group is
 $11$, it takes $5$ seconds on average to run the test. But as soon as the
-number of clusters goes up to $13$, it can take more than $1$ minute to
+number of clusters goes up to $13$, it can take more than $2$ minutes to
 finish one run.
+
+<<clus-rs-rgl-exact-time>>=
+dat.cl <- datgen.sum(11, 3, 0, c(.9, .9), ex, 0, TRUE)
+system.time(clusWilcox.test(x ~ grp + cluster(cid), dat.cl, method = "rgl",
+  exact = TRUE, B = 0))
+dat.cl <- datgen.sum(13, 3, 0, c(.9, .9), ex, 0, TRUE)
+system.time(clusWilcox.test(x ~ grp + cluster(cid), dat.cl, method = "rgl",
+  exact = TRUE, B = 0))
+@
+
 
 \begin{comment}
 Page 12, second paragraph: Include ``... methods (using the asymptotic theory) are
 very ..."
 \end{comment}
 
-Done.
+This change has been made.
 
 \begin{comment}
 Page 12, last line: The DS method can compare more than two groups. We illustrate
@@ -253,25 +303,6 @@ We have added a warning to remind the user about
 this point in the package:
 <<rgl-warning, echo = FALSE>>=
 ## demo this
-ex  <- function(dim, rho) {
-  diag(1 - rho, dim) + matrix(rho, dim, dim)
-}
-library(mvtnorm)
-datgen.sum <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1),
-  corr = ex, misrate = 0., clusgrp = TRUE) {
-    nn <- nclus * maxclsize
-    Sigma1 <- corr(maxclsize, rho[1])
-    Sigma2 <- corr(maxclsize, rho[2])
-    y1 <- c(t(rmvnorm(nclus, sigma = Sigma1)))
-    y2 <- c(t(rmvnorm(nclus, sigma = Sigma2)))
-    group <- rep(c(0, 1), each = nn)
-    if (!clusgrp) group  <- sample(group, nn, FALSE)
-    cid <- rep(1:(2 * nclus), each = maxclsize)
-    x <- exp(c(y1, y2)) + delta * group
-    dat <- data.frame(x = x, grp = group, cid = cid)
-    drop <-  sort(sample(1:(2 * nn), size = misrate * (2 * nn), FALSE))
-    if (misrate == 0.) dat else dat[-drop, ]
-}
 dat.cl <- datgen.sum(10, 3, 0, c(.9, .9), ex, 0, TRUE)
 dat.cl$grp <- rep(1:4, each = 15)
 cbind(head(dat.cl, 6), "head / tail" = "     ", tail(dat.cl, 6))
@@ -304,8 +335,8 @@ where you can find some description.
 Additionally, if a click on index I do not see the amd link to the dataset.
 \end{comment}
 
-Have fixed in the updated package.
-
+The help pages for the package and the dataset have been added to the
+updated package on CRAN. Thanks for pointing this out.
 \bibliographystyle{Chicago}
 \bibliography{clusrank}
 

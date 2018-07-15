@@ -1,6 +1,6 @@
 ---
 title: "Rank-Based Tests for Clustered Data with R package **clusrank**"
-date: August 1, 2017
+date: June 15, 2018
 fontsize: 11pt
 bibliography: clusrank.bib
 output:
@@ -16,6 +16,7 @@ output:
 
 
 ```{r setup, include=FALSE}
+library(knitr)
 opts_chunk$set(dev = 'pdf')
 knitr::opts_chunk$set(cache=TRUE)
 options(width = 60)
@@ -26,134 +27,47 @@ options(width = 60)
 ## Background
 * Two-group comparison: Wilcoxon rank sum test.
 * Paired comparison: Wilcoxon signed rank test.
-* Available implementations: \texttt{wilcox.test} in R package \textbf{stats}, \texttt{PROC NPAR1WAY} in SAS, \texttt{ranksum/signrank} in Stata, StatXact and etc.  
-* Clustered data: data which consists of a number of independent clusters.
-* Analogy of rank sum test for clustered data: @Rosn:Glyn:Lee:inco:2003, @Rosn:Glyn:Lee:exte:2006  and @Datt:Satt:rank:2005.
-* Analogy of signed rank test for clustered data: @Rosn:Grov:use:1999, @Rosn:Glyn:Lee:inco:2003 and @Datt:Satt:rank:2005.
+* Available implementations: \texttt{wilcox.test} in R package
+  \textbf{stats}, \texttt{PROC NPAR1WAY} in SAS, \texttt{ranksum/signrank}
+  in Stata, StatXact and etc.
+* Not suitable for non-iid data.
+
+## Rank-Based Tests for CLustered Data
+* Clustered data: not iid.
+* Rank-sum tests for clustered data: @Rosn:Glyn:Lee:inco:2003,
+  @Rosn:Glyn:Lee:exte:2006, @Datt:Satt:rank:2005, and @Dutt:Datt:rank:2016.
+* Signed-rank tests for clustered data: @Rosn:Grov:use:1999,
+  @Rosn:Glyn:Lee:inco:2003 and @Datt:Satt:rank:2005.
 * Some existing software for clustered data
-    + R package \texttt{coin}
-    + R package \texttt{ClusterRankTest}: @Dutt:Datt:clus:2016, @Dutt:Datt:rank:2016
-    + Stata function \texttt{cluswilcox} 
+    + R package \texttt{coin}: conditional inferences.
+    + R package \texttt{ClusterRankTest}: @Dutt:Datt:clus:2016.
+    + Stata function \texttt{cluswilcox}: RGL.
+	+ Available SAS code for RGL methods.
 
 ## R Package **clusrank**
-- Provides a unified interface for rank-based tests for clustered data
-- Modeled after the base function \texttt{wilcox.test}
-- Wilcoxon rank sum test and signed rank test
-- Can handel unbalanced data (unequal cluster sizes)
-- Available on \texttt{CRAN}
-- Manuscript companion
-
-
-# Clustered Rank-Sum Tests
-## Clustered Rank-Sum Tests
-- RGL method:  @Rosn:Glyn:Lee:inco:2003, @Rosn:Glyn:Lee:exte:2006
-- DS method: @Datt:Satt:rank:2005
-- Notations: 
-    + $X_{ij}$: the $i$th observation in the $j$th cluster, $i = 1, \ldots, N$, $j = 1, \ldots, n_i$, where $n_i$ is the size of cluster $i$.
-    + $\delta_{ij}$: the group indicator of $X_{ij}$; $\delta_{ij} = 1$ if $X_{ij}$ is in group $1$, and
-$\delta_{ij} = 0$ if $X_{ij}$ is in group $2$.
-    + $R_{ij}$: the rank of $X_{ij}$ among all the observed data.
-    + $g$: the cluster size (for all clusters; i.e., $n_i = g$, for ease of presentation only)
-
-
-
-## RGL method: cluster-level grouping
-- The treatment is assigned at cluster level: :
-$\delta_{ij} = \delta_i$ for all $1 \le j \le n_i$.
-- Define $R_{i+} =\sum_{j=1}^{n_i}R_{ij}$.
-- The Wilcoxon rank-sum statistic is
-\begin{equation}
-\label{eq:rglrs}
-W = \sum_{i = 1}^N \delta_{i}R_{i+}.
-\end{equation}
-- Rationale: permutate the "rank"s of clusters ($R_{i+}$).
-- Exchangable intra-cluster correlation.
-- Asymptotic normal distribution.
-- An extra \texttt{stratum} covariate is allowed.
-
-## RGL method: subunit-level grouping
-- The treatment is assigned at individual level.
-- The rank-sum statistic is
-\begin{equation*}
-  W_{g,N} = \sum_{i = 1}^N\sum_{j=1}^g\delta_{ij}R_{ij},
-\end{equation*}
-- Rationale:
-    + each cluster is assigned a random number $Q_i$ which is the number of subunits under treatment 1 in that cluster given the observed distribution of $Q$.
-    + permuate the individuals within each cluster according to $Q_i$.
-    + when cluster sizes are not equal, permute for each cluster size.
-  
-## DS method: subunit-level grouping
-- The treatment is assigned at individual level.
-- Rationale:
-    + randomly pick an observation, $X_i^*$ from each cluster to form a pseudo-sample, and $\delta_i^*$ be its group membership.
-    + average the Wilcoxon rank sum statistic over all possible pseudo-samples.
-- The rank-sum statistic is
-\begin{equation*}
-  W^* = \frac{1}{N+1}\sum^N_{i = 1}\delta_i^* R_i^*,
-\end{equation*}
-- The test statistic based on $W^*$ is
-$$S = E(W^* | \mathbf{X}, \boldsymbol{\delta})$$.
-
-
-## Some Remarks
-- DS method allows arbitrary intra-cluster dependence structure and remains valid when treatment affects the correlation structure.
-- DS method can also be applied to comparison of location among $m~(> 2)$ groups.
-- The DS method cannot be applied to billateral data, where exactly one individual in each cluster belongs to each treatment.
-
-- RGL method is more efficient than DS method when the intra-cluster correlation is weak.
-- Permutation test is only available for RGL method when treatments are assigned at cluster level. The permutation test can be applied to small sample (sample size less than $50$).
-
-# Clustered Signed-Rank Tests
-## Clustered Signed-Rank Tests
-- RGL method:  @Rosn:Glyn:Lee:inco:2003.
-- DS method: @Datt:Satt:rank:2005.
-- Notations
-    + $X_{ij}$:  the paired-difference score for the $j$th pair in the
-      $i$th cluster,  $i = 1, \ldots, N$, $j = 1, \ldots, n_i$.
-    + $R_{ij}$:  the rank of $|X_{ij}|$ among 
-      $\{|X_{ij}|, i = 1, \ldots, N, j = 1 \ldots, n_i\}$.
-    + $S_{ij} = V_{ij}R_{ij}$: the signed rank, where
-      $V_{ij} = \mathrm{sign}(X_{ij})$.
-
-##  RGL method: uninformative cluster size
-- Informative cluster size: the distribution of pairwise differences within a cluster depends on the cluster size.
-- The signed-rank statistic is
-$$ T^{(obs)} = \sum_{i=1}^N S_{i+} = \sum_{i=1}^N  \sum_{j=1}^g R_{ij} V_{ij},
-$$
-where $S_{i+} = \sum^g_{j=1}S_{ij}$ and only nonzero $X_{ij}$ is
-considered in the computation of signed ranks.
-
-- Rationale: permute the signed "rank"s of the clusters ($S_{i+}$).
-- The RGL test does not hold the size when the cluster size is informative.
-- Permutation test for the RGL method is supported only for small sample ($n \leq 50$).
-
-##   DS method: informative cluster size
-* Rationale:
-    + randomly draw an individual from each cluster ($X_i^*$) to form a pseudo-sample.
-    + average the signed rank statistic of all possible pseudo-samples.
-* Let $R_i^*$ be the mid-rank of $|X_i^*|$, $i = 1, \ldots, N$ to allow
-ties in the data, and let $V_i^* = \mathrm{sign}(X_i^*)$.
-* The signed rank statsitic is
-$\sum_{i=1}^N S_i^*$, where $S_i = V_i^* R_i^*$.
-* The test statistic based on the signed rank statistic is
-$$T = E (\sum_{i=1}^N S_i^* | \mathbf{X})$$, where $\mathbf{X} = \{X_{ij}: 1 \le i \le N; 1 \le j \le n_i\}$.
-
-
-# Illustration
-
-## Illustration
-
+- Provides a unified interface for the above mentioned rank-based tests for clustered data.
+<!-- - Modeled after the base function \texttt{wilcox.test} -->
+- Available on \texttt{CRAN}.
 ```{r, echo = TRUE}
 library(clusrank)
 ```
-The synopsis of the formula interface of the function is
 ```{r, echo = FALSE}
 args(clusrank:::clusWilcox.test.formula)
 ```
-The model formula can have \texttt{cluster()}.
 
-## Illustration: Two Within-Cluster Correlation Structures
-```{r, echo = TRUE, tidy = TRUE, size = 'smallsize'}
+# Clustered Rank-Sum Tests
+## RGL Method with Cluster-Level Grouping
+- RGL method:  @Rosn:Glyn:Lee:inco:2003
+- Treatment is assigned at the cluster level.
+- Compares groups at each cluster size.
+- Assuming exchangeable intracluster dependence structure.
+- Large-sample test.
+- Exact permutation test for small sample is available.
+- Imbalance of sample sizes between two groups across cluster size strata
+  may result in inefficiency.
+
+## Illustration: data
+```{r, echo = FALSE}
 library(mvtnorm)
 
 ex  <- function(dim, rho) {
@@ -163,10 +77,313 @@ ex  <- function(dim, rho) {
 ar1 <- function(dim, rho) {
   rho ^ outer(1:dim, 1:dim, function(x, y) abs(x - y))
 }
+
+datgen.sum <- function(nclus, maxclsize, delta = 0.,
+  rho = c(0.1, 0.1), corr = ex, misrate = 0., clusgrp = TRUE) {
+    nn <- nclus * maxclsize
+    Sigma1 <- corr(maxclsize, rho[1])
+    Sigma2 <- corr(maxclsize, rho[2])
+    y1 <- c(t(rmvnorm(nclus, sigma = Sigma1)))
+    y2 <- c(t(rmvnorm(nclus, sigma = Sigma2)))
+    group <- rep(c(0, 1), each = nn)
+    if (!clusgrp) group  <- sample(group, nn, FALSE)
+    cid <- rep(1:(2 * nclus), each = maxclsize)
+    x <- exp(c(y1, y2)) + delta * group
+    dat <- data.frame(x = x, grp = group, cid = cid)
+    drop <-  sort(sample(1:(2 * nn), size = misrate * (2 * nn), FALSE))
+    if (misrate == 0.) dat else dat[-drop, ]
+}
+
+dat.cls <- datgen.sum(10, 3, 0, c(.9, .9), ex, 0, TRUE)
+```
+Data \texttt{dat.cls} contains $10$ clusters from each of the two groups,
+and the grouping is assigned at the cluster level.
+```{r dat-clusd, echo = TRUE, fig.width = 2, fig.height = 2, warning = FALSE}
+dat.cls <- datgen.sum(10, 3, 0, c(.9, .9), ex, 0, TRUE)
+head(dat.cls)
+```
+## Illustration
+```{r dat-clus0, echo = TRUE, fig.width = 2, fig.height = 2, warning = FALSE}
+clusWilcox.test(x ~ grp + cluster(cid),
+                data = dat.cls, method = "rgl", exact = TRUE, B = 0)
 ```
 
-## Illustration: Generate Data for Clustered Rank-Sum Test
+## Illustration
+```{r dat-clus1, echo = TRUE, fig.width = 2, fig.height = 2, warning = FALSE}
+clusWilcox.test(x ~ grp + cluster(cid),
+                data = dat.cls, method = "rgl")
+```
+
+## Illustration
+RGL method with cluster-level grouping also allows an extra \texttt{stratum}
+variable:
+```{r dat-clusstr, echo = TRUE, fig.width = 2, fig.height = 2, warning = FALSE}
+dat.cls$strat <- rep(rep(1:2, each = 15), 2)
+## cbind(head(dat.cl, 6), "head / tail" = "     ", tail(dat.cl, 6))
+clusWilcox.test(x ~ grp + cluster(cid) + stratum(strat), dat = dat.cls,
+  method = "rgl")
+```
+
+
+## DS Method with Individual-Level Grouping
+- DS method: @Datt:Satt:rank:2005
+- Treatment is assigned at individual level.
+- Within-cluster resampling.
+- Able to compare location among $m >= 2$ treatment groups. (chi-square
+  distribution.)
+- Cannot be applied to strictly collateral data.
+
+## Illustration
+```{r dat-clus2, echo = TRUE, fig.width = 2, fig.height = 2, warning = FALSE}
+clusWilcox.test(x ~ grp + cluster(cid),
+                data = dat.cls, method = "ds")
+```
+
+## Illustration
+Data \texttt{dat.cl1} is the same as \texttt{dat.cls} except it contains $4$
+groups.
+
+```{r dat-clus3, echo = FALSE, fig.width = 2, fig.height = 2, warning = FALSE}
+dat.cl1 <- dat.cls
+dat.cl1$grp <- rep(1:4, each = 15)
+```
+```{r dat-clus4, echo = FALSE, fig.width = 2, fig.height = 2, warning = FALSE}
+clusWilcox.test(x ~ grp + cluster(cid), dat = dat.cl1, method = "ds")
+```
+
+
+## DD method: Number of Subjects in a Group within a Cluster is Informative
+- DD method: @Dutt:Datt:rank:2016
+- Group specific marginal distribution in a cluster depends on the number of
+  observations in that group.
+- Two-stage resampling.
+```{r dat-clus5, echo = FALSE, fig.width = 2, fig.height = 2, warning = FALSE}
+clusWilcox.test(x ~ grp + cluster(cid), dat = dat.cls, method = "dd")
+```
+
+
+
+## RGL Method with Individual-Level Grouping
+- RGL method: @Rosn:Glyn:Lee:exte:2006
+- Treatment is assigned at individual level.
+- Is equivalent to RGL method with cluster-level grouping when the data is
+  balanced and the treatment is also assigned at cluster-level.
+
+
+
+
+
+## More Remarks
+- DS method allows arbitrary intra-cluster dependence structure and remains valid when treatment affects the correlation structure.
+- RGL method is more efficient than DS method when the intra-cluster correlation is weak.
+- Permutation test is only available for RGL method when treatments are
+  assigned at cluster level. The permutation test can be applied to small
+  sample (number of clusters less than $20$).
+
+# Clustered Signed-Rank Tests
+## RGL Method: Uninformative Cluster Size.
+- @Rosn:Glyn:Lee:inco:2003.
+- Informative cluster size: the distribution of pairwise differences within a cluster depends on the cluster size.
+- The RGL test does not hold the size when the cluster size is informative.
+- Permutation test for the RGL method is supported only for small sample
+  (less than $50$).
+
+## Illustration: Data
+Data \texttt{dat1} contains the paired difference from $10$ clusters, each
+cluster has $5$ subunits. The difference in location is $1$.
+```{r, echo = FALSE}
+datgen.sgn <- function(nclus, maxclsize, delta = 0.,
+  rho = 0.1, corr = ex, misrate = 0.) {
+    nn <- nclus * maxclsize
+    Sigma <- corr(maxclsize, rho)
+    z <- delta + c(t(rmvnorm(nclus, sigma = Sigma)))
+    x <- sign(z) * exp(abs(z))
+    cid <- rep(1:nclus, each = maxclsize)
+    dat <- data.frame(x = x, cid = cid)
+    drop <- sort(sample(1:nn, size = misrate * nn, FALSE))
+    if (misrate == 0.) dat else dat[-drop,]
+}
+dat1 <- datgen.sgn(10, 5, rho = 0.9, delta = 1)
+```
+```{r, echo = TRUE}
+head(dat1)
+```
+## Illustration:
+```{r, echo = TRUE, warning = FALSE}
+## Default method is RGL.
+clusWilcox.test(x ~ cluster(cid), data = dat1,
+                paired = TRUE)
+
+```
+
+##   DS method: informative cluster size
+* Allows informative cluster size.
+* Rationale:
+    + randomly draw an individual from each cluster to form a pseudo-sample.
+    + average the signed rank statistic of all possible pseudo-samples.
+
+## Illustration
+```{r, echo = TRUE}
+clusWilcox.test(x ~ cluster(cid), data = dat1,
+                paired = TRUE, method = "ds")
+```
+
+
+
+
+<!-- # Illustration -->
+
+<!-- ## Illustration -->
+
+<!-- ```{r, echo = TRUE} -->
+<!-- library(clusrank) -->
+<!-- ``` -->
+<!-- The synopsis of the formula interface of the function is -->
+<!-- ```{r, echo = FALSE} -->
+<!-- args(clusrank:::clusWilcox.test.formula) -->
+<!-- ``` -->
+<!-- The model formula can have \texttt{cluster()}. -->
+
+<!-- ## Illustration: Two Within-Cluster Correlation Structures -->
+<!-- ```{r, echo = TRUE, tidy = TRUE, size = 'smallsize'} -->
+<!-- library(mvtnorm) -->
+
+<!-- ex  <- function(dim, rho) { -->
+<!--   diag(1 - rho, dim) + matrix(rho, dim, dim) -->
+<!-- } -->
+
+<!-- ar1 <- function(dim, rho) { -->
+<!--   rho ^ outer(1:dim, 1:dim, function(x, y) abs(x - y)) -->
+<!-- } -->
+<!-- ``` -->
+
+<!-- ## Illustration: Generate Data for Clustered Rank-Sum Test -->
+<!-- ```{r, echo = TRUE, tidy = TRUE, size = 'smallsize'} -->
+<!-- datgen.sum <- function(nclus, maxclsize, delta = 0., -->
+<!--   rho = c(0.1, 0.1), corr = ex, misrate = 0., clusgrp = TRUE) { -->
+<!--     nn <- nclus * maxclsize -->
+<!--     Sigma1 <- corr(maxclsize, rho[1]) -->
+<!--     Sigma2 <- corr(maxclsize, rho[2]) -->
+<!--     y1 <- c(t(rmvnorm(nclus, sigma = Sigma1))) -->
+<!--     y2 <- c(t(rmvnorm(nclus, sigma = Sigma2))) -->
+<!--     group <- rep(c(0, 1), each = nn) -->
+<!--     if (!clusgrp) group  <- sample(group, nn, FALSE) -->
+<!--     cid <- rep(1:(2 * nclus), each = maxclsize) -->
+<!--     x <- exp(c(y1, y2)) + delta * group -->
+<!--     dat <- data.frame(x = x, grp = group, cid = cid) -->
+<!--     drop <-  sort(sample(1:(2 * nn), size = misrate * (2 * nn), FALSE)) -->
+<!--     if (misrate == 0.) dat else dat[-drop, ] -->
+<!-- } -->
+<!-- ``` -->
+
+<!-- ## Illustration: Clustered Rank Sum Test -->
+<!-- - The \texttt{datgen.sum} function generates clustered data with treatment assigned either to cluster or to individual. -->
+
+<!-- - Arguments: -->
+<!--     + \texttt{nclus}: the number of clusters -->
+<!--     + \texttt{maxclsize}: the maximum of cluster size -->
+<!--     + \texttt{delta}: the difference in the location of the two treatment groups -->
+<!--     + \texttt{rho}: intra-cluster correlation of each treatment group -->
+<!--     + \texttt{rate}: a parameter controls the unbalancedness of the data randomly -->
+<!--     + \texttt{grpleve}: switch of the level on which treatment is assigned -->
+
+
+<!-- ## Illustration: Clustered Rank Sum Test -->
+<!-- The first data set has $10$ clusters in each of the two groups, and the grouping is at the cluster level. -->
+<!-- ```{r dat-clus0, echo = TRUE, fig.width = 2, fig.height = 2, warning = FALSE} -->
+<!-- dat.cls <- datgen.sum(10, 3, 0, c(.9, .9), ex, 0, TRUE) -->
+<!-- head(dat.cls) -->
+<!-- ``` -->
+<!-- ## Illustration: Clustered Rank Sum Test -->
+<!-- ```{r dat-clus1, echo = TRUE, fig.width = 2, fig.height = 2, warning = FALSE} -->
+<!-- clusWilcox.test(x ~ grp + cluster(cid), -->
+<!--                 data = dat.cls, method = "rgl") -->
+<!-- ``` -->
+
+<!-- ## Illustration: Clustered Rank Sum Test -->
+
+<!-- ```{r dat-clus2, echo = TRUE, fig.width = 2, fig.height = 2, warning = FALSE} -->
+<!-- clusWilcox.test(x ~ grp + cluster(cid), -->
+<!--                 data = dat.cls, method = "ds") -->
+<!-- ``` -->
+
+
+<!-- ## Illustration: Clustered Rank Sum Test -->
+<!-- The next data set has individual level grouping. -->
+<!-- ```{r dat-indi0, echo = TRUE, warning = FALSE} -->
+<!-- dat.ind <- datgen.sum(10, 3, 0, c(.9, .9), ex, 0, FALSE) -->
+<!-- head(dat1.ind) -->
+<!-- ``` -->
+
+<!-- ## Illustration: Clustered Rank Sum Test -->
+<!-- ```{r dat-indi1, echo = TRUE, warning = FALSE} -->
+<!-- clusWilcox.test(x ~ grp + cluster(cid), -->
+<!--                 data = dat.ind, method = "rgl") -->
+<!-- ``` -->
+
+<!-- ## Illustration: Clustered Rank Sum Test -->
+<!-- ```{r dat-indi2, echo = TRUE, warning = FALSE} -->
+<!-- clusWilcox.test(x ~ grp + cluster(cid), -->
+<!--                 data = dat.ind, method = "ds") -->
+<!-- ``` -->
+
+
+<!-- ## Illustration: Clustered Signed Rank Test -->
+<!--  Data generating function: -->
+<!-- ```{r, echo = TRUE} -->
+<!-- datgen.sgn <- function(nclus, maxclsize, delta = 0., -->
+<!--   rho = 0.1, corr = ex, misrate = 0.) { -->
+<!--     nn <- nclus * maxclsize -->
+<!--     Sigma <- corr(maxclsize, rho) -->
+<!--     z <- delta + c(t(rmvnorm(nclus, sigma = Sigma))) -->
+<!--     x <- sign(z) * exp(abs(z)) -->
+<!--     cid <- rep(1:nclus, each = maxclsize) -->
+<!--     dat <- data.frame(x = x, cid = cid) -->
+<!--     drop <- sort(sample(1:nn, size = misrate * nn, FALSE)) -->
+<!--     if (misrate == 0.) dat else dat[-drop,] -->
+<!-- } -->
+<!-- ``` -->
+
+<!-- ## Illustration: Clustered Signed Rank Test -->
+<!-- - The function \texttt{datgen.sgn} generate clustered difference between observations before and after treatment. -->
+<!-- - Arguments: -->
+<!--     * nclus, maxclsize, delta, rate: Same as the those of \texttt{datgen.sum}. -->
+<!--     *  rho: intracluster correlation, assuming treatment does not change the intracluster correlation. -->
+
+
+
+
+<!-- ## Illustration: Clustered Signed Rank Test -->
+<!-- ```{r dat-clus-0s, echo = TRUE} -->
+<!-- dat1 <- datgen.sgn(10, 5, rho = 0.9, delta = 1) -->
+<!-- head(dat1) -->
+<!-- ``` -->
+
+
+<!-- ## Illustration: Clustered Signed Rank Test -->
+<!-- ```{r, echo = TRUE} -->
+<!-- ## Default method is RGL. -->
+<!-- clusWilcox.test(x ~ cluster(cid), data = dat1, -->
+<!--                 paired = TRUE) -->
+
+<!-- ``` -->
+
+<!-- ## Illustration: Clustered Signed Rank Test -->
+<!-- ```{r, echo = TRUE} -->
+<!-- clusWilcox.test(x ~ cluster(cid), data = dat1, -->
+<!--                 paired = TRUE, method = "ds") -->
+```
+
+## Data Generation
 ```{r, echo = TRUE, tidy = TRUE, size = 'smallsize'}
+ex  <- function(dim, rho) {
+  diag(1 - rho, dim) + matrix(rho, dim, dim)
+}
+
+ar1 <- function(dim, rho) {
+  rho ^ outer(1:dim, 1:dim, function(x, y) abs(x - y))
+}
+
 datgen.sum <- function(nclus, maxclsize, delta = 0.,
   rho = c(0.1, 0.1), corr = ex, misrate = 0., clusgrp = TRUE) {
     nn <- nclus * maxclsize
@@ -184,103 +401,6 @@ datgen.sum <- function(nclus, maxclsize, delta = 0.,
 }
 ```
 
-## Illustration: Clustered Rank Sum Test
-- The \texttt{datgen.sum} function generates clustered data with treatment assigned either to cluster or to individual.
-
-- Arguments:
-    + \texttt{nclus}: the number of clusters
-    + \texttt{maxclsize}: the maximum of cluster size
-    + \texttt{delta}: the difference in the location of the two treatment groups
-    + \texttt{rho}: intra-cluster correlation of each treatment group
-    + \texttt{rate}: a parameter controls the unbalancedness of the data randomly
-    + \texttt{grpleve}: switch of the level on which treatment is assigned
-
-
-## Illustration: Clustered Rank Sum Test
-The first data set has $10$ clusters in each of the two groups, and the grouping is at the cluster level.
-```{r dat-clus0, echo = TRUE, fig.width = 2, fig.height = 2, warning = FALSE}
-dat.cls <- datgen.sum(10, 3, 0, c(.9, .9), ex, 0, TRUE)
-head(dat.cls)
-```
-## Illustration: Clustered Rank Sum Test
-```{r dat-clus1, echo = TRUE, fig.width = 2, fig.height = 2, warning = FALSE}
-clusWilcox.test(x ~ grp + cluster(cid),
-                data = dat.cls, method = "rgl")
-```
-
-## Illustration: Clustered Rank Sum Test
-
-```{r dat-clus2, echo = TRUE, fig.width = 2, fig.height = 2, warning = FALSE}
-clusWilcox.test(x ~ grp + cluster(cid),
-                data = dat.cls, method = "ds")
-```
-
-
-## Illustration: Clustered Rank Sum Test
-The next data set has individual level grouping.
-```{r dat-indi0, echo = TRUE, warning = FALSE}
-dat.ind <- datgen.sum(10, 3, 0, c(.9, .9), ex, 0, FALSE)
-head(dat1.ind)
-```
-
-## Illustration: Clustered Rank Sum Test
-```{r dat-indi1, echo = TRUE, warning = FALSE}
-clusWilcox.test(x ~ grp + cluster(cid),
-                data = dat.ind, method = "rgl")
-```
-
-## Illustration: Clustered Rank Sum Test
-```{r dat-indi2, echo = TRUE, warning = FALSE}
-clusWilcox.test(x ~ grp + cluster(cid),
-                data = dat.ind, method = "ds")
-```
-
-
-## Illustration: Clustered Signed Rank Test
- Data generating function:
-```{r, echo = TRUE}
-datgen.sgn <- function(nclus, maxclsize, delta = 0.,
-  rho = 0.1, corr = ex, misrate = 0.) {
-    nn <- nclus * maxclsize
-    Sigma <- corr(maxclsize, rho)
-    z <- delta + c(t(rmvnorm(nclus, sigma = Sigma)))
-    x <- sign(z) * exp(abs(z))
-    cid <- rep(1:nclus, each = maxclsize)
-    dat <- data.frame(x = x, cid = cid)
-    drop <- sort(sample(1:nn, size = misrate * nn, FALSE))
-    if (misrate == 0.) dat else dat[-drop,]
-}
-```
-
-## Illustration: Clustered Signed Rank Test
-- The function \texttt{datgen.sgn} generate clustered difference between observations before and after treatment.
-- Arguments:
-    * nclus, maxclsize, delta, rate: Same as the those of \texttt{datgen.sum}.
-    *  rho: intracluster correlation, assuming treatment does not change the intracluster correlation.
-
-
-
-
-## Illustration: Clustered Signed Rank Test
-```{r dat-clus-0s, echo = TRUE}
-dat1 <- datgen.sgn(10, 5, rho = 0.9, delta = 1)
-head(dat1)
-```
-
-
-## Illustration: Clustered Signed Rank Test
-```{r, echo = TRUE}
-## Default method is RGL.
-clusWilcox.test(x ~ cluster(cid), data = dat1,
-                paired = TRUE)
-
-```
-
-## Illustration: Clustered Signed Rank Test
-```{r, echo = TRUE}
-clusWilcox.test(x ~ cluster(cid), data = dat1,
-                paired = TRUE, method = "ds")
-```
 
 ## Simulation Comparison Made Easy
 ```{r, echo = TRUE}
@@ -315,10 +435,11 @@ simpower(1000, 0.05, TRUE,  20, 3, 0.0, 0.5, ar1, 0.)
 # Conclusions
 ## Conclusion
 - \texttt{clusWilcox.test} from package \textbf{clusrank} is a unified interface of clustered rank sum test and clustered signed rank test.
-- For each test, there are $2$ methods available: RGL and DS. 
-- New methods (e.g., ANOVA analog) can be added
-- Questions and request to maintainer: Yujing Jiang
-
-
+- For clustered rank-sum test: RGL, DS and DD. For clustered signed-rank
+  test: RGL and DS.
+- Future work: clustered sign test, sample size determination, rank
+  regression...
+- Questions to maintainer: Yujing Jiang
+- Thank you!
 
 ## References

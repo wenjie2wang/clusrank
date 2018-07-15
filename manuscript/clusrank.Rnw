@@ -669,7 +669,9 @@ exact tests can be very computing intensive and it is recommended to be used
 only with small samples (will test the size of sample). The package also
 provides a remedy by allowing random permutation test to approximate the
 exact test with the argument \code{B}, which is the number of permutations
-with default value 2000.
+with default value 2000. The random permutation test is also provided for
+other RGL tests and DS tests, for both rank-sum test and signed-rank test,
+even when exact permutation test is not available.
 
 The formula interface mimics that of the \code{wilcox.test} too
 with arguments \code{formula}, \code{subset} and \code{na.action}:

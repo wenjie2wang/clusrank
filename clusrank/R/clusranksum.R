@@ -36,6 +36,13 @@ clusWilcox.test.ranksum.rgl <- function(x, cluster, group, stratum,
 ### to see if they only are only assigned a single treatment.
     if (all(unlist(check) == 1))
         warning("The two groups should contain clusters with the same size for at leaset one cluster size")
+    n.obs <- length(x)
+    one <- rep(1, n.obs)
+    csize <- stats::aggregate(one ~ cluster, FUN = sum)[, 2]
+    if (length(table(csize)) == length(unique(cluster))) {
+        stop("For RGL method for rank-sum test, there should be at least a cluster size level that contains at least two clusters")
+    }
+
     arglist <- setNames(list(x, cluster, group, stratum, alternative,
                              mu, DNAME, METHOD, exact, B),
                         c("x", "cluster", "group", "stratum",
@@ -225,9 +232,9 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
     dat.l <- lapply(dat.l, csize.split)
 
     if (exact == TRUE & B == 0) {
-        METHOD <- paste0(METHOD, " (exact exactutation)")
+        METHOD <- paste0(METHOD, " (exact permutation)")
         if(length(table(cluster)) > 20)
-            print("Number of clusters exceeds 20 for RGL clustered rank exact test")
+            warning("Number of clusters exceeds 20 for RGL clustered rank exact test")
         W <- sum(dat[dat$grp == 1, "rksum"])
         n.layer <- l.csu * l.stu
         mgv <- ngv <- rep(0, n.layer)
@@ -484,7 +491,7 @@ clusWilcox.test.ranksum.rgl.sub.exact.1 <- function(x, cluster, group,
 clusWilcox.test.ranksum.rgl.sub.exact <- function(x, cluster, group,
                                                  alternative, exact, B, mu, DNAME = NULL,
                                                  METHOD = NULL, stratum) {
-    METHOD <- paste0(METHOD, " (random permutation)")
+    METHOD <- paste0(METHOD, " (Random Permutation)")
     bal <- (length(table(table(cluster))) == 1) # check balance of
                                         # data.
     x[which(group == 1)] <- x[which(group == 1)] - mu
@@ -589,7 +596,7 @@ clusWilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
                                                     alternative, exact, B,
                                                     mu, DNAME, METHOD, stratum))
     if (exact == TRUE & B == 0)
-        warning("Exact exactutation test is not available for RGL clustered rank-sum test when treatment is assigned at subunit level, will perform asymptotic test")
+        stop("Exact exactutation test is not available for RGL clustered rank-sum test when treatment is assigned at subunit level.")
     bal <- (length(table(table(cluster))) == 1) # check balance of data.
     clus <- unique(cluster)
     if (is.numeric(clus)) clus <- sort(clus)
@@ -900,7 +907,7 @@ clusWilcox.test.ranksum.ds.exact <- function(x, cluster, group,
     pval <- switch(alternative, less = w.ecdf(W),
                    greater = 1 - w.ecdf(W),
                    two.sided = 2 * min(w.ecdf(W), 1 - w.ecdf(W)))
-    METHOD <- paste0(METHOD, " (random permutation)")
+    METHOD <- paste0(METHOD, " (Random Permutation)")
     names(mu) <- "difference in locations"
 
     if (length(unique(group)) > 2) {
@@ -1009,7 +1016,7 @@ clusWilcox.test.ranksum.ds <- function(x, cluster, group,
                        nobs = n.obs, nclus = n.clus)
 
         class(result) <- "ctest"
-        result
+        return(result)
 
 
     } else {
@@ -1081,7 +1088,7 @@ clusWilcox.test.ranksum.dd <- function(x, cluster, group,
                                        alternative,
                                        mu, exact, B,
                                        DNAME, METHOD) {
-    group <- group - 1
+    group <- recoderFunc(group, sort(unique(group)), c(1, 0))
      if (exact == TRUE)  {
         stop("No exact test is available for the DD ranksum test.")
     }
@@ -1089,6 +1096,7 @@ clusWilcox.test.ranksum.dd <- function(x, cluster, group,
     if (group.uniq == 1) {
         stop("invalid group variable, should contain 2 groups")
     }
+
      cgrp0 <- aggregate(group == 0, list(cluster), sum)
      cgrp1 <- aggregate(group == 1, list(cluster), sum)
      cid <- cgrp0[, 1]
