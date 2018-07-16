@@ -246,7 +246,7 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
     group <- extractTerm("group", mf, n.obs, paired)
     DNAME <- paste0(DNAME, group[["name"]])
     group <- group[["var"]]
-    if (length(method) == 2) {
+    if (length(method) == 3) {
         warning("The default method is RGL.")
         method <- "rgl"
     }
