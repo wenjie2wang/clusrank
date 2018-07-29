@@ -284,27 +284,27 @@ clusWilcox.test.ranksum.rgl.clus <- function(x, cluster, group,
         ## Ngv: number of clusters with csize g in stratumum v
         ## Rsumgv: rank sum of clusters with size g in stratumum v
         ## VRgv: variance of rank of clusters with size g in stratumum v
-    Csize <- rep(csize.uniq, l.stu)
-    Str <- rep(strt.uniq, each = l.csu)
-    summary.mat <- data.frame(mgv, ngv, Ngv, Rsumgv, VRgv, Csize, Str)
-    for ( i in csize.uniq) {
-        for ( j in strt.uniq) {
-            j.ch <- as.character(j)
-            i.ch <- as.character(i)
-            temp <- dat.l[[j.ch]][[i.ch]] # data with csize i and stratumum j
-            temp.clus <- temp[, "clus"]
-            temp.rksum <- temp[, "rksum"]
-            temp.grp <- temp[, "grp"]
-            summary.mat[which(Csize == i & Str == j), "mgv"] <- length(temp.grp[temp.grp == 1])
-            summary.mat[which(Csize == i & Str == j), "Ngv"] <- length(temp.clus)
-            summary.mat[which(Csize == i & Str == j), "Rsumgv"] <- sum(temp.rksum)
-            VRgv.temp <- 0
-            if (length(temp.clus) > 1) {
-                VRgv.temp <- var(temp.rksum) * (length(temp.clus) - 1)
+        Csize <- rep(csize.uniq, l.stu)
+        Str <- rep(strt.uniq, each = l.csu)
+        summary.mat <- data.frame(mgv, ngv, Ngv, Rsumgv, VRgv, Csize, Str)
+        for ( i in csize.uniq) {
+            for ( j in strt.uniq) {
+                j.ch <- as.character(j)
+                i.ch <- as.character(i)
+                temp <- dat.l[[j.ch]][[i.ch]] # data with csize i and stratumum j
+                temp.clus <- temp[, "clus"]
+                temp.rksum <- temp[, "rksum"]
+                temp.grp <- temp[, "grp"]
+                summary.mat[which(Csize == i & Str == j), "mgv"] <- length(temp.grp[temp.grp == 1])
+                summary.mat[which(Csize == i & Str == j), "Ngv"] <- length(temp.clus)
+                summary.mat[which(Csize == i & Str == j), "Rsumgv"] <- sum(temp.rksum)
+                VRgv.temp <- 0
+                if (length(temp.clus) > 1) {
+                    VRgv.temp <- var(temp.rksum) * (length(temp.clus) - 1)
+                }
+                summary.mat[which(Csize == i & Str == j), "VRgv"] <- VRgv.temp
             }
-            summary.mat[which(Csize == i & Str == j), "VRgv"] <- VRgv.temp
         }
-    }
         summary.mat[, "ngv"] <- summary.mat[, "Ngv"] - summary.mat[, "mgv"]
         W <- sum(dat[dat$grp == 1, "rksum"]) # W is the ranksum stat
         Ngv <- summary.mat[, "Ngv"]
