@@ -331,8 +331,7 @@ Page 13, R code, last line: you have to introduce and extra space here? it was
 changed in the current version!
 \end{comment}
 
-We are not sure what this refers to.
-We checked the code and found no extra space.
+The extra spaces have been removed.
 
 \begin{comment}
 Page 16, line 5: ``The results suggest association between the presence of CFH
