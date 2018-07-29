@@ -633,7 +633,6 @@ which case the interface is designed to mimic that of the function
 <<args-cd, echo=TRUE>>=
 args(getS3method("clusWilcox.test", "default"))
 @
-
 The arguments \code{x}, \code{y}, \code{alternative}, \code{mu},
 \code{paired}, and \code{exact} have the same meaning as those in the
 familiar default interface of \code{wilcox.test}.
@@ -662,20 +661,24 @@ post-treatment observations; alternatively, \code{x} and \code{y} can
 specify the pre- and post-treatment observations, respectively.
 This interface is also similar to that of \code{wilcox.test}.
 
+
 Besides the asymptotic tests, exact tests for RGL clustered rank-sum test
 with cluster-level grouping and the RGL clustered signed-rank test can be
-requested by setting \code{exact = TRUE} and \code{B = 0}. However, the
-exact tests can be very computing intensive and it is recommended to be used
-only with small samples (will test the size of sample). The package also
+requested by setting \code{exact = TRUE}. However, the exact tests can be very
+computing intensive even for a moderate sample size, so it is recommended 
+only for small samples. The \code{wilcox.test} function by default computes
+exact p-values for sample size less than~50. For clustered data, we recommend
+50~observations (instead of clusters) as the threshold for the same reason.
+The package also
 provides a remedy by allowing random permutation test to approximate the
 exact test with the argument \code{B}, which is the number of permutations
 with default value 2000. The random permutation test is also provided for
 other RGL tests and DS tests, for both rank-sum test and signed-rank test,
 even when exact permutation test is not available.
 
+
 The formula interface mimics that of the \code{wilcox.test} too
 with arguments \code{formula}, \code{subset} and \code{na.action}:
-
 <<formula, echo = TRUE>>=
 args(getS3method("clusWilcox.test", "formula"))
 @
@@ -779,7 +782,7 @@ dat.cl <- datgen.sum(10, 3, 0, c(.9, .9), ex, 0, TRUE)
 @
 The first and last 6 rows of the data frame looks like this:
 <<dat.cl>>=
-cbind(head(dat.cl, 6), "head / tail" = "     ", tail(dat.cl, 6))
+cbind(head(dat.cl, 6), "head / tail" = "", tail(dat.cl, 6))
 @
 
 
@@ -822,7 +825,7 @@ For illustration, we simply add an extra column \code{strat} to the
 dataset and perform the RGL test:
 <<clus-rs-rgl-str>>=
 dat.cl$strat <- rep(rep(1:2, each = 15), 2)
-cbind(head(dat.cl, 6), "head / tail" = "     ", tail(dat.cl, 6))
+cbind(head(dat.cl, 6), "head / tail" = "", tail(dat.cl, 6))
 clusWilcox.test(x ~ grp + cluster(cid) + stratum(strat), dat = dat.cl,
   method = "rgl")
 @
@@ -835,7 +838,7 @@ method.
 We illustrate this by assigning 4 groups to this data:
 <<clus-rs-ds-mgrp>>=
 dat.cl$grp <- rep(1:4, each = 15)
-cbind(head(dat.cl, 6), "head / tail" = "     ", tail(dat.cl, 6))
+cbind(head(dat.cl, 6), "head / tail" = "", tail(dat.cl, 6))
 clusWilcox.test(x ~ grp + cluster(cid), dat = dat.cl, method = "ds")
 @
 
@@ -873,7 +876,7 @@ For illustration, we generate a dataset that consists of $10$ clusters of
 size $3$, with exchangeable correlation parameter $\rho = 0.5$.
 <<dat-sr>>=
 dat.sgn <- datgen.sgn(10, 3, cor = ex, rho = 0.5)
-cbind(head(dat.cl, 6), "head / tail" = "   ", tail(dat.cl, 6))
+cbind(head(dat.cl, 6), "head / tail" = "", tail(dat.cl, 6))
 @
 
 
@@ -968,16 +971,16 @@ rank-based tests for clustered data are an indispensable tool like
 their counterparts, the Wilcoxon tests for independent data.
 The package \pkg{clusrank} provides two schools, the RGL method and the DS
 method, of the recently developed rank-sum tests and signed-rank tests
-in a unified, higher-level, user-friendly interface.
+in a unified, higher-level, user-friendly interface. 
+For the DS methods, our implementation gives the same results as those in the
+\pkg{ClusterRankTest} package.
 Users need to be aware of the applicability of these tests when using them.
 For example, the RGL method assumes exchangeability within clusters
 and does not account for informative cluster sizes;
 the DS method cannot be applied to contralateral designs with exactly one
 subunit in each group within a cluster; both asymptotic tests require that
-the number of clusters to not to be too small.
-Our implementation of the DS methods gives the same results as those in the
-\pkg{ClusterRankTest} package. We put them together in order for the users
-to have a more convenient access to different methods for the same test.
+the number of clusters to be reasonably large.
+
 
 Implementation of other rank-based methods for clustered data can be
 considered in future development of the package \pkg{clusrank}.  For the
@@ -991,9 +994,9 @@ signed-rank tests for multivariate clustered data \citep{Laro:affi:2003,
 \citep{Laro:Neva:Oja:one:2008} have been studied.  Some tests allow the
 distributions in two groups to have different scales and/or shapes under the
 null hypothesis \citep{Laro:etal:two:2010}.  Making these tests available
-would be of interest to many users.  When covariates are available, rank
-regression for clustered data \citep[e.g.,][]{Wang:Zhu:rank:2006,
-  Wang:Zhao:weig:2008, Fu:Wang:Bai:rank:2010} would be the next step.
+would be of interest to many users.  % When covariates are available, rank
+% regression for clustered data \citep[e.g.,][]{Wang:Zhu:rank:2006,
+%   Wang:Zhao:weig:2008, Fu:Wang:Bai:rank:2010} would be the next step.
 
 
 \section*{Acknowledgement}
