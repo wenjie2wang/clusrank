@@ -141,7 +141,7 @@ The Wilcoxon rank-sum and signed-rank tests are important tools for
 two-group comparisons and paired comparisons, respectively.
 Unlike their counterparts under the normality assumption, they are attractive
 because they are rank-based without the need of distributional assumptions.
-Nonetheless, standard versions of such tests presume independent data, and
+oldNonetheless, standard versions of such tests presume independent data, and
 cannot be applied to clustered data which frequently arise in many fields.
 Clustered data consist of data obtained from correlated observations
 from sub-units or members in each cluster, where clusters may be
@@ -673,7 +673,7 @@ This interface is also similar to that of \code{wilcox.test}.
 Besides the asymptotic tests, exact tests for RGL clustered rank-sum test
 with cluster-level grouping and the RGL clustered signed-rank test can be
 requested by setting \code{exact = TRUE}. However, the exact tests can be very
-computing intensive even for a moderate sample size, so it is recommended 
+computing intensive even for a moderate sample size, so it is recommended
 only for small samples. The \code{wilcox.test} function by default computes
 exact p-values for sample size less than~50. For clustered data, we recommend
 50~observations (instead of clusters) as the threshold for the same reason.
@@ -934,16 +934,15 @@ The p-values from both tests are close and less than $0.001$, which
 implies strong evidence of an association between the presence of
 CFH~R1210C rare variant and the CARMS grade with GA as the advanced stage.
 
-{\bf use AgeSex instead of Agesex}
-For the RGL method, a stratifying variable \code{Agesex} which categorizes
+For the RGL method, a stratifying variable \code{AgeSex} which categorizes
 the patients into 6~strata by their age and gender can be used as a control
 variable:
 <<amd1234-rgl>>=
-clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = amd,
+clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(AgeSex), data = amd,
                 subset = CARMS %in% c(1, 2, 3, 4))
 @
 The p-value is still less than $0.001$ after controlling for age and gender.
-{\bf check why there is warning here}
+
 
 
 We then apply the two tests to the second subset:
@@ -962,7 +961,7 @@ presence of
 CFH~R1210C rare variant and the symptom with CNV as the advanced stage.
 Again, the RGL method can be applied with age and gender controlled:
 <<amd12355-rgl>>=
-clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = amd,
+clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(AgeSex), data = amd,
   subset = CARMS %in% c(1, 2, 3, 5), method = "rgl")
 @
 The p-value from the RGL method remains virtually unchanged after
@@ -978,7 +977,7 @@ rank-based tests for clustered data are an indispensable tool like
 their counterparts, the Wilcoxon tests for independent data.
 The package \pkg{clusrank} provides two schools, the RGL method and the DS
 method, of the recently developed rank-sum tests and signed-rank tests
-in a unified, higher-level, user-friendly interface. 
+in a unified, higher-level, user-friendly interface.
 For the DS methods, our implementation gives the same results as those in the
 \pkg{ClusterRankTest} package.
 Users need to be aware of the applicability of these tests when using them.

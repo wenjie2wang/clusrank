@@ -44,7 +44,7 @@
 #'     neovascular disease (advanced wet)
 #' \item Age_group 1: < 70 years;  2: 70 to 79.9 years; 3: >= 80 years
 #' \item Sex 1: male; 2: female
-#' \item Agesex 1: agegroup = 1, sex = 1;  2: agegroup = 2, sex = 1;
+#' \item AgeSex 1: agegroup = 1, sex = 1;  2: agegroup = 2, sex = 1;
 #'     3: agegroup = 3, sex = 1; 4: agegroup = 1, sex = 2; 5: agegroup
 #'     = 2, sex = 2; 6: agegroup = 3, sex = 2;
 #' }
@@ -72,7 +72,7 @@
 #'                subset = CARMS %in% c(1, 2, 3, 4), method = "rgl", alternative = "two")
 #' clusWilcox.test(CARMS ~ Variant + cluster(ID), data = amd,
 #'                subset = CARMS %in% c(1, 2, 3, 4), method = "ds", alternative = "two")
-#' clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(Agesex), data = amd,
+#' clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(AgeSex), data = amd,
 #'                subset = CARMS %in% c(1, 2, 3, 4), alternative = "two")
 #' @keywords datasets
 
