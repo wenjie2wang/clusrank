@@ -246,12 +246,10 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
     group <- extractTerm("group", mf, n.obs, paired)
     DNAME <- paste0(DNAME, group[["name"]])
     group <- group[["var"]]
-    if (length(method) == 3) {
-        warning("The default method is RGL.")
-        method <- "rgl"
-    }
-    if (length(unique(group)) > 2 & method == "rgl") {
-        stop("RGL method cannot handle data with more than 2 groups. Please consider DS method.")
+    method <- match.arg(method)
+    if (length(unique(group)) > 2 && method == "rgl") {
+        stop("RGL method cannot handle data with more than 2 groups. ",
+             "Please consider DS method.")
     }
 
 
