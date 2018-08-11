@@ -78,7 +78,8 @@ datgen.sgn <- function(nclus, maxclsize, delta = 0., rho = 0.1,
 
 We thank the two reviewers for their detailed, constructive comments.
 The manuscript and the package have been revised accordingly.
-Point-by-point responses are as follows.
+Point-by-point responses are as follows, with quoted comments from the
+reviewers in \emph{italic}.
 
 \subsection*{To Reviewer 1}
 
@@ -96,22 +97,36 @@ use both in data analysis and teaching purposes. However, few remarks remain and
 hope that these may help to improve the paper.
 \end{comment}
 
-Thank you for precise summary of our work and the remarks, which have been
-addressed as follows.
+Thank you for precise summary of our work and the remarks.
 
 \begin{comment}
 1. Throughout the paper the authors write the null hypothesis and alternative in
 terms of differences in location. I wonder if the correction formulation wouldn't
 be ``differences in distribution".
+\end{comment}
 
+In \citet{wilcoxon1945individual}, the original rank sum test is to test that the two
+distributions have the same means versus not. Later on the test was formulated
+with null hypothesis that the two population have the same distributions
+versus the alternatives that the two populations differ. For one sided tests,
+the alternative hypothesis often states that one population is stochastically
+larger than the other \citep{mann1947test}.
+The test does not assume known distributions of these two populations and
+therefore it was referred to as a nonparametric test \citep{fay2010wilcoxon}.
+Note that, instead of a location shift in distributions, the Mann--Whitney form of
+the Wilcoxon test on the basis of U-statistics is comparing the medians of the
+two populations. The R function \texttt{wilcox.test} (for independent data)
+formulates the alternative hypothesis as a location shift.
+We have added a comment to the end of paragraph~1, Section~2.
+
+\begin{comment}
 2. Regarding comment 1: The output of the functions also say ``alternative
 hypothesis: true difference in locations is not equal to 0". The distributions are
 not identical or something similar.
 \end{comment}
 
-The Wilcoxon rank-sum test is a nonparametric test of the null hypothesis
-that the two samples come from the same population. The rationale of the test,
-however, is based on checking whether it is equally likely that a randomly
+The rationale of the test is based on checking whether it is equally likely
+that a randomly 
 selected value from one sample will be less than or greater than a randomly
 selected value from a second sample. Consequently, it is best suited to detect a
 location shift but has no power in other situations such as a scale change.
@@ -122,8 +137,8 @@ n <- 1000
 wilcox.test(rnorm(n), rnorm(n, sd = 2))
 summary(replicate(200, wilcox.test(rnorm(n), rnorm(n, sd = 2))$p.value))
 @
-The tests that we implemted in this package are extensions of the standard
-Wilcoxon test (\texttt{wilcox.test} in R) to handle clustered data.
+The tests that we implemted in this package are extensions of the built-in R
+function \texttt{wilcox.test} to handle clustered data.
 We believe that it is desirable to keep the hypothesis formulation and
 function output similar to those of \texttt{wilcox.test}.
 
@@ -341,9 +356,7 @@ alpha?? one pvalue is 0.006312 and the other is 0.06404...
 
 We tried to avoid giving a specific conclusion here since if we set the
 alpha as one of the commonly used values, 0.01 or 0.05, these two tests will
-give contradictory conclusions, though both p-values are reasonably small,
-which implies association to some degree between the presence of CFH R1210C
-rare variant and the symptom with CNV as the advanced stage.
+give contradictory conclusions. The text has been rephrased.
 
 \begin{comment}
 Additionally, I would like to see a help file for the package (?clusrank)
