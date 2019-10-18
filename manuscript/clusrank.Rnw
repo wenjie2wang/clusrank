@@ -939,7 +939,7 @@ the patients into 6~strata by their age and gender can be used as a control
 variable:
 <<amd1234-rgl>>=
 clusWilcox.test(CARMS ~ Variant + cluster(ID) + stratum(AgeSex), data = amd,
-                subset = CARMS %in% c(1, 2, 3, 4))
+  subset = CARMS %in% c(1, 2, 3, 4))
 @
 The p-value is still less than $0.001$ after controlling for age and gender.
 
