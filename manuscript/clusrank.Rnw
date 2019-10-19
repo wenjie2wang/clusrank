@@ -929,7 +929,7 @@ variable \code{Variant}.
 
 We apply both the RGL and DS method to the first subset:
 <<amd1234-both>>=
-data(amd)
+data("amd")
 clusWilcox.test(CARMS ~ Variant + cluster(ID), data = amd,
   subset = CARMS %in% c(1, 2, 3, 4), method = "rgl")
 clusWilcox.test(CARMS ~ Variant + cluster(ID), data = amd,
