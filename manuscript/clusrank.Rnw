@@ -31,7 +31,7 @@ School1 & School2 \tabularnewline
 
 
 \author{
-Yujing Jiang\\ University of Connecticut \And
+Yujing Jiang\\ Colorado State University \And
   Xin He\\ University of Maryland \And
   Mei-Ling Ting Lee\\ University of Maryland \AND
   Bernard Rosner\\ Harvard University  \And
@@ -91,12 +91,11 @@ before and the results are discussed.
 %% in the following format:
 
 \Address{
-  Yujing Jiang and Jun Yan\\
+  Yujing Jiang\\
   Department of Statistics\\
-  Professor of Statistics\\
-  University of Connecticut\\
-  215 Glenbrook Rd. Unit 4120, Storrs, CT 06269, USA.\\
-  Email: \email{yujing.jiang@uconn.edu}, \email{jun.yan@uconn.edu}
+  Colorado State University\\
+  851 Oval Dr., Fort Collins, Colorado 80523, USA\\
+  Email: \email{yujing.jiang@colostate.edu}
 
   Xin He and Mei-Ling Ting Lee\\
   Department of Epidemiology and Biostatistics\\
@@ -110,6 +109,12 @@ before and the results are discussed.
   181 Longwood Avenue,  Boston, Massachusetts 02115, USA\\
   Email: \email{stbar@channing.harvard.edu}
 
+  Jun Yan\\
+  Department of Statistics\\
+  Professor of Statistics\\
+  University of Connecticut\\
+  215 Glenbrook Rd. Unit 4120, Storrs, CT 06269, USA.\\
+  Email: \email{jun.yan@uconn.edu}
 }
 %% It is also possible to add a telephone and fax number
 %% before the e-mail in the following format:
@@ -621,8 +626,8 @@ than a paired difference from a smaller cluster.
 \label{s:usage}
 
 <<knitr, echo=FALSE>>=
-options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
-library(knitr)
+options(prompt = "R> ", continue = "+  ", width = 76, useFancyQuotes = FALSE)
+library("knitr")
 opts_chunk$set(cache=TRUE, autodep=TRUE)
 render_sweave()
 @
@@ -631,7 +636,7 @@ Package \pkg{clusrank} provides a unified interface to all the
 methods reviewed in Sections~\ref{s:ranksum} and~\ref{s:signedrank}
 through function \code{clusWilcox.test}:
 <<args-cc, echo=TRUE>>=
-library(clusrank)
+library("clusrank")
 args(clusWilcox.test)
 @
 Argument \code{x} can be either a numeric vector or a formula.
@@ -741,7 +746,7 @@ Below is a simple implementation that allows different levels of grouping
 Package \pkg{mvtnorm} \citep{Genz:etal:mvtn:2016, Genz:Bret:comp:2009}
 is used to generate multivariate normal random vectors.
 <<datgen, echo=TRUE>>=
-library(mvtnorm)
+library("mvtnorm")
 datgen.sum <- function(nclus, maxclsize, delta = 0., rho = c(0.1, 0.1),
   corr = ex, misrate = 0., clusgrp = TRUE) {
     nn <- nclus * maxclsize
