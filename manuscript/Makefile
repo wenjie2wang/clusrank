@@ -10,7 +10,7 @@ tex : $(knitrfile)
 	$(info ************  CONVERTING KNITR TO TEX  ************)
 	Rscript -e "require(knitr); knit('$(knitrfile)')"
 
-pdf : tex 
+pdf : tex $(bibfile)
 	$(info ************  COMPILING PDF  ************)
 	pdflatex $(filestem)
 	bibtex $(filestem)
