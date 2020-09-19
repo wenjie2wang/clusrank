@@ -7,6 +7,8 @@ Authors@R: c(person(given = "Yujing", family = "Jiang",
                     email = "yujing.jiang@uconn.edu",
                     role = c("aut","cre")),
              person(given = "Mei-Ling Ting", family = "Lee", role = "ctb"),
+             person(given = "Wenjie", family = "Wang", role = "ctb",
+                    comment = c(ORCID = "0000-0003-0363-3180")),
              person(given = "Jun", family = "Yan", role = "ctb"))
 License: GPL (>=3)
 Depends:
