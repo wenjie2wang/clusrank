@@ -33,4 +33,4 @@ updateHeader:
 	sed -i "s/Date: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/Date: $$dt/" DESCRIPTION;
 
 clean:
-	rm -rf *~ */*~ */*.Rd *.Rhistroy NAMESPACE *.tar.gz *.Rcheck/ *.tgz
+	rm -rf *~ */*~ */*.Rd *.Rhistroy *.tar.gz *.Rcheck/ *.tgz
