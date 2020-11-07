@@ -817,7 +817,7 @@ approximate the exact test when needed.
 
 
 The numerical interface is illustrated with the DS method by setting
-\code{method = "ds''}:
+\code{method = "ds"}:
 <<clus-rs-ds>>=
 clusWilcox.test(x, group = grp, cluster = cid, data = dat.cl, method = "ds")
 @
