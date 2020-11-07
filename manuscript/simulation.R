@@ -1,5 +1,6 @@
 ## R code for simulation tables in 'clusrank.Rnw'
 ## need to source('clusrank.R') first
+source("clusrank.R")
 
 nrep <- 4000
 
