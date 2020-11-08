@@ -785,25 +785,13 @@ sum.tab.sr.a <- rbind(sr.b.a.1.2, sr.b.a.5.2, sr.b.a.9.2,
                       sr.ub.a.1.10, sr.ub.a.5.10, sr.ub.a.9.10) * 100
 
 
-
-
-
-
-
-
-
-
-
+save.image("sim.RData")
 
 library(xtable)
 
-sum.tab.rs.e2 <- as.data.frame(sum.tab.rs.e / nrep)
-sum.tab.rs.a2 <- as.data.frame(sum.tab.rs.a / nrep)
-sum.tab.sr.e2 <- as.data.frame(sum.tab.sr.e / nrep)
-sum.tab.sr.a2 <- as.data.frame(sum.tab.sr.a / nrep)
 
-colnames(sum.tab.rs.e2) <- paste0(rep(c("RGL", "DS"), 3), c("(d=0)", "", "(d=0.2)", "", "(d=0.5)", ""))
-sum.tab.rs.e3 <- cbind(N = c("20", "50"), sum.tab.rs.e2)
+colnames(sum.tab.rs.e) <- paste0(rep(c("RGL", "DS"), 3), c("(d=0)", "", "(d=0.2)", "", "(d=0.5)", ""))
+sum.tab.rs.e3 <- cbind(N = c("20", "50"), sum.tab.rs.e)
 sum.tab.rs.e3 <- cbind(rho = c("0.1, 0.1", "", "0.5, 0.5", "", "$-$0.1, 0.9",  ""), sum.tab.rs.e3)
 ni <- c(2, rep("", 5), 5, rep("", 5), 10, rep("", 5))
 sum.tab.rs.e3 <- cbind(ni = ni, sum.tab.rs.e3)
@@ -814,13 +802,8 @@ sum.tab.rs.e3 <- cbind(grplev = grplev, sum.tab.rs.e3)
 print(xtable(sum.tab.rs.e3, caption = "Empirical rejection percentage of the RGL and the DS methods for rank-sum tests at nominal significance level 0.05 when intracluster correlation is exchangable. The results are based on nrep datasets.", digits = 1), include.rownames = FALSE, sanitize.text.function = function(x) {x})
 
 
-
-
-
-
-
-colnames(sum.tab.rs.a2) <- paste0(rep(c("RGL", "DS"), 3), c("(d=0)", "", "(d=0.2)", "", "(d=0.5)", ""))
-sum.tab.rs.a3 <- cbind(N = c("20", "50"), sum.tab.rs.a2)
+colnames(sum.tab.rs.a) <- paste0(rep(c("RGL", "DS"), 3), c("(d=0)", "", "(d=0.2)", "", "(d=0.5)", ""))
+sum.tab.rs.a3 <- cbind(N = c("20", "50"), sum.tab.rs.a)
 sum.tab.rs.a3 <- cbind(rho = c("0.1, 0.1", "", "0.5, 0.5", "", "$-$0.1, 0.9", ""), sum.tab.rs.a3)
 ni <- c(2, rep("", 5), 5, rep("", 5), 10, rep("", 5))
 sum.tab.rs.a3 <- cbind(ni = ni, sum.tab.rs.a3)
@@ -831,8 +814,8 @@ sum.tab.rs.a3 <- cbind(grplev = grplev, sum.tab.rs.a3)
 print(xtable(sum.tab.rs.a3, caption = "Empirical rejection percentage of the RGL and the DS methods for rank-sum tests at nominal significance level 0.05 when intracluster correlation is AR1. The results are based on nrep datasets.", digits = 1), include.rownames = FALSE, sanitize.text.function = function(x) {x})
 
 
-colnames(sum.tab.sr.e2) <- paste0(rep(c("RGL", "DS"), 3), c("(d=0)", "", "(d=0.2)", "", "(d=0.5)", ""))
-sum.tab.sr.e3 <- cbind(N = c("20", "50"), sum.tab.sr.e2)
+colnames(sum.tab.sr.e) <- paste0(rep(c("RGL", "DS"), 3), c("(d=0)", "", "(d=0.2)", "", "(d=0.5)", ""))
+sum.tab.sr.e3 <- cbind(N = c("20", "50"), sum.tab.sr.e)
 sum.tab.sr.e3 <- cbind(rho = c("0.1", "", "0.5", "", "0.9",  ""), sum.tab.sr.e3)
 ni <- c(2, rep("", 5), 10, rep("", 5), 5, rep("", 5), 10, rep("", 5))
 sum.tab.sr.e3 <- cbind(ni = ni, sum.tab.sr.e3)
@@ -841,12 +824,8 @@ sum.tab.sr.e3 <- cbind(missingrate = missingrate, sum.tab.sr.e3)
 print(xtable(sum.tab.sr.e3, caption = "Empirical rejection percentage of the RGL and DS methods for signed-rank tests at nominal significance level 0.05 with exchangable intracluster correlation. The results are based on nrep datasets.", digits = 1), include.rownames = FALSE)
 
 
-
-
-
-
-colnames(sum.tab.sr.a2) <- paste0(rep(c("RGL", "DS"), 3), c("(d=0)", "", "(d=0.2)", "", "(d=0.5)", ""))
-sum.tab.sr.a3 <- cbind(N = c("20", "50"), sum.tab.sr.a2)
+colnames(sum.tab.sr.a) <- paste0(rep(c("RGL", "DS"), 3), c("(d=0)", "", "(d=0.2)", "", "(d=0.5)", ""))
+sum.tab.sr.a3 <- cbind(N = c("20", "50"), sum.tab.sr.a)
 sum.tab.sr.a3 <- cbind(rho = c("0.1", "", "0.5", "", "0.9", ""), sum.tab.sr.a3)
 ni <- c(2, rep("", 5), 10, rep("", 5), 5, rep("", 5), 10, rep("", 5))
 sum.tab.sr.a3 <- cbind(ni = ni, sum.tab.sr.a3)
