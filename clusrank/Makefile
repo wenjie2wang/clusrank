@@ -31,7 +31,7 @@ $(tar): $(objects)
 	@Rscript -e "library(methods);" \
 	-e "Rcpp::compileAttributes()" \
 	-e "devtools::document();";
-	@$(MAKE) updateTimestamp
+#	@$(MAKE) updateTimestamp
 	R CMD build .
 
 $(checkLog): $(tar)
@@ -50,9 +50,9 @@ pkgdown:
 
 
 ## update copyright year in HEADER, R script and date in DESCRIPTION
-.PHONY: updateTimestamp
-updateTimestamp:
-	@bash misc/update_timestamp.sh
+# .PHONY: updateTimestamp
+# updateTimestamp:
+# 	@bash misc/update_timestamp.sh
 
 ## make tags
 .PHONY: TAGS

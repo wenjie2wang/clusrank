@@ -1,22 +1,19 @@
 ################################################################################
 ##
-##   R package clusrank by Mei-Ling Ting Lee, Jun Yan, and Yujing Jiang
-##   Copyright (C) 2015-2017
+## clusrank: Wilcoxon Rank Tests for Clustered Data
+## Copyright (C) 2015-2020  Yujing Jiang, Mei-Ling Ting Lee, and Jun Yan
 ##
-##   This file is part of the R package clusrank.
+## This file is part of the R package clusrank.
 ##
-##   The R package clusrank is free software: you can redistribute it and/or
-##   modify it under the terms of the GNU General Public License as published
-##   by the Free Software Foundation, either version 3 of the License, or
-##   (at your option) any later version.
+## The R package clusrank is free software: You can redistribute it and/or
+## modify it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or any later
+## version (at your option). See the GNU General Public License at
+## <https://www.gnu.org/licenses/> for details.
 ##
-##   The R package clusrank is distributed in the hope that it will be useful,
-##   but WITHOUT ANY WARRANTY without even the implied warranty of
-##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##   GNU General Public License for more details.
-##
-##   You should have received a copy of the GNU General Public License
-##   along with the R package clusrank. If not, see <http://www.gnu.org/licenses/>.
+## The R package clusrank is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ##
 ################################################################################
 #' Clustered Stratified Data for Testing the Clustered Rank Sum Test
