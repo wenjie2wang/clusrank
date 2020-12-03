@@ -6,9 +6,10 @@ Description: Non-parametric tests (Wilcoxon rank sum test and Wilcoxon signed ra
 Imports: stats, MASS, Rcpp (>= 0.12.2)
 Authors@R: c(person(given = "Yujing", family = "Jiang",
                     email = "yujing.jiang@uconn.edu",
-                    role = c("aut","cre")),
+                    role = c("aut")),
              person(given = "Mei-Ling Ting", family = "Lee", role = "ctb"),
-             person(given = "Jun", family = "Yan", role = "ctb"))
+             person(given = "Jun", family = "Yan", role = c("ctb", "cre"),
+	            email = "jun.yan@uconn.edu"))
 License: GPL (>=3)
 Depends:
   R (>= 4.0.3)
