@@ -1,37 +1,66 @@
-pkg = clusrank
-header = HEADER
+objects := DESCRIPTION \
+	$(wildcard R/*.R) \
+	$(wildcard src/*.cpp) \
+	$(wildcard inst/include/*.h) \
+	$(wildcard inst/include/intsurv/*.h) \
+	$(wildcard inst/examples/*.R)
+version := $(shell grep "Version" DESCRIPTION | awk '{print $$NF}')
+pkg := $(shell grep "Package" DESCRIPTION | awk '{print $$NF}')
+tar := $(pkg)_$(version).tar.gz
+checkLog := $(pkg).Rcheck/00check.log
+# tests := $(wildcard tests/testthat/*.R)
+# rmd := vignettes/$(pkg)-intro.Rmd
+# vignettes := vignettes/$(pkg)-intro.html
 
-Rpkg: Rd build
-	make check
-	make INSTALL
+.PHONY: check
+check: $(checkLog)
 
-Rd:
-	Rscript -e "library(roxygen2); roxygenize();  library(methods); devtools::document();"
+.PHONY: build
+build: $(tar)
 
-build:  Rd
-	R CMD build ../$(pkg) --compact-vignettes="gs+qpdf"
+.PHONY: install
+install: $(tar)
+	R CMD INSTALL $(tar)
 
-check: $(pkg)_*.tar.gz
-	R CMD check $(pkg)_*.tar.gz
+# .PHONY: preview
+# preview: $(vignettes)
 
-INSTALL: $(pkg)_*.tar.gz
-	sudo R CMD INSTALL --build $(pkg)_*.tar.gz
+
+$(tar): $(objects)
+	@rm -rf src/RcppExports.cpp R/RcppExports.R
+	@Rscript -e "library(methods);" \
+	-e "Rcpp::compileAttributes()" \
+	-e "devtools::document();";
+	@$(MAKE) updateTimestamp
+	R CMD build .
+
+$(checkLog): $(tar)
+	R CMD check $(tar)
+
+.PHONY: check-as-cran
+check-as-cran: $(tar)
+	R CMD check --as-cran $(tar)
+
+# $(vignettes): $(rmd)
+#	Rscript -e "rmarkdown::render('$(rmd)')"
+
+.PHONY: pkgdown
+pkgdown:
+	@Rscript -e "library(methods); pkgdown::build_site();"
+
 
 ## update copyright year in HEADER, R script and date in DESCRIPTION
-updateHeader:
-	yr=$$(date +"%Y");\
-	sed -i "s/Copyright (C) [0-9]\{4\}/Copyright (C) $$yr/" $(header);\
-# add HEADER file if there is no header
-	for Rfile in R/*.R; do \
-	if ! grep -e 'Copyright (C)' $$Rfile ;\
-	then cat $(header) $$Rfile > tmp ;\
-	mv tmp $$Rfile;\
-	fi;\
-	yr=$$(date +"%Y");\
-	sed -i "s/Copyright (C) [0-9]\{4\}/Copyright (C) $$yr/" $$Rfile;\
-	done;\
-	dt=$$(date +"%Y-%m-%d");\
-	sed -i "s/Date: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/Date: $$dt/" DESCRIPTION;
+.PHONY: updateTimestamp
+updateTimestamp:
+	@bash misc/update_timestamp.sh
 
+## make tags
+.PHONY: TAGS
+TAGS:
+	Rscript -e "utils::rtags(path = 'R', ofile = 'TAGS')"
+	gtags
+
+## do some cleaning
+.PHONY: clean
 clean:
-	rm -rf *~ */*~ */*.Rd *.Rhistroy NAMESPACE *.tar.gz *.Rcheck/ *.tgz
+	@$(RM) -rf *~ */*~ *.Rhistroy src/{*.o,*.so} *.tar.gz *.Rcheck/ .\#*
