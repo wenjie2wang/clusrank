@@ -56,14 +56,12 @@ int crksum(int rks, int I, int J, int sumrks, int minrks, int maxrks) {
 double pcrksum(int rks, int I, IntegerVector Score, int Csize) {
   int sumrks, minrks, maxrks, n, J;
   IntegerVector idx, score_sub;
-  int N;
   double  nrksum = 0;
   meanrks = I * (I + 1) / 2;
   score_ = Score;
   csize = Csize;
   n = Score.size();
   J = n - I;
-  N = Rf_choose(I + J, I);
   sumrks = sum(Score);
   idx = seq_len(I) - 1;
   score_sub = score_[idx];
@@ -165,11 +163,10 @@ int csrkg(int srk, IntegerVector Score) {
   /* Count the no of combination with a sum rank less than srk */
   /* The sum rank is sum(rank[ rank > 0]) in the programme*/
   /* The input sum rank is sum(sign(rank) * rank) */
-  int N, max_s, sum_s, u, j, k;
+  int N, max_s, u, j, k;
   IntegerVector compare(2), w1;
   N = Score.size();
   max_s = max(Score);
-  sum_s = sum(Score);
   u = max_s * (max_s + 1) / 2;
   if((srk < 0) | (srk > u))
     return 0;
