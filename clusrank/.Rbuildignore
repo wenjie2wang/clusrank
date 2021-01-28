@@ -8,3 +8,4 @@
 ^tests$
 ^vignettes/jss.cls$
 ^COPYRIGHT$
+^misc/*

@@ -1,0 +1,27 @@
+bibentry(bibtype = "Article",
+  title        = "{W}ilcoxon Rank-Based Tests for Clustered Data with {R} Package {clusrank}",
+  author       = c(person(given = "Yujing",
+                          family = "Jiang",
+                          email = "yujing.jiang@uconn.edu"),
+                   person(given = c("Mei-Ling", "Ting"),
+                          family = "Lee",
+                          email = "mltlee@umd.edu"),
+                   person(given = "Xin",
+                          family = "He",
+                          email = "xinhe@umd.edu"),
+                   person(given = "Bernard",
+                          family = "Rosner",
+                          email = "stbar@channing.harvard.edu"),
+                   person(given = "Jun",
+                          family = "Yan",
+                          email = "jun.yan@uconn.edu")),
+  journal      = "Journal of Statistical Software",
+  year         = "2020",
+  volume       = "96",
+  number       = "6",
+  pages        = "1--26",
+  doi          = "10.18637/jss.v096.i06",
+
+  header       = "To cite clusrank in publications use:"
+)
+

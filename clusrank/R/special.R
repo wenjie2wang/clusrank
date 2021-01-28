@@ -1,22 +1,19 @@
 ################################################################################
 ##
-##   R package clusrank by Mei-Ling Ting Lee, Jun Yan, and Yujing Jiang
-##   Copyright (C) 2015-2020
+## clusrank: Wilcoxon Rank Tests for Clustered Data
+## Copyright (C) 2015-2020  Yujing Jiang, Mei-Ling Ting Lee, and Jun Yan
 ##
-##   This file is part of the R package clusrank.
+## This file is part of the R package clusrank.
 ##
-##   The R package clusrank is free software: you can redistribute it and/or
-##   modify it under the terms of the GNU General Public License as published
-##   by the Free Software Foundation, either version 3 of the License, or
-##   (at your option) any later version.
+## The R package clusrank is free software: You can redistribute it and/or
+## modify it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or any later
+## version (at your option). See the GNU General Public License at
+## <https://www.gnu.org/licenses/> for details.
 ##
-##   The R package clusrank is distributed in the hope that it will be useful,
-##   but WITHOUT ANY WARRANTY without even the implied warranty of
-##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##   GNU General Public License for more details.
-##
-##   You should have received a copy of the GNU General Public License
-##   along with the R package clusrank. If not, see <http://www.gnu.org/licenses/>.
+## The R package clusrank is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ##
 ################################################################################
 
@@ -59,10 +56,10 @@ cluster <- function(x) {x}
 stratum <- function(x) {x}
 
 
-untangle.specials <- function (tt, special, order = 1) 
+untangle.specials <- function (tt, special, order = 1)
 {
     spc <- attr(tt, "specials")[[special]]
-    if (length(spc) == 0) 
+    if (length(spc) == 0)
         return(list(vars = character(0), terms = numeric(0)))
     facs <- attr(tt, "factors")
     fname <- dimnames(facs)
@@ -79,7 +76,7 @@ extractTerm <- function(term, mf, nobs, paired) {
     } else {
         term.mf <- attr(attr(mf, "terms"), "specials")[[term]]
     }
-    
+
     if (length(term.mf) == 0) {
         if (term == "cluster") var <- c(1 : nobs)
         if (term == "stratum") var <- rep(1, nobs)
@@ -120,10 +117,10 @@ extractTerm <- function(term, mf, nobs, paired) {
         }
 
         var <- keep
-        
+
         if (is.numeric(uniq) | is.character(uniq)) {
             var <- keep
-            if (is.character(uniq)) var <- recoderFunc(keep, uniq, c(1 : uniq.l)) 
+            if (is.character(uniq)) var <- recoderFunc(keep, uniq, c(1 : uniq.l))
         } else {
             stop(paste(term, "id should be numeric or character"))
         }
@@ -136,7 +133,7 @@ extractTerm <- function(term, mf, nobs, paired) {
 extractVar <- function(var, pars, data) {
     if (!is.null(pars[[var]])) {
         return(data[, as.character(pars[[var]])])
-    } 
+    }
 }
 
 extractName <- function(var, pars) {
@@ -146,9 +143,8 @@ extractName <- function(var, pars) {
         } else {
             if (var == "x") return(paste0(pars[[var]], ";"))
             return(paste0(" ", var, ": ", pars[[var]], ";"))
-        } 
+        }
     } else {
         return(NULL)
     }
 }
-
