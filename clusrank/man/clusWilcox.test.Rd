@@ -50,7 +50,7 @@ the \code{rhs} is of the form group + \code{cluster}(x1) +
 \code{stratum}(x2) for clustered rank sum test, where
 \code{x1} and \code{x2} are cluster id and stratum id in the
 data frame \code{data}. For clustered signed rank test, the
-\code{rhs} only contains \code{cluster}{x1}.}
+\code{rhs} should only contain \code{cluster}(x1).}
 
 \item{data}{An optional data frame containing the variables.}
 

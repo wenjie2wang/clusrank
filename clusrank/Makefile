@@ -1,9 +1,4 @@
-objects := DESCRIPTION \
-	$(wildcard R/*.R) \
-	$(wildcard src/*.cpp) \
-	$(wildcard inst/include/*.h) \
-	$(wildcard inst/include/intsurv/*.h) \
-	$(wildcard inst/examples/*.R)
+objects := DESCRIPTION $(wildcard R/*.R) $(wildcard src/*.cpp)
 version := $(shell grep "Version" DESCRIPTION | awk '{print $$NF}')
 pkg := $(shell grep "Package" DESCRIPTION | awk '{print $$NF}')
 tar := $(pkg)_$(version).tar.gz
@@ -31,7 +26,7 @@ $(tar): $(objects)
 	@Rscript -e "library(methods);" \
 	-e "Rcpp::compileAttributes()" \
 	-e "devtools::document();";
-#	@$(MAKE) updateTimestamp
+	@$(MAKE) updateTimestamp
 	R CMD build .
 
 $(checkLog): $(tar)
@@ -50,9 +45,9 @@ pkgdown:
 
 
 ## update copyright year in HEADER, R script and date in DESCRIPTION
-# .PHONY: updateTimestamp
-# updateTimestamp:
-# 	@bash misc/update_timestamp.sh
+.PHONY: updateTimestamp
+updateTimestamp:
+	@bash misc/update_timestamp.sh
 
 ## make tags
 .PHONY: TAGS

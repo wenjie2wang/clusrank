@@ -1,7 +1,7 @@
 ################################################################################
 ##
 ## clusrank: Wilcoxon Rank Tests for Clustered Data
-## Copyright (C) 2015-2020  Yujing Jiang, Mei-Ling Ting Lee, and Jun Yan
+## Copyright (C) 2015-2021  Yujing Jiang, Mei-Ling Ting Lee, and Jun Yan
 ##
 ## This file is part of the R package clusrank.
 ##
@@ -56,7 +56,7 @@
 ##'     \code{stratum}(x2) for clustered rank sum test, where
 ##'     \code{x1} and \code{x2} are cluster id and stratum id in the
 ##'     data frame \code{data}. For clustered signed rank test, the
-##'     \code{rhs} only contains \code{cluster}{x1}.
+##'     \code{rhs} should only contain \code{cluster}(x1).
 ##' @param data An optional data frame containing the variables.
 ##' @param subset An optional vector specifying a subset of
 ##'     observations to be used.

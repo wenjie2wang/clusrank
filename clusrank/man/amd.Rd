@@ -60,6 +60,6 @@ Ferrara D, Seddon JM (2015)
 factor H R1210C rare genetic variant in
 age-related macular degeneration}
 JAMA Ophthalmol, 2015 Apr 16.
-\url{http://archopht.jamanetwork.com/article.aspx?articleid=2213742}.
+doi:10.1001/jamaophthalmol.2015.0814.
 }
 \keyword{datasets}

@@ -1,7 +1,7 @@
 ################################################################################
 ##
 ## clusrank: Wilcoxon Rank Tests for Clustered Data
-## Copyright (C) 2015-2020  Yujing Jiang, Mei-Ling Ting Lee, and Jun Yan
+## Copyright (C) 2015-2021  Yujing Jiang, Mei-Ling Ting Lee, and Jun Yan
 ##
 ## This file is part of the R package clusrank.
 ##
@@ -56,10 +56,10 @@ cluster <- function(x) {x}
 stratum <- function(x) {x}
 
 
-untangle.specials <- function (tt, special, order = 1) 
+untangle.specials <- function (tt, special, order = 1)
 {
     spc <- attr(tt, "specials")[[special]]
-    if (length(spc) == 0) 
+    if (length(spc) == 0)
         return(list(vars = character(0), terms = numeric(0)))
     facs <- attr(tt, "factors")
     fname <- dimnames(facs)
@@ -76,7 +76,7 @@ extractTerm <- function(term, mf, nobs, paired) {
     } else {
         term.mf <- attr(attr(mf, "terms"), "specials")[[term]]
     }
-    
+
     if (length(term.mf) == 0) {
         if (term == "cluster") var <- c(1 : nobs)
         if (term == "stratum") var <- rep(1, nobs)
@@ -117,10 +117,10 @@ extractTerm <- function(term, mf, nobs, paired) {
         }
 
         var <- keep
-        
+
         if (is.numeric(uniq) | is.character(uniq)) {
             var <- keep
-            if (is.character(uniq)) var <- recoderFunc(keep, uniq, c(1 : uniq.l)) 
+            if (is.character(uniq)) var <- recoderFunc(keep, uniq, c(1 : uniq.l))
         } else {
             stop(paste(term, "id should be numeric or character"))
         }
@@ -133,7 +133,7 @@ extractTerm <- function(term, mf, nobs, paired) {
 extractVar <- function(var, pars, data) {
     if (!is.null(pars[[var]])) {
         return(data[, as.character(pars[[var]])])
-    } 
+    }
 }
 
 extractName <- function(var, pars) {
@@ -143,9 +143,8 @@ extractName <- function(var, pars) {
         } else {
             if (var == "x") return(paste0(pars[[var]], ";"))
             return(paste0(" ", var, ": ", pars[[var]], ";"))
-        } 
+        }
     } else {
         return(NULL)
     }
 }
-

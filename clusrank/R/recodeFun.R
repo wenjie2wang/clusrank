@@ -1,7 +1,7 @@
 ################################################################################
 ##
 ## clusrank: Wilcoxon Rank Tests for Clustered Data
-## Copyright (C) 2015-2020  Yujing Jiang, Mei-Ling Ting Lee, and Jun Yan
+## Copyright (C) 2015-2021  Yujing Jiang, Mei-Ling Ting Lee, and Jun Yan
 ##
 ## This file is part of the R package clusrank.
 ##
@@ -17,21 +17,20 @@
 ##
 ################################################################################
 recoderFunc <- function(data, oldvalue, newvalue) {
-    
-    ## convert any factors to characters    
+
+    ## convert any factors to characters
     if (is.factor(data))     data     <- as.character(data)
     if (is.factor(oldvalue)) oldvalue <- as.character(oldvalue)
     if (is.factor(newvalue)) newvalue <- as.character(newvalue)
-    
-    ## create the return vector
-    
-    newvec <- data
-    
-    ## put recoded values into the correct position in the return vector
-    
-    for (i in unique(oldvalue)) newvec[data == i] <- newvalue[oldvalue == i]
-    
-    newvec
-    
-}
 
+    ## create the return vector
+
+    newvec <- data
+
+    ## put recoded values into the correct position in the return vector
+
+    for (i in unique(oldvalue)) newvec[data == i] <- newvalue[oldvalue == i]
+
+    newvec
+
+}
