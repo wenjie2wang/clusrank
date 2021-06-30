@@ -25,7 +25,7 @@ recoderFunc <- function(data, oldvalue, newvalue) {
 
     ## create the return vector
 
-    newvec <- data
+    newvec <- rep(NA, length(data))
 
     ## put recoded values into the correct position in the return vector
 

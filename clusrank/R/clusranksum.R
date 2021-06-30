@@ -938,7 +938,8 @@ clusWilcox.test.ranksum.ds <- function(x, cluster, group,
                                                alternative,
                                                mu, exact, B, DNAME, METHOD))
     }
-    group.uniq <- length(unique(group))
+    uni_group <- unique(group)
+    group.uniq <- length(uni_group)
     if (group.uniq == 1) {
         stop("invalid group variable, should contain at least 2 groups")
     }
@@ -970,9 +971,9 @@ clusWilcox.test.ranksum.ds <- function(x, cluster, group,
 
     if (group.uniq == 2) {
 ###calculate quantity 2 (using the pooled estimate of F)
-        group <- recoderFunc(group, sort(unique(group)), c(1, 0))
+        group <- recoderFunc(group, sort(uni_group), c(1L, 0L))
         x[which(group == 0)] <- x[which(group == 0)] - mu
-        ni1 <- aggregate(group ~ cluster, FUN = sum)[, 2] # number of obs under trt 2 in each cluster
+        ni1 <- tapply(group, cluster, sum) # number of obs under trt 2 in each cluster
         if (all(ni1 / ni == 0.5)) {
             warning("The DS ranksum test is not reliable for colateral data where each cluster is equally split between the 2 treatments.")
         }
