@@ -1,11 +1,11 @@
-^\.*\.Rproj$
-^\.Rproj\.user$
 \.tar\.gz$
+^COPYRIGHT$
 ^Makefile$
 ^README.md$
-^simulation$
+^\.*\.Rproj$
+^\.Rproj\.user$
 ^manuscript$
+^misc/*
+^simulation$
 ^tests$
 ^vignettes/jss.cls$
-^COPYRIGHT$
-^misc/*

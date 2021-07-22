@@ -1,0 +1,6 @@
+*.Rcheck
+*.o
+*.so
+*.tar.gz
+TAGS
+working

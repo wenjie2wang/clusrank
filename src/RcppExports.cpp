@@ -5,6 +5,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // Fprop
 NumericVector Fprop(NumericVector x, NumericVector clus, IntegerVector nvec, int m, int n);
 RcppExport SEXP _clusrank_Fprop(SEXP xSEXP, SEXP clusSEXP, SEXP nvecSEXP, SEXP mSEXP, SEXP nSEXP) {
