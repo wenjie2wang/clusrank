@@ -3,6 +3,7 @@
 ^COPYRIGHT$
 ^Makefile$
 ^README.md$
+^TAGS$
 ^\.*\.Rproj$
 ^\.Rproj\.user$
 ^manuscript$
@@ -10,3 +11,4 @@
 ^simulation$
 ^tests$
 ^vignettes/jss.cls$
+^working$
