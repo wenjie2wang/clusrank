@@ -94,7 +94,9 @@ clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
     if (exact == TRUE) {
         METHOD <- paste0(METHOD, " (exact)")
         if (length(table(cluster)) > 40)
-            print("Number of clusters exceeds 40 for RGL clustered signed-rank test, the exact signed rank test may not work due to overflow.")
+            warning("Number of clusters exceeds 40",
+                    " for RGL clustered signed-rank test,",
+                    " the exact signed rank test may not work due to overflow.")
         T <- sum(data$signrank)
         srksum <-  stats::aggregate(signrank ~ cluster, FUN = sum)[, 2]
         T.pos <- sum(srksum[srksum > 0])
