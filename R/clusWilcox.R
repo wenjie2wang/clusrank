@@ -363,11 +363,11 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
         stop("not enough (finite) 'x' observation")
     }
 
-    if (paired == TRUE) {
+    if (paired) {
         if (length(table(stratum)) > 1L) {
             warning("'stratum' will be ignored for the clustered signed rank test")
         }
-        x <- x - mu
+        ## x <- x - mu
         METHOD <- "Clustered Wilcoxon signed rank test"
         if (method == "rgl") {
             METHOD <- paste(METHOD, "using Rosner-Glynn-Lee method", sep = " ")
