@@ -1,10 +1,10 @@
 \.tar\.gz$
-^.github$
 ^COPYRIGHT$
 ^Makefile$
 ^TAGS$
 ^\.*\.Rproj$
 ^\.Rproj\.user$
+^\.github$
 ^manuscript$
 ^misc/*
 ^simulation$
