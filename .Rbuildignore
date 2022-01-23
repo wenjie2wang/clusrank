@@ -2,7 +2,6 @@
 ^.github$
 ^COPYRIGHT$
 ^Makefile$
-^README.md$
 ^TAGS$
 ^\.*\.Rproj$
 ^\.Rproj\.user$
