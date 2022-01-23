@@ -1,7 +1,7 @@
 ################################################################################
 ##
 ## clusrank: Wilcoxon Rank Tests for Clustered Data
-## Copyright (C) 2015-2021  Yujing Jiang, Mei-Ling Ting Lee, and Jun Yan
+## Copyright (C) 2015-2022  Yujing Jiang, Mei-Ling Ting Lee, and Jun Yan
 ##
 ## This file is part of the R package clusrank.
 ##
@@ -379,7 +379,6 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
             result <- do.call("clusWilcox.test.signedrank.rgl", c(arglist))
             return(result)
         }
-
         if (method == "ds") {
             if (exact == TRUE & B == 0) {
                 stop("Exact exactutation test is not available for 'ds' method.")
@@ -392,13 +391,11 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
             result <-  do.call("clusWilcox.test.signedrank.ds",
                                c(arglist))
             return(result)
-        } else {
-            stop("Method should be one of 'rgl' and 'ds'.")
         }
-
-    } else {
+        stop("Method should be one of 'rgl' and 'ds'.")
+    } else { # else, paired = FALSE
         METHOD <- "Clustered Wilcoxon rank sum test"
-        if ((method) == "rgl") {
+        if (method == "rgl") {
             METHOD <- paste( METHOD, "using Rosner-Glynn-Lee method", sep = " ")
             arglist <- setNames(list(x, cluster, group, stratum,
                                      alternative, mu, DNAME,
@@ -409,8 +406,6 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
             result <- do.call("clusWilcox.test.ranksum.rgl", c(arglist))
             return(result)
         }
-
-
         if (method == "dd") {
             if (exact == TRUE & B == 0) {
                 stop("Exact exactutation test is not available for 'dd' method.")
@@ -423,8 +418,6 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
             return(result)
 
         }
-
-
         if ((method) == "ds") {
             METHOD <- paste(METHOD, "using Datta-Satten method", sep = " ")
             arglist <- setNames(list(x, cluster, group, mu, alternative,
@@ -442,9 +435,6 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
             result <- do.call("clusWilcox.test.ranksum.ds", c(arglist))
             return(result)
         }
-
-        else {
-            stop("Method should be one of 'rgl', 'dd' or 'ds'.")
-        }
+        stop("Method should be one of 'rgl', 'dd' or 'ds'.")
     }
 }
