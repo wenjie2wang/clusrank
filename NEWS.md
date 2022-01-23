@@ -3,7 +3,7 @@
 ## Bug fixes
 
 * Fixed the tests for a nonzero location `mu` by removing a
-  duplicated subtraction of `mu` from `x`.  Thanks Iaroslav Pashentsev for the
+  duplicated subtraction of `mu` from `x`.  Thank Iaroslav Pashentsev for the
   bug report.
 
 
@@ -11,5 +11,5 @@
 
 ## Bug fixes
 
-* Fixed an internal function for encoding.  Thanks Dipankar Bandyopadhyay for
-  the bug report.
+* Fixed an internal function for encoding.  Thank Dipankar Bandyopadhyay for the
+  bug report.
