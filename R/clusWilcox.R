@@ -164,8 +164,8 @@
 #'     Informative}.
 #' Biometrics, \bold{72}, 432-440.
 #'
-#' @importFrom stats complete.cases na.omit terms complete.cases model.extract aggregate
-#' @importFrom stats lm ecdf pnorm qnorm var  pchisq setNames lag
+#' @importFrom stats complete.cases na.omit terms complete.cases model.extract
+#'     aggregate lm ecdf pnorm qnorm var pchisq setNames lag as.formula
 #' @importFrom MASS ginv
 #' @importFrom Rcpp evalCpp
 #' @useDynLib clusrank, .registration = TRUE
@@ -187,6 +187,10 @@ clusWilcox.test <- function(x, ...) {
             x <- data.temp[, as.character(pars$x)]
         }
     }
+    ## see https://github.com/wenjie2wang/clusrank/issues/1
+    if (is.language(x)) {
+        x <- eval(x, envir = parent.frame())
+    }
     UseMethod("clusWilcox.test", x)
 }
 
@@ -206,8 +210,6 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
         stop("'formula' missing or incorrect")
     }
     m <- match.call(expand.dots = FALSE)
-
-
     if (is.matrix(eval(m$data, parent.frame()))) {
         m$data <- as.data.frame(data)
     }
@@ -215,7 +217,7 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
     m[[1L]] <- quote(stats::model.frame)
     m$... <- NULL
     m$formula <- if(missing(data)) terms(formula, special)
-                 else terms(formula, special, data = data)
+                 else terms(as.formula(formula), special, data = data)
     subset.ind <- NULL
     if (!missing(subset)) {
         if ("subset" %in% names(m)) subset.ind <- which(names(m) == "subset")
