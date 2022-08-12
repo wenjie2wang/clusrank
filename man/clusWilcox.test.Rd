@@ -160,11 +160,11 @@ The exact test is only available for RGL signed rank test and  RGL
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{formula}: \code{S3} method for class 'formula'
+\item \code{clusWilcox.test(formula)}: \code{S3} method for class 'formula'
 
-\item \code{default}: Default \code{S3} method.
+\item \code{clusWilcox.test(default)}: Default \code{S3} method.
+
 }}
-
 \section{Warning}{
 
 This function can use large amounts of memory and stack if 'exact =
