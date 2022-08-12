@@ -2,7 +2,7 @@
 
 ## Minor changes
 
-* Enhanced `clusWilcox()` to allow a `language` object.
+* Enhanced `clusWilcox.test()` to allow a `language` object.
   [#1](https://github.com/wenjie2wang/clusrank/issues/1)
 
 
