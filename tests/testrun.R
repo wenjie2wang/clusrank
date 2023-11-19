@@ -1,6 +1,7 @@
-
-
 library(clusrank)
+packageVersion("clusrank")
+set.seed(123)
+
 data(crsd)
 clusWilcox.test(z, cluster = id, data = crsd, paired = TRUE, method = "rgl")
 clusWilcox.test(z, cluster = id, data = crsd, paired = TRUE, method = "rgl", alternative = "greater", mu = 1)

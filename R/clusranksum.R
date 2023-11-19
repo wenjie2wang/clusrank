@@ -171,17 +171,9 @@ clusWilcox.test.ranksum.rgl.clus.exact <- function(x, cluster, group,
                                                             group.temp,
                                                             str.temp)
     }
-
-    w.ecdf <- ecdf(W.vec)
-
-    pval<- switch(alternative,
-                  less = w.ecdf(W),
-                  greater = 1 - w.ecdf(W),
-                  two.sided = 2 * min(w.ecdf(W), 1 - w.ecdf(W)))
+    pval <- perm_pvalue(W, W.vec, alternative)
     names(mu) <- "difference in locations"
-
     names(W) <- "W"
-
     result <- list(statistic = W, p.value = pval,
                    null.value = mu, alternative = alternative,
                    data.name = DNAME, method = METHOD,
@@ -189,11 +181,6 @@ clusWilcox.test.ranksum.rgl.clus.exact <- function(x, cluster, group,
                    nobs = n.obs)
     class(result) <- "ctest"
     return(result)
-
-
-
-
-
 }
 
 
@@ -557,29 +544,19 @@ clusWilcox.test.ranksum.rgl.sub.exact <- function(x, cluster, group,
                                                            cluster.temp,
                                                            group.temp, stratum)
     }
-
-        w.ecdf <- ecdf(W.vec)
-
-        pval<- switch(alternative,
-                      less = w.ecdf(W),
-                      greater = 1 - w.ecdf(W),
-                      two.sided = 2 * min(w.ecdf(W), 1 - w.ecdf(W)))
-        names(mu) <- "shift in location"
-        if (bal == TRUE) names(W) <- "W"
-        else names(W) = "Z"
-
-        result <- list(statistic = W, p.value = pval,
+    pval <- perm_pvalue(W, W.vec, alternative)
+    names(mu) <- "shift in location"
+    if (bal)
+        names(W) <- "W"
+    else
+        names(W) = "Z"
+    result <- list(statistic = W, p.value = pval,
                    null.value = mu, alternative = alternative,
                    data.name = DNAME, method = METHOD,
                    balance = bal, exact = exact, B = B,  nclus = n.clus,
                    nobs = n.obs)
-        class(result) <- "ctest"
-        return(result)
-
-
-
-
-
+    class(result) <- "ctest"
+    return(result)
 }
 
 
@@ -896,13 +873,8 @@ clusWilcox.test.ranksum.ds.exact <- function(x, cluster, group,
         grp.temp <- sample(group, n.obs)
         W.vec[i] <- clusWilcox.test.ranksum.ds.exact.1(x, cluster,
                                                       grp.temp, 0)
-
     }
-
-    w.ecdf <- ecdf(W.vec)
-    pval <- switch(alternative, less = w.ecdf(W),
-                   greater = 1 - w.ecdf(W),
-                   two.sided = 2 * min(w.ecdf(W), 1 - w.ecdf(W)))
+    pval <- perm_pvalue(W, W.vec, alternative)
     METHOD <- paste0(METHOD, " (Random Permutation)")
     names(mu) <- "difference in locations"
 
