@@ -1,7 +1,8 @@
-################################################################################
 ##
 ## clusrank: Wilcoxon Rank Tests for Clustered Data
-## Copyright (C) 2015-2022  Yujing Jiang, Mei-Ling Ting Lee, and Jun Yan
+##
+## Copyright (C) 2015-2023 Yujing Jiang, Mei-Ling Ting Lee, and Jun Yan
+## Copyright (C) 2022-2023 Wenjie Wang
 ##
 ## This file is part of the R package clusrank.
 ##
@@ -15,7 +16,8 @@
 ## but WITHOUT ANY WARRANTY without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ##
-################################################################################
+
+
 #' Clustered Non-Stratified Data for Testing Clustered Rank Sum Test
 #'
 #' Non-stratified data including 3 variables:
