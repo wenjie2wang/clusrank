@@ -17,7 +17,7 @@ then
     version=$(grep "Version" DESCRIPTION | awk '{print $NF}')
 
     # update copyright year in the template headers
-    regexp1="s/Copyright \(C\) 2015-[0-9]+/Copyright \(C\) 2015-$yr/"
+    regexp1="s/Copyright \(C\) 20([0-9]{2})-[0-9]+/Copyright \(C\) 20\1-$yr/"
     sed -i.bak -E "$regexp1" $cprt_R && rm $cprt_R.bak
     sed "s_#_/_g" $cprt_R > $cprt_cpp
 

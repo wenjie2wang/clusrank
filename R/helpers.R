@@ -18,23 +18,16 @@
 ##
 
 
-#'  Difference between Pre and Post Treatment Scores with Clustering
-#'  Structure: Unbalanced
-#'
-#'  Simulated clustered data with the difference of pre and post treatment scores recorded.
-#'  The data is unbalanced.
-#'
-#' @format A data frame with 748 rows and 2 variables.
-#'
-#'   [, 1] id cluster id
-#'
-#'   [, 2] z  score difference
-#'
-#' @name crsdUnb
-#' @docType data
-#' @source \url{https://sites.google.com/a/channing.harvard.edu
-#' /bernardrosner/channing/
-#' cluster-signed-rank-test-for
-#' -balancedunbalanced-design/sample-data-for-unbalanced-data-1}
-#' @keywords datasets internal
-NULL
+## returns the p-value for permutation tests
+perm_pvalue <- function(w0, ws, alternative)
+{
+    ## continuity correction to prevent p-value from being exactly zero
+    prob_le_w <- (sum(ws <= w0) + 0.5) / (length(ws) + 1)
+    switch(
+        alternative,
+        two.sided = 2 * min(prob_le_w, 1 - prob_le_w),
+        greater = 1 - prob_le_w,
+        less = prob_le_w,
+        stop("Unknown alternative.")
+    )
+}
