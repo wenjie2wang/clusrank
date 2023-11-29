@@ -1,4 +1,5 @@
 *.Rcheck
+*.clangd
 *.o
 *.so
 *.tar.gz

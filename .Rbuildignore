@@ -4,6 +4,7 @@
 ^TAGS$
 ^\.*\.Rproj$
 ^\.Rproj\.user$
+^\.clangd$
 ^\.github$
 ^manuscript$
 ^misc/*
