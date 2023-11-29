@@ -174,13 +174,14 @@ This function can use large amounts of memory and stack if 'exact =
 }
 
 \examples{
+library(clusrank)
+
 ## Clustered signed rank test using RGL method.
 data(crsd)
 clusWilcox.test(z, cluster = id, data = crsd, paired = TRUE, method = "rgl")
 ## or
 clusWilcox.test(z ~ cluster(id), data = crsd, paired = TRUE, method = "rgl")
-\dontrun{clusWilcox.test(z, cluster = id, data = crsd)
-## Default is rank sum test. The group variable is required.}
+
 ## Clustered rank sum test using RGL method.
 data(crd)
 clusWilcox.test(z ~ group + cluster(id), data = crd, method = "rgl")

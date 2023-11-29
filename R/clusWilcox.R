@@ -119,26 +119,14 @@
 ##' \item{df}{degrees of freedom of chi-square distribution, will be returned when there are more than 2 treatment groups and \code{ds} method is used.}
 ##' \item{nobs}{number of observations}
 ##' \item{nclus}{number of clusters}
-
 #' @section Warning:
 #' This function can use large amounts of memory and stack if 'exact =
 #'     TRUE' and one sample is large (and even crash R if the stack
 #'     limit is exceeded). Not recommended for data set
 #'     with number of clusters more than 50.
 #'
-#' @examples
-#' ## Clustered signed rank test using RGL method.
-#' data(crsd)
-#' clusWilcox.test(z, cluster = id, data = crsd, paired = TRUE, method = "rgl")
-#' ## or
-#' clusWilcox.test(z ~ cluster(id), data = crsd, paired = TRUE, method = "rgl")
-#' \dontrun{clusWilcox.test(z, cluster = id, data = crsd)
-#' ## Default is rank sum test. The group variable is required.}
-#' ## Clustered rank sum test using RGL method.
-#' data(crd)
-#' clusWilcox.test(z ~ group + cluster(id), data = crd, method = "rgl")
-#' ## or
-#' clusWilcox.test(z, cluster = id, group = group, data = crd, method = "rgl")
+#' @example inst/examples/ex-clusWilcox.R
+#'
 #' @author Yujing Jiang
 #' @references
 #' Bernard Rosner, Robert J. Glynn, Mei-Ling T. Lee (2006)
