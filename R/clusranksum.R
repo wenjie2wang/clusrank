@@ -64,32 +64,31 @@ clusWilcox.test.ranksum.rgl <- function(x, cluster, group, stratum,
 
 clusWilcox.test.ranksum.rgl.clus.exact.1 <- function(x, cluster, group,
                                                     stratum) {
-    n.obs <- length(x)
-    one <- rep(1, n.obs)
-    x[which(group == 1)] <- x[which(group == 1)]
+    ## n.obs <- length(x)
+    ## one <- rep(1, n.obs)
+    ## x[which(group == 1)] <- x[which(group == 1)]
     xrank <- rank(x)
     rksum <-stats::aggregate(xrank ~ cluster, FUN = sum)[, 2]
-    csize <-stats::aggregate(one ~ cluster, FUN = sum)[, 2]
+    ## csize <-stats::aggregate(one ~ cluster, FUN = sum)[, 2]
     grp <- stats::aggregate(group ~ cluster, FUN = mean)[, 2]
-    strt <- stats::aggregate(stratum ~ cluster, FUN = mean)[, 2]
-    clus <- unique(cluster)
-    n.clus <- length(clus)
-    dat <- data.frame(clus, strt, grp, csize, rksum)
-    bal <- (!(length(unique(table(cluster))) != 1L))
+    ## strt <- stats::aggregate(stratum ~ cluster, FUN = mean)[, 2]
+    ## clus <- unique(cluster)
+    ## n.clus <- length(clus)
+    ## dat <- data.frame(clus, strt, grp, csize, rksum)
+    ## bal <- (!(length(unique(table(cluster))) != 1L))
 
-    csize.uniq <- unique(csize)
-    strt.uniq <- unique(strt)
-    l.csu <- length(csize.uniq)
-    l.stu <- length(strt.uniq)
+    ## csize.uniq <- unique(csize)
+    ## strt.uniq <- unique(strt)
+    ## l.csu <- length(csize.uniq)
+    ## l.stu <- length(strt.uniq)
 
-    dat.l <- split(dat, strt) ## Split the rank data by stratum
-    csize.split <- function(dat) {
-        split(dat, dat$"csize")
-    }
-    dat.l <- lapply(dat.l, csize.split)
-    sum(dat[dat$grp == 1, "rksum"])
-
-
+    ## dat.l <- split(dat, strt) ## Split the rank data by stratum
+    ## csize.split <- function(dat) {
+    ##     split(dat, dat$"csize")
+    ## }
+    ## dat.l <- lapply(dat.l, csize.split)
+    ## sum(dat[dat$grp == 1, "rksum"])
+    sum(rksum[grp == 1])
 }
 
 
