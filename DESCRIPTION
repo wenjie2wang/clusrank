@@ -23,4 +23,4 @@ LazyData: true
 URL: https://github.com/wenjie2wang/clusrank
 BugReports: https://github.com/wenjie2wang/clusrank/issues
 Encoding: UTF-8
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1

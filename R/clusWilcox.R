@@ -1,8 +1,8 @@
 ##
 ## clusrank: Wilcoxon Rank Tests for Clustered Data
 ##
-## Copyright (C) 2015-2023 Yujing Jiang, Mei-Ling Ting Lee, and Jun Yan
-## Copyright (C) 2022-2023 Wenjie Wang
+## Copyright (C) 2015-2024 Yujing Jiang, Mei-Ling Ting Lee, and Jun Yan
+## Copyright (C) 2022-2024 Wenjie Wang
 ##
 ## This file is part of the R package clusrank.
 ##
@@ -158,7 +158,6 @@
 #' @importFrom Rcpp evalCpp
 #' @useDynLib clusrank, .registration = TRUE
 #' @export
-
 clusWilcox.test <- function(x, ...) {
     pars <- as.list(match.call()[-1])
     if (!is.null(pars$data)) {
@@ -186,8 +185,6 @@ clusWilcox.test <- function(x, ...) {
 #' @method clusWilcox.test formula
 #' @describeIn clusWilcox.test \code{S3} method for class 'formula'
 #' @export
-
-
 clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NULL,
                                     na.action = na.omit,
                                     alternative = c("two.sided", "less", "greater"),
@@ -269,7 +266,6 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
 #' @method clusWilcox.test default
 #' @describeIn clusWilcox.test Default \code{S3} method.
 #' @export
-
 clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
                                     group = NULL, stratum = NULL, data = NULL,
                                     alternative = c("two.sided", "less", "greater"),
