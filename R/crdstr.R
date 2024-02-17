@@ -18,23 +18,23 @@
 ##
 
 
-#' Clustered Stratified Data for Testing the Clustered Rank Sum Test
-#'
-#' Stratified data with clustering structure, Have some missing values.
-#'
-#' @format
-#' A data frame with 956 observations on 4 variables.
-#'
-#' [, 1] id      cluster id
-#'
-#' [, 2] z       score
-#'
-#' [, 3] group   group id
-#'
-#' [, 4] stratum stratum id
-#'
-#' @name crdStr
-#' @docType data
-#' @source \url{https://sites.google.com/a/channing.harvard.edu/bernardrosner/channing/incorporating-cluster-effects-for-the-wilcoxon-rank-sum-test-1/stratify--cluswilcox/sample-data}
-#' @keywords datasets internal
+##' Clustered Stratified Data for Testing the Clustered Rank Sum Test
+##'
+##' Stratified data with clustering structure, Have some missing values.
+##'
+##' @format
+##' A data frame with 956 observations on 4 variables.
+##'
+##' [, 1] id      cluster id
+##'
+##' [, 2] z       score
+##'
+##' [, 3] group   group id
+##'
+##' [, 4] stratum stratum id
+##'
+##' @name crdStr
+##' @docType data
+##' @source \url{https://sites.google.com/a/channing.harvard.edu/bernardrosner/channing/incorporating-cluster-effects-for-the-wilcoxon-rank-sum-test-1/stratify--cluswilcox/sample-data}
+##' @keywords datasets internal
 NULL

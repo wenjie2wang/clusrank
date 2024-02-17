@@ -758,7 +758,7 @@ clusWilcox.test.ranksum.rgl.sub <- function(x, cluster, group, alternative,
     }
 }
 
-#' @importFrom MASS ginv
+##' @importFrom MASS ginv
 
 clusWilcox.test.ranksum.ds.exact.1 <- function(x, cluster, group, mu) {
     group.uniq <- length(unique(group))
@@ -898,7 +898,7 @@ clusWilcox.test.ranksum.ds.exact <- function(x, cluster, group,
 }
 
 
-#' @importFrom MASS ginv
+##' @importFrom MASS ginv
 
 clusWilcox.test.ranksum.ds <- function(x, cluster, group,
                                        alternative,

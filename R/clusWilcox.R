@@ -119,45 +119,45 @@
 ##' \item{df}{degrees of freedom of chi-square distribution, will be returned when there are more than 2 treatment groups and \code{ds} method is used.}
 ##' \item{nobs}{number of observations}
 ##' \item{nclus}{number of clusters}
-#' @section Warning:
-#' This function can use large amounts of memory and stack if 'exact =
-#'     TRUE' and one sample is large (and even crash R if the stack
-#'     limit is exceeded). Not recommended for data set
-#'     with number of clusters more than 50.
-#'
-#' @example inst/examples/ex-clusWilcox.R
-#'
-#' @author Yujing Jiang
-#' @references
-#' Bernard Rosner, Robert J. Glynn, Mei-Ling T. Lee (2006)
-#' \emph{The Wilcoxon Signed Rank Test for Paired Comparisons of
-#'  Clustered Data}. Biometrics, \bold{62}, 185-192.
-#'
-#' Bernard Rosner, Robert J. Glynn, Mei-Ling T. Lee (2003)
-#' \emph{Incorporation of Clustering Effects for the Wilcoxon Rank
-#' Sum Test: A Large-Sample Approach}. Biometrics, \bold{59}, 1089-1098.
-#'
-#' Bernard Rosner, Robert J. Glynn, Mei-Ling T. Lee (2006)
-#' \emph{Extension of the Rank Sum Test for Clustered Data:
-#' Two-Group Comparisons with Group}. Biometrics, \bold{62}, 1251-1259.
-#'
-#' Somnath Datta, Glen A. Satten (2005) \emph{Rank-Sum Tests for Clustered Data}.
-#' Journal of the American Statistical Association, \bold{100}, 908-915.
-#'
-#' Somath Datta, Glen A. Satten (2008) \emph{A Signed-Rank Test for Clustered Data}.
-#' Biometrics, \bold{64}, 501-507.
-#'
-#' Sandipan Dutta, Somnath Datta (2015) \emph{A Rank-Sum Test for Clustered
-#'     Data When the Number of Subjects in a Group within a Cluster is
-#'     Informative}.
-#' Biometrics, \bold{72}, 432-440.
-#'
-#' @importFrom stats complete.cases na.omit terms complete.cases model.extract
-#'     aggregate lm ecdf pnorm qnorm var pchisq setNames lag as.formula
-#' @importFrom MASS ginv
-#' @importFrom Rcpp evalCpp
-#' @useDynLib clusrank, .registration = TRUE
-#' @export
+##' @section Warning:
+##' This function can use large amounts of memory and stack if 'exact =
+##'     TRUE' and one sample is large (and even crash R if the stack
+##'     limit is exceeded). Not recommended for data set
+##'     with number of clusters more than 50.
+##'
+##' @example inst/examples/ex-clusWilcox.R
+##'
+##' @author Yujing Jiang
+##' @references
+##' Bernard Rosner, Robert J. Glynn, Mei-Ling T. Lee (2006)
+##' \emph{The Wilcoxon Signed Rank Test for Paired Comparisons of
+##'  Clustered Data}. Biometrics, \bold{62}, 185-192.
+##'
+##' Bernard Rosner, Robert J. Glynn, Mei-Ling T. Lee (2003)
+##' \emph{Incorporation of Clustering Effects for the Wilcoxon Rank
+##' Sum Test: A Large-Sample Approach}. Biometrics, \bold{59}, 1089-1098.
+##'
+##' Bernard Rosner, Robert J. Glynn, Mei-Ling T. Lee (2006)
+##' \emph{Extension of the Rank Sum Test for Clustered Data:
+##' Two-Group Comparisons with Group}. Biometrics, \bold{62}, 1251-1259.
+##'
+##' Somnath Datta, Glen A. Satten (2005) \emph{Rank-Sum Tests for Clustered Data}.
+##' Journal of the American Statistical Association, \bold{100}, 908-915.
+##'
+##' Somath Datta, Glen A. Satten (2008) \emph{A Signed-Rank Test for Clustered Data}.
+##' Biometrics, \bold{64}, 501-507.
+##'
+##' Sandipan Dutta, Somnath Datta (2015) \emph{A Rank-Sum Test for Clustered
+##'     Data When the Number of Subjects in a Group within a Cluster is
+##'     Informative}.
+##' Biometrics, \bold{72}, 432-440.
+##'
+##' @importFrom stats complete.cases na.omit terms complete.cases model.extract
+##'     aggregate lm ecdf pnorm qnorm var pchisq setNames lag as.formula
+##' @importFrom MASS ginv
+##' @importFrom Rcpp evalCpp
+##' @useDynLib clusrank, .registration = TRUE
+##' @export
 clusWilcox.test <- function(x, ...) {
     pars <- as.list(match.call()[-1])
     if (!is.null(pars$data)) {
@@ -182,9 +182,9 @@ clusWilcox.test <- function(x, ...) {
 }
 
 
-#' @method clusWilcox.test formula
-#' @describeIn clusWilcox.test \code{S3} method for class 'formula'
-#' @export
+##' @method clusWilcox.test formula
+##' @describeIn clusWilcox.test \code{S3} method for class 'formula'
+##' @export
 clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NULL,
                                     na.action = na.omit,
                                     alternative = c("two.sided", "less", "greater"),
@@ -263,9 +263,9 @@ clusWilcox.test.formula <- function(formula, data = parent.frame(), subset = NUL
 }
 
 
-#' @method clusWilcox.test default
-#' @describeIn clusWilcox.test Default \code{S3} method.
-#' @export
+##' @method clusWilcox.test default
+##' @describeIn clusWilcox.test Default \code{S3} method.
+##' @export
 clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
                                     group = NULL, stratum = NULL, data = NULL,
                                     alternative = c("two.sided", "less", "greater"),

@@ -18,23 +18,23 @@
 ##
 
 
-#'  Difference between Pre and Post Treatment Scores with Clustering
-#'  Structure: Unbalanced
-#'
-#'  Simulated clustered data with the difference of pre and post treatment scores recorded.
-#'  The data is unbalanced.
-#'
-#' @format A data frame with 748 rows and 2 variables.
-#'
-#'   [, 1] id cluster id
-#'
-#'   [, 2] z  score difference
-#'
-#' @name crsdUnb
-#' @docType data
-#' @source \url{https://sites.google.com/a/channing.harvard.edu
-#' /bernardrosner/channing/
-#' cluster-signed-rank-test-for
-#' -balancedunbalanced-design/sample-data-for-unbalanced-data-1}
-#' @keywords datasets internal
+##'  Difference between Pre and Post Treatment Scores with Clustering
+##'  Structure: Unbalanced
+##'
+##'  Simulated clustered data with the difference of pre and post treatment scores recorded.
+##'  The data is unbalanced.
+##'
+##' @format A data frame with 748 rows and 2 variables.
+##'
+##'   [, 1] id cluster id
+##'
+##'   [, 2] z  score difference
+##'
+##' @name crsdUnb
+##' @docType data
+##' @source \url{https://sites.google.com/a/channing.harvard.edu
+##' /bernardrosner/channing/
+##' cluster-signed-rank-test-for
+##' -balancedunbalanced-design/sample-data-for-unbalanced-data-1}
+##' @keywords datasets internal
 NULL

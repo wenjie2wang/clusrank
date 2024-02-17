@@ -18,8 +18,8 @@
 ##
 
 
-#' @keywords internal
-#' @export
+##' @keywords internal
+##' @export
 print.ctest <- function (x, digits = getOption("digits"), prefix = "\t", ...)
 {
     cat("\n")
