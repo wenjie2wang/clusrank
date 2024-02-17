@@ -56,7 +56,7 @@ cluster <- function(x) {x}
 stratum <- function(x) {x}
 
 
-untangle.specials <- function (tt, special, order = 1)
+untangle_specials <- function (tt, special, order = 1)
 {
     spc <- attr(tt, "specials")[[special]]
     if (length(spc) == 0)
@@ -92,7 +92,7 @@ extractTerm <- function(term, mf, nobs, paired) {
         if (term == "group") {
             temp <- name <- term.mf
         } else {
-            temp <- untangle.specials(terms(mf), term, 1)
+            temp <- untangle_specials(terms(mf), term, 1)
             name <- gsub("[\\(\\)]", "",
                          regmatches(temp$vars,
                                     gregexpr("\\(.*?\\)", temp$vars))[[1]])

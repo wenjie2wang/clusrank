@@ -26,13 +26,11 @@ A data frame with 283 rows and 7 variables.
 The data came from Seddon's lab.
 }
 \description{
-A data set from a research on complement factor H R1210C rare variant
-and its associated phenotype.
-This data set contains Clinical
-Age-Related Maculopathy Staging (CARMS) scores
-from a total of 143 patients (283 eyes), including
-62 patients with the rare variant,
-The data is from the lab of Dr. Johanna M. Seddon,
+A data set from a research on complement factor H R1210C rare variant and
+its associated phenotype.  This data set contains Clinical Age-Related
+Maculopathy Staging (CARMS) scores from a total of 143 patients (283 eyes)
+including 62 patients with the rare variant. The data is from the lab of
+Dr. Johanna M. Seddon,
 }
 \note{
 CARMS grades were assessed separately for

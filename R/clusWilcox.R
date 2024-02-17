@@ -362,7 +362,7 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
                                 c("x", "cluster", "alternative",
                                   "mu",
                                   "METHOD", "DNAME",  "exact", "B"))
-            result <- do.call("clusWilcox.test.signedrank.rgl", c(arglist))
+            result <- do.call("clusWilcox_test_signedrank_rgl", c(arglist))
             return(result)
         }
         if (method == "ds") {
@@ -374,7 +374,7 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
                                 c("x", "cluster", "alternative",
                                   "mu", "exact", "B", "METHOD", "DNAME"))
 
-            result <-  do.call("clusWilcox.test.signedrank.ds",
+            result <-  do.call("clusWilcox_test_signedrank_ds",
                                c(arglist))
             return(result)
         }
@@ -389,7 +389,7 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
                                 c("x", "cluster", "group", "stratum",
                                   "alternative", "mu", "DNAME", "METHOD",
                                   "exact", "B"))
-            result <- do.call("clusWilcox.test.ranksum.rgl", c(arglist))
+            result <- do.call("clusWilcox_test_ranksum_rgl", c(arglist))
             return(result)
         }
         if (method == "dd") {
@@ -400,7 +400,7 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
             arglist <- setNames(list(x, cluster, group, alternative, mu, exact, B, METHOD, DNAME),
                                 c("x", "cluster", "group", "alternative",
                                   "mu", "exact", "B", "METHOD", "DNAME"))
-            result <- do.call("clusWilcox.test.ranksum.dd", c(arglist))
+            result <- do.call("clusWilcox_test_ranksum_dd", c(arglist))
             return(result)
 
         }
@@ -418,7 +418,7 @@ clusWilcox.test.default <- function(x, y = NULL, cluster = NULL,
             if (length(table(stratum)) > 1L) {
                 warning("'stratum' will be ignored for the clustered rank sum test, 'ds' method")
             }
-            result <- do.call("clusWilcox.test.ranksum.ds", c(arglist))
+            result <- do.call("clusWilcox_test_ranksum_ds", c(arglist))
             return(result)
         }
         stop("Method should be one of 'rgl', 'dd' or 'ds'.")

@@ -18,9 +18,9 @@
 ##
 
 
-clusWilcox.test.signedrank.rgl.exact <- function(x, cluster,
-                                                alternative,
-                                                mu, B, DNAME, METHOD) {
+clusWilcox_test_signedrank_rgl_exact <- function(x, cluster,
+                                                 alternative,
+                                                 mu, B, DNAME, METHOD) {
     METHOD <- paste0(METHOD, " (random permutation)")
     x <- x - mu
     data <- data.frame(x, cluster)
@@ -60,11 +60,11 @@ clusWilcox.test.signedrank.rgl.exact <- function(x, cluster,
 
 
 
-clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
+clusWilcox_test_signedrank_rgl <- function(x, cluster, alternative,
                                            mu, exact, B, DNAME, METHOD) {
 ### Ties are dropped
     if (exact == TRUE && B >= 1)
-        return(clusWilcox.test.signedrank.rgl.exact(x, cluster, alternative,
+        return(clusWilcox_test_signedrank_rgl_exact(x, cluster, alternative,
                                                    mu, B, DNAME, METHOD))
     x <- x - mu
     data <- data.frame(x, cluster)
@@ -199,7 +199,7 @@ clusWilcox.test.signedrank.rgl <- function(x, cluster, alternative,
     }
 }
 
-clusWilcox.test.signedrank.ds.exact.1 <- function(x, cluster) {
+clusWilcox_test_signedrank_ds_exact1 <- function(x, cluster) {
     order.c <- order(cluster)
     x <- x[order.c]
     cluster <- cluster[order.c]
@@ -230,9 +230,9 @@ clusWilcox.test.signedrank.ds.exact.1 <- function(x, cluster) {
 }
 
 
-clusWilcox.test.signedrank.ds.exact <- function(x, cluster, alternative,
-                                               B,
-                                               mu, DNAME, METHOD) {
+clusWilcox_test_signedrank_ds_exact <- function(x, cluster, alternative,
+                                                B, mu, DNAME, METHOD)
+{
     METHOD <- paste0(METHOD, " (random permutation)")
     T.vec <- rep(NA, B)
     x <- x - mu
@@ -241,9 +241,9 @@ clusWilcox.test.signedrank.ds.exact <- function(x, cluster, alternative,
     for ( i in 1 : B) {
         sgn.samp <- sample(c(-1, 1), n.obs, TRUE)
         x.samp <- abs(x) * sgn.samp
-        T.vec[i] <- clusWilcox.test.signedrank.ds.exact.1(x.samp, cluster)
+        T.vec[i] <- clusWilcox_test_signedrank_ds_exact1(x.samp, cluster)
     }
-    T0 <- clusWilcox.test.signedrank.ds.exact.1(x, cluster)
+    T0 <- clusWilcox_test_signedrank_ds_exact1(x, cluster)
     pval <- perm_pvalue(T0, T.vec, alternative)
     names(n.obs) <- "total number of observations"
     names(n.clus) <- "total number of clusters"
@@ -259,16 +259,16 @@ clusWilcox.test.signedrank.ds.exact <- function(x, cluster, alternative,
 }
 
 
-clusWilcox.test.signedrank.ds <- function(x, cluster, alternative, exact, B,
+clusWilcox_test_signedrank_ds <- function(x, cluster, alternative, exact, B,
                                           mu, DNAME, METHOD) {
 
 
-    if (exact == TRUE & B >= 1){
-        return(clusWilcox.test.signedrank.ds.exact(x, cluster, alternative,
+    if (exact == TRUE && B >= 1){
+        return(clusWilcox_test_signedrank_ds_exact(x, cluster, alternative,
                                                   B, mu, DNAME, METHOD))
     }
 
-    if (exact == TRUE & B == 0) {
+    if (exact == TRUE && B == 0) {
         warning("Exact test is not provided for DS method for signed rank test, large-sample test will be carried out")
     }
 
